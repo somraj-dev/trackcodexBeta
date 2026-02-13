@@ -1,0 +1,23 @@
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findFirst()` invocation in
+C:\Users\HP\TrackcodexBeta-main\backend\routes\auth.ts:63:48
+
+  60 }
+  61 
+  62 // 2. Check for existing user (Atomic check not possible without constraints, catching constraint violation below)
+→ 63 const existingUser = await prisma.user.findFirst(
+The column `User.characterId` does not exist in the current database.
+PrismaClientKnownRequestError: 
+Invalid `prisma.user.findFirst()` invocation in
+C:\Users\HP\TrackcodexBeta-main\backend\routes\auth.ts:63:48
+
+  60 }
+  61 
+  62 // 2. Check for existing user (Atomic check not possible without constraints, catching constraint violation below)
+→ 63 const existingUser = await prisma.user.findFirst(
+The column `User.characterId` does not exist in the current database.
+    at _n.handleRequestError (C:\Users\HP\TrackcodexBeta-main\node_modules\@prisma\client\runtime\library.js:123:6854)
+    at _n.handleAndLogRequestError (C:\Users\HP\TrackcodexBeta-main\node_modules\@prisma\client\runtime\library.js:123:6188)
+    at _n.request (C:\Users\HP\TrackcodexBeta-main\node_modules\@prisma\client\runtime\library.js:123:5896)
+    at async l (C:\Users\HP\TrackcodexBeta-main\node_modules\@prisma\client\runtime\library.js:128:10871)
+    at async Object.<anonymous> (C:\Users\HP\TrackcodexBeta-main\backend\routes\auth.ts:63:30)

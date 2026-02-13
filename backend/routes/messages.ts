@@ -183,10 +183,13 @@ export async function messageRoutes(fastify: FastifyInstance) {
     // Assuming RealtimeService is setup for this or we just accept poll for now.
     // Let's assume polling in Phase 1, but we'll add the hook if RealtimeService exists.
     try {
-      // Broadcast logic here if RealtimeService supports room emission
-      // RealtimeService.to(`conversation:${id}`).emit("new_message", message);
+      // Broadcast to specific conversation room
+      RealtimeService.broadcastToRoom(id, {
+        type: "new_message",
+        ...message,
+      });
     } catch (e) {
-      // harmless fail for now if socket not ready
+      request.log.warn("Failed to broadcast message via socket", e);
     }
 
     return message;

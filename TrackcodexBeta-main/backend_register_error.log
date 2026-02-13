@@ -1,0 +1,12 @@
+Error: Password must be at least 8 characters
+Error: Password must be at least 8 characters
+    at BadRequest (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\backend\utils\AppError.ts:23:3)
+    at Object.<anonymous> (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\backend\routes\auth.ts:59:17)
+    at routeOptions.handler (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\@fastify\websocket\index.js:208:24)
+    at preHandlerCallbackInner (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\handle-request.js:160:24)
+    at preHandlerCallback (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\handle-request.js:126:5)
+    at validationCompleted (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\handle-request.js:116:5)
+    at preValidationCallback (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\handle-request.js:93:5)
+    at handler (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\handle-request.js:70:7)
+    at onDone (C:\Users\HP\Downloads\TrackcodexBeta-main\TrackcodexBeta-main\node_modules\fastify\lib\content-type-parser.js:219:5)
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)

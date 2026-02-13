@@ -1,0 +1,173 @@
+/* LandingPage.css */
+.landing-container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f5f5f7; /* Light premium gray */
+  background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.8) 0%, rgba(245, 245, 247, 1) 100%);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Navbar */
+.landing-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.nav-brand {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: #1d1d1f;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-link {
+  font-size: 14px;
+  color: #1d1d1f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+  opacity: 0.7;
+}
+
+.btn-pill {
+  background: #1d1d1f;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-pill:hover {
+  transform: scale(1.02);
+  background-color: #000;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: 140px;
+  padding-bottom: 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-title {
+  font-size: 80px;
+  line-height: 1.05;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  max-width: 900px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+.hero-subtitle {
+  font-size: 24px;
+  line-height: 1.4;
+  color: #86868b;
+  max-width: 600px;
+  margin-bottom: 40px;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out 0.2s forwards;
+}
+
+.hero-cta-group {
+  opacity: 0;
+  animation: fadeUp 0.8s ease-out 0.4s forwards;
+}
+
+.btn-large {
+  padding: 14px 32px;
+  font-size: 16px;
+}
+
+/* Illustration Container */
+.illustration-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  height: 600px; /* Adjust based on image aspect ratio */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.6s forwards;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 700px;
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 48px;
+    padding: 0 20px;
+  }
+  
+  .hero-subtitle {
+    font-size: 18px;
+    padding: 0 20px;
+  }
+  
+  .landing-nav {
+    padding: 20px;
+  }
+}

@@ -4,8 +4,7 @@ import { UserProfile } from "../../services/profile";
 import { enterpriseApi, Enterprise } from "../../services/enterprise";
 
 interface MenuItemProps {
-  icon?: string;
-  customImage?: React.ReactNode;
+  icon: string;
   label: string;
   onClick: () => void;
   badge?: string;
@@ -14,7 +13,6 @@ interface MenuItemProps {
 
 const MenuItem = ({
   icon,
-  customImage,
   label,
   onClick,
   badge,
@@ -24,15 +22,9 @@ const MenuItem = ({
     onClick={onClick}
     className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] text-gh-text-secondary hover:text-white hover:bg-white/5 transition-colors group text-left"
   >
-    {customImage ? (
-      <div className="w-[18px] h-[18px] opacity-70 group-hover:opacity-100 flex items-center justify-center">
-        {customImage}
-      </div>
-    ) : (
-      <span className="material-symbols-outlined !text-[18px] opacity-70 group-hover:opacity-100">
-        {icon}
-      </span>
-    )}
+    <span className="material-symbols-outlined !text-[18px] opacity-70 group-hover:opacity-100">
+      {icon}
+    </span>
     <span className="flex-1">{label}</span>
     {badge && (
       <span
@@ -58,10 +50,6 @@ const UserProfileDropdown = ({
   const navigate = useNavigate();
   const [enterprises, setEnterprises] = React.useState<Enterprise[]>([]);
 
-  React.useEffect(() => {
-    loadEnterprises();
-  }, []);
-
   const loadEnterprises = async () => {
     try {
       const data = await enterpriseApi.getMyEnterprises();
@@ -71,13 +59,17 @@ const UserProfileDropdown = ({
     }
   };
 
+  React.useEffect(() => {
+    loadEnterprises();
+  }, []);
+
   const handleNavigate = (path: string) => {
     navigate(path);
     onClose();
   };
 
   return (
-    <div className="absolute top-full right-0 mt-2 w-72 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-[500] py-3 backdrop-blur-xl bg-gh-bg-secondary/95">
+    <div className="absolute top-full right-0 mt-2 w-72 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-[500] py-3 animate-in fade-in zoom-in-95 duration-200 backdrop-blur-xl bg-gh-bg-secondary/95">
       {/* Header Info */}
       <div
         onClick={() => handleNavigate("/profile")}
@@ -95,7 +87,7 @@ const UserProfileDropdown = ({
                 {profile.name}
               </span>
               <span className="text-[12px] text-gh-text-secondary truncate">
-                {profile.username || "Trackcodex"}
+                {profile.username || "TrackCodex User"}
               </span>
             </div>
           </div>
@@ -143,9 +135,9 @@ const UserProfileDropdown = ({
           onClick={() => handleNavigate("/editor")}
         />
         <MenuItem
-          icon="business"
+          icon="corporate_fare"
           label="StrataHub"
-          onClick={() => handleNavigate("/stratahub")}
+          onClick={() => handleNavigate("/organizations")}
         />
         <MenuItem
           icon="favorite"
@@ -153,7 +145,7 @@ const UserProfileDropdown = ({
           onClick={() => handleNavigate("/community")}
         />
         <MenuItem
-          icon="task_alt"
+          icon="inventory_2"
           label="TaskVault"
           onClick={() => handleNavigate("/tasks")}
         />

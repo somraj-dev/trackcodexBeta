@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSidebarState } from "../../hooks/useSidebarState";
 import { profileService, UserProfile } from "../../services/profile";
 import SidebarItem from "./SidebarItem";
-import { MOCK_ORGANIZATIONS } from "../../constants";
 import { isAdmin as checkIsAdmin } from "../../auth/AccessMatrix";
 
 import { useNavigate } from "react-router-dom";
@@ -17,10 +16,6 @@ const OrgSwitcher = ({
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-    setIsOpen(false);
-  };
 
   return (
     <div className="relative">
@@ -136,7 +131,6 @@ const Sidebar = () => {
         </button>
       </div>
 
-      {/* Primary Navigation - Flat Hierarchy */}
       <div className="flex-1 overflow-y-auto custom-scrollbar py-4 space-y-1">
         <SidebarItem
           to="/dashboard/home"
@@ -145,7 +139,7 @@ const Sidebar = () => {
           isExpanded={isExpanded}
         />
 
-        {/* Role Restricted Admin Panel - moved to top */}
+        {/* Role Restricted Admin Panel - Moved to position 2 */}
         {isAdmin && (
           <SidebarItem
             to="/admin"
@@ -205,7 +199,7 @@ const Sidebar = () => {
           isExpanded={isExpanded}
         />
 
-        {/* Platform Matrix - moved to bottom */}
+        {/* Separator and Bottom Items */}
         <div className="pt-4 mt-4 border-t border-gh-border">
           <SidebarItem
             to="/platform-matrix"
@@ -216,31 +210,6 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* User Quick Profile - Static Display Only */}
-      <div className="p-3 bg-gh-bg-secondary shrink-0">
-        <div
-          className={`flex items-center gap-3 p-2 rounded-xl transition-colors ${!isExpanded ? "justify-center" : ""}`}
-        >
-          <div className="relative shrink-0">
-            <img
-              src={profile.avatar}
-              className="size-8 rounded-lg border border-gh-border transition-colors object-cover"
-              alt=""
-            />
-            <div className="absolute -bottom-0.5 -right-0.5 size-2.5 bg-emerald-500 rounded-full border-2 border-gh-bg" />
-          </div>
-          {isExpanded && (
-            <div className="flex flex-col min-w-0 flex-1 animate-in fade-in duration-300">
-              <span className="text-[12px] font-bold text-gh-text truncate leading-none mb-1">
-                {profile.name}
-              </span>
-              <span className="text-[9px] text-gh-text-secondary font-black uppercase tracking-widest">
-                {profile.systemRole}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
     </aside>
   );
 };

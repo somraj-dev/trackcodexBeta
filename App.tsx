@@ -17,6 +17,7 @@ import { RealtimeProvider } from "./contexts/RealtimeContext";
 const Login = React.lazy(() => import("./views/auth/Login"));
 const Signup = React.lazy(() => import("./views/auth/Signup"));
 const OAuthCallback = React.lazy(() => import("./views/auth/OAuthCallback"));
+const LandingPage = React.lazy(() => import("./views/LandingPage"));
 
 // Layout Components
 
@@ -26,11 +27,9 @@ import MessagingPanel from "./components/messaging/MessagingPanel";
 import SplashScreen from "./components/branding/SplashScreen";
 import SettingsLayout from "./components/settings/SettingsLayout";
 import CommandPalette from "./components/layout/CommandPalette";
-import GlobalSearchProvider from "./components/search/GlobalSearchProvider";
 import ChatWidget from "./components/social/ChatWidget"; // Global Chat
 import RedirectToLogin from "./components/auth/RedirectToLogin";
 
-import NotificationsModalView from "./components/notifications/NotificationsModal";
 import UserProfileDropdown from "./components/profile/UserProfileDropdown";
 import { profileService, UserProfile } from "./services/profile";
 
@@ -54,14 +53,10 @@ import WorkspaceIDE from "./views/ide/IDEShim"; // Native Monaco IDE
 const HomeView = React.lazy(() => import("./views/Home"));
 const ExploreView = React.lazy(() => import("./views/Explore"));
 const LibraryView = React.lazy(() => import("./views/Library"));
-const SearchResultsView = React.lazy(() => import("./views/SearchResults"));
 const ForgeAIView = React.lazy(() => import("./views/ForgeAI"));
 const NotificationsView = React.lazy(() => import("./views/NotificationsView"));
 const AcceptInvite = React.lazy(() => import("./views/AcceptInvite"));
 const WorkspaceSettings = React.lazy(() => import("./views/WorkspaceSettings"));
-const LevelView = React.lazy(() => import("./views/LevelView"));
-const StrataHub = React.lazy(() => import("./views/StrataHub"));
-const TaskVault = React.lazy(() => import("./views/TaskVault"));
 const AdminRoomView = React.lazy(() => import("./views/Admin"));
 const PlatformMatrix = React.lazy(() => import("./views/PlatformMatrix"));
 const Terms = React.lazy(() => import("./views/legal/Terms"));
@@ -73,9 +68,6 @@ const CookiePolicy = React.lazy(() => import("./views/legal/CookiePolicy"));
 import { CookieConsent } from "./components/legal/CookieConsent";
 import RoleGuard from "./auth/RoleGuard";
 const CommunityView = React.lazy(() => import("./views/Community"));
-const ProjectBoardKanban = React.lazy(
-  () => import("./views/ProjectBoardKanban"),
-);
 const DiscussionDetail = React.lazy(() => import("./views/DiscussionDetail"));
 
 // Organization Views
@@ -312,11 +304,10 @@ interface NotificationItem {
   time?: string; // Keep for fallback mock data
 }
 
-const ProtectedApp = () => {
+const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
   const [notification, setNotification] = useState<NotificationItem | null>(
     null,
   );
-  const [isFocusMode] = useState(false);
   const mainScrollRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -345,8 +336,6 @@ const ProtectedApp = () => {
   }, []);
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isNotificationsModalOpen, setIsNotificationsModalOpen] =
-    useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -357,6 +346,7 @@ const ProtectedApp = () => {
   useEffect(() => {
     return profileService.subscribe(setProfile);
   }, []);
+
   const isIdeView = ["/editor", "/workspace/", "/trials/live-session"].some(
     (path) => location.pathname.includes(path),
   );
@@ -367,9 +357,7 @@ const ProtectedApp = () => {
       // Save: Ctrl+S or Cmd+S
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault(); // Prevent browser save
-        // console.log("Global Save Triggered");
         logActivity("save", { context: location.pathname });
-        // In a real app, we'd also trigger the active editor's save method via context
         setNotification({
           id: `save-notif-${Date.now()}`,
           type: "info" as const,
@@ -463,11 +451,15 @@ const ProtectedApp = () => {
       ];
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden text-gh-text font-display bg-gh-bg transition-colors duration-300">
+    <div className="flex flex-col h-full w-full overflow-hidden text-gh-text font-display bg-gh-bg transition-colors duration-300">
       {notification && (
         <div className="fixed top-12 right-12 z-[500] bg-gh-bg-secondary border border-gh-border/30 rounded-2xl p-6 shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col gap-6 max-w-sm ring-2 ring-black/50 ring-inset">
           <div className="flex items-start gap-4">
-            {/* ... existing toast UI ... */}
+            <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
+              <span className="material-symbols-outlined !text-[20px]">
+                {notification.type === "job" ? "work" : "notifications"}
+              </span>
+            </div>
             <div className="min-w-0">
               <h4 className="text-[15px] font-black text-gh-text uppercase tracking-tight truncate">
                 {notification.title}
@@ -494,7 +486,7 @@ const ProtectedApp = () => {
           ref={mainScrollRef}
           className={`flex-1 min-w-0 flex flex-col bg-gh-bg relative ${isIdeView || isFocusMode ? "overflow-hidden" : "overflow-y-auto custom-scrollbar"}`}
         >
-          {/* Global Search Header - Visible on all non-IDE pages if desired, or just home. User wants 'Global'. */}
+          {/* Global Search Header */}
           {!isIdeView && !isFocusMode && (
             <div className="h-14 border-b border-gh-border grid grid-cols-[1fr_auto_1fr] items-center px-6 bg-gh-bg shrink-0 sticky top-0 z-40">
               <div className="flex items-center">
@@ -507,7 +499,6 @@ const ProtectedApp = () => {
                     arrow_back
                   </span>
                 </button>
-                {/* Left Spacer / Breadcrumbs placeholder */}
               </div>
 
               <div
@@ -518,39 +509,32 @@ const ProtectedApp = () => {
                   search
                 </span>
                 <span className="text-sm text-gh-text-secondary group-hover:text-gh-text flex-1">
-                  Type{" "}
-                  <kbd className="border border-gh-border rounded px-1 text-[10px] bg-gh-bg">
-                    /
-                  </kbd>{" "}
-                  to search
+                  Type <kbd className="border border-gh-border rounded px-1 text-[10px] bg-gh-bg">/</kbd> to search
                 </span>
               </div>
 
               <div className="flex items-center justify-end gap-4">
-                {/* Notifications Dropdown */}
+                {/* Notifications Bell */}
                 <div className="relative notifications-container">
                   <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className={`text-gh-text-secondary hover:text-white transition-colors relative ${isNotificationsOpen ? "text-gh-text" : ""}`}
-                    title="Notifications"
+                    className="text-gh-text-secondary hover:text-white transition-colors relative h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white/5"
                   >
                     <span className="material-symbols-outlined !text-[20px]">
                       notifications
                     </span>
-                    {displayNotifications.some(
-                      (n: NotificationItem) => !n.read,
-                    ) && (
-                        <span className="absolute top-0 right-0 size-2 bg-blue-500 rounded-full border-2 border-gh-bg"></span>
-                      )}
+                    {displayNotifications.some((n) => !n.read) && (
+                      <span className="absolute top-1.5 right-1.5 size-2 bg-primary rounded-full ring-2 ring-gh-bg-secondary" />
+                    )}
                   </button>
 
                   {isNotificationsOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-80 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-3 border-b border-gh-border bg-gh-bg">
-                        <span className="text-xs font-black uppercase tracking-widest text-gh-text">
+                    <div className="absolute top-full right-0 mt-2 w-80 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      <div className="px-4 py-3 border-b border-gh-border bg-gh-bg flex justify-between items-center">
+                        <span className="text-xs font-bold text-gh-text">
                           Notifications
                         </span>
-                        <button className="text-[10px] text-primary hover:underline">
+                        <button className="text-[10px] text-primary hover:underline font-bold">
                           Mark all read
                         </button>
                       </div>
@@ -558,48 +542,24 @@ const ProtectedApp = () => {
                         {displayNotifications.map((notif: NotificationItem) => (
                           <div
                             key={notif.id}
-                            className={`px-4 py-3 border-b border-gh-border/50 hover:bg-gh-bg transition-colors cursor-pointer group ${!notif.read ? "bg-primary/5" : ""}`}
+                            className={`px-4 py-3 border-b border-gh-border/50 hover:bg-gh-bg transition-colors cursor-pointer ${!notif.read ? "bg-primary/5" : ""}`}
                           >
                             <div className="flex items-start gap-3">
-                              <div
-                                className={`mt-0.5 size-8 rounded-lg flex items-center justify-center shrink-0 ${notif.type === "job"
-                                  ? "bg-amber-500/10 text-amber-500"
-                                  : notif.type === "comment"
-                                    ? "bg-blue-500/10 text-blue-500"
-                                    : notif.type === "community"
-                                      ? "bg-purple-500/10 text-purple-500"
-                                      : "bg-gh-text-secondary/10 text-gh-text-secondary"
-                                  }`}
-                              >
+                              <div className="size-8 rounded-lg bg-gh-bg flex items-center justify-center text-gh-text-secondary border border-gh-border/50">
                                 <span className="material-symbols-outlined !text-[16px]">
-                                  {notif.type === "job"
-                                    ? "work"
-                                    : notif.type === "comment"
-                                      ? "chat_bubble"
-                                      : notif.type === "community"
-                                        ? "local_fire_department"
-                                        : "info"}
+                                  {notif.type === "job" ? "work" : "info"}
                                 </span>
                               </div>
-                              <div>
-                                <div className="flex items-center justify-between mb-0.5">
-                                  <h5
-                                    className={`text-sm font-bold ${!notif.read ? "text-gh-text" : "text-gh-text-secondary"}`}
-                                  >
+                              <div className="min-w-0 flex-1">
+                                <div className="flex justify-between items-start mb-0.5">
+                                  <h5 className="text-sm font-bold text-gh-text truncate">
                                     {notif.title}
                                   </h5>
-                                  <span className="text-[10px] text-gh-text-secondary">
-                                    {notif.createdAt
-                                      ? new Date(
-                                        notif.createdAt,
-                                      ).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })
-                                      : "Now"}
+                                  <span className="text-[10px] text-gh-text-secondary whitespace-nowrap ml-2">
+                                    Now
                                   </span>
                                 </div>
-                                <p className="text-xs text-gh-text-secondary leading-relaxed line-clamp-2 group-hover:text-gh-text">
+                                <p className="text-xs text-gh-text-secondary line-clamp-2">
                                   {notif.message}
                                 </p>
                               </div>
@@ -612,43 +572,26 @@ const ProtectedApp = () => {
                           setIsNotificationsOpen(false);
                           navigate("/notifications");
                         }}
-                        className="w-full py-2 text-[10px] font-bold text-gh-text-secondary hover:text-white bg-gh-bg border-t border-gh-border transition-colors uppercase tracking-widest"
+                        className="w-full py-2.5 text-[10px] font-black uppercase tracking-widest text-gh-text-secondary hover:text-white bg-gh-bg border-t border-gh-border transition-colors"
                       >
-                        View All Notifications
+                        View All
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* Notifications Modal */}
-                <NotificationsModalView
-                  isOpen={isNotificationsModalOpen}
-                  onClose={() => setIsNotificationsModalOpen(false)}
-                  notifications={displayNotifications}
-                  onMarkAllRead={() => {
-                    const updated = notifications.map((n) => ({
-                      ...n,
-                      read: true,
-                    }));
-                    setNotifications(updated);
-                    // Ideally call API to mark read here
-                  }}
-                />
-
-                {/* Add Menu Dropdown */}
+                {/* Add Menu */}
                 <div className="relative add-menu-container">
                   <button
                     onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-                    className={`text-gh-text-secondary hover:text-white transition-colors ${isAddMenuOpen ? "text-white" : ""}`}
-                    title="Create New..."
+                    className="text-gh-text-secondary hover:text-white transition-colors h-8 w-8 flex items-center justify-center rounded-lg hover:bg-white/5"
                   >
                     <span className="material-symbols-outlined !text-[20px]">
-                      add
+                      add_circle
                     </span>
                   </button>
-
                   {isAddMenuOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-48 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
                       <div className="px-3 py-2 border-b border-gh-border mb-1">
                         <span className="text-[10px] font-black uppercase tracking-widest text-gh-text-secondary">
                           Create New
@@ -659,7 +602,7 @@ const ProtectedApp = () => {
                           setIsAddMenuOpen(false);
                           navigate("/workspace/new");
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
                       >
                         <span className="material-symbols-outlined !text-[16px]">
                           laptop_mac
@@ -671,7 +614,7 @@ const ProtectedApp = () => {
                           setIsAddMenuOpen(false);
                           navigate("/repositories");
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
                       >
                         <span className="material-symbols-outlined !text-[16px]">
                           folder_open
@@ -681,50 +624,33 @@ const ProtectedApp = () => {
                       <button
                         onClick={() => {
                           setIsAddMenuOpen(false);
-                          navigate("/marketplace/missions");
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
-                      >
-                        <span className="material-symbols-outlined !text-[16px]">
-                          rocket_launch
-                        </span>
-                        Mission
-                      </button>
-                      <div className="h-px bg-gh-border my-1"></div>
-                      <button
-                        onClick={() => {
-                          setIsAddMenuOpen(false);
                           navigate("/organizations");
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
                       >
                         <span className="material-symbols-outlined !text-[16px]">
-                          domain
+                          corporate_fare
                         </span>
-                        Organization
+                        Strata
                       </button>
                     </div>
                   )}
                 </div>
 
+                {/* Profile Dropdown */}
                 <div className="relative profile-dropdown-container">
-                  <button
+                  <div
                     onClick={() =>
                       setIsProfileDropdownOpen(!isProfileDropdownOpen)
                     }
-                    className={`cursor-pointer p-1.5 rounded-full outline-none group ${isProfileDropdownOpen
-                      ? "bg-gh-bg-tertiary ring-2 ring-primary/30"
-                      : "hover:bg-gh-bg-tertiary hover:ring-2 hover:ring-gh-border/50"
-                      }`}
-                    title="Profile Settings"
+                    className="cursor-pointer"
                   >
                     <img
                       src={profile.avatar}
-                      className="size-7 rounded-full border border-gh-border object-cover"
+                      className="size-6 rounded-full border border-gh-border hover:border-gh-text transition-colors"
                       alt="Profile"
                     />
-                  </button>
-
+                  </div>
                   {isProfileDropdownOpen && (
                     <UserProfileDropdown
                       profile={profile}
@@ -737,29 +663,15 @@ const ProtectedApp = () => {
             </div>
           )}
 
-          {/* ErrorBoundary wrapping Routes for safety */}
           <ErrorBoundary>
-            {/* Suspense removed for debugging */}
-            {/* <React.Suspense fallback={...}> */}
             <Routes>
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/status" element={<Status />} />
-              <Route path="/security" element={<Security />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/cookies" element={<CookiePolicy />} />
-              <Route path="/cookies" element={<CookiePolicy />} />
               <Route path="/" element={<Navigate to="/dashboard/home" />} />
               <Route path="/dashboard/home" element={<HomeView />} />
               <Route path="/onboarding/welcome" element={<WelcomeView />} />
-
-              {/* Enterprise */}
               <Route
                 path="/enterprise/:slug"
                 element={<EnterpriseDashboard />}
               />
-
-              {/* Protected Routes */}
               <Route path="/accept-invite" element={<AcceptInvite />} />
               <Route path="/explore" element={<ExploreView />} />
               <Route path="/platform-matrix" element={<PlatformMatrix />} />
@@ -781,16 +693,14 @@ const ProtectedApp = () => {
               />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/profile/:userId" element={<PublicProfile />} />
-              <Route path="/stars" element={<LevelView />} />
-              <Route path="/stratahub" element={<StrataHub />} />
-              <Route path="/tasks" element={<TaskVault />} />
+              <Route
+                path="/stars"
+                element={<Navigate to="/repositories" replace />}
+              />
               <Route path="/notifications" element={<NotificationsView />} />
               <Route path="/org-dashboard" element={<AdminDashboard />} />
 
-              <Route
-                path="/organizations"
-                element={<OrganizationIndexView />}
-              />
+              <Route path="/organizations" element={<OrganizationIndexView />} />
               <Route path="/org/:orgId" element={<OrganizationDetailView />}>
                 <Route index element={<OrgOverview />} />
                 <Route path="repositories" element={<OrgRepositories />} />
@@ -861,6 +771,7 @@ const ProtectedApp = () => {
 
                 <Route path="*" element={<Navigate to="missions" replace />} />
               </Route>
+
               <Route
                 path="/dashboard/jobs"
                 element={<Navigate to="/marketplace/missions" replace />}
@@ -882,13 +793,11 @@ const ProtectedApp = () => {
               </Route>
 
               <Route path="/finance" element={<WalletDashboard />} />
-
               <Route path="/welcome/:userId" element={<WelcomeView />} />
               <Route
                 path="/offer/:offerId/accept"
                 element={<OfferAcceptanceView />}
               />
-
               <Route
                 path="/trials/submitted/:trialId"
                 element={<TrialSubmittedView />}
@@ -950,16 +859,11 @@ const ProtectedApp = () => {
 
               <Route path="*" element={<Navigate to="/dashboard/home" />} />
             </Routes>
-
-            <Footer />
-            <CookieConsent />
-            {/* </React.Suspense> */}
           </ErrorBoundary>
         </main>
       </div>
-      {/* StatusBar removed */}
       {!isFocusMode && <MessagingPanel />}
-      <ChatWidget /> {/* Global Real-Time Chat */}
+      <ChatWidget />
       <CommandPalette
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
@@ -970,44 +874,48 @@ const ProtectedApp = () => {
 
 const AppContent = () => {
   const { isAuthenticated, isLoading } = useAuth();
-  // Removed artificial delay
-  const [isAppLoading, setIsAppLoading] = useState(false);
+  const [isAppLoading] = useState(false);
 
   if (isLoading || isAppLoading) {
-    console.log("AppContent: Showing SplashScreen");
     return <SplashScreen />;
   }
 
   return (
     <React.Suspense fallback={<SplashScreen />}>
-      <Routes>
-        {!isAuthenticated ? (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/auth/callback/:provider"
-              element={<OAuthCallback />}
-            />
-            <Route path="*" element={<RedirectToLogin />} />
-          </>
-        ) : (
-          <Route path="/*" element={<ProtectedApp />} />
-        )}
-      </Routes>
+      <div className="flex flex-col h-screen overflow-hidden">
+        <main className="flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar">
+          <Routes>
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/status" element={<Status />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/cookies" element={<CookiePolicy />} />
+            {!isAuthenticated ? (
+              <>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route
+                  path="/auth/callback/:provider"
+                  element={<OAuthCallback />}
+                />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="*" element={<RedirectToLogin />} />
+              </>
+            ) : (
+              <Route path="/*" element={<ProtectedApp isFocusMode={false} />} />
+            )}
+          </Routes>
+        </main>
+        <Footer />
+        <CookieConsent />
+      </div>
     </React.Suspense>
   );
 };
 
-// This component now correctly consumes useAuth (because it's wrapped by AuthProvider in App)
-// and handles the conditional rendering of RealtimeProvider.
 const AppWithProviders = () => {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  console.log("AppWithProviders Render:", {
-    isAuthenticated,
-    isLoading,
-    userId: user?.id,
-  });
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <NotificationProvider>

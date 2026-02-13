@@ -211,7 +211,7 @@ const CommunityView = () => {
                           src={post.author.avatar}
                           alt={post.author.name}
                           className="size-10 rounded-full border border-[#30363d] cursor-pointer"
-                          onClick={() => navigate(`/marketplace/growth/profile/${post.author.id}`)}
+                          onClick={() => navigate(`/profile/${post.author.id}`)}
                         />
                         {/* Hover Card */}
                         <div className="hidden group-hover/author:block absolute top-8 left-0 z-50 pt-2">
@@ -222,7 +222,7 @@ const CommunityView = () => {
                         <div className="flex items-center gap-2">
                           <span
                             className="text-[15px] font-bold text-[#c9d1d9] hover:underline cursor-pointer"
-                            onClick={() => navigate(`/marketplace/growth/profile/${post.author.id}`)}
+                            onClick={() => navigate(`/profile/${post.author.id}`)}
                           >
                             {post.author.name}
                           </span>

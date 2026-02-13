@@ -120,8 +120,8 @@ const DEFAULT_PROFILE: UserProfile = {
     },
   ],
   techStatus: {
-    emoji: "😁",
-    text: "Building cool stuff",
+    emoji: "🚀",
+    text: "Building the future with TrackCodex",
   },
 };
 

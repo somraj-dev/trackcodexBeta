@@ -4,7 +4,7 @@ import { profileService, UserProfile } from "../services/profileService";
 import { activityService, Activity } from "../services/activityService";
 import { useAuth } from "../context/AuthContext";
 import { FollowListModal } from "../components/profile/FollowListModal";
-import { ChatDialog } from "../components/chat/ChatDialog";
+import { ChatInterface } from "../components/chat/ChatInterface";
 import PortfolioDisplay from "../components/profile/PortfolioDisplay";
 import RepositoryShowcase from "../components/profile/RepositoryShowcase";
 import PinnedItemsGrid from "../components/profile/PinnedItemsGrid";
@@ -281,12 +281,18 @@ export const PublicProfile: React.FC = () => {
             )}
           </div>
 
-          <ChatDialog
+          <ChatInterface
             isOpen={chatOpen}
             onClose={() => setChatOpen(false)}
-            targetUserId={profile.id}
-            targetUserName={profile.name}
-            currentUserId={currentUser?.id || ""}
+            targetUser={{
+              id: profile.id,
+              username: profile.username || profile.name,
+              avatar: profile.avatar || "/default-avatar.png",
+            }}
+            currentUser={{
+              id: currentUser?.id || "",
+              avatar: currentUser?.avatar || "/default-avatar.png",
+            }}
           />
 
           {profile.bio && (

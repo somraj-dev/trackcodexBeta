@@ -33,8 +33,6 @@ import { wikiRoutes } from "./wiki";
 import { messageRoutes } from "./messages";
 import portfolioRoutes from "./portfolio";
 import statsRoutes from "./stats";
-import { gamificationRoutes } from "./gamification";
-import { characterRoutes } from "./characters";
 
 export async function routes(fastify: FastifyInstance) {
   // Middleware - DISABLED FOR DEBUGGING
@@ -81,10 +79,6 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(statsRoutes, { prefix: "/stats" });
 
   await fastify.register(messageRoutes);
-
-  // Gamification System
-  await fastify.register(gamificationRoutes);
-  await fastify.register(characterRoutes);
 
   const { default: deploymentRoutes } = await import("./deployments");
   await fastify.register(deploymentRoutes);

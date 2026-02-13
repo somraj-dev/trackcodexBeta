@@ -30,7 +30,7 @@ export interface Post {
   title?: string;
   content: string;
   type: PostType;
-  author: { id: string; name: string; avatar: string; role?: string };
+  author: { id: string; name: string; username: string; avatar: string; role?: string; karma: number };
   createdAt: string;
   comments: Comment[];
   likes: number;
@@ -94,8 +94,10 @@ const MOCK_POSTS: Post[] = [
     author: {
       id: "u1",
       name: "TrackCodex Team",
+      username: "trackcodexteam",
       avatar: "https://github.com/Quantaforge-trackcodex.png",
       role: "Core Team",
+      karma: 9001,
     },
     createdAt: new Date().toISOString(),
     comments: [],
@@ -109,8 +111,10 @@ const MOCK_POSTS: Post[] = [
     author: {
       id: "u2",
       name: "Sarah Chen",
+      username: "sarahchen",
       avatar: "https://i.pravatar.cc/150?u=sarah",
       role: "Frontend Lead",
+      karma: 4200,
     },
     createdAt: new Date(Date.now() - 3600000).toISOString(),
     comments: [],
@@ -127,7 +131,9 @@ const MOCK_POSTS: Post[] = [
     author: {
       id: "u3",
       name: "Rust Foundation",
+      username: "rustlang",
       avatar: "https://avatars.githubusercontent.com/u/5430905?s=200&v=4",
+      karma: 8800,
     },
     createdAt: new Date(Date.now() - 7200000).toISOString(),
     comments: [],
