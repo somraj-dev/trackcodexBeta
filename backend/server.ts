@@ -246,22 +246,24 @@ async function bootstrap() {
         console.warn("[WARN] Multipart/Artifacts failed to load:", (err as Error).message);
     }
 
-    // Root Health Check - ONLY IN DEV
-    // In production, fastify-static handles "/" via index.html
-    if (process.env.NODE_ENV !== "production") {
-        server.get("/", async (request, reply) => {
-            // If browser request, redirect to frontend
-            if (request.headers["accept"]?.includes("text/html")) {
-                return reply.redirect(process.env.FRONTEND_URL || "http://localhost:3001");
-            }
+    // Root Health Check
+    server.get("/", async (request, reply) => {
+        // If static files aren't enabled or it's an API-like request
+        if (!process.env.SERVE_STATIC || request.headers["accept"]?.includes("application/json")) {
             return {
                 status: "online",
                 message: "TrackCodex Backend Server is running.",
                 api_version: "v1",
                 security: "enhanced",
+                environment: process.env.NODE_ENV
             };
-        });
-    }
+        }
+        // In production, fastify-static handles "/" via index.html if possible
+        if (request.headers["accept"]?.includes("text/html") && process.env.NODE_ENV !== "production") {
+            return reply.redirect(process.env.FRONTEND_URL || "http://localhost:3001");
+        }
+        return reply.status(200).send("TrackCodex Backend API");
+    });
 
     // Register API Routes
     await server.register(routes, { prefix: "/api/v1" });
@@ -275,19 +277,20 @@ async function bootstrap() {
         console.warn("[WARN] CSS routes failed to load:", err.message);
     }
 
-    // Serve Frontend in Production
-    if (process.env.NODE_ENV === "production") {
-        const fastifyStatic = (await import("@fastify/static")).default;
+    // Serve Frontend in Production (Optional based on folder existence)
+    const distPath = path.join(__dirname, "../dist");
+    const distExists = fs.existsSync(distPath);
 
-        // Serve static files from 'dist'
-        // In prod: dist-backend/index.js is execution point so ../dist is sibling
+    if (process.env.NODE_ENV === "production" && distExists) {
+        const fastifyStatic = (await import("@fastify/static")).default;
+        server.log.info(`Serving static frontend from: ${distPath}`);
+
         await server.register(fastifyStatic, {
-            root: path.join(__dirname, "../dist"),
+            root: distPath,
             prefix: "/",
-            wildcard: false, // Handle 404s manually for SPA
+            wildcard: false,
         });
 
-        // SPA Fallback for non-API routes
         server.setNotFoundHandler((request, reply) => {
             if (request.raw.url && request.raw.url.startsWith("/api")) {
                 reply.status(404).send({
@@ -296,11 +299,11 @@ async function bootstrap() {
                     available_endpoints: ["/", "/api/v1", "/api/v1/jobs"],
                 });
             } else {
-                // Serve index.html for client-side routing
                 reply.sendFile("index.html");
             }
         });
     } else {
+        // Fallback or Dev mode 404
         // Dev mode or default 404
         server.setNotFoundHandler((request, reply) => {
             server.log.warn(`404 Encountered: ${request.method} ${request.url}`);
