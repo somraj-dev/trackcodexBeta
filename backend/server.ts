@@ -246,24 +246,26 @@ async function bootstrap() {
         console.warn("[WARN] Multipart/Artifacts failed to load:", (err as Error).message);
     }
 
-    // Root Health Check
-    server.get("/", async (request, reply) => {
-        // If static files aren't enabled or it's an API-like request
-        if (!process.env.SERVE_STATIC || request.headers["accept"]?.includes("application/json")) {
-            return {
-                status: "online",
-                message: "TrackCodex Backend Server is running.",
-                api_version: "v1",
-                security: "enhanced",
-                environment: process.env.NODE_ENV
-            };
-        }
-        // In production, fastify-static handles "/" via index.html if possible
-        if (request.headers["accept"]?.includes("text/html") && process.env.NODE_ENV !== "production") {
-            return reply.redirect(process.env.FRONTEND_URL || "http://localhost:3001");
-        }
-        return reply.status(200).send("TrackCodex Backend API");
+    // Health Check API
+    server.get("/api/health", async () => {
+        return {
+            status: "online",
+            message: "TrackCodex Backend Server is running.",
+            api_version: "v1",
+            security: "enhanced",
+            environment: process.env.NODE_ENV
+        };
     });
+
+    // Root Redirect (Dev Only)
+    if (process.env.NODE_ENV !== "production") {
+        server.get("/", async (request, reply) => {
+            if (request.headers["accept"]?.includes("text/html")) {
+                return reply.redirect(process.env.FRONTEND_URL || "http://localhost:3001");
+            }
+            return reply.redirect("/api/health");
+        });
+    }
 
     // Register API Routes
     await server.register(routes, { prefix: "/api/v1" });
