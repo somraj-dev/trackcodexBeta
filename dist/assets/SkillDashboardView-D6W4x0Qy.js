@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const t=()=>e.jsxs("div",{className:"p-8 text-gh-text",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Skill Dashboard"}),e.jsx("p",{className:"text-gh-text-secondary",children:"This is a placeholder for the Skill Dashboard view."})]});export{t as default};

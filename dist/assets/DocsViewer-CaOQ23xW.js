@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const s=()=>e.jsxs("div",{className:"prose prose-invert max-w-none",children:[e.jsx("h1",{children:"Docs Viewer"}),e.jsx("p",{children:"Documentation content will appear here."})]});export{s as default};

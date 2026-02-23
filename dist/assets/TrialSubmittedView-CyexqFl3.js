@@ -1,0 +1,1 @@
+import{j as t}from"./index-DJt_uZb_.js";const i=()=>t.jsxs("div",{className:"p-8 text-white",children:[t.jsx("h1",{className:"text-2xl font-bold",children:"Trial Submitted"}),t.jsx("p",{children:"This is a placeholder for the trial submission confirmation page."})]});export{i as default};

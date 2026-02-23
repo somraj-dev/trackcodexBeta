@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const s=()=>e.jsxs("div",{className:"p-8 text-gh-text",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Candidate Discovery"}),e.jsx("p",{className:"text-gh-text-secondary",children:"This is a placeholder for the Candidate Discovery view."})]});export{s as default};

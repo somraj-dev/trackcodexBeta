@@ -1,0 +1,1 @@
+import{j as e,O as s}from"./index-DJt_uZb_.js";const a=()=>e.jsxs("div",{className:"flex flex-col min-h-screen bg-[#0d1117] text-[#c9d1d9]",children:[e.jsx("header",{className:"px-6 py-4 border-b border-[#30363d]",children:e.jsx("h1",{className:"text-xl font-bold",children:"Documentation"})}),e.jsx("main",{className:"flex-1 p-6",children:e.jsx(s,{})})]});export{a as default};

@@ -26,7 +26,7 @@ const Signup = () => {
     }
     const params = new URLSearchParams({
       client_id: clientId,
-      redirect_uri: "http://localhost:3001/auth/callback/google",
+      redirect_uri: `${window.location.origin}/auth/callback/google`,
       response_type: "code",
       scope: "openid email profile",
       access_type: "offline",
@@ -45,7 +45,7 @@ const Signup = () => {
     }
     const params = new URLSearchParams({
       client_id: clientId,
-      redirect_uri: "http://localhost:3001/auth/callback/github",
+      redirect_uri: `${window.location.origin}/auth/callback/github`,
       scope: "read:user user:email",
       state,
     });

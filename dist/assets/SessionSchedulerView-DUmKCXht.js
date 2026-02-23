@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const i=()=>e.jsxs("div",{className:"p-8 text-white",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Session Scheduler"}),e.jsx("p",{children:"This is a placeholder for the Session Scheduler view."})]});export{i as default};

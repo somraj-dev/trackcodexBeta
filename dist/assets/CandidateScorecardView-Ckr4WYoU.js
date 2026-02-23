@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const r=()=>e.jsxs("div",{className:"p-8 text-white",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Candidate Scorecard"}),e.jsx("p",{children:"This is a placeholder for the Candidate Scorecard view."})]});export{r as default};

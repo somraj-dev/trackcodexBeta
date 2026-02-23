@@ -1,0 +1,1 @@
+import{j as s}from"./index-DJt_uZb_.js";const t=()=>s.jsxs("div",{className:"space-y-6",children:[s.jsx("h2",{className:"text-2xl font-bold",children:"Latest Posts"}),s.jsx("p",{className:"text-gray-400",children:"No posts available yet."})]});export{t as default};

@@ -1,0 +1,1 @@
+import{j as s}from"./index-DJt_uZb_.js";const t=()=>s.jsxs("div",{className:"p-8 text-gh-text",children:[s.jsx("h1",{className:"text-2xl font-bold",children:"Assessments"}),s.jsx("p",{className:"text-gh-text-secondary",children:"This is a placeholder for the Assessments view."})]});export{t as default};

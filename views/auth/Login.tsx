@@ -63,7 +63,7 @@ const Login = () => {
 
       // IMPORTANT: This redirect_uri must be added EXACTLY as-is in Google Cloud Console
       // → APIs & Services → Credentials → OAuth 2.0 Client → Authorized redirect URIs
-      const REDIRECT_URI = "http://localhost:3001/auth/callback/google";
+      const REDIRECT_URI = `${window.location.origin}/auth/callback/google`;
 
       const params = new URLSearchParams({
         client_id: clientId,
@@ -100,7 +100,7 @@ const Login = () => {
       localStorage.setItem("oauth_state", state);
 
       // IMPORTANT: This redirect_uri must be added EXACTLY as-is in GitHub OAuth App settings
-      const REDIRECT_URI = "http://localhost:3001/auth/callback/github";
+      const REDIRECT_URI = `${window.location.origin}/auth/callback/github`;
 
       const params = new URLSearchParams({
         client_id: clientId,

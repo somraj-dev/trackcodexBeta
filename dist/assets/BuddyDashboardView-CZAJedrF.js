@@ -1,0 +1,1 @@
+import{j as s}from"./index-DJt_uZb_.js";const d=()=>s.jsxs("div",{className:"p-8 text-white",children:[s.jsx("h1",{className:"text-2xl font-bold",children:"Buddy Dashboard"}),s.jsx("p",{children:"This is a placeholder for the Buddy Dashboard view."})]});export{d as default};

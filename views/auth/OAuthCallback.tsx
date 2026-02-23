@@ -67,7 +67,7 @@ const OAuthCallback: React.FC = () => {
 
         // Exchange code for session with backend
         // Pass the redirectUri so backend uses the same one for token exchange
-        const REDIRECT_URI = `http://localhost:3001/auth/callback/${provider}`;
+        const REDIRECT_URI = `${window.location.origin}/auth/callback/${provider}`;
         const response = await api.post(`/auth/${provider}`, {
           code,
           codeVerifier,

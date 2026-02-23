@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const t=()=>e.jsxs("div",{className:"p-8 text-white",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Welcome!"}),e.jsx("p",{children:"This is the onboarding welcome view."})]});export{t as default};

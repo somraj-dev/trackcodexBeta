@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const t=()=>e.jsxs("div",{className:"p-8 text-white",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Interviewer Feedback"}),e.jsx("p",{children:"This is a placeholder for the Interviewer Feedback view."})]});export{t as default};

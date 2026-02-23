@@ -194,7 +194,7 @@ async function bootstrap() {
     try {
         const ciModule = await import("./routes/ci");
         await server.register(ciModule.default || ciModule, { prefix: "/api/ci" });
-    } catch {
+    } catch (err: unknown) {
         console.warn("[WARN] CI routes failed to load:", (err as Error).message);
     }
 
@@ -217,7 +217,7 @@ async function bootstrap() {
     try {
         const gitModule = await import("./routes/git");
         await server.register(gitModule.default || gitModule, { prefix: "/git" });
-    } catch {
+    } catch (err: any) {
         console.warn("[WARN] Git routes failed to load:", (err as Error).message);
     }
 
@@ -238,7 +238,7 @@ async function bootstrap() {
         // Artifact Upload routes (depends on multipart)
         const artifactsModule = await import("./routes/artifacts");
         await server.register(artifactsModule.default || artifactsModule, { prefix: "/api/artifacts" });
-    } catch {
+    } catch (err: any) {
         console.warn("[WARN] Multipart/Artifacts failed to load:", (err as Error).message);
     }
 
@@ -248,7 +248,7 @@ async function bootstrap() {
         server.get("/", async (request, reply) => {
             // If browser request, redirect to frontend
             if (request.headers["accept"]?.includes("text/html")) {
-                return reply.redirect("http://localhost:3001");
+                return reply.redirect(process.env.FRONTEND_URL || "http://localhost:3001");
             }
             return {
                 status: "online",

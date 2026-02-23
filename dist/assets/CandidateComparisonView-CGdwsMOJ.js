@@ -1,0 +1,1 @@
+import{j as e}from"./index-DJt_uZb_.js";const s=()=>e.jsxs("div",{className:"p-8 text-white",children:[e.jsx("h1",{className:"text-2xl font-bold",children:"Candidate Comparison"}),e.jsx("p",{children:"This is a placeholder for the Candidate Comparison view."})]});export{s as default};

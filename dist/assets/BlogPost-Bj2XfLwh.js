@@ -1,0 +1,1 @@
+import{c as o,j as s}from"./index-DJt_uZb_.js";const t=()=>{const{slug:e}=o();return s.jsxs("div",{className:"prose prose-invert max-w-none",children:[s.jsxs("h1",{children:["Blog Post: ",e]}),s.jsx("p",{children:"Content for this post will appear here."})]})};export{t as default};
