@@ -15,24 +15,25 @@ const AIHealthIndicator = ({
   label: string;
 }) => {
   const getColors = () => {
-    if (score.startsWith("A"))
+      const s = String(score || "B");
+      if (s.startsWith("A"))
+        return {
+          text: "text-emerald-400",
+          border: "border-emerald-500/30",
+          bg: "bg-emerald-500/10",
+        };
+      if (s.startsWith("B"))
+        return {
+          text: "text-amber-400",
+          border: "border-amber-500/30",
+          bg: "bg-amber-500/10",
+        };
       return {
-        text: "text-emerald-400",
-        border: "border-emerald-500/30",
-        bg: "bg-emerald-500/10",
+        text: "text-rose-400",
+        border: "border-rose-500/30",
+        bg: "bg-rose-500/10",
       };
-    if (score.startsWith("B"))
-      return {
-        text: "text-amber-400",
-        border: "border-amber-500/30",
-        bg: "bg-amber-500/10",
-      };
-    return {
-      text: "text-rose-400",
-      border: "border-rose-500/30",
-      bg: "bg-rose-500/10",
     };
-  };
   const colors = getColors();
 
   return (
@@ -194,26 +195,52 @@ const Repositories = () => {
       );
   };
 
-  const handleCreateRepo = (newRepoData: Partial<Repository>) => {
-    const newRepo = {
-      ...newRepoData,
-      isPublic: newRepoData.visibility === "PUBLIC",
-    } as Repository;
+  const handleCreateRepo = async (newRepoData: Partial<Repository>) => {
+    try {
+      // Actually call the backend API to create the repo in DB + Gitea
+      const created = await api.repositories.create({
+        name: newRepoData.name || "untitled",
+        description: newRepoData.description || "",
+        isPublic: newRepoData.visibility === "PUBLIC",
+        techStack: newRepoData.techStack || "TypeScript",
+      });
 
-    const updated = [newRepo, ...repos];
-    setRepos(updated);
-    localStorage.setItem("trackcodex_local_repos", JSON.stringify(updated));
-    setIsModalOpen(false);
+      // Enrich the returned data for the UI
+      const newRepo = {
+        ...created,
+        aiHealth: "A",
+        aiHealthLabel: "Healthy",
+        securityStatus: "Passing",
+        lastUpdated: "Just now",
+        techStack: newRepoData.techStack || "TypeScript",
+        techColor: "#3178c6",
+        visibility: (created.isPublic ? "PUBLIC" : "PRIVATE") as "PUBLIC" | "PRIVATE",
+      } as Repository;
 
-    window.dispatchEvent(
-      new CustomEvent("trackcodex-notification", {
-        detail: {
-          title: "Repository Initialized",
-          message: `${newRepo.name} has been created and indexed on the Gitea cluster.`,
-          type: "success",
-        },
-      }),
-    );
+      setRepos((prev) => [newRepo, ...prev]);
+      setIsModalOpen(false);
+
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-notification", {
+          detail: {
+            title: "Repository Created",
+            message: `${newRepo.name} has been created and synced to Gitea.`,
+            type: "success",
+          },
+        }),
+      );
+    } catch (err: any) {
+      console.error("❌ Failed to create repository:", err);
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-notification", {
+          detail: {
+            title: "Repository Creation Failed",
+            message: err?.message || "An error occurred while creating the repository.",
+            type: "error",
+          },
+        }),
+      );
+    }
   };
 
   const filteredRepos = repos.filter((repo) => {
@@ -386,7 +413,7 @@ const Repositories = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate("/workspace/new");
+                        navigate(`/workspace/${repo.id}/ide`);
                       }}
                       className="bg-primary/10 hover:bg-primary text-primary hover:text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-primary/20 shadow-lg shadow-primary/5 active:scale-95"
                     >

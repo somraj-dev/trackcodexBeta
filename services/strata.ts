@@ -44,3 +44,20 @@ export const strataNetworkApi = {
   // List my enterprises
   getMyNetworks: () => api.get<StrataNetwork[]>("/enterprises"),
 };
+
+// Alias used by UserProfileDropdown
+export const strataApi = {
+  getMyStrata: async () => {
+    const networks = await strataNetworkApi.getMyNetworks();
+    // Map StrataNetwork[] to Strata[] shape expected by dropdown
+    return (networks || []).map((n: StrataNetwork) => ({
+      id: n.id,
+      name: n.name,
+      avatar: "",
+      description: "",
+      members: [],
+      teams: [],
+      repositories: [],
+    }));
+  },
+};

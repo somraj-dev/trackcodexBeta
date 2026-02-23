@@ -103,8 +103,8 @@ model User {
   notifications        Notification[]
 
   // Skill Radar
-  skillScore    UserSkillScore?
-  skillMetrics  SkillRawMetrics?
+  skillScore   UserSkillScore?
+  skillMetrics SkillRawMetrics?
 }
 
 model Profile {
@@ -312,6 +312,11 @@ model Repository {
   license         Json? // Stores license object { key, name, spdx_id, url, node_id }
   openIssuesCount Int       @default(0)
   lastSyncAt      DateTime?
+
+  // Gitea Self-Hosting Integration
+  giteaId  Int?
+  cloneUrl String?
+  sshUrl   String?
 
   securityAlerts  SecurityAlert[]
   aiTasks         AITask[]
@@ -1309,10 +1314,10 @@ model SkillRawMetrics {
   user   User   @relation(fields: [userId], references: [id])
 
   // Coding
-  commitsPushed   Int @default(0)
-  prCreated       Int @default(0)
-  prMerged        Int @default(0)
-  linesChanged    Int @default(0)
+  commitsPushed    Int   @default(0)
+  prCreated        Int   @default(0)
+  prMerged         Int   @default(0)
+  linesChanged     Int   @default(0)
   mergeSuccessRate Float @default(0.0)
 
   // Quality
@@ -1322,34 +1327,34 @@ model SkillRawMetrics {
   testCoverageGain Float @default(0.0)
 
   // Bug Detection
-  bugsReported    Int   @default(0)
-  bugsFixed       Int   @default(0)
-  bugAccuracy     Float @default(0.0)
-  
+  bugsReported Int   @default(0)
+  bugsFixed    Int   @default(0)
+  bugAccuracy  Float @default(0.0)
+
   // Security
   securityIssuesReported Int @default(0)
   vulnerabilitiesFixed   Int @default(0)
-  
+
   // Collaboration
-  commentsPosted       Int @default(0)
-  prReviewsGiven       Int @default(0)
-  crossRepoContribs    Int @default(0)
-  
+  commentsPosted    Int @default(0)
+  prReviewsGiven    Int @default(0)
+  crossRepoContribs Int @default(0)
+
   // Architecture
-  reposCreated         Int @default(0)
-  workspacesCreated    Int @default(0)
-  largeFeaturesMerged  Int @default(0)
-  designDocsCreated    Int @default(0)
-  
+  reposCreated        Int @default(0)
+  workspacesCreated   Int @default(0)
+  largeFeaturesMerged Int @default(0)
+  designDocsCreated   Int @default(0)
+
   // Consistency
-  currentStreak        Int @default(0)
-  weeklyActiveDays     Int @default(0)
-  
+  currentStreak    Int @default(0)
+  weeklyActiveDays Int @default(0)
+
   // Community
-  starsReceived        Int @default(0)
-  forks                Int @default(0)
-  followers            Int @default(0)
-  karma                Int @default(0)
+  starsReceived Int @default(0)
+  forks         Int @default(0)
+  followers     Int @default(0)
+  karma         Int @default(0)
 
   updatedAt DateTime @updatedAt
 }
@@ -1357,24 +1362,24 @@ model SkillRawMetrics {
 model ActivityEvent {
   id        String   @id @default(uuid())
   userId    String
-  type      String   // e.g., 'COMMIT_PUSH', 'PR_MERGE', 'BUG_FIX'
+  type      String // e.g., 'COMMIT_PUSH', 'PR_MERGE', 'BUG_FIX'
   metadata  Json?
   timestamp DateTime @default(now())
-  
+
   // Optional relations for context
   repoId      String?
   workspaceId String?
-  
+
   @@index([userId, type])
   @@index([timestamp])
 }
 
 model RadarSnapshot {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   userId    String
   userScore UserSkillScore @relation(fields: [userId], references: [userId])
-  
-  scores    Json     // Stores the state of 8 axes at this point in time
+
+  scores    Json // Stores the state of 8 axes at this point in time
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])

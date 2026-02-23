@@ -49,24 +49,39 @@ const VSCodeWorkspaceView: React.FC = () => {
         setStatus("loading");
 
         try {
-            // Fetch workspace details
-            const detailRes = await fetch(`/api/v1/workspaces/${id}`);
-            if (detailRes.ok) {
-                const detail = await detailRes.json();
-                setWorkspaceName(detail.name || "Workspace");
+            // First, try to get repo details (when launched from Repositories page)
+            let repoName: string | null = null;
+            try {
+                const repoRes = await fetch(`/api/v1/repositories/${id}`);
+                if (repoRes.ok) {
+                    const repo = await repoRes.json();
+                    repoName = repo.name || null;
+                    setWorkspaceName(repo.name || "Workspace");
+                }
+            } catch {
+                // Not a repo-based launch, try workspace details
             }
 
-            // Start workspace — this spins up VS Code Web server
+            // If not a repo, fetch workspace details
+            if (!repoName) {
+                const detailRes = await fetch(`/api/v1/workspaces/${id}`);
+                if (detailRes.ok) {
+                    const detail = await detailRes.json();
+                    setWorkspaceName(detail.name || "Workspace");
+                }
+            }
+
+            // Start workspace — pass repoId so backend clones from Gitea
             const startRes = await fetch(`/api/v1/workspaces/${id}/start`, {
                 method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ repoId: id }),
             });
 
             if (startRes.ok) {
                 const data = await startRes.json();
-                // Backend returns { url: 'http://localhost:XXXX', port: XXXX }
                 setVsCodeUrl(data.url || "http://localhost:8080");
             } else {
-                // If start API doesn't work, fallback to default VS Code Web URL
                 console.warn("Workspace start API returned error, using default VS Code Web URL");
                 setVsCodeUrl("http://localhost:8080");
             }

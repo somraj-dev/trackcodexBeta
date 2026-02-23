@@ -1,0 +1,15 @@
+2026-02-23 06:02:23.048 [info] [main] Log level: Info
+2026-02-23 06:02:23.049 [info] [main] Validating found git in: "git"
+2026-02-23 06:02:23.049 [info] [main] Using git "2.34.1" from "git"
+2026-02-23 06:02:23.050 [info] [Model][doInitialScan] Initial repository scan started
+2026-02-23 06:02:23.077 [info] > git rev-parse --show-toplevel [42ms]
+2026-02-23 06:02:23.078 [info] fatal: detected dubious ownership in repository at '/home/workspace/c'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/workspace/c
+2026-02-23 06:02:23.085 [info] [Model][doInitialScan] Initial repository scan completed - repositories (0), closed repositories (0), parent repositories (0), unsafe repositories (1)
+2026-02-23 06:02:25.656 [info] > git rev-parse --show-toplevel [57ms]
+2026-02-23 06:02:25.656 [info] fatal: detected dubious ownership in repository at '/home/workspace/c'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/workspace/c

@@ -433,3 +433,11 @@ export interface Notification {
     [key: string]: any;
   };
 }
+
+export interface SSHKey {
+  id: string;
+  title: string;
+  key: string;
+  fingerprint?: string;
+  createdAt?: string;
+}

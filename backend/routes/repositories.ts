@@ -49,13 +49,17 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
   // List Repositories
   fastify.get<{ Querystring: { userId?: string; limit?: string } }>(
     "/repositories",
+    { preHandler: requireAuth },
     async (request) => {
       const { userId, limit } = request.query;
       const take = limit ? parseInt(limit) : undefined;
 
       const where: any = {};
+      // Filter by explicit userId param, or default to logged-in user
       if (userId) {
         where.ownerId = userId;
+      } else if (request.user?.userId) {
+        where.ownerId = request.user.userId;
       }
 
       const repositories = await prisma.repository.findMany({
@@ -67,7 +71,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         },
         orderBy: { updatedAt: "desc" },
       });
-      return { repositories };
+      return repositories;
     },
   );
 
@@ -110,7 +114,8 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             description,
             isPublic: isPublic || false,
             language: techStack,
-            orgId: orgId,
+            orgId: orgId || undefined,
+            owner: { connect: { id: user.userId } },
             stars: 0,
             forksCount: 0,
           },
@@ -126,17 +131,75 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           ipAddress: request.ip,
         });
 
-        // Sync with SCM Engine
+        // Create real Git repository in Gitea
         try {
-          await SCMService.createRepository({
-            id: repoData.id,
-            name: repoData.name,
-            description: repoData.description || undefined,
-            techStack: techStack,
+          const { GiteaService } = await import("../services/giteaService");
+
+          // Fetch the actual username from DB (session only has userId, not username)
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.userId },
+            select: { email: true, username: true },
           });
+          const ownerUsername = dbUser?.username;
+
+          if (!ownerUsername) {
+            request.log.warn(`[Gitea] No username found for userId=${user.userId}, skipping Gitea sync`);
+          } else {
+            // Sanitize repo name for Gitea (no spaces, lowercase)
+            const giteaRepoName = name
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9._-]/g, "")
+              .replace(/-+/g, "-")
+              .replace(/^-|-$/g, "");
+
+            request.log.info(`[Gitea] Syncing: user="${ownerUsername}", repo="${name}" -> "${giteaRepoName}"`);
+
+            // Ensure the user exists in Gitea
+            const giteaUser = await GiteaService.getUser(ownerUsername);
+            if (!giteaUser) {
+              request.log.info(`[Gitea] Creating user "${ownerUsername}" in Gitea...`);
+              await GiteaService.createUser(
+                dbUser.email,
+                ownerUsername,
+                "trackcodex-default-" + Date.now(),
+              );
+            }
+
+            // Create the repository
+            const giteaRepo = await GiteaService.createRepo(
+              ownerUsername,
+              giteaRepoName,
+              description,
+              !isPublic,
+            );
+            request.log.info(`[Gitea] Repo created! clone_url=${giteaRepo.clone_url}`);
+
+            // Store Gitea clone URLs and ID in the DB record
+            await prisma.repository.update({
+              where: { id: repoData.id },
+              data: {
+                cloneUrl: giteaRepo.clone_url,
+                sshUrl: giteaRepo.ssh_url,
+                giteaId: giteaRepo.id,
+              },
+            });
+
+            // Auto-register a webhook
+            const backendUrl = process.env.GITEA_WEBHOOK_URL || "http://host.docker.internal:4000";
+            await GiteaService.createWebhook(
+              ownerUsername,
+              giteaRepoName,
+              `${backendUrl}/api/v1/webhooks/gitea/push`,
+              ["push"],
+            ).catch((webhookErr: any) =>
+              request.log.warn(`[Gitea] Webhook failed: ${webhookErr.message}`),
+            );
+          }
         } catch (err: any) {
-          request.log.error("Failed to sync with SCM engine:", err);
+          request.log.error(`[Gitea] FAILED: ${err.message}`);
         }
+
 
         return repoData;
       } catch (error) {

@@ -151,28 +151,37 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
   // Start Workspace IDE
   fastify.post("/workspaces/:id/start", async (request, reply) => {
     const { id } = request.params as any;
+    const { repoId } = (request.body as any) || {};
 
-    // Ensure workspace exists first
-    // Ensure workspace exists first
+    // Look up repo details FIRST (before creating workspace)
+    let repoName: string | undefined;
+    let cloneUrl: string | undefined;
+    let repoDisplayName: string | undefined;
+
+    if (repoId) {
+      const repo = await prisma.repository.findUnique({ where: { id: repoId } });
+      if (repo) {
+        repoDisplayName = repo.name;
+        repoName = repo.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9._-]/g, "");
+        cloneUrl = repo.cloneUrl || undefined;
+        request.log.info(`[Workspace] Starting IDE for repo: ${repo.name} (${repoName}), clone: ${cloneUrl}`);
+      }
+    }
+
+    // Ensure workspace exists
     let workspace = await prisma.workspace.findUnique({ where: { id } });
 
-    // Auto-Recovery: Create workspace if missing (Critical for Simulator Mode reliability)
     if (!workspace) {
-      request.log.info(`[Auto-Recovery] Creating missing workspace: ${id}`);
-
-      // Find a default owner (System or First User)
       const defaultOwner = await prisma.user.findFirst();
       if (!defaultOwner) {
-        throw InternalError(
-          "System Error: No users available to own workspace.",
-        );
+        throw InternalError("System Error: No users available to own workspace.");
       }
 
       workspace = await prisma.workspace.create({
         data: {
-          id, // Use the requested ID
-          name: `Simulator ${id.substring(0, 6)}`,
-          description: "Auto-created simulator workspace",
+          id,
+          name: repoDisplayName || `Workspace ${id.substring(0, 6)}`,
+          description: repoDisplayName ? `IDE for ${repoDisplayName}` : "Auto-created workspace",
           ownerId: defaultOwner.id,
           status: "Starting",
         },
@@ -180,9 +189,12 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
     }
 
     try {
-      // Lazy load to avoid circular deps if any, though separate files usually fine
       const { WorkspaceManager } = await import("../services/workspaceManager");
-      const result = await WorkspaceManager.startWorkspace(id);
+
+      const result = await WorkspaceManager.startWorkspace(id, {
+        repoName,
+        cloneUrl,
+      });
 
       // Update status
       await prisma.workspace.update({
@@ -190,7 +202,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
         data: { status: "Running" },
       });
 
-      return result; // Returns { url: 'http://localhost:300X', port: 300X }
+      return result;
     } catch (error: any) {
       request.log.error(error);
       throw error;

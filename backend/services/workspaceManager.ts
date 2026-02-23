@@ -1,68 +1,75 @@
-import { DockerService } from "./docker";
+import path from "path";
+import fs from "fs";
+import { execSync } from "child_process";
 
-// Simple in-memory storage for active workspace ports
-const activeWorkspaces = new Map<string, number>();
-const START_PORT = 3001;
+// OpenVSCode Server URL (Docker service on port 8080)
+const OPENVSCODE_URL = process.env.OPENVSCODE_URL || "http://localhost:8080";
+const OPENVSCODE_TOKEN = process.env.OPENVSCODE_TOKEN || "trackcodex";
+
+// Local workspaces directory — bind-mounted into the Docker container at /home/workspace
+const WORKSPACES_ROOT = path.join(process.cwd(), "workspaces");
 
 export class WorkspaceManager {
-  // Get an available port
-  static async allocatePort(): Promise<number> {
-    let port = START_PORT;
-    const usedPorts = Array.from(activeWorkspaces.values());
-    while (usedPorts.includes(port)) {
-      port++;
-    }
-    return port;
-  }
-
-  // Start a workspace container and return the access URL
-  // Start a workspace (or get URL for code-server)
+  /**
+   * Start a workspace for a given repo.
+   * Clones the repo from Gitea if not already cloned, then
+   * returns the OpenVSCode Server URL pointing to the folder.
+   */
   static async startWorkspace(
     workspaceId: string,
+    options?: { repoName?: string; cloneUrl?: string },
   ): Promise<{ url: string; port: number }> {
     try {
-      // Local code-server mode (Preferred for local dev)
-      const workspacePath = require("path").join(process.cwd(), "workspaces", workspaceId);
+      const repoName = options?.repoName || workspaceId;
+      const workspacePath = path.join(WORKSPACES_ROOT, repoName);
 
-      // Ensure workspace directory exists
-      const fs = require("fs");
-      if (!fs.existsSync(workspacePath)) {
+      // Ensure workspaces root exists
+      if (!fs.existsSync(WORKSPACES_ROOT)) {
+        fs.mkdirSync(WORKSPACES_ROOT, { recursive: true });
+      }
+
+      // Clone from Gitea if folder doesn't exist yet
+      if (!fs.existsSync(workspacePath) && options?.cloneUrl) {
+        console.warn(`[WorkspaceManager] Cloning ${options.cloneUrl} → ${workspacePath}`);
+        try {
+          // git clone creates the target directory itself — don't pre-create it
+          execSync(`git clone "${options.cloneUrl}" "${workspacePath}"`, {
+            stdio: "pipe",
+            timeout: 60000,
+          });
+          console.warn(`[WorkspaceManager] Clone complete: ${repoName}`);
+        } catch (cloneErr: unknown) {
+          const msg = cloneErr instanceof Error ? cloneErr.message : String(cloneErr);
+          console.error(`[WorkspaceManager] Clone failed: ${msg}`);
+          // Create empty directory so IDE still opens
+          if (!fs.existsSync(workspacePath)) {
+            fs.mkdirSync(workspacePath, { recursive: true });
+          }
+        }
+      } else if (!fs.existsSync(workspacePath)) {
+        // No clone URL — create empty workspace directory
         fs.mkdirSync(workspacePath, { recursive: true });
       }
 
-      console.log(`[WorkspaceManager] Serving workspace ${workspaceId} via @vscode/test-web`);
+      // Build OpenVSCode URL pointing to the workspace folder
+      // The bind mount maps ./workspaces → /home/workspace in the container
+      const folderPath = `/home/workspace/${repoName}`;
+      const url = `${OPENVSCODE_URL}/?tkn=${OPENVSCODE_TOKEN}&folder=${folderPath}`;
 
-      // @vscode/test-web mounts the project root at /static/mount
-      // Workspaces are in ./workspaces/{id} relative to root
+      console.warn(`[WorkspaceManager] IDE URL: ${url}`);
+
+      return { url, port: 8080 };
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(`[WorkspaceManager] Failed: ${msg}`);
       return {
-        url: `http://127.0.0.1:8080/?folder=/static/mount/workspaces/${workspaceId}`,
-        port: 8080,
-      };
-    } catch (error: any) {
-      console.error(
-        `[WorkspaceManager] Failed to start workspace: ${error.message}`,
-      );
-      return {
-        url: `http://localhost:8080`,
+        url: `${OPENVSCODE_URL}/?tkn=${OPENVSCODE_TOKEN}`,
         port: 8080,
       };
     }
   }
 
   static async stopWorkspace(workspaceId: string) {
-    const port = activeWorkspaces.get(workspaceId);
-    if (port) {
-      try {
-        // Find container by name conventionally
-        const containerName = `trackcodex-${workspaceId}`;
-        const { docker } = await import("./docker");
-        const container = docker.getContainer(containerName);
-        await container.stop();
-        activeWorkspaces.delete(workspaceId);
-        console.log(`[Cloud] Stopped container for ${workspaceId}`);
-      } catch (e: any) {
-        console.warn(`[Cloud] Cleanup failed: ${e.message}`);
-      }
-    }
+    console.warn(`[WorkspaceManager] Stopped tracking workspace ${workspaceId}`);
   }
 }

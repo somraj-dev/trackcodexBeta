@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { authRoutes } from "./auth";
 import { rateLimiter } from "../middleware/rateLimiter";
 import { authOtpRoutes } from "./auth_otp";
+import { giteaWebhookRoutes } from "./gitea-webhooks";
 import { workspaceRoutes } from "./workspaces";
 import { workspaceStarsRoutes } from "./workspace-stars";
 import { repositoryRoutes } from "./repositories";
@@ -82,4 +83,5 @@ export async function routes(fastify: FastifyInstance) {
 
   const { default: deploymentRoutes } = await import("./deployments");
   await fastify.register(deploymentRoutes);
+  await fastify.register(giteaWebhookRoutes);
 }

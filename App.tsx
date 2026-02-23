@@ -51,7 +51,7 @@ const Portfolio = React.lazy(() => import("./views/Portfolio"));
 // const WorkspaceDetailView = React.lazy(
 //   () => import("./views/WorkspaceDetailView"),
 // );
-import WorkspaceIDE from "./views/ide/VSCodeWorkspaceView"; // VS Code Web Integration
+import WorkspaceIDE from "./views/ide/VSCodeWorkspaceView"; // OpenVSCode Server IDE Integration
 const HomeView = React.lazy(() => import("./views/Home"));
 const ExploreView = React.lazy(() => import("./views/Explore"));
 const LibraryView = React.lazy(() => import("./views/Library"));
@@ -73,6 +73,8 @@ import { CookieConsent } from "./components/legal/CookieConsent";
 import RoleGuard from "./auth/RoleGuard";
 const CommunityView = React.lazy(() => import("./views/Community"));
 const DiscussionDetail = React.lazy(() => import("./views/DiscussionDetail"));
+const CreateRepoView = React.lazy(() => import("./views/CreateRepo"));
+const ImportRepoView = React.lazy(() => import("./views/ImportRepo"));
 
 // Strata Views
 const StrataIndexView = React.lazy(
@@ -83,6 +85,9 @@ const StrataDetailView = React.lazy(
 );
 const StrataOverview = React.lazy(
   () => import("./components/organizations/StrataOverview"),
+);
+const CreateStrataView = React.lazy(
+  () => import("./views/organizations/CreateStrata"),
 );
 const StrataRepositories = React.lazy(
   () => import("./components/organizations/StrataRepositories"),
@@ -197,9 +202,7 @@ const TrialSubmittedView = React.lazy(
 );
 
 // Enterprise
-const EnterpriseDashboard = React.lazy(
-  () => import("./views/enterprise/EnterpriseDashboard"),
-);
+
 
 // --- Marketplace Sub-views ---
 const MissionsView = React.lazy(
@@ -283,6 +286,13 @@ const CommunityModeration = React.lazy(
 const RoleEditor = React.lazy(() => import("./components/admin/RoleEditor"));
 const AuditLogs = React.lazy(() => import("./components/admin/AuditLogs"));
 const AdminDashboard = React.lazy(() => import("./views/AdminDashboard"));
+
+// Documentation & Blog
+const DocsLayout = React.lazy(() => import("./components/docs/DocsLayout"));
+const DocsViewer = React.lazy(() => import("./views/docs/DocsViewer"));
+const BlogLayout = React.lazy(() => import("./components/blog/BlogLayout"));
+const BlogIndex = React.lazy(() => import("./views/blog/BlogIndex"));
+const BlogPost = React.lazy(() => import("./views/blog/BlogPost"));
 
 import { logActivity } from "./services/activityLogger";
 
@@ -389,7 +399,10 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
     window.location.hostname.startsWith("workspace.") ||
     new URLSearchParams(window.location.search).get("standalone") === "true";
 
-  const isIdeView = ["/editor", "/workspace/", "/trials/live-session"].some(
+  const isIdeView = (
+    location.pathname.startsWith("/workspace/") &&
+    location.pathname !== "/workspace/new"
+  ) || ["/editor", "/trials/live-session"].some(
     (path) => location.pathname.includes(path),
   ) || isStandalone;
 
@@ -547,7 +560,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
         </div>
       )}
       <div className="flex-1 flex min-h-0">
-        {!isFocusMode && <Sidebar />}
+        {!isFocusMode && !isIdeView && <Sidebar />}
 
         <main
           ref={mainScrollRef}
@@ -557,15 +570,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
           {!isIdeView && !isFocusMode && (
             <div className="h-14 border-b border-gh-border grid grid-cols-[1fr_auto_1fr] items-center px-6 bg-gh-bg/60 backdrop-blur-xl shrink-0 sticky top-0 z-40 transition-all duration-300">
               <div className="flex items-center">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="mr-4 text-gh-text-secondary hover:text-gh-text transition-colors p-1 rounded-full hover:bg-gh-bg-secondary"
-                  title="Go Back"
-                >
-                  <span className="material-symbols-outlined !text-[20px]">
-                    arrow_back
-                  </span>
-                </button>
+                {/* Back button removed */}
               </div>
 
               <div
@@ -682,7 +687,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                       <button
                         onClick={() => {
                           setIsAddMenuOpen(false);
-                          navigate("/repositories");
+                          navigate("/repositories/new");
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
                       >
@@ -694,7 +699,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                       <button
                         onClick={() => {
                           setIsAddMenuOpen(false);
-                          navigate("/strata");
+                          navigate("/strata/new");
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm text-gh-text hover:text-white hover:bg-gh-bg flex items-center gap-2"
                       >
@@ -739,10 +744,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
               <Route path="/" element={<Navigate to="/dashboard/home" />} />
               <Route path="/dashboard/home" element={<HomeView />} />
               <Route path="/onboarding/welcome" element={<WelcomeView />} />
-              <Route
-                path="/network/:slug"
-                element={<EnterpriseDashboard />}
-              />
+
               <Route path="/accept-invite" element={<AcceptInvite />} />
               <Route path="/explore" element={<ExploreView />} />
               <Route path="/platform-matrix" element={<PlatformMatrix />} />
@@ -751,7 +753,10 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
               <Route path="/community" element={<CommunityView />} />
               <Route path="/workspace/new" element={<CreateWorkspaceView />} />
               <Route path="/workspace/:id" element={<WorkspaceIDE />} />
+              <Route path="/workspace/:id/ide" element={<WorkspaceIDE />} />
               <Route path="/repositories" element={<RepositoriesView />} />
+              <Route path="/repositories/new" element={<CreateRepoView />} />
+              <Route path="/repositories/import" element={<ImportRepoView />} />
               <Route path="/repo/:id/*" element={<RepoDetailView />} />
               <Route
                 path="/repositories/:id/discussions/:number"
@@ -773,10 +778,22 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
 
               <Route path="/notifications" element={<NotificationsView />} />
 
+              {/* Documentation & Blog */}
+              <Route path="/docs" element={<DocsLayout />}>
+                <Route index element={<DocsViewer />} />
+                <Route path="*" element={<DocsViewer />} />
+              </Route>
+
+              <Route path="/blog" element={<BlogLayout />}>
+                <Route index element={<BlogIndex />} />
+                <Route path=":slug" element={<BlogPost />} />
+              </Route>
+
               <Route path="/strata-dashboard" element={<AdminDashboard />} />
 
               <Route path="/strata" element={<StrataIndexView />} />
-              <Route path="/strata/:orgId" element={<StrataDetailView />}>
+              <Route path="/strata/new" element={<CreateStrataView />} />
+              <Route path="/strata/:strataId" element={<StrataDetailView />}>
                 <Route index element={<StrataOverview />} />
                 <Route path="repositories" element={<StrataRepositories />} />
                 <Route path="people" element={<StrataPeople />} />
@@ -942,6 +959,9 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                 <Route path="audit-logs" element={<AuditLogs />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </Route>
+
+              {/* GitHub-style owner/repo URLs (catch-all, must be last) */}
+              <Route path="/:owner/:repo/*" element={<RepoDetailView />} />
 
               <Route path="*" element={<Navigate to="/dashboard/home" />} />
             </Routes>

@@ -268,6 +268,11 @@ model Repository {
   openIssuesCount Int       @default(0)
   lastSyncAt      DateTime?
 
+  // Gitea Self-Hosting Integration
+  giteaId  Int?
+  cloneUrl String?
+  sshUrl   String?
+
   securityAlerts  SecurityAlert[]
   aiTasks         AITask[]
   jobs            Job[]
@@ -456,17 +461,17 @@ model AITask {
 }
 
 model Workspace {
-  id              String   @id @default(uuid())
-  name            String
-  description     String?
-  status          String   @default("Active")
-  ownerId         String
-  owner           User     @relation(fields: [ownerId], references: [id])
-  repoUrl         String?
-  visibility      String   @default("public")
-  accessPassword  String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  status         String   @default("Active")
+  ownerId        String
+  owner          User     @relation(fields: [ownerId], references: [id])
+  repoUrl        String?
+  visibility     String   @default("public")
+  accessPassword String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 // --- Jobs & Marketplace ---
@@ -990,88 +995,88 @@ model CodeSymbol {
 // --- Code Security System (CSS) ---
 
 model CodeScan {
-  id              String   @id @default(uuid())
-  repositoryId    String
-  triggeredBy     String   // userId or "system"
-  status          String   @default("QUEUED") // QUEUED, IN_PROGRESS, COMPLETED, FAILED
-  scanType        String   @default("FULL") // FULL, INCREMENTAL, PR_CHECK
-  commitSha       String?
-  branch          String?
+  id           String  @id @default(uuid())
+  repositoryId String
+  triggeredBy  String // userId or "system"
+  status       String  @default("QUEUED") // QUEUED, IN_PROGRESS, COMPLETED, FAILED
+  scanType     String  @default("FULL") // FULL, INCREMENTAL, PR_CHECK
+  commitSha    String?
+  branch       String?
 
   // Results Summary
-  totalFindings   Int      @default(0)
-  criticalCount   Int      @default(0)
-  highCount       Int      @default(0)
-  mediumCount     Int      @default(0)
-  lowCount        Int      @default(0)
+  totalFindings Int @default(0)
+  criticalCount Int @default(0)
+  highCount     Int @default(0)
+  mediumCount   Int @default(0)
+  lowCount      Int @default(0)
 
   // Scores
   secureCodingScore Float?
   riskScore         Float?
 
   // Shannon Integration
-  shannonEnabled    Boolean @default(false)
-  shannonScanId     String? // External ID from Shannon adapter
+  shannonEnabled Boolean @default(false)
+  shannonScanId  String? // External ID from Shannon adapter
 
   // Timing
-  startedAt       DateTime?
-  completedAt     DateTime?
-  durationMs      Int?
+  startedAt   DateTime?
+  completedAt DateTime?
+  durationMs  Int?
 
-  errorMessage    String?  @db.Text
+  errorMessage String? @db.Text
 
   vulnerabilities Vulnerability[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([repositoryId])
   @@index([status])
 }
 
 model Vulnerability {
-  id               String   @id @default(uuid())
-  scanId           String
-  scan             CodeScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  repositoryId     String
+  id           String   @id @default(uuid())
+  scanId       String
+  scan         CodeScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  repositoryId String
 
   // Location
-  filePath         String
-  lineNumber       Int
-  endLine          Int?
-  codeSnippet      String?  @db.Text
+  filePath    String
+  lineNumber  Int
+  endLine     Int?
+  codeSnippet String? @db.Text
 
   // Classification
-  vulnerabilityType String  // SQL_INJECTION, XSS, AUTH_BYPASS, SSRF, PATH_TRAVERSAL, etc.
-  severity          String  // CRITICAL, HIGH, MEDIUM, LOW, INFO
-  confidenceScore   Float   @default(0) // 0.0 to 1.0
+  vulnerabilityType String // SQL_INJECTION, XSS, AUTH_BYPASS, SSRF, PATH_TRAVERSAL, etc.
+  severity          String // CRITICAL, HIGH, MEDIUM, LOW, INFO
+  confidenceScore   Float  @default(0) // 0.0 to 1.0
 
   // Data Flow
-  source           String?  @db.Text // Taint source description
-  sink             String?  @db.Text // Taint sink description
-  dataFlowPath     String?  @db.Text // JSON array of flow steps
+  source       String? @db.Text // Taint source description
+  sink         String? @db.Text // Taint sink description
+  dataFlowPath String? @db.Text // JSON array of flow steps
 
   // AHI Validation
-  ahiExploitable   Boolean?
-  ahiSeverity      String?
-  ahiReasoning     String?  @db.Text
-  ahiPatchCode     String?  @db.Text
-  ahiConfidence    Float?
+  ahiExploitable Boolean?
+  ahiSeverity    String?
+  ahiReasoning   String?  @db.Text
+  ahiPatchCode   String?  @db.Text
+  ahiConfidence  Float?
 
   // Shannon Validation
   shannonConfirmed Boolean?
   shannonDetails   String?  @db.Text
 
   // Combined validation
-  validationSource String   @default("CSS") // CSS, SHANNON, BOTH
+  validationSource String @default("CSS") // CSS, SHANNON, BOTH
 
   // Status
-  status           String   @default("OPEN") // OPEN, CONFIRMED, DISMISSED, FIXED
-  dismissedBy      String?
-  fixedInCommit    String?
+  status        String  @default("OPEN") // OPEN, CONFIRMED, DISMISSED, FIXED
+  dismissedBy   String?
+  fixedInCommit String?
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([scanId])
   @@index([repositoryId])
@@ -1086,34 +1091,34 @@ model Vulnerability {
 // --- Layer 1: Domain Scoring ---
 
 model RepositoryDomainScore {
-  id                   String   @id @default(uuid())
-  userId               String   @unique
-  secureCodingScore    Float    @default(0) // 0-100: from scan results
-  fixSpeedScore        Float    @default(0) // 0-100: vuln detection → fix time
-  riskManagementScore  Float    @default(0) // 0-100: repeated vuln history
-  consistencyScore     Float    @default(0) // 0-100: regularity of secure commits
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  secureCodingScore   Float    @default(0) // 0-100: from scan results
+  fixSpeedScore       Float    @default(0) // 0-100: vuln detection → fix time
+  riskManagementScore Float    @default(0) // 0-100: repeated vuln history
+  consistencyScore    Float    @default(0) // 0-100: regularity of secure commits
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model MarketplaceDomainScore {
-  id                          String   @id @default(uuid())
-  userId                      String   @unique
-  professionalReliabilityScore Float   @default(0) // 0-100: job success + rating
-  deliveryDisciplineScore     Float    @default(0) // 0-100: on-time delivery %
-  appliedSecurityScore        Float    @default(0) // 0-100: security compliance
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id                           String   @id @default(uuid())
+  userId                       String   @unique
+  professionalReliabilityScore Float    @default(0) // 0-100: job success + rating
+  deliveryDisciplineScore      Float    @default(0) // 0-100: on-time delivery %
+  appliedSecurityScore         Float    @default(0) // 0-100: security compliance
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
 }
 
 model OssDomainScore {
-  id                       String   @id @default(uuid())
-  userId                   String   @unique
-  engineeringDepthScore    Float    @default(0) // 0-100: PRs + code reviews
-  securityLeadershipScore  Float    @default(0) // 0-100: security patches + approvals
-  ossImpactScore           Float    @default(0) // 0-100: stars, forks, adoption
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id                      String   @id @default(uuid())
+  userId                  String   @unique
+  engineeringDepthScore   Float    @default(0) // 0-100: PRs + code reviews
+  securityLeadershipScore Float    @default(0) // 0-100: security patches + approvals
+  ossImpactScore          Float    @default(0) // 0-100: stars, forks, adoption
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
 
 // --- Layer 2: Radar Aggregation ---
@@ -1121,7 +1126,7 @@ model OssDomainScore {
 model UserRadarState {
   id          String   @id @default(uuid())
   userId      String
-  axisName    String   // SECURE_ENGINEERING, APPLIED_SECURITY, PROFESSIONAL_RELIABILITY, ENGINEERING_DEPTH, SECURITY_LEADERSHIP
+  axisName    String // SECURE_ENGINEERING, APPLIED_SECURITY, PROFESSIONAL_RELIABILITY, ENGINEERING_DEPTH, SECURITY_LEADERSHIP
   axisScore   Float    @default(0) // 0-100 clamped
   lastUpdated DateTime @default(now()) @updatedAt
 
@@ -1133,10 +1138,10 @@ model UserRadarState {
 
 model GovernanceRule {
   id          String   @id @default(uuid())
-  axisName    String   // Which radar axis this rule evaluates
-  operator    String   // LT, GT, LTE, GTE
-  threshold   Float    // Score threshold
-  action      String   // BLOCK_MERGE, REQUIRE_APPROVAL, REDUCE_RANKING, GRANT_PRIVILEGES
+  axisName    String // Which radar axis this rule evaluates
+  operator    String // LT, GT, LTE, GTE
+  threshold   Float // Score threshold
+  action      String // BLOCK_MERGE, REQUIRE_APPROVAL, REDUCE_RANKING, GRANT_PRIVILEGES
   description String?  @db.Text
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -1164,7 +1169,7 @@ model RadarHistory {
 model UserExtension {
   id          String   @id @default(uuid())
   userId      String
-  extensionId String   // e.g. "esbenp.prettier-vscode"
+  extensionId String // e.g. "esbenp.prettier-vscode"
   publisher   String
   name        String
   version     String
@@ -1177,4 +1182,3 @@ model UserExtension {
   @@unique([userId, extensionId])
   @@index([userId])
 }
-

@@ -1,4 +1,4 @@
-import { Repository, Workspace, Job, ProfileData } from "../types";
+import { Repository, Workspace, Job, ProfileData, SSHKey } from "../types";
 
 // Extended Window interface for Electron Bridge
 declare global {
@@ -94,7 +94,12 @@ export const api = {
       request<void>(`/workspaces/${id}`, { method: "DELETE" }),
   },
   repositories: {
-    list: () => request<Repository[]>("/repositories"),
+    list: async (): Promise<Repository[]> => {
+      const res = await request<{ repositories: Repository[] } | Repository[]>("/repositories");
+      // Backend may return { repositories: [...] } or flat array — handle both
+      if (Array.isArray(res)) return res;
+      return (res as any).repositories || [];
+    },
     get: (id: string) => request<Repository>(`/repositories/${id}`),
     create: (data: any) =>
       request<Repository>("/repositories", {
@@ -106,6 +111,14 @@ export const api = {
         "/repositories/sync",
         { method: "POST" },
       ),
+    getCommits: (id: string, ref?: string, path?: string, depth?: number) =>
+      request<any[]>(
+        `/repositories/${id}/commits?ref=${ref || "HEAD"}&path=${path || ""}&depth=${depth || 50}`,
+      ),
+    getBranches: (id: string) =>
+      request<string[]>(`/repositories/${id}/branches`),
+    getCommitDiff: (id: string, sha: string) =>
+      request<{ diff: string }>(`/repositories/${id}/commits/${sha}/diff`),
   },
   forgeAI: {
     complete: (options: {
@@ -159,6 +172,43 @@ export const api = {
     list: (userId: string) => request<any[]>(`/notifications?userId=${userId}`),
     markRead: (id: string) => request<void>(`/notifications/${id}/read`, { method: "POST" }),
     markAllRead: (userId: string) => request<void>("/notifications/read-all", { method: "POST", body: JSON.stringify({ userId }) }),
+  },
+  pullRequests: {
+    list: (repoId: string, status?: string) =>
+      request<any[]>(`/repositories/${repoId}/pulls${status ? `?status=${status}` : ""}`),
+    get: (repoId: string, number: number) =>
+      request<any>(`/repositories/${repoId}/pulls/${number}`),
+    create: (repoId: string, data: { base: string; head: string; title: string; body?: string; draft?: boolean }) =>
+      request<any>(`/repositories/${repoId}/pulls`, { method: "POST", body: JSON.stringify(data) }),
+    merge: (repoId: string, number: number, method?: "merge" | "squash" | "rebase") =>
+      request<any>(`/repositories/${repoId}/pulls/${number}/merge`, { method: "POST", body: JSON.stringify({ method }) }),
+    close: (repoId: string, number: number) =>
+      request<any>(`/repositories/${repoId}/pulls/${number}/close`, { method: "POST" }),
+    addReview: (repoId: string, number: number, status: "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED", body?: string) =>
+      request<any>(`/repositories/${repoId}/pulls/${number}/reviews`, { method: "POST", body: JSON.stringify({ status, body }) }),
+    getDiff: (repoId: string, number: number) =>
+      request<{ diff: string }>(`/repositories/${repoId}/pulls/${number}/diff`),
+    addComment: (repoId: string, number: number, body: string) =>
+      request<any>(`/repositories/${repoId}/pulls/${number}/comments`, { method: "POST", body: JSON.stringify({ body }) }),
+  },
+  ciRuns: {
+    list: (repoId: string) => request<any[]>(`/repos/${repoId}/runs`),
+    get: (runId: string) => request<any>(`/runs/${runId}`),
+    cancel: (runId: string) => request<any>(`/runs/${runId}/cancel`, { method: "POST" }),
+    rerun: (runId: string) => request<any>(`/runs/${runId}/rerun`, { method: "POST" }),
+    dispatch: (repoId: string, workflowId?: string) =>
+      request<any>(`/repos/${repoId}/dispatch`, { method: "POST", body: JSON.stringify({ workflowId }) }),
+  },
+
+  sshKeys: {
+    list: () => request<SSHKey[]>("/ssh-keys"),
+    add: (title: string, key: string) =>
+      request<SSHKey>("/ssh-keys", {
+        method: "POST",
+        body: JSON.stringify({ title, key }),
+      }),
+    delete: (id: string) =>
+      request<void>(`/ssh-keys/${id}`, { method: "DELETE" }),
   },
   // Generic methods for services
   get: <T>(path: string) => request<T>(path),

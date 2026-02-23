@@ -7,7 +7,7 @@ interface GlobalSearchHookProps {
 /**
  * Global hook to manage search modal state and keyboard shortcuts
  */
-export const use GlobalSearch = () => {
+export const useGlobalSearch = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {

@@ -10,8 +10,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/trackcodex
       - NODE_ENV=production
+      - GITEA_URL=http://gitea:3000
+      - GITEA_API_TOKEN=${GITEA_API_TOKEN}
     depends_on:
       - db
+      - gitea
 
   db:
     image: postgres:15-alpine
@@ -24,17 +27,53 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  # ── Gitea: Self-Hosted Git Server ──
+  gitea:
+    image: gitea/gitea:latest
+    ports:
+      - "3000:3000" # Gitea Web UI + HTTP Git clone/push
+      - "2222:22" # SSH Git access (git@localhost:2222)
+    environment:
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=db:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=postgres
+      - GITEA__database__PASSWD=password
+      - GITEA__server__ROOT_URL=http://localhost:3000
+      - GITEA__server__DISABLE_SSH=false
+      - GITEA__server__SSH_PORT=2222
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__service__REQUIRE_SIGNIN_VIEW=false
+      - GITEA__api__ENABLE_SWAGGER=true
+    volumes:
+      - gitea_data:/data
+    depends_on:
+      - db
+
   postgrest:
     image: postgrest/postgrest
     ports:
-      - "3000:3000"
+      - "3100:3000" # Moved from 3000 to 3100 (Gitea uses 3000)
     environment:
       PGRST_DB_URI: postgres://postgres:password@db:5432/trackcodex
       PGRST_DB_SCHEMA: public
       PGRST_DB_ANON_ROLE: web_anon
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3100
     depends_on:
       - db
 
+  # ── OpenVSCode Server: Self-Hosted IDE ──
+  openvscode:
+    image: gitpod/openvscode-server:latest
+    ports:
+      - "8080:3000"   # OpenVSCode Web UI
+    volumes:
+      - ./workspaces:/home/workspace   # Bind mount so backend + container share files
+    environment:
+      - CONNECTION_TOKEN=trackcodex   # Simple shared token for auth
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  gitea_data:
+
