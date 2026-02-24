@@ -59,7 +59,8 @@ const CommandPalette = ({
         // Group and format results for GitHub style
         const formattedResults = serviceResults.map(r => ({
           ...r,
-          group: r.type === "user" ? "Owners" : r.type === "repo" ? "Repositories" : "Other"
+          label: r.type === "user" ? (r.label.startsWith("@") ? r.label : `@${r.label}`) : r.label,
+          group: r.type === "user" ? "People" : r.type === "repo" ? "Repositories" : "Other"
         }));
 
         setResults([

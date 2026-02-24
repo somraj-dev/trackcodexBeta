@@ -21,6 +21,8 @@ const ContinueWorkspaces = () => {
           setWorkspaces(Array.isArray(data) ? data : []);
         })
         .catch((err) => {
+          console.error("Failed to load workspaces", err);
+        })
         .finally(() => setLoading(false));
     });
   }, []);

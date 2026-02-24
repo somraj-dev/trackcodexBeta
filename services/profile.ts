@@ -554,16 +554,18 @@ export const profileService = {
         withCredentials: true,
       });
 
-      const results = response.data;
+      // Map backend 'avatar' to frontend 'avatarUrl' and handle other schema differences
+      const results = response.data.map((u: any) => ({
+        ...u,
+        avatarUrl: u.avatar || u.avatarUrl,
+        followersCount: u.profile?.followersCount || u.followersCount || 0,
+        followingCount: u.profile?.followingCount || u.followingCount || 0,
+        bio: u.profile?.bio || u.bio || "",
+      }));
 
-      // Merge with mock matches
-      const mockMatches = MOCK_USERS.filter(u =>
-        u.name.toLowerCase().includes(query.toLowerCase()) ||
-        u.username.toLowerCase().includes(query.toLowerCase())
-      );
-
-      return [...mockMatches, ...results];
+      return results;
     } catch (error) {
+      console.warn("User search API failed, using mock fallback", error);
       return MOCK_USERS.filter(u =>
         u.name.toLowerCase().includes(query.toLowerCase()) ||
         u.username.toLowerCase().includes(query.toLowerCase())

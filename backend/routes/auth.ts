@@ -104,11 +104,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         );
 
         // 5. Set Cookie
+        const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60,
         });
 
@@ -203,11 +204,12 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
         );
 
+        const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60,
         });
 
@@ -278,11 +280,12 @@ export async function authRoutes(fastify: FastifyInstance) {
     } catch (error) {
       console.error("DEBUG: /me CRASH:", error);
       request.log.error(error);
+      const sessionId = request.cookies.session_id;
       // Fallback: Clear cookie if invalid
-      if (request.cookies.session_id) {
+      if (sessionId) {
         reply.clearCookie("session_id", { path: "/" });
       }
-      return reply.code(401).send({ error: "Session invalid" }); // Return 401 instead of 500 to stop retry loop
+      return reply.code(401).send({ error: "Session invalid", debug: { sessionId: sessionId ? "present" : "missing" } }); // Return 401 instead of 500 to stop retry loop
     }
   });
 
@@ -380,11 +383,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         );
 
         // 4. Set HttpOnly Cookie
+        const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60, // 7 days
         });
 
@@ -568,11 +572,12 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
         });
 
+        const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60,
         });
 
@@ -743,11 +748,12 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
         });
 
+        const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
+          secure: isProduction,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7 * 24 * 60 * 60,
         });
 
