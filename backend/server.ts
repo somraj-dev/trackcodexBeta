@@ -454,14 +454,20 @@ async function bootstrap() {
             } catch (err: any) {
                 retries--;
                 console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${err.message}`);
+
+                if (process.env.DATABASE_URL?.includes(":5432")) {
+                    console.warn("💡 TIP: You are using port 5432. If this is Render + Supabase, please try port 6543 (Pooler) instead.");
+                }
+
                 if (retries === 0) {
                     console.error("❌ [FATAL] Database connection could not be established after all retries.");
-                    // In production, we might want to exit, but here we'll log and keep the port bound for debugging
-                    console.error("Check Render DATABASE_URL and Supabase Network Restrictions.");
+                    console.error("1. Ensure your DATABASE_URL in Render matches Supabase's 'Transaction' mode URL.");
+                    console.error("2. Verify that port 6543 is used if connecting from Render.");
+                    console.error("3. Check Supabase 'Network Restrictions' (Allow all IPs if using Render).");
                     break;
                 }
-                console.warn("⏳ Waiting 10 seconds before next attempt...");
-                await new Promise(resolve => setTimeout(resolve, 10000));
+                console.warn("⏳ Waiting 5 seconds before next attempt...");
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
         }
 

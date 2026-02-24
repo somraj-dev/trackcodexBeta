@@ -2,9 +2,16 @@ import { PrismaClient } from "@prisma/client";
 
 // Shared PrismaClient instance to be used across the entire application.
 // This prevents connection pool exhaustion in production (Supabase/Render).
-export const prisma = new PrismaClient({
+const prismaInstance = new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
 });
+
+// Diagnostic: Log connection target (masked) on first import
+const dbUrl = process.env.DATABASE_URL || "";
+const maskedUrl = dbUrl.replace(/:([^:@]+)@/, ":****@");
+console.warn(`[PRISMA] Initialized for: ${maskedUrl || "MISSING DATABASE_URL"}`);
+
+export const prisma = prismaInstance;
 
 // Graceful shutdown
 process.on("beforeExit", async () => {

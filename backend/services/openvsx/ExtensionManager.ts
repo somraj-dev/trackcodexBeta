@@ -4,7 +4,7 @@
  * Manages per-user extension install/uninstall/enable/disable state.
  * Persists to UserExtension table.
  */
-import { prisma } from "../../prisma";
+import { prisma } from "../prisma";
 
 // Shared prisma instance
 
