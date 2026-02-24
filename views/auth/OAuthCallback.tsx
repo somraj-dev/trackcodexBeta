@@ -101,7 +101,7 @@ const OAuthCallback: React.FC = () => {
         setTimeout(() => navigate(redirectPath), 100);
       } catch (err: any) {
         console.error("OAuth callback error:", err);
-        const serverError = err.response?.data?.error || err.response?.data?.detail;
+        const serverError = err.response?.data?.message || err.response?.data?.error || err.response?.data?.detail;
         const errorMessage = serverError || err.message || "Authentication failed";
         setError(errorMessage);
         // Redirect to login after 5 seconds to give user time to read
