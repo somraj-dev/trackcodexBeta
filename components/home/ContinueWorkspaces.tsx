@@ -18,9 +18,9 @@ const ContinueWorkspaces = () => {
           // Backend returns: { id, name, description, status, ownerId, ... }
           // UI expects: { name, org, status, badgeColor, aiText, icon, aiColor } relative to mocks
           // We will adapt the display to be more generic for real data
-          setWorkspaces(data);
+          setWorkspaces(Array.isArray(data) ? data : []);
         })
-        .catch((err) => console.error("Failed to load workspaces", err))
+        .catch((err) => {
         .finally(() => setLoading(false));
     });
   }, []);
