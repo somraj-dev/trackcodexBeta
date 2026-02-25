@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../../context/AuthContext";
-import IDEShim from "../../views/ide/IDEShim";
+import TrackCodexIDE from "../../views/ide/TrackCodexIDE";
 
 const WorkspaceEmbed: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -101,7 +101,7 @@ const WorkspaceEmbed: React.FC = () => {
   }
 
   if (useFallbackShim) {
-    return <IDEShim />;
+    return <TrackCodexIDE />;
   }
 
   return (

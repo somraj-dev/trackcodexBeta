@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import VSCodeWebBridge from "../../components/ide/VSCodeWebBridge";
 import { useTheme } from "../../context/ThemeContext";
 import { api } from "../../services/api";
-import IDEShim from "./IDEShim";
+import TrackCodexIDE from "./TrackCodexIDE";
 
 /**
  * VSCodeWorkspaceView — Full VS Code Web Integration
@@ -194,7 +194,7 @@ const VSCodeWorkspaceView: React.FC = () => {
     }
 
     if (useFallbackShim) {
-        return <IDEShim />;
+        return <TrackCodexIDE />;
     }
 
     // ── VS Code Web iframe ─────────────────────────────────────
