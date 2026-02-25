@@ -68,6 +68,11 @@ model User {
   teamMembers       TeamMember[]
   jobApplications   JobApplication[]
 
+  workspaceMemberships    WorkspaceMember[]
+  workspaceStars          WorkspaceStar[]
+  workspaceInvitesSent    WorkspaceMember[] @relation("InvitedBy")
+  workspaceInvitesCreated WorkspaceInvite[]
+
   customProfile       Profile?
   sshKeys             SSHKey[]
   gpgKeys             GPGKey[]
@@ -649,6 +654,60 @@ model Workspace {
   updatedAt      DateTime        @updatedAt
   activityLogs   ActivityLog[]
   communityPosts CommunityPost[]
+
+  members    WorkspaceMember[]
+  invites    WorkspaceInvite[]
+  stars      WorkspaceStar[]
+  starsCount Int               @default(0)
+  forksCount Int               @default(0)
+  forkedFrom String?
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String // OWNER, ADMIN, WRITE, READ
+  invitedBy   String?
+  inviter     User?     @relation("InvitedBy", fields: [invitedBy], references: [id])
+  joinedAt    DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model WorkspaceInvite {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  email       String
+  role        String // ADMIN, WRITE, READ
+  invitedBy   String
+  inviter     User      @relation(fields: [invitedBy], references: [id])
+  token       String    @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([workspaceId])
+  @@index([token])
+  @@index([email])
+}
+
+model WorkspaceStar {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([userId])
 }
 
 // --- Jobs & Marketplace ---

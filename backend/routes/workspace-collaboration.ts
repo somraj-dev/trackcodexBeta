@@ -209,7 +209,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
         memberId: string;
       };
       const { role } = request.body as { role: string };
-      const userId = (request as any).user?.userId;
+      const userId = (request as any).user?.id;
 
       if (!userId) {
         return reply.code(401).send({ message: "Unauthorized" });
@@ -284,7 +284,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
         workspaceId: string;
         memberId: string;
       };
-      const userId = (request as any).user?.userId;
+      const userId = (request as any).user?.id;
 
       if (!userId) {
         return reply.code(401).send({ message: "Unauthorized" });
@@ -340,7 +340,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
    */
   fastify.post("/workspaces/:workspaceId/leave", async (request, reply) => {
     const { workspaceId } = request.params as { workspaceId: string };
-    const userId = (request as any).user?.userId;
+    const userId = (request as any).user?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
@@ -386,7 +386,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
   fastify.post("/workspaces/:workspaceId/password", async (request, reply) => {
     const { workspaceId } = request.params as { workspaceId: string };
     const { password } = request.body as { password: string };
-    const userId = (request as any).user?.userId;
+    const userId = (request as any).user?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });
@@ -440,7 +440,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
     "/workspaces/:workspaceId/password",
     async (request, reply) => {
       const { workspaceId } = request.params as { workspaceId: string };
-      const userId = (request as any).user?.userId;
+      const userId = (request as any).user?.id;
 
       if (!userId) {
         return reply.code(401).send({ message: "Unauthorized" });
@@ -680,7 +680,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
         workspaceId: string;
         inviteId: string;
       };
-      const userId = (request as any).user?.userId;
+      const userId = (request as any).user?.id;
 
       if (!userId) {
         return reply.code(401).send({ message: "Unauthorized" });
@@ -716,7 +716,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
     "/workspaces/:workspaceId/permissions",
     async (request, reply) => {
       const { workspaceId } = request.params as { workspaceId: string };
-      const userId = (request as any).user?.userId;
+      const userId = (request as any).user?.id;
 
       if (!userId) {
         return reply.code(401).send({ message: "Unauthorized" });
@@ -755,7 +755,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
   fastify.post("/workspaces/:workspaceId/transfer", async (request, reply) => {
     const { workspaceId } = request.params as { workspaceId: string };
     const { newOwnerId } = request.body as { newOwnerId: string };
-    const userId = (request as any).user?.userId;
+    const userId = (request as any).user?.id;
 
     if (!userId) {
       return reply.code(401).send({ message: "Unauthorized" });

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { MOCK_REPOS } from "../constants";
 import PostJobModal from "../components/jobs/PostJobModal";
+import { api } from "../context/AuthContext";
 import { useRealtime } from "../contexts/RealtimeContext";
 
 // Tabs
@@ -92,19 +93,15 @@ const RepoDetailView = () => {
       try {
         let url = "";
         if (id && id !== "undefined") {
-          url = `/api/v1/repositories/${id}`;
+          url = `/repositories/${id}`;
         } else if (owner && repoName) {
-          url = `/api/v1/repositories/by-name/${owner}/${repoName}`;
+          url = `/repositories/by-name/${owner}/${repoName}`;
         } else {
           throw new Error("No repository ID or owner/name provided in URL");
         }
 
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch repository details");
-        }
-        const data = await response.json();
-        setRepo(data);
+        const response = await api.get(url);
+        setRepo(response.data);
       } catch (err) {
         console.error("Failed to fetch repo detail from internal API", err);
         const mockId = id || (owner && repoName ? `${owner}/${repoName}` : undefined);
