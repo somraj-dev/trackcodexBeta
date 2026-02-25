@@ -14,7 +14,7 @@ export async function userRoutes(fastify: FastifyInstance) {
         const userData = await prisma.user.findUnique({
           where: { id: currentUser.userId },
           include: {
-            profile: true,
+            customProfile: true,
             posts: true,
             comments: true,
             repositories: true,
@@ -33,7 +33,8 @@ export async function userRoutes(fastify: FastifyInstance) {
           "Content-Disposition",
           `attachment; filename="trackcodex-export-${currentUser.username}.json"`,
         );
-        return userData;
+        const { customProfile, ...rest } = userData as any;
+        return { ...rest, profile: customProfile };
       } catch (error) {
         request.log.error(error);
         return reply.code(500).send({ message: "Export failed" });
@@ -87,7 +88,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           avatar: true,
           role: true,
           createdAt: true,
-          profile: {
+          customProfile: {
             select: {
               bio: true,
               location: true,
@@ -120,12 +121,12 @@ export async function userRoutes(fastify: FastifyInstance) {
 
       return {
         ...user,
-        followers: user.profile?.followersCount || 0,
-        following: user.profile?.followingCount || 0,
-        bio: user.profile?.bio || "",
-        location: user.profile?.location || "",
-        website: user.profile?.website || "",
-        company: user.profile?.company || "",
+        followers: (user as any).customProfile?.followersCount || 0,
+        following: (user as any).customProfile?.followingCount || 0,
+        bio: (user as any).customProfile?.bio || "",
+        location: (user as any).customProfile?.location || "",
+        website: (user as any).customProfile?.website || "",
+        company: (user as any).customProfile?.company || "",
         isFollowing,
       };
     } catch (error) {
@@ -248,15 +249,16 @@ export async function userRoutes(fastify: FastifyInstance) {
         where: { followingId: userId },
         include: {
           follower: {
-            include: { profile: true },
+            include: { customProfile: true },
           },
         },
         orderBy: { createdAt: "desc" },
       });
 
-      return followers.map((f) => ({
+      return followers.map((f: any) => ({
         ...f.follower,
-        profile: f.follower.profile,
+        profile: f.follower.customProfile,
+        customProfile: undefined
       }));
     } catch (error) {
       console.error("Get followers error:", error);
@@ -273,15 +275,16 @@ export async function userRoutes(fastify: FastifyInstance) {
         where: { followerId: userId },
         include: {
           following: {
-            include: { profile: true },
+            include: { customProfile: true },
           },
         },
         orderBy: { createdAt: "desc" },
       });
 
-      return following.map((f) => ({
+      return following.map((f: any) => ({
         ...f.following,
-        profile: f.following.profile,
+        profile: f.following.customProfile,
+        customProfile: undefined
       }));
     } catch (error) {
       console.error("Get following error:", error);
@@ -307,11 +310,15 @@ export async function userRoutes(fastify: FastifyInstance) {
             { name: { contains: q, mode: "insensitive" } },
           ],
         },
-        include: { profile: true },
+        include: { customProfile: true },
         take: 20,
       });
 
-      return users;
+      return users.map((u: any) => ({
+        ...u,
+        profile: u.customProfile,
+        customProfile: undefined
+      }));
     } catch (error) {
       console.error("Search error:", error);
       return reply.code(500).send({ message: "Search failed" });
@@ -322,16 +329,20 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.get("/users/trending", async (request, reply) => {
     try {
       const users = await prisma.user.findMany({
-        include: { profile: true },
+        include: { customProfile: true },
         orderBy: {
-          profile: {
+          customProfile: {
             followersCount: "desc",
           },
         },
         take: 10,
       });
 
-      return users;
+      return users.map((u: any) => ({
+        ...u,
+        profile: u.customProfile,
+        customProfile: undefined
+      }));
     } catch (error) {
       console.error("Trending users error:", error);
       return reply
@@ -361,16 +372,20 @@ export async function userRoutes(fastify: FastifyInstance) {
             notIn: currentUser ? [...followingIds, currentUser.id] : [],
           },
         },
-        include: { profile: true },
+        include: { customProfile: true },
         take: 5,
         orderBy: {
-          profile: {
+          customProfile: {
             followersCount: "desc",
           },
         },
       });
 
-      return users;
+      return users.map((u: any) => ({
+        ...u,
+        profile: u.customProfile,
+        customProfile: undefined
+      }));
     } catch (error) {
       console.error("Suggested users error:", error);
       return reply
