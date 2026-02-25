@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VSCodeWebBridge from "../../components/ide/VSCodeWebBridge";
 import { useTheme } from "../../context/ThemeContext";
+import { API_BASE } from "../../services/api";
 
 /**
  * VSCodeWorkspaceView — Full VS Code Web Integration
@@ -29,7 +30,7 @@ const VSCodeWorkspaceView: React.FC = () => {
     useEffect(() => {
         const syncTheme = async () => {
             try {
-                await fetch("/api/v1/ide/theme", {
+                await fetch(`${API_BASE}/ide/theme`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ theme: resolvedTheme.type })
@@ -52,7 +53,7 @@ const VSCodeWorkspaceView: React.FC = () => {
             // First, try to get repo details (when launched from Repositories page)
             let repoName: string | null = null;
             try {
-                const repoRes = await fetch(`/api/v1/repositories/${id}`);
+                const repoRes = await fetch(`${API_BASE}/repositories/${id}`);
                 if (repoRes.ok) {
                     const repo = await repoRes.json();
                     repoName = repo.name || null;
@@ -64,7 +65,7 @@ const VSCodeWorkspaceView: React.FC = () => {
 
             // If not a repo, fetch workspace details
             if (!repoName) {
-                const detailRes = await fetch(`/api/v1/workspaces/${id}`);
+                const detailRes = await fetch(`${API_BASE}/workspaces/${id}`);
                 if (detailRes.ok) {
                     const detail = await detailRes.json();
                     setWorkspaceName(detail.name || "Workspace");
@@ -72,7 +73,7 @@ const VSCodeWorkspaceView: React.FC = () => {
             }
 
             // Start workspace — pass repoId so backend clones from Gitea
-            const startRes = await fetch(`/api/v1/workspaces/${id}/start`, {
+            const startRes = await fetch(`${API_BASE}/workspaces/${id}/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ repoId: id }),
@@ -80,7 +81,25 @@ const VSCodeWorkspaceView: React.FC = () => {
 
             if (startRes.ok) {
                 const data = await startRes.json();
-                setVsCodeUrl(data.url || "http://localhost:8080");
+                let url = data.url || "http://localhost:8080";
+
+                // Fast fallback: If backend returned localhost but we are on a remote domain,
+                // try rewriting it to the current window's hostname.
+                try {
+                    const parsed = new URL(url);
+                    if (
+                        (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") &&
+                        window.location.hostname !== "localhost" &&
+                        window.location.hostname !== "127.0.0.1"
+                    ) {
+                        parsed.hostname = window.location.hostname;
+                        url = parsed.toString();
+                    }
+                } catch (e) {
+                    // Ignore URL parsing errors
+                }
+
+                setVsCodeUrl(url);
             } else {
                 console.warn("Workspace start API returned error, using default VS Code Web URL");
                 setVsCodeUrl("http://localhost:8080");

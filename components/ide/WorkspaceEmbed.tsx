@@ -15,7 +15,25 @@ const WorkspaceEmbed: React.FC = () => {
       try {
         // Use central API instance --> handles Base URL + Credentials + CSRF automatically
         const response = await api.post(`/workspaces/${id}/start`);
-        setIdeUrl(response.data.url);
+        let url = response.data.url;
+
+        // Fast fallback: If backend returned localhost but we are on a remote domain,
+        // try rewriting it to the current window's hostname.
+        try {
+          const parsed = new URL(url);
+          if (
+            (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") &&
+            window.location.hostname !== "localhost" &&
+            window.location.hostname !== "127.0.0.1"
+          ) {
+            parsed.hostname = window.location.hostname;
+            url = parsed.toString();
+          }
+        } catch (e) {
+          // Ignore URL parsing errors
+        }
+
+        setIdeUrl(url);
       } catch (err: any) {
         console.error("Workspace start error:", err);
         const msg =
