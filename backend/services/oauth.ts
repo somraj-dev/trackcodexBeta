@@ -136,7 +136,10 @@ export class OAuthService {
   /**
    * Exchange GitHub authorization code for access token
    */
-  static async exchangeGithubCode(code: string): Promise<OAuthTokenData> {
+  static async exchangeGithubCode(
+    code: string,
+    redirectUri?: string
+  ): Promise<OAuthTokenData> {
     if (!getGithubClientId() || !getGithubClientSecret()) {
       throw new Error("GitHub credentials are not configured on the server.");
     }
@@ -153,7 +156,7 @@ export class OAuthService {
           client_id: getGithubClientId(),
           client_secret: getGithubClientSecret(),
           code,
-          redirect_uri: getGithubRedirectUri(),
+          redirect_uri: redirectUri || getGithubRedirectUri(),
         }),
       },
     );

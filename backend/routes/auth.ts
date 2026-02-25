@@ -626,14 +626,20 @@ export async function authRoutes(fastify: FastifyInstance) {
       config: { rateLimit: rateLimitConfig.oauth },
     },
     async (request, reply) => {
-      const { code } = request.body as { code: string };
+      const { code, redirectUri } = request.body as {
+        code: string;
+        redirectUri?: string;
+      };
       const ip = request.ip;
       const userAgent = request.headers["user-agent"] || "unknown";
 
       try {
         if (!code) throw BadRequest("Authorization code required");
 
-        const tokenData = await OAuthService.exchangeGithubCode(code);
+        const tokenData = await OAuthService.exchangeGithubCode(
+          code,
+          redirectUri,
+        );
         const githubUser = await OAuthService.getGithubUserInfo(
           tokenData.access_token,
         );
