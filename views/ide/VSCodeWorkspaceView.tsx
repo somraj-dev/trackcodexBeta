@@ -176,27 +176,6 @@ const VSCodeWorkspaceView: React.FC = () => {
         );
     }
 
-    // ── Fallback to Monaco IDEShim if OpenVSCode is Localhost on a Remote Domain ──
-    let useFallbackShim = false;
-    try {
-        if (vsCodeUrl) {
-            const parsed = new URL(vsCodeUrl);
-            if (
-                (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") &&
-                window.location.hostname !== "localhost" &&
-                window.location.hostname !== "127.0.0.1"
-            ) {
-                useFallbackShim = true;
-            }
-        }
-    } catch (e) {
-        // Ignore URL parsing errors
-    }
-
-    if (useFallbackShim) {
-        return <TrackCodexIDE />;
-    }
-
     // ── VS Code Web iframe ─────────────────────────────────────
     return (
         <div className="w-full h-screen relative">

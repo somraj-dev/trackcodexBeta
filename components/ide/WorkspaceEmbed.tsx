@@ -84,25 +84,6 @@ const WorkspaceEmbed: React.FC = () => {
     );
   }
 
-  let useFallbackShim = false;
-  try {
-    if (ideUrl) {
-      const parsed = new URL(ideUrl);
-      if (
-        (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") &&
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1"
-      ) {
-        useFallbackShim = true;
-      }
-    }
-  } catch (e) {
-    // Ignore URL parsing errors
-  }
-
-  if (useFallbackShim) {
-    return <TrackCodexIDE />;
-  }
 
   return (
     <div className="w-full h-full bg-[#1e1e1e] overflow-hidden">
