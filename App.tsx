@@ -17,6 +17,7 @@ import { RealtimeProvider } from "./contexts/RealtimeContext";
 const Login = React.lazy(() => import("./views/auth/Login"));
 const Signup = React.lazy(() => import("./views/auth/Signup"));
 const OAuthCallback = React.lazy(() => import("./views/auth/OAuthCallback"));
+const SignOut = React.lazy(() => import("./views/auth/SignOut"));
 const LandingPage = React.lazy(() => import("./views/LandingPage"));
 
 // Layout Components
@@ -1117,7 +1118,10 @@ const AppContent = () => {
 
             {/* Application */}
             {isAuthenticated && (
-              <Route path="/*" element={<ProtectedApp isFocusMode={false} />} />
+              <>
+                <Route path="/logout" element={<SignOut />} />
+                <Route path="/*" element={<ProtectedApp isFocusMode={false} />} />
+              </>
             )}
           </Routes>
         </main>

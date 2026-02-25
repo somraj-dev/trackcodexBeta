@@ -58,7 +58,10 @@ const OrgSwitcher = ({
           </div>
 
           <div
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              setIsOpen(false);
+              window.location.hash = "#/logout";
+            }}
             className="menu-item-gh text-red-400 hover:text-red-300"
           >
             <span className="material-symbols-outlined icon">logout</span> Sign

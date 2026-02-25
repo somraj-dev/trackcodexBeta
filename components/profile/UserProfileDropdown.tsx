@@ -40,13 +40,11 @@ const MenuItem = ({
 interface UserProfileDropdownProps {
   profile: UserProfile;
   onClose: () => void;
-  logout: () => void;
 }
 
 const UserProfileDropdown = ({
   profile,
   onClose,
-  logout,
 }: UserProfileDropdownProps) => {
   const navigate = useNavigate();
   const [stratas, setStratas] = React.useState<Strata[]>([]);
@@ -186,7 +184,7 @@ const UserProfileDropdown = ({
         <div className="h-px bg-gh-border my-2 mx-3"></div>
 
         {/* Section 3 */}
-        <MenuItem icon="logout" label="Sign out" onClick={logout} />
+        <MenuItem icon="logout" label="Sign out" onClick={() => handleNavigate("/logout")} />
       </div>
     </div>
   );
