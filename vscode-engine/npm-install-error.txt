@@ -1,0 +1,45 @@
+npm warn cleanup Failed to remove some directories [
+npm warn cleanup   [
+npm warn cleanup     'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\which',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\asus\Downloads\project\TrackcodexBeta\vscode-engine\node_modules\which\bin'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\which\\bin'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\cross-env',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\asus\Downloads\project\TrackcodexBeta\vscode-engine\node_modules\cross-env\dist'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\cross-env\\dist'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\code-server',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\asus\Downloads\project\TrackcodexBeta\vscode-engine\node_modules\code-server\lib\vscode\out\media'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\code-server\\lib\\vscode\\out\\media'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\code-server',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\asus\Downloads\project\TrackcodexBeta\vscode-engine\node_modules\code-server\lib\vscode\extensions\json-language-features\server'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\asus\\Downloads\\project\\TrackcodexBeta\\vscode-engine\\node_modules\\code-server\\lib\\vscode\\extensions\\json-language-features\\server'
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code 1
+npm error path C:\Users\asus\Downloads\project\TrackcodexBeta\vscode-engine\node_modules\code-server
+npm error command failed
+npm error command C:\Windows\system32\cmd.exe /d /s /c sh ./postinstall.sh
+npm error 'sh' is not recognized as an internal or external command,
+npm error operable program or batch file.
+npm error A complete log of this run can be found in: C:\Users\asus\AppData\Local\npm-cache\_logs\2026-02-25T07_44_57_853Z-debug-0.log

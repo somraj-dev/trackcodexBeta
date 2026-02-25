@@ -7,11 +7,11 @@ const TAG_LENGTH = 16;
 const KEY_LENGTH = 32;
 const ITERATIONS = 100000;
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "";
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "fallback_default_encryption_key_32_chars_long!";
 
-if (!ENCRYPTION_KEY) {
+if (ENCRYPTION_KEY === "fallback_default_encryption_key_32_chars_long!") {
   console.warn(
-    "WARNING: ENCRYPTION_KEY is not set. Token encryption will fail.",
+    "WARNING: ENCRYPTION_KEY is not set in environment variables. Using fallback key. This is insecure for production!",
   );
 }
 

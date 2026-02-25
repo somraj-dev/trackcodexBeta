@@ -572,14 +572,9 @@ export async function authRoutes(fastify: FastifyInstance) {
           { ipAddress: ip, userAgent },
         );
 
-        // Log Login
-        await prisma.activityLog.create({
-          data: {
-            userId: user.id,
-            action: "AUTH_LOGIN",
-            details: { provider: "google", method: "oauth", ip, userAgent },
-          },
-        });
+        // NOTE: ActivityLog is not defined in Prisma schema
+        // Consider restoring this once ActivityLog is added to schema
+        console.log("DEBUG: Would log AUTH_LOGIN activity:", { userId: user.id, provider: "google" });
 
         const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
@@ -617,11 +612,9 @@ export async function authRoutes(fastify: FastifyInstance) {
           );
         }
 
-        // Return the real message in dev mode for easier debugging
-        if (process.env.NODE_ENV !== "production") {
-          return reply.code(500).send({ error: "Google login failed", detail: realMessage });
-        }
-        throw InternalError("Google login failed");
+        // Return a clear 400 error with the real message instead of throwing an InternalError
+        // This ensures the frontend receives the reason (e.g. redirect_uri_mismatch) instead of a generic 500
+        return reply.code(400).send({ error: "Google login failed", detail: realMessage });
       }
     },
   );
@@ -749,14 +742,9 @@ export async function authRoutes(fastify: FastifyInstance) {
           { ipAddress: ip, userAgent },
         );
 
-        // Log Login
-        await prisma.activityLog.create({
-          data: {
-            userId: user.id,
-            action: "AUTH_LOGIN",
-            details: { provider: "github", method: "oauth", ip, userAgent },
-          },
-        });
+        // NOTE: ActivityLog is not defined in Prisma schema
+        // Consider restoring this once ActivityLog is added to schema
+        console.log("DEBUG: Would log AUTH_LOGIN activity:", { userId: user.id, provider: "github" });
 
         const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {

@@ -1,0 +1,637 @@
+__tests__/escrow.test.ts(21,59): error TS7006: Parameter 'callback' implicitly has an 'any' type.
+__tests__/escrow.test.ts(77,59): error TS7006: Parameter 'callback' implicitly has an 'any' type.
+graphql/resolvers.ts(51,61): error TS2353: Object literal may only specify known properties, and 'slug' does not exist in type 'OrganizationWhereInput'.
+middleware/gitAuth.ts(31,53): error TS2551: Property 'passwordHash' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'. Did you mean 'password'?
+middleware/gitAuth.ts(61,5): error TS2322: Type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }' is not assignable to type '{ id: string; userId: string; role: string; name?: string | undefined; username?: string | undefined; email?: string | undefined; } & Partial<{ id: string; email: string; username: string | null; ... 31 more ...; pinnedItems: string[]; }>'.
+  Property 'userId' is missing in type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }' but required in type '{ id: string; userId: string; role: string; name?: string | undefined; username?: string | undefined; email?: string | undefined; }'.
+middleware/gitAuth.ts(73,3): error TS2322: Type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }' is not assignable to type '{ id: string; userId: string; role: string; name?: string | undefined; username?: string | undefined; email?: string | undefined; } & Partial<{ id: string; email: string; username: string | null; ... 31 more ...; pinnedItems: string[]; }>'.
+  Property 'userId' is missing in type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }' but required in type '{ id: string; userId: string; role: string; name?: string | undefined; username?: string | undefined; email?: string | undefined; }'.
+routes/auth_otp.ts(33,17): error TS2353: Object literal may only specify known properties, and 'otpCode' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+routes/auth_otp.ts(51,19): error TS2339: Property 'otpCode' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/auth_otp.ts(51,36): error TS2339: Property 'otpExpiresAt' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/auth_otp.ts(55,31): error TS2339: Property 'otpExpiresAt' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/auth_otp.ts(59,18): error TS2339: Property 'otpCode' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/auth_otp.ts(66,21): error TS2353: Object literal may only specify known properties, and 'otpCode' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+routes/css.ts(166,40): error TS2339: Property 'pushToRadar' does not exist on type 'GovernanceEngine'.
+routes/css.ts(171,40): error TS2339: Property 'notifyOwner' does not exist on type 'GovernanceEngine'.
+routes/deployments.ts(19,39): error TS2339: Property 'deployment' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/deployments.ts(33,10): error TS7006: Parameter 'r' implicitly has an 'any' type.
+routes/deployments.ts(45,20): error TS2339: Property 'deploymentApproval' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/deployments.ts(56,22): error TS2339: Property 'deployment' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/deployments.ts(66,13): error TS2353: Object literal may only specify known properties, and 'environmentId' does not exist in type 'WorkflowJobWhereInput'.
+routes/deployments.ts(82,22): error TS2339: Property 'deployment' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/deployments.ts(91,13): error TS2353: Object literal may only specify known properties, and 'environmentId' does not exist in type 'WorkflowJobWhereInput'.
+routes/deployments.ts(110,39): error TS2339: Property 'environment' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/git.ts(77,33): error TS2339: Property 'userKey' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/gitea-webhooks.ts(54,29): error TS2339: Property 'broadcast' does not exist on type 'typeof RealtimeService'.
+routes/jobs.ts(24,56): error TS2353: Object literal may only specify known properties, and 'avatar' does not exist in type 'OrganizationSelect<DefaultArgs>'.
+routes/jobs.ts(41,56): error TS2353: Object literal may only specify known properties, and 'avatar' does not exist in type 'OrganizationSelect<DefaultArgs>'.
+routes/messages.ts(188,9): error TS2783: 'type' is specified more than once, so this usage will be overwritten.
+routes/messages.ts(192,66): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(obj: "Failed to broadcast message via socket", msg?: undefined): void', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'undefined'.
+  Overload 2 of 3, '(obj: "Failed to broadcast message via socket", msg?: undefined, ...args: unknown[]): void', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'undefined'.
+routes/portfolio.ts(110,15): error TS2339: Property 'title' does not exist on type 'unknown'.
+routes/portfolio.ts(110,22): error TS2339: Property 'description' does not exist on type 'unknown'.
+routes/portfolio.ts(110,35): error TS2339: Property 'imageUrl' does not exist on type 'unknown'.
+routes/portfolio.ts(110,45): error TS2339: Property 'demoUrl' does not exist on type 'unknown'.
+routes/portfolio.ts(110,54): error TS2339: Property 'sourceUrl' does not exist on type 'unknown'.
+routes/portfolio.ts(110,65): error TS2339: Property 'technologies' does not exist on type 'unknown'.
+routes/pr_endpoints_snippet.ts(5,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(7,17): error TS2304: Cannot find name 'requireAuth'.
+routes/pr_endpoints_snippet.ts(8,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(8,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(19,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(25,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(27,17): error TS2304: Cannot find name 'requireRepoCapability'.
+routes/pr_endpoints_snippet.ts(28,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(28,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(40,13): error TS2304: Cannot find name 'BadRequest'.
+routes/pr_endpoints_snippet.ts(57,13): error TS2304: Cannot find name 'AuditService'.
+routes/pr_endpoints_snippet.ts(69,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(75,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(77,17): error TS2304: Cannot find name 'requireAuth'.
+routes/pr_endpoints_snippet.ts(78,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(78,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(85,24): error TS2304: Cannot find name 'prisma'.
+routes/pr_endpoints_snippet.ts(107,22): error TS2304: Cannot find name 'NotFound'.
+routes/pr_endpoints_snippet.ts(111,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(117,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(119,17): error TS2304: Cannot find name 'requireAuth'.
+routes/pr_endpoints_snippet.ts(120,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(120,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(127,24): error TS2304: Cannot find name 'prisma'.
+routes/pr_endpoints_snippet.ts(136,22): error TS2304: Cannot find name 'NotFound'.
+routes/pr_endpoints_snippet.ts(145,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(151,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(153,17): error TS2304: Cannot find name 'requireRepoCapability'.
+routes/pr_endpoints_snippet.ts(154,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(154,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(165,24): error TS2304: Cannot find name 'prisma'.
+routes/pr_endpoints_snippet.ts(174,22): error TS2304: Cannot find name 'NotFound'.
+routes/pr_endpoints_snippet.ts(185,13): error TS2304: Cannot find name 'AuditService'.
+routes/pr_endpoints_snippet.ts(197,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(203,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(205,17): error TS2304: Cannot find name 'requireRepoCapability'.
+routes/pr_endpoints_snippet.ts(206,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(206,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(214,24): error TS2304: Cannot find name 'prisma'.
+routes/pr_endpoints_snippet.ts(223,22): error TS2304: Cannot find name 'NotFound'.
+routes/pr_endpoints_snippet.ts(230,13): error TS2304: Cannot find name 'AuditService'.
+routes/pr_endpoints_snippet.ts(242,13): error TS2304: Cannot find name 'InternalError'.
+routes/pr_endpoints_snippet.ts(248,1): error TS2304: Cannot find name 'fastify'.
+routes/pr_endpoints_snippet.ts(250,17): error TS2304: Cannot find name 'requireAuth'.
+routes/pr_endpoints_snippet.ts(251,10): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(251,19): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/pr_endpoints_snippet.ts(262,24): error TS2304: Cannot find name 'BadRequest'.
+routes/pr_endpoints_snippet.ts(265,24): error TS2304: Cannot find name 'prisma'.
+routes/pr_endpoints_snippet.ts(274,22): error TS2304: Cannot find name 'NotFound'.
+routes/pr_endpoints_snippet.ts(286,13): error TS2304: Cannot find name 'AuditService'.
+routes/pr_endpoints_snippet.ts(298,13): error TS2304: Cannot find name 'InternalError'.
+routes/profile.ts(10,10): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(req: FastifyRequest<{ Params: { userId: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'req' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { userId: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { userId: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ userId: string; }'.
+routes/profile.ts(100,10): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(req: FastifyRequest<{ Params: { userId: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'req' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { userId: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { userId: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ userId: string; }'.
+routes/profile.ts(137,10): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(req: FastifyRequest<{ Params: { userId: string; }; Body: { readme: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'req' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { userId: string; }; Body: { readme: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { userId: string; }; Body: { readme: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ userId: string; }'.
+routes/profile.ts(184,10): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: (request: FastifyRequest, reply: FastifyReply) => Promise<undefined>; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(req: FastifyRequest<{ Params: { userId: string; }; Body: { showResume?: boolean; showReadme?: boolean; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'req' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { userId: string; }; Body: { showResume?: boolean | undefined; showReadme?: boolean | undefined; }; }, RawServerDefault, IncomingMessage, ... 4 more ..., ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { userId: string; }; Body: { showResume?: boolean | undefined; showReadme?: boolean | undefined; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ userId: string; }'.
+routes/repositories.ts(587,41): error TS2345: Argument of type '"write_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(701,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1011,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1102,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1155,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1206,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1250,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1286,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1324,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1360,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1533,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1596,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1643,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1672,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1692,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1711,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1741,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1772,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1798,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1847,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1917,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(1948,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(2035,41): error TS2345: Argument of type '"read_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(2052,41): error TS2345: Argument of type '"write_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/repositories.ts(2075,13): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(obj: "Real SCA scan failed, falling back to mocks", msg?: undefined): void', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'undefined'.
+  Overload 2 of 3, '(obj: "Real SCA scan failed, falling back to mocks", msg?: undefined, ...args: unknown[]): void', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'undefined'.
+routes/repositories.ts(2118,41): error TS2345: Argument of type '"write_repo"' is not assignable to parameter of type 'RepoPermission'.
+routes/search.ts(152,38): error TS2339: Property 'codeSymbol' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/search.ts(163,38): error TS7006: Parameter 's' implicitly has an 'any' type.
+routes/search.ts(198,47): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/search.ts(230,20): error TS7006: Parameter 'a' implicitly has an 'any' type.
+routes/search.ts(231,17): error TS7006: Parameter 'a' implicitly has an 'any' type.
+routes/teams.ts(3,23): error TS2724: '"../middleware/auth"' has no exported member named 'requireOrgRole'. Did you mean 'requireRole'?
+routes/teams.ts(6,35): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+routes/teams.ts(89,55): error TS2353: Object literal may only specify known properties, and 'repos' does not exist in type 'TeamCountOutputTypeSelect<DefaultArgs>'.
+routes/users.ts(6,43): error TS2304: Cannot find name 'FastifyInstance'.
+routes/users.ts(11,12): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(11,21): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(17,13): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(48,12): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(48,21): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(69,40): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(69,49): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(90,11): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserSelect<DefaultArgs>'.
+routes/users.ts(123,25): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(124,25): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(125,19): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(126,24): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(127,23): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(128,23): error TS2339: Property 'profile' does not exist on type '{ id: string; email: string; username: string | null; password: string | null; name: string | null; avatar: string | null; role: string; profileCompleted: boolean; orcidId: string | null; ... 25 more ...; pinnedItems: string[]; }'.
+routes/users.ts(138,48): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(138,57): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(192,50): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(192,59): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(243,50): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(243,59): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(251,24): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(258,14): error TS2551: Property 'follower' does not exist on type '{ followerId: string; followingId: string; createdAt: Date; }'. Did you mean 'followerId'?
+routes/users.ts(259,20): error TS2551: Property 'follower' does not exist on type '{ followerId: string; followingId: string; createdAt: Date; }'. Did you mean 'followerId'?
+routes/users.ts(268,50): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(268,59): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(276,24): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(283,14): error TS2551: Property 'following' does not exist on type '{ followerId: string; followingId: string; createdAt: Date; }'. Did you mean 'followingId'?
+routes/users.ts(284,20): error TS2551: Property 'following' does not exist on type '{ followerId: string; followingId: string; createdAt: Date; }'. Did you mean 'followingId'?
+routes/users.ts(293,39): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(293,48): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(310,20): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(322,41): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(322,50): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(325,20): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(327,11): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserOrderByWithRelationInput | UserOrderByWithRelationInput[]'.
+routes/users.ts(344,42): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(344,51): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(364,20): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserInclude<DefaultArgs>'.
+routes/users.ts(367,11): error TS2353: Object literal may only specify known properties, and 'profile' does not exist in type 'UserOrderByWithRelationInput | UserOrderByWithRelationInput[]'.
+routes/users.ts(383,49): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(383,58): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/users.ts(420,55): error TS7006: Parameter 'request' implicitly has an 'any' type.
+routes/users.ts(420,64): error TS7006: Parameter 'reply' implicitly has an 'any' type.
+routes/wallet.ts(24,30): error TS2339: Property 'currency' does not exist on type '{ id: string; userId: string; balance: number; updatedAt: Date; }'.
+routes/wallet.ts(50,17): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type 'Without<TransactionCreateInput, TransactionUncheckedCreateInput> & TransactionUncheckedCreateInput'.
+routes/webhooks.ts(42,27): error TS2339: Property 'webhook' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/webhooks.ts(52,31): error TS2339: Property 'webhook' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(22,9): error TS2353: Object literal may only specify known properties, and 'metadata' does not exist in type 'Without<ActivityLogCreateInput, ActivityLogUncheckedCreateInput> & ActivityLogUncheckedCreateInput'.
+routes/workspace-collaboration.ts(49,37): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(63,41): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(77,45): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(94,37): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(169,38): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(220,46): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(232,43): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(243,44): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(295,46): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(307,43): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(317,22): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(350,35): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(366,20): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(397,35): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(451,37): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(532,38): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(584,37): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(605,22): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(615,22): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(649,35): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(661,20): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(691,37): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(699,22): error TS2339: Property 'workspaceInvite' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(726,37): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(766,41): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(777,37): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(790,16): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-collaboration.ts(795,16): error TS2339: Property 'workspaceMember' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+routes/workspace-stars.ts(32,41): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(46,20): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(57,11): error TS2353: Object literal may only specify known properties, and 'starsCount' does not exist in type '(Without<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput> & WorkspaceUncheckedUpdateInput) | (Without<...> & WorkspaceUpdateInput)'.
+routes/workspace-stars.ts(78,33): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(92,20): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(100,11): error TS2353: Object literal may only specify known properties, and 'starsCount' does not exist in type '(Without<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput> & WorkspaceUncheckedUpdateInput) | (Without<...> & WorkspaceUpdateInput)'.
+routes/workspace-stars.ts(120,34): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(134,34): error TS2551: Property 'workspaceStar' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'. Did you mean 'workspace'?
+routes/workspace-stars.ts(138,32): error TS7006: Parameter 'star' implicitly has an 'any' type.
+routes/workspace-stars.ts(238,11): error TS2353: Object literal may only specify known properties, and 'environment' does not exist in type '(Without<WorkspaceCreateInput, WorkspaceUncheckedCreateInput> & WorkspaceUncheckedCreateInput) | (Without<...> & WorkspaceCreateInput)'.
+routes/workspace-stars.ts(238,42): error TS2339: Property 'environment' does not exist on type '{ id: string; name: string; description: string | null; status: string; ownerId: string; repoUrl: string | null; visibility: string; accessPassword: string | null; createdAt: Date; updatedAt: Date; }'.
+routes/workspace-stars.ts(239,38): error TS2339: Property 'runtime' does not exist on type '{ id: string; name: string; description: string | null; status: string; ownerId: string; repoUrl: string | null; visibility: string; accessPassword: string | null; createdAt: Date; updatedAt: Date; }'.
+routes/workspace-stars.ts(251,11): error TS2353: Object literal may only specify known properties, and 'forksCount' does not exist in type '(Without<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput> & WorkspaceUncheckedUpdateInput) | (Without<...> & WorkspaceUpdateInput)'.
+routes/workspace-stars.ts(261,28): error TS2339: Property 'forkedFrom' does not exist on type '{ id: string; name: string; description: string | null; status: string; ownerId: string; repoUrl: string | null; visibility: string; accessPassword: string | null; createdAt: Date; updatedAt: Date; }'.
+server.ts(424,22): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+services/activityService.ts(20,25): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/activityService.ts(35,25): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/activityService.ts(47,25): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/aiOrchestrator.ts(53,33): error TS2339: Property 'getGenerativeModel' does not exist on type 'GoogleGenAI'.
+services/artifact.ts(29,33): error TS2339: Property 'commit' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/artifact.ts(69,41): error TS2339: Property 'commitArtifact' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/audit.ts(29,19): error TS2353: Object literal may only specify known properties, and 'eventHash' does not exist in type 'AuditLogSelect<DefaultArgs>'.
+services/audit.ts(33,18): error TS2339: Property 'eventHash' does not exist on type '{ id: string; enterpriseId: string | null; orgId: string | null; repoId: string | null; actorId: string; action: string; resource: string; details: JsonValue; ipAddress: string | null; userAgent: string | null; createdAt: Date; }'.
+services/audit.ts(66,11): error TS2353: Object literal may only specify known properties, and 'previousEventHash' does not exist in type 'Without<AuditLogCreateInput, AuditLogUncheckedCreateInput> & AuditLogUncheckedCreateInput'.
+services/chat.ts(1,10): error TS2305: Module '"@fastify/websocket"' has no exported member 'SocketStream'.
+services/chat.ts(43,29): error TS2353: Object literal may only specify known properties, and 'receiverId' does not exist in type '(Without<MessageCreateInput, MessageUncheckedCreateInput> & MessageUncheckedCreateInput) | (Without<...> & MessageCreateInput)'.
+services/contributionStatsService.ts(24,37): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/contributionStatsService.ts(82,37): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/contributionStatsService.ts(117,35): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+services/contributionStatsService.ts(118,35): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+services/contributionStatsService.ts(136,33): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+services/contributionStatsService.ts(137,33): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type 'string | number'.
+services/contributionStatsService.ts(165,32): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(98,35): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(138,34): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(162,26): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(295,39): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(353,22): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(450,23): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(460,23): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(471,23): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/css/CSSService.ts(484,23): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/dependencyManager.ts(58,20): error TS18046: 'info' is of type 'unknown'.
+services/dependencyManager.ts(59,19): error TS18046: 'info' is of type 'unknown'.
+services/dependencyManager.ts(60,19): error TS18046: 'info' is of type 'unknown'.
+services/dependencyManager.ts(92,23): error TS18046: 'vuln' is of type 'unknown'.
+services/dependencyManager.ts(93,32): error TS18046: 'vuln' is of type 'unknown'.
+services/dependencyManager.ts(93,44): error TS18046: 'vuln' is of type 'unknown'.
+services/dependencyManager.ts(93,66): error TS18046: 'vuln' is of type 'unknown'.
+services/dependencyManager.ts(94,29): error TS18046: 'vuln' is of type 'unknown'.
+services/dependencyManager.ts(95,20): error TS18046: 'vuln' is of type 'unknown'.
+services/github.ts(55,15): error TS2353: Object literal may only specify known properties, and 'githubId' does not exist in type 'RepositoryWhereInput'.
+services/github.ts(73,11): error TS2322: Type 'number' is not assignable to type 'RepositoryUncheckedCreateNestedManyWithoutParentInput | RepositoryCreateNestedManyWithoutParentInput | undefined'.
+services/github.ts(84,11): error TS2322: Type 'number' is not assignable to type 'RepositoryUncheckedUpdateManyWithoutParentNestedInput | RepositoryUpdateManyWithoutParentNestedInput | undefined'.
+services/integrity.ts(204,32): error TS2339: Property 'userKey' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/integrity.ts(219,18): error TS2339: Property 'commit' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/jwt.ts(16,16): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: null, options?: (SignOptions & { algorithm: "none"; }) | undefined): string', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'null'.
+  Overload 2 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, options?: SignOptions | undefined): string', gave the following error.
+    Type 'string' is not assignable to type 'number | StringValue | undefined'.
+  Overload 3 of 5, '(payload: string | object | Buffer<ArrayBufferLike>, secretOrPrivateKey: Buffer<ArrayBufferLike> | Secret | PrivateKeyInput | JsonWebKeyInput, callback: SignCallback): void', gave the following error.
+    Object literal may only specify known properties, and 'expiresIn' does not exist in type 'SignCallback'.
+services/openvsx/ExtensionManager.ts(22,23): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(45,33): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(57,23): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(67,23): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(77,34): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(88,26): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/openvsx/ExtensionManager.ts(101,37): error TS2339: Property 'userExtension' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/pipelineService.ts(1,30): error TS7016: Could not find a declaration file for module 'uuid'. 'C:/Users/asus/Downloads/project/TrackcodexBeta/node_modules/uuid/dist/esm-browser/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/uuid` if it exists or add a new declaration (.d.ts) file containing `declare module 'uuid';`
+services/radar/domains/MarketplaceDomain.ts(26,22): error TS2339: Property 'marketplaceDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/MarketplaceDomain.ts(43,26): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'JobApplicationWhereInput'.
+services/radar/domains/MarketplaceDomain.ts(46,26): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'JobApplicationWhereInput'.
+services/radar/domains/MarketplaceDomain.ts(49,26): error TS2561: Object literal may only specify known properties, but 'revieweeId' does not exist in type 'JobReviewWhereInput'. Did you mean to write 'reviewerId'?
+services/radar/domains/MarketplaceDomain.ts(73,22): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'JobApplicationWhereInput'.
+services/radar/domains/MarketplaceDomain.ts(82,21): error TS2339: Property 'job' does not exist on type '{ id: string; jobId: string; applicantId: string; status: string; stage: string; coverLetter: string | null; resumeUrl: string | null; score: number; createdAt: Date; updatedAt: Date; }'.
+services/radar/domains/MarketplaceDomain.ts(83,47): error TS2339: Property 'job' does not exist on type '{ id: string; jobId: string; applicantId: string; status: string; stage: string; coverLetter: string | null; resumeUrl: string | null; score: number; createdAt: Date; updatedAt: Date; }'.
+services/radar/domains/MarketplaceDomain.ts(101,41): error TS2339: Property 'repositoryDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/MarketplaceDomain.ts(119,23): error TS2339: Property 'marketplaceDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/OssContributionDomain.ts(25,22): error TS2339: Property 'ossDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/OssContributionDomain.ts(45,21): error TS2353: Object literal may only specify known properties, and 'state' does not exist in type 'PullRequestWhereInput'.
+services/radar/domains/OssContributionDomain.ts(75,17): error TS2353: Object literal may only specify known properties, and 'state' does not exist in type 'PullRequestWhereInput'.
+services/radar/domains/OssContributionDomain.ts(88,41): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/OssContributionDomain.ts(114,53): error TS2365: Operator '+' cannot be applied to types 'number' and '{ id: string; name: string; description: string | null; isPublic: boolean; language: string | null; stars: number; createdAt: Date; updatedAt: Date; settings: JsonValue; ... 18 more ...; sshUrl: string | null; }[]'.
+services/radar/domains/OssContributionDomain.ts(127,23): error TS2339: Property 'ossDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(27,22): error TS2339: Property 'repositoryDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(41,36): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(70,41): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(84,42): error TS7006: Parameter 'v' implicitly has an 'any' type.
+services/radar/domains/RepositorySecurityDomain.ts(90,46): error TS7006: Parameter 'a' implicitly has an 'any' type.
+services/radar/domains/RepositorySecurityDomain.ts(90,49): error TS7006: Parameter 'b' implicitly has an 'any' type.
+services/radar/domains/RepositorySecurityDomain.ts(105,42): error TS2339: Property 'vulnerability' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(137,42): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/domains/RepositorySecurityDomain.ts(158,23): error TS2339: Property 'repositoryDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(49,36): error TS2339: Property 'governanceRule' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(89,42): error TS2339: Property 'userRadarState' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(99,36): error TS2339: Property 'governanceRule' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(149,35): error TS2339: Property 'codeScan' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(175,56): error TS7006: Parameter 'v' implicitly has an 'any' type.
+services/radar/GovernanceEngine.ts(194,56): error TS7006: Parameter 'v' implicitly has an 'any' type.
+services/radar/GovernanceEngine.ts(237,43): error TS2339: Property 'governanceRule' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(241,30): error TS2339: Property 'governanceRule' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/GovernanceEngine.ts(252,23): error TS2339: Property 'governanceRule' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(58,20): error TS2339: Property 'repositoryDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(59,20): error TS2339: Property 'marketplaceDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(60,20): error TS2339: Property 'ossDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(109,20): error TS2339: Property 'userRadarState' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(123,22): error TS2339: Property 'radarHistory' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(141,42): error TS2339: Property 'userRadarState' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(148,42): error TS7006: Parameter 'state' implicitly has an 'any' type.
+services/radar/RadarService.ts(149,20): error TS2339: Property 'userRadarState' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(166,37): error TS2339: Property 'userRadarState' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(185,23): error TS2339: Property 'radarHistory' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(196,20): error TS2339: Property 'repositoryDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(197,20): error TS2339: Property 'marketplaceDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/radar/RadarService.ts(198,20): error TS2339: Property 'ossDomainScore' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/ravenIndexer.ts(43,20): error TS2339: Property 'codeSymbol' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/ravenIndexer.ts(160,20): error TS2339: Property 'codeSymbol' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/repositoryService.ts(38,36): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'RepoPermissionWhereInput'.
+services/repositoryService.ts(47,7): error TS2322: Type '{ name: string; description: string | null; isPublic: boolean; language: string | null; forkedFromId: string; }' is not assignable to type '(Without<RepositoryCreateInput, RepositoryUncheckedCreateInput> & RepositoryUncheckedCreateInput) | (Without<...> & RepositoryCreateInput)'.
+  Type '{ name: string; description: string | null; isPublic: boolean; language: string | null; forkedFromId: string; }' is not assignable to type 'Without<RepositoryCreateInput, RepositoryUncheckedCreateInput> & RepositoryUncheckedCreateInput'.
+    Property 'ownerId' is missing in type '{ name: string; description: string | null; isPublic: boolean; language: string | null; forkedFromId: string; }' but required in type 'RepositoryUncheckedCreateInput'.
+services/repositoryService.ts(78,9): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'Without<RepoPermissionCreateInput, RepoPermissionUncheckedCreateInput> & RepoPermissionUncheckedCreateInput'.
+services/repositoryService.ts(137,7): error TS2322: Type '{ name: string; description: string | null; isPublic: boolean; language: string | null; }' is not assignable to type '(Without<RepositoryCreateInput, RepositoryUncheckedCreateInput> & RepositoryUncheckedCreateInput) | (Without<...> & RepositoryCreateInput)'.
+  Type '{ name: string; description: string | null; isPublic: boolean; language: string | null; }' is not assignable to type 'Without<RepositoryUncheckedCreateInput, RepositoryCreateInput> & RepositoryCreateInput'.
+    Property 'owner' is missing in type '{ name: string; description: string | null; isPublic: boolean; language: string | null; }' but required in type 'RepositoryCreateInput'.
+services/repositoryService.ts(147,35): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type 'Without<RepoPermissionCreateInput, RepoPermissionUncheckedCreateInput> & RepoPermissionUncheckedCreateInput'.
+services/searchService.ts(128,43): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/searchService.ts(188,20): error TS2339: Property 'activity' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/session.ts(123,5): error TS2322: Type 'string | null' is not assignable to type 'string'.
+  Type 'null' is not assignable to type 'string'.
+services/webhookService.ts(4,15): error TS2305: Module '"@prisma/client"' has no exported member 'Webhook'.
+services/webhookService.ts(22,35): error TS2339: Property 'webhook' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/webhookService.ts(73,20): error TS2339: Property 'webhookDelivery' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/webhookService.ts(90,20): error TS2339: Property 'webhookDelivery' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+services/webhookService.ts(119,31): error TS2339: Property 'webhook' does not exist on type 'PrismaClient<{ log: ("error" | "query" | "warn")[]; }, never, DefaultArgs>'.
+../components/applications/KanbanBoard.tsx(21,30): error TS7006: Parameter 'event' implicitly has an 'any' type.
+../components/applications/KanbanBoard.tsx(26,34): error TS7006: Parameter 'event' implicitly has an 'any' type.
+../components/community/CommentItem.tsx(73,30): error TS2741: Property 'id' is missing in type '{ name: string; username: string; avatar: string; karma: number; }' but required in type '{ id: string; name: string; username: string; avatar: string; role?: string | undefined; karma: number; bio?: string | undefined; followersCount?: number | undefined; postsCount?: number | undefined; isVerified?: boolean | undefined; }'.
+../components/ide/ExtensionsPanel.tsx(47,25): error TS2554: Expected 1 arguments, but got 0.
+../components/ide/IDELayout.tsx(24,67): error TS2322: Type '{ id: string; name: string; type: string; language: string; content: string; } | undefined' is not assignable to type 'FileSystemItem'.
+  Type 'undefined' is not assignable to type 'FileSystemItem'.
+../components/ide/IDELayout.tsx(94,68): error TS2345: Argument of type '{ id: string; name: string; type: string; children: ({ id: string; name: string; type: string; children: { id: string; name: string; type: string; language: string; content: string; }[]; language?: undefined; content?: undefined; } | { ...; })[]; }[]' is not assignable to parameter of type 'FileSystemItem[] | (() => FileSystemItem[])'.
+  Type '{ id: string; name: string; type: string; children: ({ id: string; name: string; type: string; children: { id: string; name: string; type: string; language: string; content: string; }[]; language?: undefined; content?: undefined; } | { ...; })[]; }[]' is not assignable to type 'FileSystemItem[]'.
+    Type '{ id: string; name: string; type: string; children: ({ id: string; name: string; type: string; children: { id: string; name: string; type: string; language: string; content: string; }[]; language?: undefined; content?: undefined; } | { ...; })[]; }' is not assignable to type 'FileSystemItem'.
+      Types of property 'type' are incompatible.
+        Type 'string' is not assignable to type '"file" | "folder"'.
+../components/ide/IDELayout.tsx(129,21): error TS2322: Type '{ fileSystem: FileSystemItem[]; onFileClick: (file: FileSystemItem) => void; openFiles: FileSystemItem[]; activeFileId: string; onCloseFile: (e: MouseEvent<...>, id: string) => void; onAddFile: (name: string, type: "file" | "folder") => void; }' is not assignable to type 'IntrinsicAttributes & FileExplorerProps'.
+  Property 'fileSystem' does not exist on type 'IntrinsicAttributes & FileExplorerProps'.
+../components/ide/SearchPanel.tsx(162,29): error TS7006: Parameter 'line' implicitly has an 'any' type.
+../components/ide/SearchPanel.tsx(162,35): error TS7006: Parameter 'lIdx' implicitly has an 'any' type.
+../components/jobs/JobCard.tsx(39,116): error TS2551: Property 'InProgress' does not exist on type '{ Open: string; "In Progress": string; Completed: string; Pending: string; }'. Did you mean 'In Progress'?
+../components/jobs/JobDetail.tsx(12,81): error TS2339: Property 'feedback' does not exist on type 'Job'.
+../components/jobs/JobDetail.tsx(13,77): error TS2339: Property 'rating' does not exist on type 'Job'.
+../components/jobs/JobDetail.tsx(51,22): error TS2367: This comparison appears to be unintentional because the types '"InProgress" | "Completed" | "Pending"' and '"In Progress"' have no overlap.
+../components/jobs/JobDetail.tsx(71,15): error TS2367: This comparison appears to be unintentional because the types '"Open" | "InProgress" | "Completed" | "Pending"' and '"In Progress"' have no overlap.
+../components/profile/ContributionHeatmap.tsx(57,13): error TS2322: Type '{ data: Activity[]; theme: { light?: ColorScale | undefined; dark: ColorScale; }; blockSize: number; blockRadius: number; blockMargin: number; fontSize: number; ... 4 more ...; renderBlock: (block: BlockElement, activity: Activity) => Element; }' is not assignable to type 'IntrinsicAttributes & Omit<Props, "ref"> & RefAttributes<HTMLElement>'.
+  Property 'hideColorLegend' does not exist on type 'IntrinsicAttributes & Omit<Props, "ref"> & RefAttributes<HTMLElement>'. Did you mean 'renderColorLegend'?
+../components/profile/ContributionHeatmap.tsx(61,16): error TS2322: Type '{ "data-tooltip-id": string; "data-tooltip-content": string; className: string; suppressHydrationWarning?: boolean | undefined; color?: string | undefined; height?: string | number | undefined; ... 537 more ...; 'data-tooltip-class-name'?: string | undefined; }' is not assignable to type 'DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>'.
+  Type '{ "data-tooltip-id": string; "data-tooltip-content": string; className: string; suppressHydrationWarning?: boolean | undefined; color?: string | undefined; height?: string | number | undefined; ... 537 more ...; 'data-tooltip-class-name'?: string | undefined; }' is not assignable to type 'HTMLAttributes<HTMLDivElement>'.
+    Types of property 'onCopy' are incompatible.
+      Type 'ClipboardEventHandler<SVGRectElement> | undefined' is not assignable to type 'ClipboardEventHandler<HTMLDivElement> | undefined'.
+        Type 'ClipboardEventHandler<SVGRectElement>' is not assignable to type 'ClipboardEventHandler<HTMLDivElement>'.
+          Type 'SVGRectElement' is missing the following properties from type 'HTMLDivElement': align, accessKey, accessKeyLabel, autocapitalize, and 26 more.
+../components/profile/ProfilePreviewModal.tsx(4,29): error TS2307: Cannot find module '../../services/profileService' or its corresponding type declarations.
+../components/repositories/CreateRepoModal.tsx(41,7): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+../hooks/useForgeAI.ts(22,9): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+../hooks/useForgeAI.ts(26,21): error TS2339: Property 'content' does not exist on type '{ result: string; }'.
+../hooks/useForgeAI.ts(41,9): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+../hooks/useForgeAI.ts(45,21): error TS2339: Property 'content' does not exist on type '{ result: string; }'.
+../scripts/reset_analytics.ts(7,18): error TS2339: Property 'dailyContribution' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+../scripts/seed_production.ts(61,7): error TS2322: Type '{ id: string; name: string; description: string; isPublic: boolean; language: string; stars: number; forks: number; }' is not assignable to type '(Without<RepositoryUpdateInput, RepositoryUncheckedUpdateInput> & RepositoryUncheckedUpdateInput) | (Without<...> & RepositoryUpdateInput)'.
+  Type '{ id: string; name: string; description: string; isPublic: boolean; language: string; stars: number; forks: number; }' is not assignable to type 'Without<RepositoryUncheckedUpdateInput, RepositoryUpdateInput> & RepositoryUpdateInput'.
+    Types of property 'forks' are incompatible.
+      Type 'number' has no properties in common with type 'RepositoryUpdateManyWithoutParentNestedInput'.
+../scripts/seed_production.ts(62,7): error TS2322: Type '{ id: string; name: string; description: string; isPublic: boolean; language: string; stars: number; forks: number; }' is not assignable to type '(Without<RepositoryCreateInput, RepositoryUncheckedCreateInput> & RepositoryUncheckedCreateInput) | (Without<...> & RepositoryCreateInput)'.
+  Type '{ id: string; name: string; description: string; isPublic: boolean; language: string; stars: number; forks: number; }' is not assignable to type 'Without<RepositoryUncheckedCreateInput, RepositoryCreateInput> & RepositoryCreateInput'.
+    Property 'owner' is missing in type '{ id: string; name: string; description: string; isPublic: boolean; language: string; stars: number; forks: number; }' but required in type 'RepositoryCreateInput'.
+../scripts/seed_real_jobs.ts(48,17): error TS2561: Object literal may only specify known properties, but 'passwordHash' does not exist in type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'. Did you mean to write 'password'?
+../services/directMessageBus.ts(22,37): error TS2322: Type '{ id: string; name: string; avatar: string; context?: string | undefined; }' is not assignable to type '{ userId: string; name: string; avatar: string; context?: string | undefined; } | { conversationId: string; message: any; } | { userId: string; conversationId: string; } | { conversationId: string; userId: string; }'.
+  Property 'userId' is missing in type '{ id: string; name: string; avatar: string; context?: string | undefined; }' but required in type '{ userId: string; name: string; avatar: string; context?: string | undefined; }'.
+../services/gemini.ts(122,25): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+../trackcodex_changes/App.tsx(11,31): error TS2307: Cannot find module './context/ThemeContext' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(13,56): error TS2307: Cannot find module './context/NotificationContext' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(15,34): error TS2307: Cannot find module './contexts/RealtimeContext' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(21,45): error TS2307: Cannot find module './views/LandingPage' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(25,21): error TS2307: Cannot find module './components/layout/Sidebar' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(26,20): error TS2307: Cannot find module './components/layout/Footer' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(27,28): error TS2307: Cannot find module './components/messaging/MessagingPanel' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(28,26): error TS2307: Cannot find module './components/branding/SplashScreen' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(29,28): error TS2307: Cannot find module './components/settings/SettingsLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(30,28): error TS2307: Cannot find module './components/layout/CommandPalette' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(31,24): error TS2307: Cannot find module './components/social/ChatWidget' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(32,29): error TS2307: Cannot find module './components/auth/RedirectToLogin' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(38,50): error TS2307: Cannot find module './views/Repositories' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(41,28): error TS2307: Cannot find module './views/RepoDetail' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(44,44): error TS2307: Cannot find module './views/Editor' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(45,45): error TS2307: Cannot find module './views/Profile' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(46,42): error TS2307: Cannot find module './views/Overview' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(47,48): error TS2307: Cannot find module './views/Workspaces' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(49,47): error TS2307: Cannot find module './views/PublicProfile' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(50,43): error TS2307: Cannot find module './views/Portfolio' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(55,42): error TS2307: Cannot find module './views/Home' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(56,45): error TS2307: Cannot find module './views/Explore' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(57,45): error TS2307: Cannot find module './views/Library' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(58,45): error TS2307: Cannot find module './views/ForgeAI' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(59,51): error TS2307: Cannot find module './views/NotificationsView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(60,46): error TS2307: Cannot find module './views/AcceptInvite' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(61,51): error TS2307: Cannot find module './views/WorkspaceSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(62,45): error TS2307: Cannot find module './views/Leaderboard' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(63,47): error TS2307: Cannot find module './views/Admin' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(64,43): error TS2307: Cannot find module './views/TaskVault' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(65,48): error TS2307: Cannot find module './views/PlatformMatrix' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(66,39): error TS2307: Cannot find module './views/legal/Terms' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(67,41): error TS2307: Cannot find module './views/legal/Privacy' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(68,40): error TS2307: Cannot find module './views/legal/Status' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(69,42): error TS2307: Cannot find module './views/legal/Security' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(70,41): error TS2307: Cannot find module './views/legal/Contact' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(71,46): error TS2307: Cannot find module './views/legal/CookiePolicy' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(72,31): error TS2307: Cannot find module './components/legal/CookieConsent' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(73,23): error TS2307: Cannot find module './auth/RoleGuard' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(74,47): error TS2307: Cannot find module './views/Community' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(75,50): error TS2307: Cannot find module './views/DiscussionDetail' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(76,48): error TS2307: Cannot find module './views/CreateRepo' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(77,48): error TS2307: Cannot find module './views/ImportRepo' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(81,16): error TS2307: Cannot find module './views/organizations/StrataIndexView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(84,16): error TS2307: Cannot find module './views/organizations/StrataDetailView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(87,16): error TS2307: Cannot find module './components/organizations/StrataOverview' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(90,16): error TS2307: Cannot find module './views/organizations/CreateStrata' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(93,16): error TS2307: Cannot find module './components/organizations/StrataRepositories' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(96,16): error TS2307: Cannot find module './components/organizations/StrataPeople' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(99,16): error TS2307: Cannot find module './components/organizations/StrataTeams' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(102,16): error TS2307: Cannot find module './components/organizations/StrataSettingsLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(105,16): error TS2307: Cannot find module './views/organizations/settings/StrataGeneralSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(108,16): error TS2307: Cannot find module './views/organizations/settings/StrataAuthenticationSecurity' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(111,16): error TS2307: Cannot find module './views/organizations/settings/StrataEnvironments' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(114,16): error TS2307: Cannot find module './views/organizations/settings/StrataPermissions' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(117,16): error TS2307: Cannot find module './views/organizations/settings/StrataWebhooks' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(122,16): error TS2307: Cannot find module './views/settings/AppearanceSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(125,16): error TS2307: Cannot find module './views/settings/EmailSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(128,16): error TS2307: Cannot find module './views/settings/SecuritySettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(131,16): error TS2307: Cannot find module './views/settings/AccountSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(134,16): error TS2307: Cannot find module './views/settings/ProfileSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(137,16): error TS2307: Cannot find module './views/settings/BillingSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(140,16): error TS2307: Cannot find module './views/settings/ForgeAIUsageSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(143,16): error TS2307: Cannot find module './views/settings/AccessibilitySettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(146,16): error TS2307: Cannot find module './views/settings/NotificationsSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(149,16): error TS2307: Cannot find module './views/settings/PersonalAccessTokensSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(152,16): error TS2307: Cannot find module './views/settings/IntegrationsSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(155,16): error TS2307: Cannot find module './views/settings/SessionsSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(158,16): error TS2307: Cannot find module './views/settings/SSHKeysSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(161,16): error TS2307: Cannot find module './views/settings/AhiCsSettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(164,16): error TS2307: Cannot find module './views/settings/PrivacySettings' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(167,16): error TS2307: Cannot find module './views/settings/billing/BillingUsage' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(170,16): error TS2307: Cannot find module './views/settings/billing/BillingAnalytics' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(173,16): error TS2307: Cannot find module './views/settings/billing/BillingBudgets' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(176,16): error TS2307: Cannot find module './views/settings/billing/BillingLicensing' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(179,16): error TS2307: Cannot find module './views/settings/billing/BillingPaymentInfo' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(182,16): error TS2307: Cannot find module './views/settings/billing/BillingPaymentHistory' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(185,16): error TS2307: Cannot find module './views/settings/billing/BillingAdditional' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(190,16): error TS2307: Cannot find module './views/marketplace/MarketplaceLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(193,16): error TS2307: Cannot find module './views/onboarding/OnboardingLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(195,45): error TS2307: Cannot find module './views/onboarding/WelcomeView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(197,16): error TS2307: Cannot find module './views/trials/OfferAcceptanceView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(201,16): error TS2307: Cannot find module './views/trials/TrialSubmittedView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(209,16): error TS2307: Cannot find module './views/marketplace/MissionsView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(212,16): error TS2307: Cannot find module './views/marketplace/MissionDetailView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(215,16): error TS2307: Cannot find module './views/marketplace/MyApplicationsView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(218,16): error TS2307: Cannot find module './views/marketplace/TrialRepositoriesView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(222,46): error TS2307: Cannot find module './views/hiring/HiringLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(224,16): error TS2307: Cannot find module './views/hiring/CandidateDiscoveryView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(227,16): error TS2307: Cannot find module './views/hiring/CandidateScorecardView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(230,16): error TS2307: Cannot find module './views/hiring/CandidateComparisonView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(233,16): error TS2307: Cannot find module './views/hiring/OfferEditorView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(236,16): error TS2307: Cannot find module './views/hiring/SessionSchedulerView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(239,16): error TS2307: Cannot find module './views/hiring/InterviewerFeedbackView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(242,16): error TS2307: Cannot find module './views/hiring/AssessmentsView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(245,16): error TS2307: Cannot find module './views/hiring/JobApplicationsView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(249,46): error TS2307: Cannot find module './views/growth/GrowthLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(251,16): error TS2307: Cannot find module './views/growth/SkillDashboardView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(254,16): error TS2307: Cannot find module './views/growth/DeveloperProfileView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(259,16): error TS2307: Cannot find module './views/onboarding/OnboardingWorkspace' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(262,16): error TS2307: Cannot find module './views/onboarding/BuddyDashboardView' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(265,16): error TS2307: Cannot find module './views/finance/WalletDashboard' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(270,16): error TS2307: Cannot find module './components/admin/AdminOverview' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(272,45): error TS2307: Cannot find module './components/admin/UserManager' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(273,45): error TS2307: Cannot find module './components/admin/TeamManager' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(275,16): error TS2307: Cannot find module './components/admin/WorkspaceMonitor' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(278,16): error TS2307: Cannot find module './components/admin/RepositoryGovernance' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(281,16): error TS2307: Cannot find module './components/admin/JobOversight' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(284,16): error TS2307: Cannot find module './components/admin/CommunityModeration' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(286,44): error TS2307: Cannot find module './components/admin/RoleEditor' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(287,43): error TS2307: Cannot find module './components/admin/AuditLogs' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(288,48): error TS2307: Cannot find module './views/AdminDashboard' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(291,44): error TS2307: Cannot find module './components/docs/DocsLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(292,44): error TS2307: Cannot find module './views/docs/DocsViewer' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(293,44): error TS2307: Cannot find module './components/blog/BlogLayout' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(294,43): error TS2307: Cannot find module './views/blog/BlogIndex' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(295,42): error TS2307: Cannot find module './views/blog/BlogPost' or its corresponding type declarations.
+../trackcodex_changes/App.tsx(297,29): error TS2307: Cannot find module './services/activityLogger' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(7,25): error TS2307: Cannot find module '../services/encryption' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(8,29): error TS2307: Cannot find module '../middleware/auth' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(14,8): error TS2307: Cannot find module '../services/session' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(20,8): error TS2307: Cannot find module '../services/auditLogger' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(21,33): error TS2307: Cannot find module '../middleware/rateLimit' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/auth.ts(30,8): error TS2307: Cannot find module '../utils/AppError' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/forge.ts(2,31): error TS2307: Cannot find module '../services/docker' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/forge.ts(3,33): error TS2307: Cannot find module '../services/terminal' or its corresponding type declarations.
+../trackcodex_changes/backend/routes/forge.ts(18,80): error TS7006: Parameter 'err' implicitly has an 'any' type.
+../trackcodex_changes/backend/services/oauth.ts(5,25): error TS2307: Cannot find module './encryption' or its corresponding type declarations.
+../trackcodex_changes/components/profile/ProfileCard.tsx(4,27): error TS2307: Cannot find module '../jobs/offer/OfferJobModal' or its corresponding type declarations.
+../trackcodex_changes/components/profile/ProfileCard.tsx(5,34): error TS2307: Cannot find module '../../services/directMessageBus' or its corresponding type declarations.
+../trackcodex_changes/components/profile/ProfileCard.tsx(6,29): error TS2307: Cannot find module './FollowListModal' or its corresponding type declarations.
+../trackcodex_changes/components/profile/ProfileCard.tsx(8,31): error TS2307: Cannot find module './ProofProfileModal' or its corresponding type declarations.
+../trackcodex_changes/components/profile/UserProfileDropdown.tsx(4,27): error TS2307: Cannot find module '../../services/strata' or its corresponding type declarations.
+../trackcodex_changes/components/profile/UserProfileDropdown.tsx(5,24): error TS2307: Cannot find module '../../types' or its corresponding type declarations.
+../trackcodex_changes/context/AuthContext.tsx(3,30): error TS2307: Cannot find module '../config/api' or its corresponding type declarations.
+../trackcodex_changes/services/api.ts(1,65): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+../trackcodex_changes/services/profile.ts(1,28): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+../trackcodex_changes/services/profile.ts(2,27): error TS2307: Cannot find module './systemBus' or its corresponding type declarations.
+../views/CreateRepo.tsx(40,9): error TS2353: Object literal may only specify known properties, and 'initReadme' does not exist in type 'Partial<Repository>'.
+../views/CreateWorkspace.tsx(108,33): error TS2339: Property 'userId' does not exist on type 'UserProfile'.
+../views/Editor.tsx(3,25): error TS2307: Cannot find module 'monaco-editor/esm/vs/editor/editor.api' or its corresponding type declarations.
+../views/Editor.tsx(262,40): error TS2353: Object literal may only specify known properties, and 'trigger' does not exist in type 'MenuItem'.
+../views/Editor.tsx(263,34): error TS2353: Object literal may only specify known properties, and 'trigger' does not exist in type 'MenuItem'.
+../views/Editor.tsx(471,15): error TS2322: Type '{ fileSystem: any[]; onFileClick: (file: any) => Promise<void>; openFiles: any[]; activeFileId: string; onCloseFile: (e: MouseEvent<Element, MouseEvent>, id: string) => void; onAddFile: (name: string, type: "file" | "folder") => void; }' is not assignable to type 'IntrinsicAttributes & FileExplorerProps'.
+  Property 'fileSystem' does not exist on type 'IntrinsicAttributes & FileExplorerProps'.
+../views/Editor.tsx(603,60): error TS2322: Type '{ children: Element; defaultSize: number; minSize: number; collapsible: true; collapsed: boolean; }' is not assignable to type 'IntrinsicAttributes & Omit<HTMLAttributes<HTMLElement | HTMLDivElement | HTMLSpanElement | HTMLImageElement | ... 58 more ... | HTMLVideoElement>, "id" | "onResize"> & { ...; } & { ...; } & RefAttributes<...>'.
+  Property 'collapsed' does not exist on type 'IntrinsicAttributes & Omit<HTMLAttributes<HTMLElement | HTMLDivElement | HTMLSpanElement | HTMLImageElement | ... 58 more ... | HTMLVideoElement>, "id" | "onResize"> & { ...; } & { ...; } & RefAttributes<...>'. Did you mean 'onCollapse'?
+../views/enterprise/EnterpriseDashboard.tsx(26,5): error TS2304: Cannot find name 'loadEnterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(82,8): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(94,16): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(97,54): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(99,18): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(138,20): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(139,21): error TS2304: Cannot find name 'enterprise'.
+../views/enterprise/EnterpriseDashboard.tsx(146,20): error TS2304: Cannot find name 'enterprise'.
+../views/ide/TrackCodexIDE.tsx(109,22): error TS2322: Type '{ activePanel: "search" | "explorer" | "debug" | "extensions" | "source-control"; onPanelChange: Dispatch<SetStateAction<"search" | "explorer" | "debug" | "extensions" | "source-control">>; }' is not assignable to type 'IntrinsicAttributes & ActivityBarProps'.
+  Property 'activePanel' does not exist on type 'IntrinsicAttributes & ActivityBarProps'.
+../views/ide/TrackCodexIDE.tsx(116,15): error TS2322: Type '{ files: any[]; onFileSelect: (file: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileExplorerProps'.
+  Property 'onFileSelect' does not exist on type 'IntrinsicAttributes & FileExplorerProps'.
+../views/ide/TrackCodexIDE.tsx(116,30): error TS7006: Parameter 'file' implicitly has an 'any' type.
+../views/ide/TrackCodexIDE.tsx(175,16): error TS2741: Property 'fileId' is missing in type '{ content: any; language: any; onChange: (content: string | undefined) => void; theme: "vs-dark"; }' but required in type 'MonacoEditorProps'.
+../views/ide/TrackCodexIDE.tsx(196,16): error TS2741: Property 'workspaceId' is missing in type '{}' but required in type 'TerminalProps'.
+../views/Jobs.tsx(169,9): error TS2322: Type '{ isOpen: boolean; onClose: () => void; onSubmit: () => void; }' is not assignable to type 'IntrinsicAttributes & CreateJobModalProps'.
+  Property 'onSubmit' does not exist on type 'IntrinsicAttributes & CreateJobModalProps'.
+../views/Profile.tsx(153,27): error TS2339: Property 'licenseName' does not exist on type 'Repository'.
+../views/Profile.tsx(155,34): error TS2339: Property 'licenseName' does not exist on type 'Repository'.
+../views/Profile.tsx(215,9): error TS2304: Cannot find name 'setIsMockMode'.
+../views/Profile.tsx(251,9): error TS2304: Cannot find name 'setIsMockMode'.
+../views/Profile.tsx(254,9): error TS2304: Cannot find name 'setIsMockMode'.
+../views/Settings.tsx(41,31): error TS2339: Property 'email' does not exist on type 'never'.
+../views/Settings.tsx(48,37): error TS2339: Property 'avatar' does not exist on type 'never'.
+../views/Settings.tsx(49,37): error TS2339: Property 'name' does not exist on type 'never'.
+../views/Settings.tsx(54,37): error TS2339: Property 'name' does not exist on type 'never'.
+../views/Settings.tsx(57,37): error TS2339: Property 'email' does not exist on type 'never'.
+../views/Settings.tsx(64,29): error TS2339: Property 'role' does not exist on type 'never'.
+../views/Settings.tsx(68,147): error TS2339: Property 'status' does not exist on type 'never'.
+../views/Settings.tsx(71,68): error TS2339: Property 'status' does not exist on type 'never'.
+../views/Settings.tsx(73,31): error TS2339: Property 'status' does not exist on type 'never'.
+../views/settings/AccessibilitySettings.tsx(11,4): error TS2322: Type '{ children: Element; type: "button"; onClick: () => void; className: string; "aria-checked": string; role: "switch"; "aria-label": string; }' is not assignable to type 'DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>'.
+  Type '{ children: Element; type: "button"; onClick: () => void; className: string; "aria-checked": string; role: "switch"; "aria-label": string; }' is not assignable to type 'ButtonHTMLAttributes<HTMLButtonElement>'.
+    Types of property '"aria-checked"' are incompatible.
+      Type 'string' is not assignable to type 'boolean | "true" | "false" | "mixed" | undefined'.
