@@ -176,6 +176,21 @@ const Login = () => {
       <div className="flex-1 bg-white flex flex-col justify-center items-center p-6 lg:p-12 text-gray-900">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:text-left">
+            {/* Regional Status Banner */}
+            <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 shadow-sm animate-pulse">
+              <div className="mt-0.5 text-amber-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-900">Regional Connectivity Notice</h4>
+                <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                  A major Supabase outage is affecting DNS resolution in India. If login fails, please use a <b>VPN</b> or switch to <b>Google DNS (8.8.8.8)</b> to restore access.
+                </p>
+              </div>
+            </div>
+
             <h2 className="text-3xl font-bold tracking-tight text-gray-900">
               Sign in to TrackCodex
             </h2>
