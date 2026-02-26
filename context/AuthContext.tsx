@@ -60,45 +60,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Supabase Auth Listener
   useEffect(() => {
     // 1. Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        const mappedUser: User = {
-          id: session.user.id,
-          email: session.user.email || "",
-          username: session.user.user_metadata?.username || "",
-          name: session.user.user_metadata?.full_name || "",
-          avatar: session.user.user_metadata?.avatar_url || "",
-          role: session.user.user_metadata?.role || "user",
-        };
-        setUser(mappedUser);
-        profileService.initFromAuth(mappedUser);
-      }
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          const mappedUser: User = {
+            id: session.user.id,
+            email: session.user.email || "",
+            username: session.user.user_metadata?.username || "",
+            name: session.user.user_metadata?.full_name || "",
+            avatar: session.user.user_metadata?.avatar_url || "",
+            role: session.user.user_metadata?.role || "user",
+          };
+          setUser(mappedUser);
+          profileService.initFromAuth(mappedUser);
+        }
+        setIsLoading(false);
+      });
+    } else {
       setIsLoading(false);
-    });
+    }
 
     // 2. Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        const mappedUser: User = {
-          id: session.user.id,
-          email: session.user.email || "",
-          username: session.user.user_metadata?.username || "",
-          name: session.user.user_metadata?.full_name || "",
-          avatar: session.user.user_metadata?.avatar_url || "",
-          role: session.user.user_metadata?.role || "user",
-        };
-        setUser(mappedUser);
-        profileService.initFromAuth(mappedUser);
-      } else {
-        setUser(null);
-        profileService.clearProfile();
-      }
-      setIsLoading(false);
-    });
+    if (supabase) {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+          const mappedUser: User = {
+            id: session.user.id,
+            email: session.user.email || "",
+            username: session.user.user_metadata?.username || "",
+            name: session.user.user_metadata?.full_name || "",
+            avatar: session.user.user_metadata?.avatar_url || "",
+            role: session.user.user_metadata?.role || "user",
+          };
+          setUser(mappedUser);
+          profileService.initFromAuth(mappedUser);
+        } else {
+          setUser(null);
+          profileService.clearProfile();
+        }
+        setIsLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   // Configure axios interceptor to attach Supabase JWT or legacy Session ID
@@ -115,11 +121,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       // 1. Try to get current Supabase session
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        config.headers["Authorization"] = `Bearer ${session.access_token}`;
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          config.headers["Authorization"] = `Bearer ${session.access_token}`;
+        } else {
+          // 2. Fallback to legacy Session ID
+          const sessionId = localStorage.getItem("session_id");
+          if (sessionId) {
+            config.headers["Authorization"] = `Bearer ${sessionId}`;
+          }
+        }
       } else {
-        // 2. Fallback to legacy Session ID
+        // Fallback to legacy Session ID if Supabase is missing
         const sessionId = localStorage.getItem("session_id");
         if (sessionId) {
           config.headers["Authorization"] = `Bearer ${sessionId}`;
