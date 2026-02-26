@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth, api } from "../../context/AuthContext";
-import { otpService } from "../../services/otp";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const Signup = () => {
-  const { login } = useAuth();
+  const { } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,39 +17,38 @@ const Signup = () => {
   const [otpMode, setOtpMode] = useState(false);
   const [otpInput, setOtpInput] = useState("");
 
-  const handleGoogleLogin = () => {
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem("oauth_state", state);
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-    if (!clientId || clientId === "YOUR_GOOGLE_CLIENT_ID") {
-      alert("Google login is not configured yet."); return;
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback/google`,
+        }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to initialize Google login");
+      setIsLoading(false);
     }
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: `${window.location.origin}/auth/callback/google`,
-      response_type: "code",
-      scope: "openid email profile",
-      access_type: "offline",
-      prompt: "consent",
-      state,
-    });
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   };
 
-  const handleGithubLogin = () => {
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem("oauth_state", state);
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "";
-    if (!clientId || clientId === "YOUR_GITHUB_CLIENT_ID") {
-      alert("GitHub login is not configured yet."); return;
+  const handleGithubLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback/github`,
+        }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to initialize GitHub login");
+      setIsLoading(false);
     }
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: `${window.location.origin}/auth/callback/github`,
-      scope: "read:user user:email",
-      state,
-    });
-    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,11 +57,24 @@ const Signup = () => {
     setError("");
 
     try {
-      // Step 1: Send OTP
-      await otpService.sendOTP(email);
+      // Step 1: Sign up with Supabase
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            full_name: username,
+            country,
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
       setOtpMode(true);
-    } catch (err) {
-      setError("Failed to send verification code. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -74,25 +86,20 @@ const Signup = () => {
 
     try {
       // Step 2: Verify OTP
-      await otpService.verifyOTP(email, otpInput);
-
-      // Step 3: Create Account
-      const res = await api.post("/auth/register", {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
         email,
-        password,
-        username,
-        name: username,
-        country,
+        token: otpInput,
+        type: 'signup',
       });
 
-      login(res.data.user, res.data.csrfToken);
+      if (verifyError) throw verifyError;
+
+      // Note: Backend sync is handled via Supabase triggers.
+      // After verification, onAuthStateChange in AuthContext will trigger navigation
+      // but we can also navigate manually for immediate feedback.
       navigate("/dashboard/home");
     } catch (err: any) {
-      // Extract error message from axios response or general error
-      const backendMessage = err.response?.data?.message || err.response?.data?.error;
-      const errorMessage = backendMessage || err.message || "Registration failed";
-      console.error("[Signup] Registration failed:", err.response?.data || err);
-      setError(errorMessage);
+      setError(err.message || "Verification failed");
     } finally {
       setIsLoading(false);
     }

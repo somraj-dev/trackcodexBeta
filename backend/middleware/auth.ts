@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getSession } from "../services/session";
 import { prisma } from "../services/prisma";
+import { supabaseAdmin } from "../services/supabase";
 
 // Shared prisma instance
 
@@ -13,33 +14,62 @@ export async function requireAuth(
   reply: FastifyReply,
 ) {
   try {
-    // Get session ID from HttpOnly cookie or Authorization header
-    let sessionId = request.cookies?.session_id;
-    if (!sessionId && request.headers.authorization) {
-      const authHeader = request.headers.authorization;
-      if (authHeader.startsWith("Bearer ")) {
-        sessionId = authHeader.substring(7);
+    // 1. Try to get Supabase JWT from Authorization header
+    const authHeader = request.headers.authorization;
+    let supabaseUser: { id: string; email?: string } | null = null;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      // If it looks like a JWT (roughly 3 parts separated by dots)
+      if (token.split(".").length === 3) {
+        const { data, error } = await supabaseAdmin.auth.getUser(token);
+        if (!error && data.user) {
+          supabaseUser = data.user;
+        }
       }
     }
 
+    if (supabaseUser) {
+      // Find user in our database to get full profile (role, org, etc)
+      const dbUser = await prisma.user.findUnique({
+        where: { id: supabaseUser.id },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          // Add other fields you need in request.user
+        },
+      });
+
+      if (dbUser) {
+        (request as any).user = {
+          userId: dbUser.id,
+          email: dbUser.email,
+          role: dbUser.role,
+          // Note: organizationId/workspaceId might need to be fetched differently
+          // if they were stored in the session table before.
+        };
+        return; // Success with Supabase JWT
+      }
+    }
+
+    // 2. Fallback to existing Session ID logic (Cookie or Bearer token)
+    let sessionId = request.cookies?.session_id;
+    if (!sessionId && authHeader?.startsWith("Bearer ")) {
+      sessionId = authHeader.substring(7);
+    }
+
     if (!sessionId) {
-      console.warn(
-        "[Auth Middleware] 401: No session_id cookie or Bearer token found in request.",
-      );
       return reply.code(401).send({
         error: "Unauthorized",
-        message: "No session cookie or token found",
+        message: "Authentication required",
       });
     }
 
-    // Get and validate session
+    // Get and validate session from our database
     const sessionData = await getSession(sessionId);
 
     if (!sessionData) {
-      console.warn(
-        `[Auth Middleware] 401: Session ID ${sessionId} not found in store.`,
-      );
-      // Clear invalid cookie
       reply.clearCookie("session_id");
       return reply.code(401).send({
         error: "Unauthorized",
@@ -48,7 +78,7 @@ export async function requireAuth(
     }
 
     // Attach user info to request
-    (request as any).user = {
+    (request as Record<string, any>).user = {
       userId: sessionData.userId,
       email: sessionData.email,
       role: sessionData.role,
@@ -57,7 +87,7 @@ export async function requireAuth(
     };
 
     // Attach CSRF token for response
-    (request as any).csrfToken = sessionData.csrfToken;
+    (request as Record<string, any>).csrfToken = sessionData.csrfToken;
   } catch (error: any) {
     return reply.code(401).send({
       error: "Unauthorized",
@@ -94,7 +124,7 @@ export async function optionalAuth(
           organizationId: sessionData.organizationId,
           workspaceId: sessionData.workspaceId,
         };
-        (request as any).csrfToken = sessionData.csrfToken;
+        (request as Record<string, any>).csrfToken = sessionData.csrfToken;
       }
     }
   } catch (error) {

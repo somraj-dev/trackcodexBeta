@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
 import { profileService } from "../services/profile";
+import { supabase } from "../lib/supabase";
 
 interface User {
   id: string;
@@ -54,15 +55,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [csrfToken, setCsrfToken] = useState<string | null>(
     localStorage.getItem("csrf_token"),
   );
-  const [isLoading, setIsLoading] = useState(() => {
-    const hasSession = !!localStorage.getItem("session_id") || !!localStorage.getItem("csrf_token");
-    return hasSession;
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Configure axios interceptor to attach CSRF token and Session ID
+  // Supabase Auth Listener
   useEffect(() => {
-    const interceptor = api.interceptors.request.use((config) => {
-      // CSRF token is needed for state-changing requests
+    // 1. Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        const mappedUser: User = {
+          id: session.user.id,
+          email: session.user.email || "",
+          username: session.user.user_metadata?.username || "",
+          name: session.user.user_metadata?.full_name || "",
+          avatar: session.user.user_metadata?.avatar_url || "",
+          role: session.user.user_metadata?.role || "user",
+        };
+        setUser(mappedUser);
+        profileService.initFromAuth(mappedUser);
+      }
+      setIsLoading(false);
+    });
+
+    // 2. Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const mappedUser: User = {
+          id: session.user.id,
+          email: session.user.email || "",
+          username: session.user.user_metadata?.username || "",
+          name: session.user.user_metadata?.full_name || "",
+          avatar: session.user.user_metadata?.avatar_url || "",
+          role: session.user.user_metadata?.role || "user",
+        };
+        setUser(mappedUser);
+        profileService.initFromAuth(mappedUser);
+      } else {
+        setUser(null);
+        profileService.clearProfile();
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Configure axios interceptor to attach Supabase JWT or legacy Session ID
+  useEffect(() => {
+    const interceptor = api.interceptors.request.use(async (config) => {
+      // CSRF token is needed for state-changing requests (Legacy)
       if (
         ["post", "put", "delete", "patch"].includes(
           config.method?.toLowerCase() || "",
@@ -72,9 +114,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         config.headers["X-CSRF-Token"] = csrfToken;
       }
 
-      const sessionId = localStorage.getItem("session_id");
-      if (sessionId) {
-        config.headers["Authorization"] = `Bearer ${sessionId}`;
+      // 1. Try to get current Supabase session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        config.headers["Authorization"] = `Bearer ${session.access_token}`;
+      } else {
+        // 2. Fallback to legacy Session ID
+        const sessionId = localStorage.getItem("session_id");
+        if (sessionId) {
+          config.headers["Authorization"] = `Bearer ${sessionId}`;
+        }
       }
 
       return config;
@@ -83,62 +132,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => api.interceptors.request.eject(interceptor);
   }, [csrfToken]);
 
-  useEffect(() => {
-    const checkAuthStatus = async () => {
-      console.log("AuthContext: Starting checkAuthStatus");
-      try {
-        const res = await api.get("/auth/me", {
-          timeout: 5000,
-        });
-        console.log("AuthContext: checkAuthStatus returned", res);
-        if (res.data.user) {
-          console.log("AuthContext: User found", res.data.user);
-          setUser(res.data.user);
-          // Seed the frontend profile from the real authenticated user
-          profileService.initFromAuth(res.data.user);
-          if (res.data.csrfToken) {
-            setCsrfToken(res.data.csrfToken);
-            localStorage.setItem("csrf_token", res.data.csrfToken);
-          }
-          if (res.data.sessionId) {
-            localStorage.setItem("session_id", res.data.sessionId);
-          }
-        }
-      } catch (error) {
-        console.warn(
-          "AuthContext: checkAuthStatus failed (not logged in)",
-          error,
-        );
-        // Not authenticated or Error
-        console.warn("Auth check failed or 500 error, logging out");
-        setUser(null);
-        setCsrfToken(null);
-        localStorage.removeItem("csrf_token");
-        localStorage.removeItem("session_id");
-      } finally {
-        console.log(
-          "AuthContext: checkAuthStatus finished, setting isLoading false",
-        );
-        setIsLoading(false);
-      }
-    };
-
-    checkAuthStatus();
-  }, []);
-
   const login = (userData: User, token: string, sessionId?: string) => {
     setUser(userData);
     setCsrfToken(token);
-    localStorage.setItem("csrf_token", token);
-    if (sessionId) {
-      localStorage.setItem("session_id", sessionId);
-    }
-    // Seed the profile with real user data
+    if (token) localStorage.setItem("csrf_token", token);
+    if (sessionId) localStorage.setItem("session_id", sessionId);
     profileService.initFromAuth(userData);
   };
 
   const logout = async () => {
     try {
+      await supabase.auth.signOut();
       await api.post("/auth/logout");
     } catch (err) {
       console.error("Logout failed", err);
@@ -147,7 +151,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setCsrfToken(null);
       localStorage.removeItem("csrf_token");
       localStorage.removeItem("session_id");
-      // Clear any profile data so the next user starts fresh
       profileService.clearProfile();
       window.location.href = "/login";
     }

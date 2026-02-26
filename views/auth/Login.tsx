@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, api } from "../../context/AuthContext";
-// import OAuthButton from "../../components/auth/OAuthButton";
+import { supabase } from "../../lib/supabase";
 
 const Login = () => {
   const { login } = useAuth();
@@ -11,108 +11,37 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // PKCE Helpers
-  const generateRandomString = (length: number) => {
-    const possible =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-    let text = "";
-    for (let i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-  };
-
-  const sha256 = async (plain: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(plain);
-    const hash = await window.crypto.subtle.digest("SHA-256", data);
-    return hash;
-  };
-
-  const base64urlencode = (a: ArrayBuffer) => {
-    const bytes = new Uint8Array(a);
-    let str = "";
-    for (let i = 0; i < bytes.byteLength; i++) {
-      str += String.fromCharCode(bytes[i]);
-    }
-    return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  };
-
-  const generateCodeChallenge = async (v: string) => {
-    const hashed = await sha256(v);
-    return base64urlencode(hashed);
-  };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-      if (!clientId || clientId === "YOUR_GOOGLE_CLIENT_ID") {
-        setError("Google login is not configured. Please contact the administrator.");
-        setIsLoading(false);
-        return;
-      }
-
-      const state = generateRandomString(32);
-      const codeVerifier = generateRandomString(64);
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
-
-      localStorage.setItem("oauth_state", state);
-      localStorage.setItem("oauth_code_verifier", codeVerifier);
-
-      // IMPORTANT: This redirect_uri must be added EXACTLY as-is in Google Cloud Console
-      // → APIs & Services → Credentials → OAuth 2.0 Client → Authorized redirect URIs
-      const REDIRECT_URI = `${window.location.origin}/auth/callback/google`;
-
-      const params = new URLSearchParams({
-        client_id: clientId,
-        redirect_uri: REDIRECT_URI,
-        response_type: "code",
-        scope: "openid email profile",
-        access_type: "offline",
-        prompt: "consent",
-        state: state,
-        code_challenge: codeChallenge,
-        code_challenge_method: "S256",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback/google`,
+        }
       });
-
-      window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    } catch (err) {
+      if (error) throw error;
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to initialize Google login");
+      setError(err.message || "Failed to initialize Google login");
       setIsLoading(false);
     }
   };
 
-  const handleGithubLogin = () => {
+  const handleGithubLogin = async () => {
     setIsLoading(true);
     try {
-      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-
-      if (!clientId || clientId === "YOUR_GITHUB_CLIENT_ID") {
-        setError("GitHub login is not configured. Please contact the administrator.");
-        setIsLoading(false);
-        return;
-      }
-
-      const state = generateRandomString(32);
-      localStorage.setItem("oauth_state", state);
-
-      // IMPORTANT: This redirect_uri must be added EXACTLY as-is in GitHub OAuth App settings
-      const REDIRECT_URI = `${window.location.origin}/auth/callback/github`;
-
-      const params = new URLSearchParams({
-        client_id: clientId,
-        redirect_uri: REDIRECT_URI,
-        scope: "read:user user:email",
-        state: state,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback/github`,
+        }
       });
-
-      window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
-    } catch (err) {
+      if (error) throw error;
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to initialize GitHub login");
+      setError(err.message || "Failed to initialize GitHub login");
       setIsLoading(false);
     }
   };
@@ -124,27 +53,27 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await api.post("/auth/login", {
-        username,
-        email: username,
+      // 1. Sign in with Supabase
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: username.includes('@') ? username : `${username}@manual-sync.local`, // Fallback logic for username
         password,
       });
-      login(res.data.user, res.data.csrfToken);
 
-      // Redirect to saved path or default
-      const redirectPath =
-        localStorage.getItem("redirect_after_login") || "/dashboard/home";
+      if (authError) {
+        if (authError.message === "Invalid login credentials") {
+          throw new Error("Invalid username/email or password");
+        }
+        throw authError;
+      }
+
+      // 2. State update is handled by onAuthStateChange in AuthContext
+
+      // 3. Redirect
+      const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
       localStorage.removeItem("redirect_after_login");
       navigate(redirectPath);
-    } catch (err: unknown) {
-      const error = err as {
-        response?: { status?: number; data?: { error?: string } };
-      };
-      if (error.response?.status === 401 && !error.response?.data?.error) {
-        setError("Invalid credentials");
-      } else {
-        setError(error.response?.data?.error || "Login failed");
-      }
+    } catch (err: any) {
+      setError(err.message || "Login failed");
     } finally {
       setIsLoading(false);
     }

@@ -38,6 +38,11 @@ const envSchema = z.object({
   // Redis (Optional for dev, recommended for prod)
   REDIS_URL: z.string().url().optional(),
 
+  // Supabase
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  SUPABASE_ANON_KEY: z.string().optional(),
+
   // Frontend
   FRONTEND_URL: z.string().url(),
 });
@@ -54,7 +59,7 @@ if (!_env.success) {
       "env_error.log",
       `\n[${new Date().toISOString()}]\n${errorMsg}\n`,
     );
-  } catch (err) {
+  } catch {
     // ignore
   }
   process.exit(1);

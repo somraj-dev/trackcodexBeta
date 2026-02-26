@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useAuth, api } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: "google" | "github" }>();
@@ -17,97 +18,26 @@ const OAuthCallback: React.FC = () => {
 
     const handleCallback = async () => {
       try {
-        // HASH ROUTER FIX:
-        // React Router's useLocation().search only sees params AFTER the hash (e.g., #/callback?code=...)
-        // OAuth providers often redirect to /callback?code=... (no hash) or /?code=...#/callback
-        // We must check window.location.search as a fallback.
-        const routerParams = new URLSearchParams(location.search);
-        const windowParams = new URLSearchParams(window.location.search);
-
-        const code = routerParams.get("code") || windowParams.get("code");
-        const state = routerParams.get("state") || windowParams.get("state");
-        const error = routerParams.get("error") || windowParams.get("error");
-
-        // Check for OAuth errors
-        if (error) {
-          throw new Error(`OAuth error: ${error}`);
-        }
+        const queryParams = new URLSearchParams(window.location.search);
+        const code = queryParams.get("code");
 
         if (!code) {
           throw new Error("No authorization code received");
         }
 
-        // Verify state to prevent CSRF (lenient for development)
-        const savedState = localStorage.getItem("oauth_state");
-
-        // In development, allow missing state if we're in localhost
-        const isDevelopment = window.location.hostname === "localhost";
-
-        if (state && savedState && state !== savedState) {
-          console.error("State mismatch:", {
-            received: state,
-            saved: savedState,
-          });
-          throw new Error("Invalid state parameter");
-        }
-
-        // Warn if state is missing but continue in development
-        if (!savedState && !isDevelopment) {
-          console.warn("OAuth state not found in localStorage");
-          throw new Error("Invalid state parameter - session expired");
-        }
-
-        // Clear saved state
-        localStorage.removeItem("oauth_state");
-
-        // Create Session
-
-        // Retrieve PKCE Code Verifier
-        const codeVerifier = localStorage.getItem("oauth_code_verifier");
-
-        // Exchange code for session with backend
-        // Pass the redirectUri so backend uses the same one for token exchange
-        const REDIRECT_URI = `${window.location.origin}/auth/callback/${provider}`;
-        const response = await api.post(`/auth/${provider}`, {
-          code,
-          codeVerifier,
-          redirectUri: REDIRECT_URI,
-        });
-
-        // Clean up PKCE verifier
-        localStorage.removeItem("oauth_code_verifier");
-
-        // Update auth context (cookie handles session, we just need csrf token)
-        const data = response.data;
-        login(data.user, data.csrfToken);
-
-        // Store provider token for live API sync (e.g., GitHub Repos/Profile)
-        if (provider === "github" && data.githubToken) {
-          localStorage.setItem("trackcodex_github_token", data.githubToken);
-        } else if (provider === "google" && data.googleToken) {
-          localStorage.setItem("trackcodex_google_token", data.googleToken);
-        }
-
-        // Clear any manual token storage (legacy cleanup)
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("refresh_token");
+        // Exchange code for session
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (exchangeError) throw exchangeError;
 
         // Redirect to dashboard or saved path
-        const redirectPath =
-          localStorage.getItem("redirect_after_login") || "/dashboard/home";
+        const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
         localStorage.removeItem("redirect_after_login");
 
-        // Use navigate with small delay to ensure state is flushed
-        setTimeout(() => navigate(redirectPath), 100);
+        navigate(redirectPath);
       } catch (err: any) {
         console.error("OAuth callback error:", err);
-        const serverError = err.response?.data?.message || err.response?.data?.error || err.response?.data?.detail;
-        const errorMessage = serverError || err.message || "Authentication failed";
-        setError(errorMessage);
-        // Redirect to login after 5 seconds to give user time to read
-        setTimeout(() => {
-          navigate("/login");
-        }, 5000);
+        setError(err.message || "Authentication failed");
+        setTimeout(() => navigate("/login"), 5000);
       }
     };
 

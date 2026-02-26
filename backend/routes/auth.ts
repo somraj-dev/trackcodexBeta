@@ -3,8 +3,6 @@ import { prisma } from "../services/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import fs from "fs";
-import { OAuthService } from "../services/oauth";
-import { encrypt } from "../services/encryption";
 import { requireAuth } from "../middleware/auth";
 import {
   createSession,
@@ -12,11 +10,11 @@ import {
   revokeSession,
   revokeAllUserSessions,
 } from "../services/session";
+import { supabaseAdmin } from "../services/supabase";
 import {
   logLoginAttempt,
   checkSuspiciousActivity,
   logSensitiveOperation,
-  logOAuthLink,
 } from "../services/auditLogger";
 import { rateLimitConfig } from "../middleware/rateLimit";
 import {
@@ -59,31 +57,31 @@ export async function authRoutes(fastify: FastifyInstance) {
           throw BadRequest("Password must be at least 8 characters");
         }
 
-        // 2. Check for existing user (Atomic check not possible without constraints, catching constraint violation below)
-        const existingUser = await prisma.user.findFirst({
-          where: { OR: [{ email }, { username }] },
-        });
-
-        if (existingUser) {
-          if (existingUser.email === email) {
-            throw Conflict("Email already in use");
-          }
-          throw Conflict("Username already taken");
-        }
-
-        // 3. Create User
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const user = await prisma.user.create({
-          data: {
-            email,
-            username,
-            name,
-            password: hashedPassword,
-            role: "user",
-            profileCompleted: true,
+        // 2. Register user with Supabase
+        const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+              username: username,
+            },
           },
         });
+
+        if (authError) {
+          throw BadRequest(authError.message);
+        }
+
+        if (!authData.user) {
+          throw InternalError("Failed to create user in Supabase");
+        }
+
+        const user = authData.user;
+
+        // 3. The SQL trigger handle_new_user() will create the entry in public."User"
+        // We might need to wait a moment or just trust the trigger.
+        // For registration response, we return what we have.
 
         // 4. Create Session
         const sessionId = crypto.randomUUID();
@@ -91,11 +89,11 @@ export async function authRoutes(fastify: FastifyInstance) {
           sessionId,
           {
             userId: user.id,
-            email: user.email,
-            username: user.username as string,
-            name: user.name as string,
-            role: user.role,
-            tokenVersion: user.tokenVersion,
+            email: user.email!,
+            username: (user.user_metadata?.username as string) || "",
+            name: (user.user_metadata?.full_name as string) || "",
+            role: "user",
+            tokenVersion: 1,
           },
           {
             ipAddress: request.ip,
@@ -140,10 +138,10 @@ export async function authRoutes(fastify: FastifyInstance) {
           user: {
             id: user.id,
             email: user.email,
-            username: user.username,
-            name: user.name,
-            avatar: user.avatar,
-            role: user.role,
+            username: user.user_metadata?.username,
+            name: user.user_metadata?.full_name,
+            avatar: user.user_metadata?.avatar_url,
+            role: "user",
           },
         };
       } catch (error: any) {
@@ -359,38 +357,55 @@ export async function authRoutes(fastify: FastifyInstance) {
         }
 
         // Find user by email OR username
-        const user = await prisma.user.findFirst({
-          where: {
-            OR: [{ email: identifier }, { username: identifier }],
-          },
+        // 2. Validate Credentials with Supabase
+        const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+          email: identifier.includes("@") ? identifier : undefined,
+          // If identifier is not an email, we might have a problem if Supabase doesn't support username login out of the box
+          // Supabase supports email/password or phone/password.
+          // For username login, we'd need to fetch the email from Prisma first.
+          ...(identifier.includes("@") ? { email: identifier } : {}),
+          password,
         });
 
-        // 2. Validate Credentials
-        // Timing attack mitigation: always hash comparison even if user not found?
-        // For now, simpler logic is acceptable as long as we return generic error.
-        if (!user || !user.password) {
+        let finalAuthData = authData;
+        let finalAuthError = authError;
+
+        if (!identifier.includes("@")) {
+          // Attempt to find user by username to get email
+          const dbUser = await prisma.user.findUnique({
+            where: { username: identifier },
+            select: { email: true }
+          });
+          if (dbUser) {
+            const { data: retryData, error: retryError } = await supabaseAdmin.auth.signInWithPassword({
+              email: dbUser.email,
+              password,
+            });
+            finalAuthData = retryData;
+            finalAuthError = retryError;
+          } else {
+            return reply.code(401).send({ error: "Invalid credentials" });
+          }
+        }
+
+        if (finalAuthError || !finalAuthData.user) {
           await logLoginAttempt(
             identifier,
             ip,
             userAgent,
             false,
             undefined,
-            "invalid_credentials",
+            finalAuthError?.message || "invalid_credentials",
           );
-          return reply.code(401).send({ error: "Invalid credentials" });
+          return reply.code(401).send({ error: finalAuthError?.message || "Invalid credentials" });
         }
 
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
-          await logLoginAttempt(
-            identifier,
-            ip,
-            userAgent,
-            false,
-            user.id,
-            "invalid_password",
-          );
-          return reply.code(401).send({ error: "Invalid credentials" });
+        const user = await prisma.user.findUnique({
+          where: { id: finalAuthData.user.id }
+        });
+
+        if (!user) {
+          throw InternalError("User authenticated but not found in database");
         }
 
         // 3. Create Secure Session
@@ -453,10 +468,8 @@ export async function authRoutes(fastify: FastifyInstance) {
       config: { rateLimit: rateLimitConfig.oauth },
     },
     async (request, reply) => {
-      const { code, codeVerifier, redirectUri } = request.body as {
+      const { code } = request.body as {
         code: string;
-        codeVerifier?: string;
-        redirectUri?: string;
       };
       const ip = request.ip;
       const userAgent = request.headers["user-agent"] || "unknown";
@@ -477,120 +490,29 @@ export async function authRoutes(fastify: FastifyInstance) {
           throw BadRequest("Authorization code required");
         }
 
-        // Exchange code for tokens
-        // IMPORTANT: redirectUri must exactly match what was sent in the auth request
-        const tokenData = await OAuthService.exchangeGoogleCode(
-          code,
-          codeVerifier,
-          redirectUri,
-        );
+        // 1. Exchange code for session with Supabase
+        const { data: authData, error: authError } = await supabaseAdmin.auth.exchangeCodeForSession(code);
 
-        // Get user info from Google
-        const googleUser = await OAuthService.getGoogleUserInfo(
-          tokenData.access_token,
-        );
+        if (authError || !authData.user) {
+          throw BadRequest(authError?.message || "Google OAuth exchange failed");
+        }
 
-        // Find or create user logic
-        let user = await prisma.user.findFirst({
-          where: { email: googleUser.email },
+        const supabaseUser = authData.user;
+
+        // 2. Fetch/Sync user from our database
+        // The trigger handle_new_user should have already created the user
+        const user = await prisma.user.findUnique({
+          where: { id: supabaseUser.id },
         });
 
-        // Encrypt tokens before storage
-        let encryptedAccessToken, encryptedRefreshToken, encryptedIdToken;
-        try {
-          encryptedAccessToken = encrypt(tokenData.access_token);
-          encryptedRefreshToken = tokenData.refresh_token
-            ? encrypt(tokenData.refresh_token)
-            : undefined;
-          encryptedIdToken = tokenData.id_token
-            ? encrypt(tokenData.id_token)
-            : undefined;
-        } catch (encError: any) {
-          console.error("Encryption failed. ENCRYPTION_KEY is likely missing.");
-          throw InternalError(
-            "Server Configuration Error: ENCRYPTION_KEY is not set in the environment variables."
-          );
+        if (!user) {
+          // Fallback in case trigger hasn't finished or failed
+          // But ideally we just wait a bit or the trigger handles it.
+          // For now, let's attempt a quick retry or just handle it.
+          throw InternalError("User sync failed after Google OAuth");
         }
 
-        if (user) {
-          // Link Verification
-          const existingLink = await prisma.oAuthAccount.findUnique({
-            where: {
-              provider_providerAccountId: {
-                provider: "google",
-                providerAccountId: googleUser.id,
-              },
-            },
-          });
-
-          if (!existingLink) {
-            // Create link
-            await prisma.oAuthAccount.create({
-              data: {
-                userId: user.id,
-                provider: "google",
-                providerAccountId: googleUser.id,
-                accessToken: encryptedAccessToken,
-                refreshToken: encryptedRefreshToken,
-                tokenType: tokenData.token_type,
-                idToken: encryptedIdToken,
-              },
-            });
-            await logOAuthLink(user.id, "google", "link", ip, userAgent);
-          } else {
-            // Update tokens
-            await prisma.oAuthAccount.update({
-              where: { id: existingLink.id },
-              data: {
-                accessToken: encryptedAccessToken,
-                refreshToken:
-                  encryptedRefreshToken || existingLink.refreshToken,
-                idToken: encryptedIdToken,
-              },
-            });
-          }
-        } else {
-          // Register new user
-          // Ensure username uniqueness
-          let username = googleUser.email.split("@")[0];
-          const exists = await prisma.user.findUnique({ where: { username } });
-          if (exists) {
-            username = username + "_" + Math.random().toString(36).substring(7);
-          }
-
-          user = await prisma.user.create({
-            data: {
-              email: googleUser.email,
-              username,
-              name: googleUser.name,
-              avatar: googleUser.avatar,
-              role: "user",
-              emailVerified: true, // Google verified
-              emailVerifiedAt: new Date(),
-              oauthAccounts: {
-                create: {
-                  provider: "google",
-                  providerAccountId: googleUser.id,
-                  accessToken: encryptedAccessToken,
-                  refreshToken: encryptedRefreshToken,
-                  tokenType: tokenData.token_type,
-                  idToken: encryptedIdToken,
-                },
-              },
-            },
-          });
-          await logSensitiveOperation(
-            user.id,
-            "register_oauth",
-            "auth",
-            "google",
-            ip,
-            userAgent,
-            true,
-          );
-        }
-
-        // Create Session
+        // 3. Create Secure Session
         const sessionId = crypto.randomUUID();
         const { csrfToken } = await createSession(
           sessionId,
@@ -604,10 +526,6 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
           { ipAddress: ip, userAgent },
         );
-
-        // NOTE: ActivityLog is not defined in Prisma schema
-        // Consider restoring this once ActivityLog is added to schema
-        console.log("DEBUG: Would log AUTH_LOGIN activity:", { userId: user.id, provider: "google" });
 
         const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
@@ -660,9 +578,8 @@ export async function authRoutes(fastify: FastifyInstance) {
       config: { rateLimit: rateLimitConfig.oauth },
     },
     async (request, reply) => {
-      const { code, redirectUri } = request.body as {
+      const { code } = request.body as {
         code: string;
-        redirectUri?: string;
       };
       const ip = request.ip;
       const userAgent = request.headers["user-agent"] || "unknown";
@@ -675,110 +592,33 @@ export async function authRoutes(fastify: FastifyInstance) {
           if (hostParts.length >= 2) {
             cookieDomain = '.' + hostParts.slice(-2).join('.');
           }
-        } catch (e) { }
+        } catch {
+          // Ignore parsing errors for domain
+        }
       }
 
       try {
         if (!code) throw BadRequest("Authorization code required");
 
-        const tokenData = await OAuthService.exchangeGithubCode(
-          code,
-          redirectUri,
-        );
-        const githubUser = await OAuthService.getGithubUserInfo(
-          tokenData.access_token,
-        );
+        // 1. Exchange code for session
+        const { data: authData, error: authError } = await supabaseAdmin.auth.exchangeCodeForSession(code);
 
-        const email = githubUser.email;
-
-        if (!email)
-          throw BadRequest("No verified email found in GitHub account");
-
-        // Encrypt tokens
-        const encryptedAccessToken = encrypt(tokenData.access_token);
-        // GitHub doesn't usually give refresh tokens in web flow unless app is GitHub App
-        const encryptedRefreshToken = tokenData.refresh_token
-          ? encrypt(tokenData.refresh_token)
-          : undefined;
-
-        // Find existing user by email
-        let user = await prisma.user.findUnique({ where: { email } });
-
-        if (user) {
-          // Link account
-          const existingLink = await prisma.oAuthAccount.findUnique({
-            where: {
-              provider_providerAccountId: {
-                provider: "github",
-                providerAccountId: githubUser.id,
-              },
-            },
-          });
-
-          if (!existingLink) {
-            await prisma.oAuthAccount.create({
-              data: {
-                userId: user.id,
-                provider: "github",
-                providerAccountId: githubUser.id,
-                accessToken: encryptedAccessToken,
-                scope: tokenData.scope,
-              },
-            });
-            await logOAuthLink(user.id, "github", "link", ip, userAgent);
-          } else {
-            // Update token
-            await prisma.oAuthAccount.update({
-              where: { id: existingLink.id },
-              data: { accessToken: encryptedAccessToken },
-            });
-          }
-
-          // [SYNC] Ensure Username matches GitHub (only if not taken)
-          if (user.username !== githubUser.username) {
-            // Logic to sync username skipped to prevent confusing changes for existing users
-            // If vital, can be added back, but strictly it's safer not to force rename.
-          }
-        } else {
-          // Register
-          let username = githubUser.username;
-          // Ensure uniqueness
-          const exists = await prisma.user.findUnique({ where: { username } });
-          if (exists) {
-            username = username + "_" + Math.random().toString(36).substring(7);
-          }
-
-          user = await prisma.user.create({
-            data: {
-              email,
-              username,
-              name: githubUser.name || username,
-              avatar: githubUser.avatar,
-              role: "user",
-              emailVerified: true,
-              emailVerifiedAt: new Date(),
-              oauthAccounts: {
-                create: {
-                  provider: "github",
-                  providerAccountId: githubUser.id,
-                  accessToken: encryptedAccessToken,
-                  scope: tokenData.scope,
-                },
-              },
-            },
-          });
-          await logSensitiveOperation(
-            user.id,
-            "register_oauth",
-            "auth",
-            "github",
-            ip,
-            userAgent,
-            true,
-          );
+        if (authError || !authData.user) {
+          throw BadRequest(authError?.message || "GitHub OAuth exchange failed");
         }
 
-        // Create Session
+        const supabaseUser = authData.user;
+
+        // 2. Sync with database
+        const user = await prisma.user.findUnique({
+          where: { id: supabaseUser.id },
+        });
+
+        if (!user) {
+          throw InternalError("User sync failed after GitHub OAuth");
+        }
+
+        // 3. Create Session
         const sessionId = crypto.randomUUID();
         const { csrfToken } = await createSession(
           sessionId,
@@ -792,10 +632,6 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
           { ipAddress: ip, userAgent },
         );
-
-        // NOTE: ActivityLog is not defined in Prisma schema
-        // Consider restoring this once ActivityLog is added to schema
-        console.log("DEBUG: Would log AUTH_LOGIN activity:", { userId: user.id, provider: "github" });
 
         const isProduction = process.env.NODE_ENV === "production";
         reply.setCookie("session_id", sessionId, {
@@ -916,78 +752,111 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
     "/auth/verify-email/request",
     { preHandler: requireAuth },
-    async (request, reply) => {
+    async (request) => {
       const user = (request as any).user;
-      // In a real app, you'd rate limit this aggressively
 
       try {
-        const token = crypto.randomUUID();
-        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-        // Store token
-        await prisma.verificationToken.create({
-          data: {
-            identifier: user.email,
-            token,
-            expires,
-          },
+        const { error } = await supabaseAdmin.auth.resend({
+          type: "signup",
+          email: user.email,
         });
 
-        // Mock Email Sending (Log to console)
-        request.log.info(
-          `[EMAIL MOCK] To: ${user.email} | Subject: Verify Email | Link: ${process.env.FRONTEND_URL}/verify-email?token=${token}`,
-        );
+        if (error) {
+          throw BadRequest(error.message);
+        }
 
         return { message: "Verification email sent" };
-      } catch (error) {
+      } catch (error: any) {
         request.log.error(error);
-        return reply
-          .code(500)
-          .send({ error: "Failed to send verification email" });
+        throw error;
       }
     },
   );
 
   fastify.post("/auth/verify-email/confirm", async (request, reply) => {
-    const { token } = request.body as { token: string };
+    const { token, email } = request.body as { token: string; email: string };
 
-    if (!token) return reply.code(400).send({ error: "Token required" });
+    if (!token || !email) {
+      throw BadRequest("Token and email required");
+    }
 
     try {
-      const verificationToken = await prisma.verificationToken.findUnique({
-        where: { token },
+      const { data, error } = await supabaseAdmin.auth.verifyOtp({
+        email,
+        token,
+        type: "signup",
       });
 
-      if (!verificationToken) {
-        return reply.code(400).send({ error: "Invalid token" });
+      if (error) {
+        throw BadRequest(error.message);
       }
 
-      if (verificationToken.expires < new Date()) {
-        return reply.code(400).send({ error: "Token expired" });
-      }
-
-      // Verify User
-      const user = await prisma.user.findUnique({
-        where: { email: verificationToken.identifier },
-      });
-      if (!user) return reply.code(400).send({ error: "User not found" });
-
-      // Update User
+      // Sync local DB (emailVerified)
       await prisma.user.update({
-        where: { id: user.id },
+        where: { id: data.user?.id },
         data: {
           emailVerified: true,
           emailVerifiedAt: new Date(),
         },
       });
 
-      // Delete token
-      await prisma.verificationToken.delete({ where: { token } });
-
-      return { message: "Email verified successfully" };
-    } catch (error) {
+    } catch (error: any) {
       request.log.error(error);
-      return reply.code(500).send({ error: "Verification failed" });
+      throw error;
+    }
+  });
+
+  // --- Password Reset ---
+  fastify.post("/auth/password-reset/request", async (request) => {
+    const { email } = request.body as { email: string };
+
+    if (!email) throw BadRequest("Email required");
+
+    try {
+      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
+      });
+
+      if (error) throw BadRequest(error.message);
+
+      return { message: "Password reset email sent" };
+    } catch (error: any) {
+      request.log.error(error);
+      throw error;
+    }
+  });
+
+  fastify.post("/auth/password-reset/confirm", async (request, reply) => {
+    const { token, password } = request.body as {
+      token: string;
+      password: string;
+    };
+
+    if (!token || !password) {
+      throw BadRequest("Token and new password required");
+    }
+
+    try {
+      // 1. Exchange token for session (Supabase use token in reset link)
+      const { error: authError } = await supabaseAdmin.auth.verifyOtp({
+        token,
+        type: "recovery",
+        email: (request.body as any).email, // Some flows need email
+      });
+
+      if (authError) throw BadRequest(authError.message);
+
+      // 2. Update password
+      const { error: updateError } = await supabaseAdmin.auth.updateUser({
+        password,
+      });
+
+      if (updateError) throw BadRequest(updateError.message);
+
+      return { message: "Password reset successful" };
+    } catch (error: any) {
+      request.log.error(error);
+      throw error;
     }
   });
 
