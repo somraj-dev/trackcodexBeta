@@ -7,16 +7,19 @@ if (!supabaseUrl || !supabaseServiceKey) {
     console.warn("⚠️  [SUPABASE] Missing keys. Auth features will fail.");
 }
 
-/**
- * Supabase Admin client - used for backend operations that bypass RLS
- * like managing users, deleting accounts, etc.
- */
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-    },
-});
+// Initialize admin client only if keys are present to prevent crash
+export const supabaseAdmin = (supabaseUrl && supabaseServiceKey)
+    ? createClient(supabaseUrl, supabaseServiceKey, {
+        auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+        },
+    })
+    : null as any;
+
+if (!supabaseAdmin) {
+    console.error("❌ [SUPABASE] Admin client initialization failed: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+}
 
 /**
  * Helper to get a client with a specific user's token
