@@ -18,14 +18,25 @@ USING (auth.uid()::text = id);
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public."User" (id, email, name, avatar, "emailVerified", role)
+  INSERT INTO public."User" (
+    id, 
+    email, 
+    name, 
+    avatar, 
+    "emailVerified", 
+    role, 
+    "createdAt", 
+    "updatedAt"
+  )
   VALUES (
     new.id::text, 
     new.email, 
     new.raw_user_meta_data->>'full_name', 
     new.raw_user_meta_data->>'avatar_url',
     true,
-    'user'
+    'user',
+    now(),
+    now()
   );
   RETURN new;
 END;

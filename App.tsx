@@ -1149,9 +1149,19 @@ const AppWithProviders = () => {
 };
 
 const App = () => {
-  // Use HashRouter for Electron/Standalone, BrowserRouter for web
-  const isElectron = window.navigator.userAgent.toLowerCase().includes('electron');
+  // Use HashRouter ONLY for Electron (local file protocol)
+  const isElectron = window.navigator.userAgent.toLowerCase().includes('electron') || window.location.protocol === 'file:';
   const Router = isElectron ? HashRouter : BrowserRouter;
+
+  // --- ROOT FIX: Force Hash-to-Path Redirect ---
+  // If a user lands on a legacy hashed URL (e.g. /#/login), 
+  // we immediately convert it to a clean URL (/login).
+  useEffect(() => {
+    if (!isElectron && window.location.hash.startsWith('#/')) {
+      const cleanPath = window.location.hash.substring(2);
+      window.history.replaceState(null, '', `/${cleanPath}`);
+    }
+  }, [isElectron]);
 
   return (
     <ThemeProvider>
