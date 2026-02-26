@@ -43,32 +43,34 @@ const OAuthCallback: React.FC = () => {
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) throw exchangeError;
 
-        if (!data.session) {
-          throw new Error("Session exchange completed but no session was returned.");
+        if (!data.session || !data.user) {
+          throw new Error("Session exchange completed but no valid session was returned.");
         }
 
-        // We wait a brief moment for the AuthContext to pick up the new session
-        // This prevents the race condition where we navigate to a protected route
-        // before the state update has finished.
-        let attempts = 0;
-        const checkAuth = setInterval(async () => {
-          attempts++;
-          const { data: { session } } = await supabase.auth.getSession();
+        // --- ROOT FIX: Immediate State Sync ---
+        // Instead of waiting for the AuthContext listener to fire, we manually
+        // push the user data into the context. This prevents the "RedirectToLogin"
+        // from firing during the transition.
+        const mappedUser = {
+          id: data.session.user.id,
+          email: data.session.user.email || "",
+          username: data.session.user.user_metadata?.username || "",
+          name: data.session.user.user_metadata?.full_name || "",
+          avatar: data.session.user.user_metadata?.avatar_url || "",
+          role: data.session.user.user_metadata?.role || "user",
+        };
 
-          if (session) { // We check if Supabase now has a stable session
-            clearInterval(checkAuth);
+        // This triggers the immediate re-render of App.tsx, which will
+        // unmount OAuthCallback and mount ProtectedApp.
+        // We call login with user data and access token.
+        login(mappedUser, data.session.access_token, data.session.access_token);
 
-            // Redirect to dashboard or saved path
-            const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
-            localStorage.removeItem("redirect_after_login");
-            navigate(redirectPath, { replace: true });
-          } else if (attempts > 30) { // Timeout after 3 seconds
-            clearInterval(checkAuth);
-            // Even if session isn't immediately visible, we try to navigate to home
-            // AuthContext will handle the secondary redirect if it's still missing
-            navigate("/dashboard/home", { replace: true });
-          }
-        }, 150);
+        // Redirect to dashboard or saved path
+        const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+        localStorage.removeItem("redirect_after_login");
+
+        // Navigation still happens but now we are GUARANTEED to be authenticated in the context
+        navigate(redirectPath, { replace: true });
 
       } catch (err: any) {
         console.error("OAuth callback error:", err);
