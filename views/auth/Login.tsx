@@ -18,7 +18,7 @@ const Login = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback/google`,
+          redirectTo: `${window.location.origin}/#/auth/callback/google`,
         }
       });
       if (error) throw error;
@@ -35,7 +35,7 @@ const Login = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback/github`,
+          redirectTo: `${window.location.origin}/#/auth/callback/github`,
         }
       });
       if (error) throw error;

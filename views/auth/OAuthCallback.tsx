@@ -18,8 +18,15 @@ const OAuthCallback: React.FC = () => {
 
     const handleCallback = async () => {
       try {
+        // In HashRouter, the code might be in the query params of the hash
         const queryParams = new URLSearchParams(window.location.search);
-        const code = queryParams.get("code");
+        let code = queryParams.get("code");
+
+        if (!code && window.location.hash.includes("?")) {
+          const hashQuery = window.location.hash.split("?")[1];
+          const hashParams = new URLSearchParams(hashQuery);
+          code = hashParams.get("code");
+        }
 
         if (!code) {
           throw new Error("No authorization code received");
