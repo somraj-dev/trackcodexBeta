@@ -243,6 +243,20 @@ export const api = {
       request<{ success: boolean }>(`/repos/${repoId}/dispatch`, { method: "POST", body: JSON.stringify({ workflowId }) }),
   },
 
+  integrations: {
+    connect: (provider: string, accessToken: string, providerUsername?: string) =>
+      request<{ success: boolean }>("/integrations/connect", {
+        method: "POST",
+        body: JSON.stringify({ provider, accessToken, providerUsername }),
+      }),
+    getToken: (provider: string) =>
+      request<{ connected: boolean; accessToken?: string }>(`/integrations/token/${provider}`),
+    status: () =>
+      request<{ connected: Record<string, boolean> }>("/integrations/status"),
+    disconnect: (provider: string) =>
+      request<{ success: boolean }>(`/integrations/disconnect/${provider}`, { method: "DELETE" }),
+  },
+
   sshKeys: {
     list: () => request<SSHKey[]>("/ssh-keys"),
     add: (title: string, key: string) =>

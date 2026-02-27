@@ -87,9 +87,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           setUser(mappedUser);
           profileService.initFromAuth(mappedUser);
 
-          // Auto-connect GitHub/Google integration if user logged in via OAuth
+          // Auto-connect GitHub/Google/GitLab integration if user logged in via OAuth
           const provider = session.user.app_metadata?.provider;
           const providerToken = session.provider_token;
+
+          // Helper: persist token to backend for permanent storage (non-blocking)
+          const persistTokenToBackend = (prov: string, token: string, username?: string) => {
+            fetch(`${import.meta.env?.VITE_API_URL || ""}/api/v1/integrations/connect`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("session_id") || ""}`,
+              },
+              credentials: "include",
+              body: JSON.stringify({ provider: prov, accessToken: token, providerUsername: username }),
+            }).catch((err) => console.warn("[AuthContext] Backend token persist failed (non-critical):", err));
+          };
+
           if (provider === "github") {
             if (providerToken) {
               localStorage.setItem("trackcodex_github_token", providerToken);
@@ -98,13 +112,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             if (ghUsername) {
               localStorage.setItem("trackcodex_github_username", ghUsername);
             }
+            if (providerToken) {
+              persistTokenToBackend("github", providerToken, ghUsername);
+            }
           } else if (provider === "google") {
             if (providerToken) {
               localStorage.setItem("trackcodex_google_token", providerToken);
+              persistTokenToBackend("google", providerToken);
             }
           } else if (provider === "gitlab") {
             if (providerToken) {
               localStorage.setItem("trackcodex_gitlab_token", providerToken);
+              persistTokenToBackend("gitlab", providerToken);
             }
           }
         }
@@ -142,6 +161,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
             const provider = session.user.app_metadata?.provider;
             const providerToken = session.provider_token;
+
+            const persistToken = (prov: string, token: string, username?: string) => {
+              fetch(`${import.meta.env?.VITE_API_URL || ""}/api/v1/integrations/connect`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${localStorage.getItem("session_id") || ""}`,
+                },
+                credentials: "include",
+                body: JSON.stringify({ provider: prov, accessToken: token, providerUsername: username }),
+              }).catch(() => { });
+            };
+
             if (provider === "github") {
               if (providerToken) {
                 localStorage.setItem("trackcodex_github_token", providerToken);
@@ -150,13 +182,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               if (ghUsername) {
                 localStorage.setItem("trackcodex_github_username", ghUsername);
               }
+              if (providerToken) persistToken("github", providerToken, ghUsername);
             } else if (provider === "google") {
               if (providerToken) {
                 localStorage.setItem("trackcodex_google_token", providerToken);
+                persistToken("google", providerToken);
               }
             } else if (provider === "gitlab") {
               if (providerToken) {
                 localStorage.setItem("trackcodex_gitlab_token", providerToken);
+                persistToken("gitlab", providerToken);
               }
             }
           }
