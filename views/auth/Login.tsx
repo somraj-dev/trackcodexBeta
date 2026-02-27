@@ -46,6 +46,9 @@ const Login = () => {
         provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback/github`,
+          queryParams: {
+            prompt: 'consent',
+          },
         }
       });
       if (error) throw error;
