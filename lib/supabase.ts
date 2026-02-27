@@ -1,9 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+// Use the proxy URL if available (bypasses ISP blocking of supabase.co in India)
+// Falls back to direct Supabase URL
+const supabaseUrl = import.meta.env.VITE_SUPABASE_PROXY_URL
+    || import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// 6. Only initialize if keys are present
+// Only initialize if keys are present
 export const supabase = (supabaseUrl && supabaseAnonKey)
     ? createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
