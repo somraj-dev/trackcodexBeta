@@ -18,6 +18,8 @@ import { RealtimeProvider } from "./contexts/RealtimeContext";
 const Login = React.lazy(() => import("./views/auth/Login"));
 const Signup = React.lazy(() => import("./views/auth/Signup"));
 const OAuthCallback = React.lazy(() => import("./views/auth/OAuthCallback"));
+const ForgotPassword = React.lazy(() => import("./views/auth/ForgotPassword"));
+const ResetPassword = React.lazy(() => import("./views/auth/ResetPassword"));
 const SignOut = React.lazy(() => import("./views/auth/SignOut"));
 const LandingPage = React.lazy(() => import("./views/LandingPage"));
 
@@ -1111,6 +1113,8 @@ const AppContent = () => {
                 <>
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/" element={<LandingPage />} />
                   <Route path="*" element={<RedirectToLogin />} />
                 </>

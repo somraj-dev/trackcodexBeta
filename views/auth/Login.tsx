@@ -232,27 +232,36 @@ const Login = () => {
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold text-gray-700"
-                >
-                  Password
-                </label>
-                <a
-                  href="#"
-                  className="text-sm text-blue-600 hover:underline font-medium"
-                >
-                  Forgot password?
-                </a>
+              {/* Password */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium text-gh-text-secondary">
+                    Password
+                  </label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-xs text-primary hover:text-blue-500 transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative group/input">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gh-text-secondary group-focus-within/input:text-primary transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">
+                      lock
+                    </span>
+                  </span>
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-gh-bg border border-gh-border rounded-md text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                    placeholder="••••••••"
+                  />
+                </div>
               </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              />
             </div>
 
             {error && (
