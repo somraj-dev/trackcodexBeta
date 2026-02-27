@@ -14,6 +14,63 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider, useNotifications } from "./context/NotificationContext";
 import { RealtimeProvider } from "./contexts/RealtimeContext";
 
+// Error boundary to catch stale chunk load failures after redeployments
+class ChunkErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    if (
+      error.message.includes("Failed to fetch dynamically imported module") ||
+      error.message.includes("Importing a module script failed") ||
+      error.message.includes("error loading dynamically imported module")
+    ) {
+      return { hasError: true };
+    }
+    throw error; // Re-throw non-chunk errors
+  }
+
+  componentDidCatch(error: Error) {
+    // Auto-reload once to get fresh chunks (prevent infinite loop with sessionStorage flag)
+    const reloadKey = "chunk_reload_" + window.location.pathname;
+    if (!sessionStorage.getItem(reloadKey)) {
+      sessionStorage.setItem(reloadKey, "1");
+      window.location.reload();
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gh-bg text-gh-text">
+          <div className="text-center space-y-4">
+            <span className="material-symbols-outlined text-5xl text-red-500">error</span>
+            <h2 className="text-xl font-semibold">Application Updated</h2>
+            <p className="text-gh-text-secondary text-sm max-w-md">
+              A new version of TrackCodex is available. Please reload to get the latest version.
+            </p>
+            <button
+              onClick={() => {
+                sessionStorage.clear();
+                window.location.reload();
+              }}
+              className="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+            >
+              Reload Application
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Auth Views
 const Login = React.lazy(() => import("./views/auth/Login"));
 const Signup = React.lazy(() => import("./views/auth/Signup"));
@@ -1086,53 +1143,55 @@ const AppContent = () => {
   }
 
   return (
-    <React.Suspense fallback={<SplashScreen />}>
-      <div className="flex flex-col h-screen overflow-hidden">
-        <main className={`flex-1 flex flex-col min-h-0 overflow-y-auto ${location.pathname === "/" ? "no-scrollbar" : "custom-scrollbar"}`}>
-          <Routes>
-            {/* Public Pages with Static Footer */}
-            <Route
-              element={
-                <>
-                  <Outlet />
-                  <Footer />
-                </>
-              }
-            >
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/status" element={<Status />} />
-              <Route path="/security" element={<Security />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/cookies" element={<CookiePolicy />} />
+    <ChunkErrorBoundary>
+      <React.Suspense fallback={<SplashScreen />}>
+        <div className="flex flex-col h-screen overflow-hidden">
+          <main className={`flex-1 flex flex-col min-h-0 overflow-y-auto ${location.pathname === "/" ? "no-scrollbar" : "custom-scrollbar"}`}>
+            <Routes>
+              {/* Public Pages with Static Footer */}
               <Route
-                path="/auth/callback/:provider"
-                element={<OAuthCallback />}
-              />
-              {!isAuthenticated && (
+                element={
+                  <>
+                    <Outlet />
+                    <Footer />
+                  </>
+                }
+              >
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/status" element={<Status />} />
+                <Route path="/security" element={<Security />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/cookies" element={<CookiePolicy />} />
+                <Route
+                  path="/auth/callback/:provider"
+                  element={<OAuthCallback />}
+                />
+                {!isAuthenticated && (
+                  <>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="*" element={<RedirectToLogin />} />
+                  </>
+                )}
+              </Route>
+
+              {/* Application */}
+              {isAuthenticated && (
                 <>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="*" element={<RedirectToLogin />} />
+                  <Route path="/logout" element={<SignOut />} />
+                  <Route path="/*" element={<ProtectedApp isFocusMode={false} />} />
                 </>
               )}
-            </Route>
-
-            {/* Application */}
-            {isAuthenticated && (
-              <>
-                <Route path="/logout" element={<SignOut />} />
-                <Route path="/*" element={<ProtectedApp isFocusMode={false} />} />
-              </>
-            )}
-          </Routes>
-        </main>
-        <CookieConsent />
-      </div>
-    </React.Suspense>
+            </Routes>
+          </main>
+          <CookieConsent />
+        </div>
+      </React.Suspense>
+    </ChunkErrorBoundary>
   );
 };
 
