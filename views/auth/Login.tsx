@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth, api } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Safety net: If auth state becomes true (e.g. from onAuthStateChange),
+  // redirect away from login immediately
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+      localStorage.removeItem("redirect_after_login");
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
 
   const handleGoogleLogin = async () => {
@@ -67,8 +77,9 @@ const Login = () => {
       }
 
       // 2. State update is handled by onAuthStateChange in AuthContext
+      // The useEffect above will catch isAuthenticated becoming true and redirect
 
-      // 3. Redirect
+      // 3. Also try direct redirect as a fast path
       const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
       localStorage.removeItem("redirect_after_login");
       navigate(redirectPath);
@@ -78,65 +89,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-
-  // Effect to handle redirect after successful login
-  // We can't do this inside handleSubmit easily because login() is void and might trigger rerender
-  // But typically useAuth's login just needs to facilitate the state change.
-  // Wait, useAuth.login is synchronous in context, but the CONSUMER usually handles the navigate.
-  // Actually, looking at AuthContext, login just sets state. App.tsx listens to state change.
-  // BUT App.tsx just renders ProtectedApp.
-  // Let's check where the redirection usually happens.
-  // In App.tsx:
-  // {!isAuthenticated ? ( ...Login... ) : ( <Route path="/*" element={<ProtectedApp />} /> )}
-  // So once isAuthenticated becomes true, ProtectedApp renders.
-  // ProtectedApp renders routes. Default route is / -> /dashboard/home.
-
-  // So we need to ensure that when ProtectedApp mounts, or somewhere, we navigate.
-  // OR we can manually navigate here after calling login().
-  // Let's modify handleSubmit to navigate.
-
-  // Wait, if I call login(), isAuthenticated becomes true.
-  // React Router will switch to ProtectedApp.
-  // If I'm strictly at /login, ProtectedApp might redirect me to /dashboard/home via its own logic?
-  // Let's check App.tsx again.
-  // <Route path="*" element={<Navigate to="/dashboard/home" />} /> (inside ProtectedApp)
-
-  // Actually, if we are at /login, and auth becomes true, App.tsx renders ProtectedApp.
-  // ProtectedApp defines routes. /login is NOT a valid route in ProtectedApp.
-  // So it falls through to * -> /dashboard/home.
-
-  // To fix this, we should programmatically navigate to the intended URL *before* or *immediately after* setting auth state?
-  // Or better, let ProtectedApp handle "if I am at /login, go to dashboard".
-
-  // Actually, the standard pattern:
-  // 1. User is at /login.
-  // 2. User clicks login.
-  // 3. handler calls login() -> context updates -> App rerenders -> shows ProtectedApp.
-  // 4. URL is still /login.
-  // 5. ProtectedApp routes don't have /login.
-  // 6. It hits * -> Navigate to /dashboard/home.
-
-  // SO, we can't easily intercept this in the component unless we change the URL *before* the context update triggers the App rerender?
-  // No, context update triggers render immediately.
-
-  // Better approach:
-  // In Login.tsx:
-  // const navigate = useNavigate();
-  // ...
-  // login(...)
-  // const redirectPath = localStorage.getItem('redirect_after_login') || '/dashboard/home';
-  // localStorage.removeItem('redirect_after_login');
-  // navigate(redirectPath);
-
-  // This race condition (App rerender vs navigate) is tricky.
-  // If App rerenders first, it sees /login, renders ProtectedApp, which redirects to /dashboard.
-  // However, if we navigate immediately after login(), we might beat it?
-
-  // Let's try adding navigate import and usage.
-
-  // Wait, I can't write all this reasoning in the ReplacementContent.
-
-  // I will just add the navigation logic.
 
   return (
     <div className="flex min-h-screen font-display">
