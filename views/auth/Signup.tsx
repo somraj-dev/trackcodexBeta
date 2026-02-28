@@ -43,26 +43,25 @@ const Signup = () => {
       await signInWithPopup(auth, githubProvider);
       // Auth state change handled by onAuthStateChanged in AuthContext
     } catch (error: any) {
-      if (error.code === 'auth/account-exists-with-different-credential') {
-        const email = error.customData?.email;
+      if (error.code === 'auth/account-exists-with-different-credential' || (error.message && error.message.includes('account-exists-with-different-credential'))) {
         const pendingAuthCredential = GithubAuthProvider.credentialFromError(error);
-        if (email && pendingAuthCredential) {
+        if (pendingAuthCredential) {
           try {
-            // Get sign-in methods for this email
-            const methods = await fetchSignInMethodsForEmail(auth, email);
-
-            // If the user signed in with Google previously
-            if (methods.includes('google.com')) {
-              // Prompt for Google login to verify identity, then link the GitHub credential to it
-              const result = await signInWithPopup(auth, googleProvider);
-              await linkWithCredential(result.user, pendingAuthCredential);
-              return; // Success! Linked and logged in.
-            }
+            // Bypass fetchSignInMethodsForEmail to avoid Email Enumeration Protection errors
+            // Automatically restart the Google Flow, and if successful, link GitHub to it.
+            const result = await signInWithPopup(auth, googleProvider);
+            await linkWithCredential(result.user, pendingAuthCredential);
+            return; // Success! Linked and logged in.
           } catch (linkingError) {
             console.error("Linking failed:", linkingError);
-            setError("Failed to link your accounts. Please sign in with Google.");
+            setError("Your email is registered with Google. Please click 'Continue with Google' to sign in.");
+            setIsLoading(false);
+            return;
           }
         }
+        setError("Your email is registered with Google. Please click 'Continue with Google' to sign in.");
+        setIsLoading(false);
+        return;
       }
       console.error(error);
       setError(error.message || "Failed to initialize GitHub login");
