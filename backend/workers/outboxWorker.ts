@@ -1,38 +1,28 @@
 import { PrismaClient } from '@prisma/client';
-import { Kafka, logLevel } from 'kafkajs';
+import { Client } from '@elastic/elasticsearch';
 
 const prisma = new PrismaClient();
-const KAFKA_BROKER_URL = process.env.KAFKA_BROKER_URL || 'localhost:9092';
+const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL || 'http://10.12.209.110:9200';
 
-const kafka = new Kafka({
-    clientId: 'trackcodex-outbox-worker',
-    brokers: [KAFKA_BROKER_URL],
-    logLevel: logLevel.ERROR,
+const esClient = new Client({
+    node: ELASTICSEARCH_URL
 });
-
-const producer = kafka.producer();
 
 /**
  * The Outbox Worker polls the OutboxEvent table for unprocessed events,
- * publishes them to Kafka, and then marks them as processed.
+ * and inserts them directly into Elasticsearch.
  */
 export async function startOutboxWorker() {
-    try {
-        await producer.connect();
-        console.log(`[Outbox Worker] Connected to Kafka Broker at ${KAFKA_BROKER_URL}`);
+    console.log(`[Outbox Worker] Starting ES-only outbox worker. Target: ${ELASTICSEARCH_URL}`);
 
-        // Poll every 5 seconds
-        setInterval(async () => {
-            try {
-                await processOutboxEvents();
-            } catch (err) {
-                console.error('[Outbox Worker] Error during polling cycle:', err);
-            }
-        }, 5000);
-
-    } catch (error) {
-        console.error('[Outbox Worker] Fatal error connecting to Kafka:', error);
-    }
+    // Poll every 5 seconds
+    setInterval(async () => {
+        try {
+            await processOutboxEvents();
+        } catch (err) {
+            console.error('[Outbox Worker] Error during polling cycle:', err);
+        }
+    }, 5000);
 }
 
 async function processOutboxEvents() {
@@ -49,14 +39,32 @@ async function processOutboxEvents() {
 
     for (const event of events) {
         try {
-            // 1. Send to Kafka. 
-            //    We use the "topic" column from the DB as the Kafka topic name.
-            await producer.send({
-                topic: event.topic,
-                messages: [
-                    { value: JSON.stringify(event.payload) }
-                ],
-            });
+            // 1. Send to Elasticsearch directly
+            // Extract the table name from the topic (e.g. server1.public.users)
+            const indexName = event.topic;
+
+            // Format ID for ES if needed, assuming payload has an id
+            const payload = event.payload as any;
+            if (payload && payload.id) {
+                await esClient.index({
+                    index: indexName,
+                    id: payload.id.toString(), // Use DB ID as document ID for upserts
+                    body: {
+                        payload: payload,
+                        eventType: event.eventType,
+                        timestamp: event.createdAt
+                    }
+                });
+            } else {
+                await esClient.index({
+                    index: indexName,
+                    body: {
+                        payload: payload,
+                        eventType: event.eventType,
+                        timestamp: event.createdAt
+                    }
+                });
+            }
 
             // 2. Mark as processed in the database
             await prisma.outboxEvent.update({
