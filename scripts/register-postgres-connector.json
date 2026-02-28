@@ -1,0 +1,25 @@
+{
+    "name": "trackcodex-postgres-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "database.hostname": "dpg-d6hbumbuibrs739sp0ng-a.singapore-postgres.render.com",
+        "database.port": "5432",
+        "database.user": "trackcodex_db_user",
+        "database.password": "WGX7ejNBuI4zfkxPqsYW3duQup5XJ6XO",
+        "database.dbname": "trackcodex_db",
+        "database.server.name": "trackcodex-db",
+        "plugin.name": "pgoutput",
+
+        "table.include.list": "public.Activity,public.CodeScan,public.Vulnerability",
+        "topic.prefix": "trackcodex-db",
+        
+        "slot.name": "debezium_cdc_slot",
+        "publication.name": "cdc_publication",
+        "publication.autocreate.mode": "filtered",
+
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter.schemas.enable": "false"
+    }
+}

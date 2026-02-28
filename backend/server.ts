@@ -28,6 +28,7 @@ import { routes } from "./routes/index";
 import { RealtimeService } from "./services/realtime";
 import { AppError } from "./utils/AppError";
 import { prisma } from "./services/prisma";
+import { startOutboxWorker } from "./workers/outboxWorker";
 
 const server = Fastify({
     logger: true,
@@ -482,6 +483,11 @@ async function bootstrap() {
             console.warn("   Pass : password123");
             console.warn("---------------------------------------");
         }
+
+        // 14. Start the Background Outbox Poller for Elasticsearch Sync
+        startOutboxWorker();
+        console.log("📨 [Worker] Outbox daemon started for Kafka synchronization.");
+
     } catch (err) {
         console.error("❌ [FATAL] Backend startup failed:");
         console.error(err);

@@ -17,14 +17,27 @@ export class ActivityService {
     repoId?: string;
     details?: any;
   }) {
-    return await prisma.activity.create({
-      data: {
-        type: data.type,
-        actorId: data.actorId,
-        orgId: data.orgId,
-        repoId: data.repoId,
-        details: data.details,
-      },
+    return await prisma.$transaction(async (tx) => {
+      // 1. Create the actual Activity record
+      const activity = await tx.activity.create({
+        data: {
+          type: data.type,
+          actorId: data.actorId,
+          orgId: data.orgId,
+          repoId: data.repoId,
+          details: data.details,
+        },
+      });
+
+      // 2. Queue it for Elasticsearch mapping via the Outbox Worker
+      await tx.outboxEvent.create({
+        data: {
+          topic: "activity", // Matches the indexName the ES Service expects
+          payload: activity,
+        },
+      });
+
+      return activity;
     });
   }
 

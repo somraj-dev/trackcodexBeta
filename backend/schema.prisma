@@ -1249,3 +1249,16 @@ model UserExtension {
   @@unique([userId, extensionId])
   @@index([userId])
 }
+
+// --- Outbox Pattern (Elasticsearch Sync) ---
+model OutboxEvent {
+  id          String   @id @default(uuid())
+  topic       String   // e.g., "activity_log.created", "issue.updated"
+  payload     Json     // The actual data to send to ES
+  processed   Boolean  @default(false)
+  error       String?  @db.Text
+  createdAt   DateTime @default(now())
+  processedAt DateTime?
+
+  @@index([processed, createdAt]) 
+}
