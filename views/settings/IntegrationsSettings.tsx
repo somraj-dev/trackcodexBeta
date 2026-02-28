@@ -241,7 +241,7 @@ const IntegrationsSettings = () => {
     setShowPermissionModal(false);
     if (!pendingIntegration) return;
 
-    // Use Supabase OAuth to link GitHub/GitLab identity
+    // Use Firebase OAuth to link GitHub/GitLab identity
     if (pendingIntegration.id === "github" || pendingIntegration.id === "gitlab") {
       try {
         const provider = pendingIntegration.id as "github" | "gitlab";

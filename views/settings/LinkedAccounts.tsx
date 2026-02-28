@@ -47,7 +47,7 @@ const LinkedAccounts: React.FC = () => {
     if (provider === "google") {
       const params = new URLSearchParams({
         client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
-        redirect_uri: "http://localhost:3000/auth/callback/google",
+        redirect_uri: `${window.location.origin}/auth/callback/google`,
         response_type: "code",
         scope: "openid email profile",
         access_type: "offline",
@@ -58,7 +58,7 @@ const LinkedAccounts: React.FC = () => {
     } else {
       const params = new URLSearchParams({
         client_id: import.meta.env.VITE_GITHUB_CLIENT_ID || "",
-        redirect_uri: "http://localhost:3000/auth/callback/github",
+        redirect_uri: `${window.location.origin}/auth/callback/github`,
         scope: "read:user user:email",
         state,
       });

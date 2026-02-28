@@ -41,6 +41,7 @@ const envSchema = z.object({
   // Firebase
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_SERVICE_ACCOUNT_KEY: z.string().optional(),
+  FIREBASE_DATABASE_SECRET: z.string().optional(),
 
   // Frontend
   FRONTEND_URL: z.string().url(),
