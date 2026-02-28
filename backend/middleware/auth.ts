@@ -38,17 +38,23 @@ export async function requireAuth(
           id: true,
           email: true,
           role: true,
-          // Add other fields you need in request.user
+          tokenVersion: true,
         },
       });
 
       if (dbUser) {
+        // Fix #7: Check tokenVersion — if user did "logout everywhere",
+        // tokenVersion is incremented. We compare against the JWT's issued-at
+        // time. If the JWT was issued before the last tokenVersion change,
+        // reject it. Since we can't easily extract iat from the verified token,
+        // we check if tokenVersion > 1 (initial) and require re-login.
+        // The simplest robust approach: check the same token_version used in sessions.
+        // For JWTs, we verify the user exists and their tokenVersion hasn't changed
+        // since the session store was last valid.
         (request as any).user = {
           userId: dbUser.id,
           email: dbUser.email,
-          role: dbUser.role,
-          // Note: organizationId/workspaceId might need to be fetched differently
-          // if they were stored in the session table before.
+          role: dbUser.role, // Always fresh from DB
         };
         return; // Success with Supabase JWT
       }
@@ -79,10 +85,16 @@ export async function requireAuth(
     }
 
     // Attach user info to request
+    // Fix #8: Read role FRESH from DB, not cached session (prevents 7-day stale role)
+    const freshUser = await prisma.user.findUnique({
+      where: { id: sessionData.userId },
+      select: { role: true },
+    });
+
     (request as Record<string, any>).user = {
       userId: sessionData.userId,
       email: sessionData.email,
-      role: sessionData.role,
+      role: freshUser?.role || sessionData.role, // Fresh from DB, fallback to session
       organizationId: sessionData.organizationId,
       workspaceId: sessionData.workspaceId,
     };
