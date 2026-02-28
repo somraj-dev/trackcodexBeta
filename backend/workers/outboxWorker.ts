@@ -5,7 +5,11 @@ const prisma = new PrismaClient();
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL || 'http://10.12.209.110:9200';
 
 const esClient = new Client({
-    node: ELASTICSEARCH_URL
+    node: ELASTICSEARCH_URL,
+    headers: {
+        'Bypass-Tunnel-Reminder': 'true',
+        'User-Agent': 'trackcodex-backend'
+    }
 });
 
 /**

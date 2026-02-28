@@ -5,6 +5,10 @@ import { Client } from "@elastic/elasticsearch";
 
 const esClient = new Client({
   node: process.env.ELASTICSEARCH_URL || "http://10.12.209.110:9200",
+  headers: {
+    'Bypass-Tunnel-Reminder': 'true',
+    'User-Agent': 'trackcodex-backend'
+  }
 });
 
 // Shared prisma instance
