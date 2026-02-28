@@ -5,33 +5,33 @@
 
 import { FastifyRequest, FastifyReply } from "fastify";
 
-// Rate limit configurations
+// Rate limit configurations (Production-hardened, GitHub-standard)
 export const rateLimitConfig = {
-  // Login attempts: 100 per minute (Development permissive)
+  // Login: 5 per minute per IP (prevents brute-force)
   login: {
-    max: 100,
+    max: 5,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",
-      message: "Too many login attempts. Please try again in a minute.",
+      message: "Too many login attempts. Please wait before trying again.",
       retryAfter: 60,
     }),
   },
 
-  // Registration: 50 per minute
+  // Registration: 3 per minute per IP (prevents spam accounts)
   register: {
-    max: 50,
+    max: 3,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",
-      message: "Too many registration attempts. Please try again soon.",
+      message: "Too many registration attempts. Please try again later.",
       retryAfter: 60,
     }),
   },
 
-  // OAuth: 100 per minute
+  // OAuth: 10 per minute per IP
   oauth: {
-    max: 100,
+    max: 10,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",
@@ -40,31 +40,42 @@ export const rateLimitConfig = {
     }),
   },
 
-  // Password reset: 50 per minute
+  // Password reset: 3 per minute per IP (prevents email spam)
   passwordReset: {
-    max: 50,
+    max: 3,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",
-      message: "Too many password reset requests. Please try again soon.",
+      message: "Too many password reset requests. Please try again later.",
       retryAfter: 60,
     }),
   },
 
-  // OTP sending: 50 per minute
+  // OTP sending: 3 per minute per IP
   otpSend: {
-    max: 50,
+    max: 3,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",
-      message: "Too many OTP requests. Please try again soon.",
+      message: "Too many OTP requests. Please try again later.",
       retryAfter: 60,
     }),
   },
 
-  // General API: 1000 requests per minute
+  // Email verification resend: 3 per minute
+  verifyEmail: {
+    max: 3,
+    timeWindow: "1 minute",
+    errorResponseBuilder: () => ({
+      error: "Too Many Requests",
+      message: "Too many verification requests. Please try again later.",
+      retryAfter: 60,
+    }),
+  },
+
+  // General API: 300 requests per minute per IP
   general: {
-    max: 1000,
+    max: 300,
     timeWindow: "1 minute",
     errorResponseBuilder: () => ({
       error: "Too Many Requests",

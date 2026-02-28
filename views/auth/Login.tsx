@@ -67,9 +67,15 @@ const Login = () => {
     setError("");
 
     try {
-      // 1. Sign in with Supabase
+      // 1. Sign in with Supabase (email only - never fabricate fake emails)
+      const loginEmail = username.includes('@') ? username : null;
+
+      if (!loginEmail) {
+        throw new Error("Please use your email address to sign in.");
+      }
+
       const { error: authError } = await supabase.auth.signInWithPassword({
-        email: username.includes('@') ? username : `${username}@manual-sync.local`, // Fallback logic for username
+        email: loginEmail,
         password,
       });
 

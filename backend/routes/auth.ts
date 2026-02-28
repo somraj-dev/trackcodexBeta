@@ -134,7 +134,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return {
           message: "Registration successful",
           csrfToken,
-          sessionId,
           user: {
             id: user.id,
             email: user.email,
@@ -166,12 +165,15 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
   );
 
-  // DEV ONLY: Bypass Login
-  if (process.env.NODE_ENV !== "production") {
+  // DEV ONLY: Bypass Login (Requires NODE_ENV=development AND DEV_LOGIN_SECRET)
+  if (process.env.NODE_ENV === "development" && process.env.DEV_LOGIN_SECRET) {
     fastify.post("/auth/dev-login", async (request, reply) => {
+      const { secret } = request.body as any;
+      if (secret !== process.env.DEV_LOGIN_SECRET) {
+        return reply.code(403).send({ error: "Invalid dev login secret" });
+      }
+
       try {
-        // Atomic "Find or Create" logic using transaction not strictly needed here if we handle races,
-        // but for dev login, simple is fine. We just want reliability.
         let user = await prisma.user.findFirst();
 
         if (!user) {
@@ -189,9 +191,8 @@ export async function authRoutes(fastify: FastifyInstance) {
               },
             });
           } catch (createError) {
-            // Race condition: User created by another request moments ago
             user = await prisma.user.findFirst();
-            if (!user) throw createError; // Genuine failure
+            if (!user) throw createError;
           }
         }
 
@@ -214,29 +215,18 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
         );
 
-        let cookieDomain: string | undefined = undefined;
-        if (process.env.FRONTEND_URL) {
-          try {
-            const urlObj = new URL(process.env.FRONTEND_URL);
-            const hostParts = urlObj.hostname.split('.');
-            if (hostParts.length >= 2) cookieDomain = '.' + hostParts.slice(-2).join('.');
-          } catch (e) { }
-        }
-
-        const isProduction = process.env.NODE_ENV === "production";
+        const isProduction = false;
         reply.setCookie("session_id", sessionId, {
           path: "/",
           httpOnly: true,
           secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
-          domain: isProduction ? cookieDomain : undefined,
+          sameSite: "lax",
           maxAge: 7 * 24 * 60 * 60,
         });
 
         return {
           message: "Dev login successful",
           csrfToken,
-          sessionId,
           user: {
             id: user.id,
             email: user.email,
@@ -256,7 +246,6 @@ export async function authRoutes(fastify: FastifyInstance) {
   // Get Current User (Session Check)
   fastify.get("/auth/me", async (request, reply) => {
     try {
-      console.log("DEBUG: /me called");
       let sessionId = request.cookies.session_id;
       if (!sessionId && request.headers.authorization) {
         const authHeader = request.headers.authorization;
@@ -264,34 +253,27 @@ export async function authRoutes(fastify: FastifyInstance) {
           sessionId = authHeader.substring(7);
         }
       }
-      console.log("DEBUG: Session ID from cookie/header:", sessionId);
 
       if (!sessionId) {
-        console.log("DEBUG: No session ID");
         return reply.code(401).send({ error: "Unauthorized" });
       }
 
-      console.log("DEBUG: Calling getSession");
       const session = await getSession(sessionId);
-      console.log("DEBUG: getSession result:", session ? "Found" : "Null");
 
       if (!session) {
         return reply.code(401).send({ error: "Unauthorized" });
       }
 
       // Check for locked account
-      console.log("DEBUG: Checking user lock status");
       const user = await prisma.user.findUnique({
         where: { id: session.userId },
         select: { accountLocked: true },
       });
 
       if (user?.accountLocked) {
-        console.log("DEBUG: Account is locked");
         return reply.code(403).send({ error: "Account Locked" });
       }
 
-      console.log("DEBUG: Returning user data");
       return {
         user: {
           id: session.userId,
@@ -305,14 +287,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         csrfToken: session.csrfToken,
       };
     } catch (error) {
-      console.error("DEBUG: /me CRASH:", error);
       request.log.error(error);
       const sessionId = request.cookies.session_id;
-      // Fallback: Clear cookie if invalid
       if (sessionId) {
         reply.clearCookie("session_id", { path: "/" });
       }
-      return reply.code(401).send({ error: "Session invalid", debug: { sessionId: sessionId ? "present" : "missing" } }); // Return 401 instead of 500 to stop retry loop
+      return reply.code(401).send({ error: "Session invalid" });
     }
   });
 
@@ -397,7 +377,7 @@ export async function authRoutes(fastify: FastifyInstance) {
             undefined,
             finalAuthError?.message || "invalid_credentials",
           );
-          return reply.code(401).send({ error: finalAuthError?.message || "Invalid credentials" });
+          return reply.code(401).send({ error: "Invalid credentials" });
         }
 
         const user = await prisma.user.findUnique({
@@ -443,7 +423,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return {
           message: "Login successful",
           csrfToken,
-          sessionId,
           user: {
             id: user.id,
             email: user.email,
@@ -540,7 +519,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return {
           message: "OAuth login successful",
           csrfToken,
-          sessionId,
           user: {
             id: user.id,
             email: user.email,
@@ -557,16 +535,12 @@ export async function authRoutes(fastify: FastifyInstance) {
         request.log.error({ msg: "Google OAuth failed", error: realMessage });
         console.error("[AUTH/GOOGLE] REAL ERROR:", realMessage);
 
-        // Provide clear feedback for missing or invalid Google credentials
+        // Log real error server-side but don't expose details to client
         if (realMessage.includes("Google token exchange failed") || realMessage.includes("redirect_uri_mismatch")) {
-          throw InternalError(
-            "Server Configuration Error: Google token exchange failed. Please verify GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and REDIRECT_URI in the environment variables."
-          );
+          request.log.error({ msg: "Google OAuth config error", detail: realMessage });
         }
 
-        // Return a clear 400 error with the real message instead of throwing an InternalError
-        // This ensures the frontend receives the reason (e.g. redirect_uri_mismatch) instead of a generic 500
-        return reply.code(400).send({ error: "Google login failed", detail: realMessage });
+        return reply.code(400).send({ error: "Google login failed" });
       }
     },
   );
@@ -646,7 +620,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return {
           message: "OAuth login successful",
           csrfToken,
-          sessionId,
           user: {
             id: user.id,
             email: user.email,
@@ -751,7 +724,10 @@ export async function authRoutes(fastify: FastifyInstance) {
   // --- Email Verification ---
   fastify.post(
     "/auth/verify-email/request",
-    { preHandler: requireAuth },
+    {
+      preHandler: requireAuth,
+      config: { rateLimit: rateLimitConfig.verifyEmail },
+    },
     async (request) => {
       const user = (request as any).user;
 
@@ -807,51 +783,67 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   // --- Password Reset ---
-  fastify.post("/auth/password-reset/request", async (request) => {
-    const { email } = request.body as { email: string };
+  fastify.post(
+    "/auth/password-reset/request",
+    {
+      config: { rateLimit: rateLimitConfig.passwordReset },
+    },
+    async (request) => {
+      const { email } = request.body as { email: string };
 
-    if (!email) throw BadRequest("Email required");
+      if (!email) throw BadRequest("Email required");
 
-    try {
-      const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
-      });
+      try {
+        const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+          redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
+        });
 
-      if (error) throw BadRequest(error.message);
+        if (error) throw BadRequest(error.message);
 
-      return { message: "Password reset email sent" };
-    } catch (error: any) {
-      request.log.error(error);
-      throw error;
-    }
-  });
+        // Always return success to prevent email enumeration
+        return { message: "If an account exists, a password reset email has been sent" };
+      } catch (error: any) {
+        request.log.error(error);
+        // Still return success to prevent enumeration
+        return { message: "If an account exists, a password reset email has been sent" };
+      }
+    });
 
   fastify.post("/auth/password-reset/confirm", async (request, reply) => {
-    const { token, password } = request.body as {
+    const { token, password, email } = request.body as {
       token: string;
       password: string;
+      email: string;
     };
 
     if (!token || !password) {
       throw BadRequest("Token and new password required");
     }
 
+    if (password.length < 8) {
+      throw BadRequest("Password must be at least 8 characters");
+    }
+
     try {
-      // 1. Exchange token for session (Supabase use token in reset link)
-      const { error: authError } = await supabaseAdmin.auth.verifyOtp({
+      // 1. Verify the recovery OTP
+      const { data: otpData, error: authError } = await supabaseAdmin.auth.verifyOtp({
         token,
         type: "recovery",
-        email: (request.body as any).email, // Some flows need email
+        email: email,
       });
 
       if (authError) throw BadRequest(authError.message);
 
-      // 2. Update password
-      const { error: updateError } = await supabaseAdmin.auth.updateUser({
-        password,
-      });
-
-      if (updateError) throw BadRequest(updateError.message);
+      // 2. Update password using admin API with the verified user's ID
+      if (otpData.user?.id) {
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+          otpData.user.id,
+          { password },
+        );
+        if (updateError) throw BadRequest(updateError.message);
+      } else {
+        throw BadRequest("Unable to identify user from recovery token");
+      }
 
       return { message: "Password reset successful" };
     } catch (error: any) {
@@ -865,7 +857,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     "/auth/profile/complete",
     { preHandler: requireAuth },
     async (request, reply) => {
-      const { username, name, bio, role } = request.body as any;
+      const { username, name, bio } = request.body as any; // Never accept role from client
       const user = (request as any).user;
 
       try {
@@ -1149,16 +1141,16 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
     },
   );
-  // --- ORCID OAuth (Mocked for Demo) ---
-  fastify.get("/auth/orcid", async (request, reply) => {
-    // In production, this would redirect to ORCID OAuth
-    const mockCode = "mock_auth_code_123";
-    return reply.redirect(`/api/v1/auth/orcid/callback?code=${mockCode}`);
-  });
+  // --- ORCID OAuth (Mocked for Demo - DISABLED in production) ---
+  if (process.env.NODE_ENV === "development") {
+    fastify.get("/auth/orcid", async (request, reply) => {
+      const mockCode = "mock_auth_code_123";
+      return reply.redirect(`/api/v1/auth/orcid/callback?code=${mockCode}`);
+    });
 
-  fastify.get("/auth/orcid/callback", async (request, reply) => {
-    const mockOrcidId = "0000-0002-1825-0097"; // Example valid format
-    // Redirect back to frontend settings with the ID
-    return reply.redirect(`http://localhost:5173/settings/profile?orcid_id=${mockOrcidId}`);
-  });
+    fastify.get("/auth/orcid/callback", async (request, reply) => {
+      const mockOrcidId = "0000-0002-1825-0097";
+      return reply.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/settings/profile?orcid_id=${mockOrcidId}`);
+    });
+  }
 }

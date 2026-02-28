@@ -112,9 +112,11 @@ class ErrorBoundary extends React.Component<
               <pre style={{ whiteSpace: "pre-wrap" }}>
                 {this.state.error?.toString()}
               </pre>
-              <pre style={{ marginTop: "1rem", opacity: 0.7 }}>
-                {this.state.error?.stack}
-              </pre>
+              {import.meta.env.DEV && (
+                <pre style={{ marginTop: "1rem", opacity: 0.7 }}>
+                  {this.state.error?.stack}
+                </pre>
+              )}
             </>
           )}
         </div>

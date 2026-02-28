@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { getSession } from "../services/session";
 import { prisma } from "../services/prisma";
 import { supabaseAdmin } from "../services/supabase";
+import { logSensitiveOperation } from "../services/auditLogger";
 
 // Shared prisma instance
 
@@ -97,6 +98,31 @@ export async function requireAuth(
 }
 
 /**
+ * CSRF validation middleware
+ * Validates X-CSRF-Token header against stored session CSRF token
+ * Must be used on all state-changing routes (POST, PUT, PATCH, DELETE)
+ */
+export async function requireCsrf(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  // Skip CSRF for GET/HEAD/OPTIONS (safe methods)
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    return;
+  }
+
+  const csrfHeader = request.headers["x-csrf-token"] as string | undefined;
+  const sessionCsrf = (request as any).csrfToken;
+
+  if (!csrfHeader || !sessionCsrf || csrfHeader !== sessionCsrf) {
+    return reply.code(403).send({
+      error: "Forbidden",
+      message: "Invalid or missing CSRF token",
+    });
+  }
+}
+
+/**
  * Optional authentication middleware
  * Attaches user if session exists, but doesn't reject if missing
  */
@@ -180,8 +206,13 @@ export function requirePermission(
       });
     }
 
-    // Super admins bypass permission checks
+    // Super admins bypass permission checks (with audit trail)
     if (user.role === "super_admin") {
+      logSensitiveOperation(
+        user.userId, "permission_bypass", resource, action,
+        request.ip, request.headers["user-agent"] || "unknown", true,
+        { bypass: "super_admin", resource, action },
+      ).catch(() => { }); // Fire-and-forget, don't block request
       return;
     }
 
@@ -228,8 +259,13 @@ export function requireOwnership(
       });
     }
 
-    // Super admins bypass ownership checks
+    // Super admins bypass ownership checks (with audit trail)
     if (user.role === "super_admin") {
+      logSensitiveOperation(
+        user.userId, "ownership_bypass", resourceType, "super_admin_bypass",
+        request.ip, request.headers["user-agent"] || "unknown", true,
+        { bypass: "super_admin", resourceType },
+      ).catch(() => { });
       return;
     }
 
