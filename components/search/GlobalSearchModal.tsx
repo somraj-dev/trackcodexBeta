@@ -20,6 +20,16 @@ interface RecentRepo {
   lastVisited: Date;
 }
 
+const STATIC_PAGES: SearchResult[] = [
+  { id: "page-dashboard", type: "page", label: "Dashboard", subLabel: "Personalized home area", icon: "dashboard", group: "Pages", url: "/dashboard/home" },
+  { id: "page-community", type: "page", label: "Community Workspace", subLabel: "Discussions, issues, and collaboration", icon: "forum", group: "Pages", url: "/community" },
+  { id: "page-workspaces", type: "page", label: "IDE Workspaces", subLabel: "Cloud development environments", icon: "computer", group: "Pages", url: "/workspaces" },
+  { id: "page-repositories", type: "page", label: "Repositories", subLabel: "Your codebase and git projects", icon: "book", group: "Pages", url: "/repositories" },
+  { id: "page-marketplace", type: "page", label: "Job Marketplace", subLabel: "Find freelance work and bounties", icon: "work", group: "Pages", url: "/marketplace" },
+  { id: "page-integrations", type: "page", label: "Integration Settings", subLabel: "Connect GitHub, Slack, Jira, etc.", icon: "integration_instructions", group: "Settings", url: "/strata/default/settings/integrations" }, // Defaulting to 'default' strata
+  { id: "page-settings", type: "page", label: "General Settings", subLabel: "Configure your environment settings", icon: "settings", group: "Settings", url: "/strata/default/settings/general" },
+];
+
 interface GlobalSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -69,13 +79,25 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
+        // 1. Filter local static pages based on search text
+        const lowerQuery = query.toLowerCase();
+        const staticMatches = STATIC_PAGES.filter(p =>
+          p.label.toLowerCase().includes(lowerQuery) ||
+          (p.subLabel && p.subLabel.toLowerCase().includes(lowerQuery))
+        );
+
+        // 2. Fetch remote ElasticSearch matches (dynamic users, repos, jobs)
+        let dynamicMatches: SearchResult[] = [];
         const res = await fetch(
           `/api/v1/search?q=${encodeURIComponent(query)}`,
         );
         if (res.ok) {
           const data = await res.json();
-          setResults(data.results || []);
+          dynamicMatches = data.results || [];
         }
+
+        // 3. Combine both lists (Static first, then dynamic)
+        setResults([...staticMatches, ...dynamicMatches]);
       } catch (error) {
         console.error("Search error:", error);
       } finally {
