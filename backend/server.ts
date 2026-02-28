@@ -1,4 +1,4 @@
-// Fix: Global SSL bypass for self-signed certificates (Supabase/Render networking)
+// Fix: Global SSL bypass for self-signed certificates (PostgreSQL/Render networking)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 console.warn("☢️  [INIT] NODE_TLS_REJECT_UNAUTHORIZED set to '0' (SSL Bypass Active)");
 

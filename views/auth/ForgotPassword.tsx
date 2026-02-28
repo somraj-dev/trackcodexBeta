@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
+import { auth } from "../../lib/firebase";
+import { sendPasswordResetEmail } from "firebase/auth";
 import TrackCodexLogo from "../../components/branding/TrackCodexLogo";
 
 const ForgotPassword = () => {
@@ -16,18 +17,16 @@ const ForgotPassword = () => {
         setMessage(null);
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
-            });
-
-            if (error) {
-                throw error;
-            }
-
+            await sendPasswordResetEmail(auth, email);
             setMessage("Password reset link sent! Please check your email.");
             setEmail("");
         } catch (err: any) {
-            setError(err.message || "Failed to send reset link");
+            if (err.code === "auth/user-not-found") {
+                // Don't reveal if user exists — same message either way
+                setMessage("If an account exists with this email, a password reset link has been sent.");
+            } else {
+                setError(err.message || "Failed to send reset link");
+            }
         } finally {
             setIsLoading(false);
         }

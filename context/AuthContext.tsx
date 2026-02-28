@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
 import { profileService } from "../services/profile";
-import { supabase } from "../lib/supabase";
+import { auth } from "../lib/firebase";
+import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from "firebase/auth";
 
 interface User {
   id: string;
@@ -38,11 +39,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Create axios instance with credentials support
-console.log("[AuthContext] API_BASE_URL:", API_BASE_URL);
-console.log(
-  "[AuthContext] import.meta.env.VITE_API_URL:",
-  import.meta.env.VITE_API_URL,
-);
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // Essential for sending Cookies
@@ -55,156 +51,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Supabase Auth Listener
+  // Firebase Auth Listener
   useEffect(() => {
     let isMounted = true;
 
-    // Safety net: Force loading to false after 10 seconds to prevent
-    // infinite black screen if auth initialization hangs
+    // Safety net: Force loading to false after 10 seconds
     const loadingTimeout = setTimeout(() => {
       if (isMounted && isLoading) {
-        console.warn("[AuthContext] Auth initialization timed out after 10s, forcing isLoading=false");
+        console.warn("[AuthContext] Auth initialization timed out after 10s");
         setIsLoading(false);
       }
     }, 10000);
 
-    // 1. Get initial session
-    if (supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!isMounted) return;
-        console.log("[AuthContext] getSession result:", session ? "Session found" : "No session");
-        if (session) {
-          const mappedUser: User = {
-            id: session.user.id,
-            email: session.user.email || "",
-            username: session.user.user_metadata?.username || session.user.user_metadata?.user_name || "",
-            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || "",
-            avatar: session.user.user_metadata?.avatar_url || "",
-            role: session.user.user_metadata?.role || "user",
-          };
-          setUser(mappedUser);
-          profileService.initFromAuth(mappedUser);
+    // Listen for Firebase auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (!isMounted) return;
 
-          // Auto-connect GitHub/Google/GitLab integration if user logged in via OAuth
-          const provider = session.user.app_metadata?.provider;
-          const providerToken = session.provider_token;
+      if (firebaseUser) {
+        // Map Firebase user to our User interface
+        const mappedUser: User = {
+          id: firebaseUser.uid,
+          email: firebaseUser.email || "",
+          username: firebaseUser.displayName?.replace(/\s+/g, "").toLowerCase() || "",
+          name: firebaseUser.displayName || "",
+          avatar: firebaseUser.photoURL || "",
+          role: "user",
+        };
+        setUser(mappedUser);
+        profileService.initFromAuth(mappedUser);
 
-          // Helper: persist token to backend for permanent storage (non-blocking)
-          const persistTokenToBackend = (prov: string, token: string, username?: string) => {
-            fetch(`${import.meta.env?.VITE_API_URL || ""}/api/v1/integrations/connect`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("session_id") || ""}`,
-              },
-              credentials: "include",
-              body: JSON.stringify({ provider: prov, accessToken: token, providerUsername: username }),
-            }).catch((err) => console.warn("[AuthContext] Backend token persist failed (non-critical):", err));
-          };
+        // Persist OAuth provider tokens to backend (non-blocking)
+        try {
+          const idToken = await firebaseUser.getIdToken();
 
-          if (provider === "github") {
-            const ghUsername = session.user.user_metadata?.user_name || session.user.user_metadata?.preferred_username || "";
-            if (providerToken) {
-              // Server-side only — never store in localStorage
-              persistTokenToBackend("github", providerToken, ghUsername);
-            }
-            if (ghUsername) {
-              localStorage.setItem("trackcodex_github_username", ghUsername);
-            }
-          } else if (provider === "google") {
-            if (providerToken) {
-              persistTokenToBackend("google", providerToken);
-            }
-          } else if (provider === "gitlab") {
-            if (providerToken) {
-              persistTokenToBackend("gitlab", providerToken);
-            }
-          }
-        }
-        setIsLoading(false);
-      }).catch((err) => {
-        console.error("[AuthContext] getSession failed:", err);
-        if (isMounted) setIsLoading(false);
-      });
-    } else {
-      console.warn("[AuthContext] Supabase client is null, skipping auth");
-      setIsLoading(false);
-    }
-
-    // 2. Listen for auth changes
-    let subscription: any = null;
-    if (supabase) {
-      const {
-        data: { subscription: sub },
-      } = supabase.auth.onAuthStateChange((event: any, session: any) => {
-        console.log(`[AuthContext] Auth event: ${event}, session: ${session ? "present" : "null"}`);
-        if (!isMounted) return;
-        if (session) {
-          const mappedUser: User = {
-            id: session.user.id,
-            email: session.user.email || "",
-            username: session.user.user_metadata?.username || session.user.user_metadata?.user_name || "",
-            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || "",
-            avatar: session.user.user_metadata?.avatar_url || "",
-            role: session.user.user_metadata?.role || "user",
-          };
-          setUser(mappedUser);
-          profileService.initFromAuth(mappedUser);
-
-          // Auto-connect integrations on SIGNED_IN event
-          if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-            const provider = session.user.app_metadata?.provider;
-            const providerToken = session.provider_token;
-
-            const persistToken = (prov: string, token: string, username?: string) => {
-              fetch(`${import.meta.env?.VITE_API_URL || ""}/api/v1/integrations/connect`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${localStorage.getItem("session_id") || ""}`,
-                },
-                credentials: "include",
-                body: JSON.stringify({ provider: prov, accessToken: token, providerUsername: username }),
-              }).catch(() => { });
-            };
-
-            if (provider === "github") {
-              const ghUsername = session.user.user_metadata?.user_name || session.user.user_metadata?.preferred_username || "";
+          // Check provider data for GitHub/Google
+          for (const providerData of firebaseUser.providerData) {
+            if (providerData.providerId === "github.com") {
+              const ghUsername = providerData.displayName || "";
               if (ghUsername) {
                 localStorage.setItem("trackcodex_github_username", ghUsername);
               }
-              if (providerToken) persistToken("github", providerToken, ghUsername);
-            } else if (provider === "google") {
-              if (providerToken) {
-                persistToken("google", providerToken);
-              }
-            } else if (provider === "gitlab") {
-              if (providerToken) {
-                persistToken("gitlab", providerToken);
-              }
+              // Persist to backend (the token was already handled during OAuth flow)
+              fetch(`${API_BASE_URL}/integrations/connect`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${idToken}`,
+                },
+                credentials: "include",
+                body: JSON.stringify({ provider: "github", providerUsername: ghUsername }),
+              }).catch(() => { });
             }
           }
-        } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-          // Only clear if we explicitly got a sign out event
-          setUser(null);
-          profileService.clearProfile();
+        } catch {
+          // Non-critical
         }
-        setIsLoading(false);
-      });
-      subscription = sub;
-    }
+      } else {
+        setUser(null);
+        profileService.clearProfile();
+      }
+      setIsLoading(false);
+    });
 
     return () => {
       isMounted = false;
       clearTimeout(loadingTimeout);
-      if (subscription) subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
-  // Configure axios interceptor to attach Supabase JWT or legacy Session ID
+  // Configure axios interceptor to attach Firebase ID token
   useEffect(() => {
     const interceptor = api.interceptors.request.use(async (config) => {
-      // CSRF token is needed for state-changing requests (Legacy)
+      // CSRF token for state-changing requests
       if (
         ["post", "put", "delete", "patch"].includes(
           config.method?.toLowerCase() || "",
@@ -214,23 +133,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         config.headers["X-CSRF-Token"] = csrfToken;
       }
 
-      // 1. Try to get current Supabase session
-      if (supabase) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          config.headers["Authorization"] = `Bearer ${session.access_token}`;
-        } else {
-          // 2. Fallback to legacy Session ID
-          const sessionId = localStorage.getItem("session_id");
-          if (sessionId) {
-            config.headers["Authorization"] = `Bearer ${sessionId}`;
-          }
-        }
-      } else {
-        // Fallback to legacy Session ID if Supabase is missing
-        const sessionId = localStorage.getItem("session_id");
-        if (sessionId) {
-          config.headers["Authorization"] = `Bearer ${sessionId}`;
+      // Attach Firebase ID token as Bearer token
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        try {
+          const idToken = await currentUser.getIdToken();
+          config.headers["Authorization"] = `Bearer ${idToken}`;
+        } catch {
+          // Token refresh failed — session may have expired
         }
       }
 
@@ -243,14 +153,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = (userData: User, token: string) => {
     setUser(userData);
     setCsrfToken(token);
-    // CSRF token in memory only — never localStorage (XSS protection)
     profileService.initFromAuth(userData);
   };
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
       await api.post("/auth/logout");
+      await firebaseSignOut(auth);
     } catch (err) {
       console.error("Logout failed", err);
     } finally {

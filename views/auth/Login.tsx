@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { auth, googleProvider, githubProvider } from "../../lib/firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 const Login = () => {
   const { login, isAuthenticated } = useAuth();
@@ -11,8 +12,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Safety net: If auth state becomes true (e.g. from onAuthStateChange),
-  // redirect away from login immediately
+  // Safety net: If auth state becomes true, redirect away from login
   useEffect(() => {
     if (isAuthenticated) {
       const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
@@ -21,17 +21,11 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback/google`,
-        }
-      });
-      if (error) throw error;
+      await signInWithPopup(auth, googleProvider);
+      // Auth state change is handled by onAuthStateChanged in AuthContext
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to initialize Google login");
@@ -42,17 +36,8 @@ const Login = () => {
   const handleGithubLogin = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback/github`,
-          scopes: 'repo read:user read:org',
-          queryParams: {
-            prompt: 'consent',
-          },
-        }
-      });
-      if (error) throw error;
+      await signInWithPopup(auth, githubProvider);
+      // Auth state change is handled by onAuthStateChanged in AuthContext
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to initialize GitHub login");
@@ -60,41 +45,32 @@ const Login = () => {
     }
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
     try {
-      // 1. Sign in with Supabase (email only - never fabricate fake emails)
       const loginEmail = username.includes('@') ? username : null;
 
       if (!loginEmail) {
         throw new Error("Please use your email address to sign in.");
       }
 
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password,
-      });
+      await signInWithEmailAndPassword(auth, loginEmail, password);
 
-      if (authError) {
-        if (authError.message === "Invalid login credentials") {
-          throw new Error("Invalid username/email or password");
-        }
-        throw authError;
-      }
-
-      // 2. State update is handled by onAuthStateChange in AuthContext
-      // The useEffect above will catch isAuthenticated becoming true and redirect
-
-      // 3. Also try direct redirect as a fast path
+      // State update is handled by onAuthStateChanged in AuthContext
       const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
       localStorage.removeItem("redirect_after_login");
       navigate(redirectPath);
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
+        setError("Invalid username/email or password");
+      } else if (err.code === "auth/user-not-found") {
+        setError("No account found with this email");
+      } else {
+        setError(err.message || "Login failed");
+      }
     } finally {
       setIsLoading(false);
     }

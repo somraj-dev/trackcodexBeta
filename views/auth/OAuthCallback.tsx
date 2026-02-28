@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { auth } from "../../lib/firebase";
+import { getRedirectResult } from "firebase/auth";
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: "google" | "github" | "gitlab" }>();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const hasRun = React.useRef(false);
@@ -17,93 +18,34 @@ const OAuthCallback: React.FC = () => {
 
     const handleCallback = async () => {
       try {
-        // --- FIX: Check for existing session FIRST ---
-        // Supabase's `detectSessionInUrl: true` auto-exchanges the OAuth code
-        // before this component runs. If we try to exchange the same code again,
-        // it fails because the code was already consumed. So we first check
-        // if a session already exists from the auto-detection.
+        // Firebase handles OAuth redirect internally
+        // getRedirectResult picks up the result after redirect
+        const result = await getRedirectResult(auth);
 
-        let session = null;
-        let user = null;
-
-        // Attempt 1: Check if Supabase already auto-exchanged the code
-        const { data: existingSession } = await supabase.auth.getSession();
-        if (existingSession?.session) {
-          console.log("[OAuthCallback] Session already exists from auto-detection");
-          session = existingSession.session;
-          user = session.user;
-        }
-
-        // Attempt 2: If no session yet, wait briefly for auto-exchange to complete
-        if (!session) {
-          console.log("[OAuthCallback] No session yet, waiting for auto-exchange...");
-          for (let i = 0; i < 5; i++) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const { data: retrySession } = await supabase.auth.getSession();
-            if (retrySession?.session) {
-              console.log(`[OAuthCallback] Session found after ${(i + 1) * 500}ms`);
-              session = retrySession.session;
-              user = session.user;
-              break;
+        if (result?.user) {
+          // Auth state change handled by onAuthStateChanged in AuthContext
+          const redirectPath =
+            localStorage.getItem("integration_return_path") ||
+            localStorage.getItem("redirect_after_login") ||
+            "/dashboard/home";
+          localStorage.removeItem("integration_return_path");
+          localStorage.removeItem("integration_pending_provider");
+          localStorage.removeItem("redirect_after_login");
+          navigate(redirectPath, { replace: true });
+        } else if (isAuthenticated) {
+          // Already authenticated (popup flow completed)
+          navigate("/dashboard/home", { replace: true });
+        } else {
+          // Wait briefly for auth state to update
+          setTimeout(() => {
+            if (auth.currentUser) {
+              navigate("/dashboard/home", { replace: true });
+            } else {
+              setError("Authentication did not complete. Please try again.");
+              setTimeout(() => navigate("/login"), 3000);
             }
-          }
+          }, 2000);
         }
-
-        // Attempt 3: Manual code exchange as last resort (code might not have been auto-consumed)
-        if (!session) {
-          console.log("[OAuthCallback] Attempting manual code exchange...");
-          const queryParams = new URLSearchParams(window.location.search);
-          let code = queryParams.get("code");
-
-          // Fallback: Check hash (HashRouter legacy)
-          if (!code && window.location.hash.includes("code=")) {
-            const hashQuery = window.location.hash.split("?")[1] || window.location.hash.split("#")[1];
-            const hashParams = new URLSearchParams(hashQuery);
-            code = hashParams.get("code");
-          }
-
-          // Fallback: Manual regex
-          if (!code) {
-            const codeMatch = window.location.href.match(/[?&]code=([^&#]+)/);
-            code = codeMatch ? codeMatch[1] : null;
-          }
-
-          if (!code) {
-            throw new Error("No authorization code received from the auth provider.");
-          }
-
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          if (exchangeError) throw exchangeError;
-
-          session = data.session;
-          user = data.user;
-        }
-
-        if (!session || !user) {
-          throw new Error("Session exchange completed but no valid session was returned.");
-        }
-
-        // Sync user state into AuthContext immediately
-        const mappedUser = {
-          id: user.id,
-          email: user.email || "",
-          username: user.user_metadata?.username || "",
-          name: user.user_metadata?.full_name || "",
-          avatar: user.user_metadata?.avatar_url || "",
-          role: user.user_metadata?.role || "user",
-        };
-
-        login(mappedUser, session.access_token, session.access_token);
-
-        // Redirect: If user came from integrations page, go back there
-        const integrationReturnPath = localStorage.getItem("integration_return_path");
-        localStorage.removeItem("integration_return_path");
-        localStorage.removeItem("integration_pending_provider");
-
-        const redirectPath = integrationReturnPath || localStorage.getItem("redirect_after_login") || "/dashboard/home";
-        localStorage.removeItem("redirect_after_login");
-        navigate(redirectPath, { replace: true });
-
       } catch (err: any) {
         console.error("OAuth callback error:", err);
         setError(err.message || "Authentication failed. Please try again.");
@@ -112,7 +54,7 @@ const OAuthCallback: React.FC = () => {
     };
 
     handleCallback();
-  }, [provider, navigate, login]);
+  }, [provider, navigate, isAuthenticated]);
 
   if (error) {
     return (

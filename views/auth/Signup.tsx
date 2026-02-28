@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { auth, googleProvider, githubProvider } from "../../lib/firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 
 const Signup = () => {
   const { } = useAuth();
@@ -13,20 +19,14 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // OTP State
-  const [otpMode, setOtpMode] = useState(false);
-  const [otpInput, setOtpInput] = useState("");
+  // Email verification sent state (replaces OTP flow)
+  const [verificationSent, setVerificationSent] = useState(false);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback/google`,
-        }
-      });
-      if (error) throw error;
+      await signInWithPopup(auth, googleProvider);
+      // Auth state change handled by onAuthStateChanged in AuthContext
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to initialize Google login");
@@ -37,13 +37,8 @@ const Signup = () => {
   const handleGithubLogin = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback/github`,
-        }
-      });
-      if (error) throw error;
+      await signInWithPopup(auth, githubProvider);
+      // Auth state change handled by onAuthStateChanged in AuthContext
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to initialize GitHub login");
@@ -57,52 +52,34 @@ const Signup = () => {
     setError("");
 
     try {
-      // Step 1: Sign up with Supabase
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            full_name: username,
-            country,
-          }
-        }
+      // Step 1: Create user with Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Set display name
+      await updateProfile(userCredential.user, {
+        displayName: username,
       });
 
-      if (signUpError) throw signUpError;
+      // Send email verification
+      await sendEmailVerification(userCredential.user);
 
-      setOtpMode(true);
+      setVerificationSent(true);
     } catch (err: any) {
-      setError(err.message || "Signup failed. Please try again.");
+      if (err.code === "auth/email-already-in-use") {
+        setError("An account with this email already exists.");
+      } else if (err.code === "auth/weak-password") {
+        setError("Password should be at least 6 characters.");
+      } else {
+        setError(err.message || "Signup failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleVerifyOTP = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      // Step 2: Verify OTP
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otpInput,
-        type: 'signup',
-      });
-
-      if (verifyError) throw verifyError;
-
-      // Note: Backend sync is handled via Supabase triggers.
-      // After verification, onAuthStateChange in AuthContext will trigger navigation
-      // but we can also navigate manually for immediate feedback.
-      navigate("/dashboard/home");
-    } catch (err: any) {
-      setError(err.message || "Verification failed");
-    } finally {
-      setIsLoading(false);
-    }
+  // After email verification, user can just navigate to dashboard
+  const handleContinue = () => {
+    navigate("/dashboard/home");
   };
 
   return (
@@ -228,8 +205,8 @@ const Signup = () => {
             </div>
           )}
 
-          {/* OTP Verification UI */}
-          {otpMode ? (
+          {/* Email Verification UI */}
+          {verificationSent ? (
             <div className="space-y-6 animate-in fade-in slide-in-from-right duration-300">
               <div className="text-center space-y-2">
                 <div className="size-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -248,43 +225,26 @@ const Signup = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  Verify your email
+                  Check your email
                 </h3>
                 <p className="text-sm text-gray-500">
-                  We sent a 6-digit code to{" "}
+                  We sent a verification link to{" "}
                   <span className="font-semibold text-gray-900">{email}</span>.
+                  Click the link to verify your account.
                 </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 text-center">
-                  Verification Code
-                </label>
-                <input
-                  autoFocus
-                  type="text"
-                  value={otpInput}
-                  onChange={(e) =>
-                    setOtpInput(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  placeholder="000000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-center text-2xl font-mono tracking-[0.5em]"
-                  maxLength={6}
-                />
               </div>
 
               <div className="space-y-3">
                 <button
                   type="button"
-                  onClick={handleVerifyOTP}
-                  disabled={isLoading || otpInput.length !== 6}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                  onClick={handleContinue}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg hover:shadow-xl"
                 >
-                  {isLoading ? "Verifying..." : "Verify & Create Account"}
+                  Continue to Dashboard
                 </button>
                 <button
                   type="button"
-                  onClick={() => setOtpMode(false)}
+                  onClick={() => setVerificationSent(false)}
                   className="w-full text-sm text-gray-500 hover:text-gray-900 font-medium"
                 >
                   Back to details
@@ -292,7 +252,7 @@ const Signup = () => {
               </div>
 
               <p className="text-xs text-center text-gray-400">
-                Check your spam folder or wait a minute before requesting again.
+                Check your spam folder if you don't see the email.
               </p>
             </div>
           ) : (

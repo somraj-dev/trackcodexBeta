@@ -38,10 +38,9 @@ const envSchema = z.object({
   // Redis (Optional for dev, recommended for prod)
   REDIS_URL: z.string().url().optional(),
 
-  // Supabase
-  SUPABASE_URL: z.string().url().optional(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
-  SUPABASE_ANON_KEY: z.string().optional(),
+  // Firebase
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_SERVICE_ACCOUNT_KEY: z.string().optional(),
 
   // Frontend
   FRONTEND_URL: z.string().url(),

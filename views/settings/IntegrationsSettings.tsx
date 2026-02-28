@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabase";
+import { auth, githubProvider } from "../../lib/firebase";
+import { signInWithPopup, GithubAuthProvider } from "firebase/auth";
 import { api } from "../../services/api";
 import { githubService } from "../../services/github";
 import { gitlabService } from "../../services/gitlab";
@@ -244,26 +245,24 @@ const IntegrationsSettings = () => {
     if (pendingIntegration.id === "github" || pendingIntegration.id === "gitlab") {
       try {
         const provider = pendingIntegration.id as "github" | "gitlab";
-        const scopes = provider === "github"
-          ? "repo read:user read:org"
-          : "api read_user read_repository";
 
         // Save return path so we come back to integrations after OAuth
         localStorage.setItem("integration_return_path", window.location.pathname);
         localStorage.setItem("integration_pending_provider", provider);
 
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback/${provider}`,
-            scopes,
-            queryParams: {
-              prompt: "consent",
-            },
-          },
-        });
-
-        if (error) throw error;
+        // Use Firebase signInWithPopup for GitHub
+        if (provider === "github") {
+          const result = await signInWithPopup(auth, githubProvider);
+          const credential = GithubAuthProvider.credentialFromResult(result);
+          const accessToken = credential?.accessToken;
+          if (accessToken) {
+            // Persist token to backend
+            await api.integrations.connect(provider, accessToken);
+          }
+        } else {
+          // GitLab: Fall back to manual token entry
+          setActiveIntegrationId(pendingIntegration.id);
+        }
       } catch (err: any) {
         console.error("OAuth link failed:", err);
         // Fallback to manual token entry

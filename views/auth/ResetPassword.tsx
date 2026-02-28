@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
+import React, { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { auth } from "../../lib/firebase";
+import { confirmPasswordReset } from "firebase/auth";
 import TrackCodexLogo from "../../components/branding/TrackCodexLogo";
 
 const ResetPassword = () => {
@@ -10,16 +11,16 @@ const ResetPassword = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    // Supabase automatically extracts the access_token from the URL hash 
-    // on page load and sets the session, so the user is temporarily "logged in".
+    // Firebase sends oobCode (out-of-band code) in the reset link URL
+    const oobCode = searchParams.get("oobCode");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
 
-        // Basic validation
         if (password.length < 6) {
             setError("Password must be at least 6 characters.");
             setIsLoading(false);
@@ -32,20 +33,24 @@ const ResetPassword = () => {
             return;
         }
 
+        if (!oobCode) {
+            setError("Invalid or expired reset link. Please request a new one.");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const { error } = await supabase.auth.updateUser({
-                password: password,
-            });
-
-            if (error) {
-                throw error;
-            }
-
+            await confirmPasswordReset(auth, oobCode, password);
             setSuccess(true);
-            // Automatically redirect to login after 3 seconds
             setTimeout(() => navigate("/login"), 3000);
         } catch (err: any) {
-            setError(err.message || "Failed to update password");
+            if (err.code === "auth/expired-action-code") {
+                setError("This reset link has expired. Please request a new one.");
+            } else if (err.code === "auth/invalid-action-code") {
+                setError("This reset link is invalid or has already been used.");
+            } else {
+                setError(err.message || "Failed to update password");
+            }
         } finally {
             setIsLoading(false);
         }

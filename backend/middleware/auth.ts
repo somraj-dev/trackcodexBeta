@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getSession } from "../services/session";
 import { prisma } from "../services/prisma";
-import { supabaseAdmin } from "../services/supabase";
+import { firebaseAdmin } from "../services/firebase";
 import { logSensitiveOperation } from "../services/auditLogger";
 
 // Shared prisma instance
@@ -15,25 +15,27 @@ export async function requireAuth(
   reply: FastifyReply,
 ) {
   try {
-    // 1. Try to get Supabase JWT from Authorization header
+    // 1. Try to get Firebase ID token from Authorization header
     const authHeader = request.headers.authorization;
-    let supabaseUser: { id: string; email?: string } | null = null;
+    let firebaseUid: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
       // If it looks like a JWT (roughly 3 parts separated by dots)
       if (token.split(".").length === 3) {
-        const { data, error } = await supabaseAdmin.auth.getUser(token);
-        if (!error && data.user) {
-          supabaseUser = data.user;
+        try {
+          const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+          firebaseUid = decodedToken.uid;
+        } catch {
+          // Token verification failed — fall through to session auth
         }
       }
     }
 
-    if (supabaseUser) {
-      // Find user in our database to get full profile (role, org, etc)
+    if (firebaseUid) {
+      // Find user in our database to get full profile
       const dbUser = await prisma.user.findUnique({
-        where: { id: supabaseUser.id },
+        where: { id: firebaseUid },
         select: {
           id: true,
           email: true,
@@ -43,20 +45,12 @@ export async function requireAuth(
       });
 
       if (dbUser) {
-        // Fix #7: Check tokenVersion — if user did "logout everywhere",
-        // tokenVersion is incremented. We compare against the JWT's issued-at
-        // time. If the JWT was issued before the last tokenVersion change,
-        // reject it. Since we can't easily extract iat from the verified token,
-        // we check if tokenVersion > 1 (initial) and require re-login.
-        // The simplest robust approach: check the same token_version used in sessions.
-        // For JWTs, we verify the user exists and their tokenVersion hasn't changed
-        // since the session store was last valid.
         (request as any).user = {
           userId: dbUser.id,
           email: dbUser.email,
-          role: dbUser.role, // Always fresh from DB
+          role: dbUser.role,
         };
-        return; // Success with Supabase JWT
+        return; // Success with Firebase JWT
       }
     }
 
