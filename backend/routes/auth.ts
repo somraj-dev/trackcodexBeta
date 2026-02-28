@@ -89,7 +89,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
         const firebaseUid = firebaseUser.uid;
 
-        // 3. Create user in our database (Firebase doesn't have triggers like Supabase)
+        // 3. Create user in our database
         const hashedPassword = await bcrypt.hash(password, 12);
         await prisma.user.create({
           data: {

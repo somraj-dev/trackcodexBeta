@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 // Shared PrismaClient instance to be used across the entire application.
-// This prevents connection pool exhaustion in production (Supabase/Render).
+// This prevents connection pool exhaustion in production (Render).
 const prismaInstance = new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
 });

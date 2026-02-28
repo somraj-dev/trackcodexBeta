@@ -198,9 +198,12 @@ const IntegrationsSettings = () => {
 
     if (service && token) {
       // Persist token to backend (server-side only)
-      try {
-        await api.integrations.connect(service, token, username || undefined);
-      } catch { }
+      const submitOAuthToken = async () => {
+        try {
+          await api.integrations.connect(service, token, username || undefined);
+        } catch { }
+      };
+      submitOAuthToken();
       if (service === "github") {
         if (username) localStorage.setItem("trackcodex_github_username", username);
         toggleConnection("github");
