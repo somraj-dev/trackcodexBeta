@@ -7,3 +7,12 @@ dist-backend/
 dist-electron/
 .vscode/
 *.log
+
+# Databases & Backups
+pg_bin/
+pgsql/
+*.zip
+*.dump
+*.exe
+*.dll
+*.lib
