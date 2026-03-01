@@ -116,15 +116,15 @@ const WorkflowRunDetail: React.FC = () => {
   const getStatusBadge = (status: string, conclusion?: string) => {
     if (status === "QUEUED") {
       return (
-        <span className="px-2 py-1 rounded-full text-xs bg-gray-500/20 text-gray-400">
+        <span className="px-2 py-1 rounded-full text-xs bg-gray-500/20 text-[#a1a1aa]">
           Queued
         </span>
       );
     }
     if (status === "IN_PROGRESS") {
       return (
-        <span className="px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-400 flex items-center gap-1">
-          <span className="size-2 bg-blue-400 rounded-full animate-pulse"></span>
+        <span className="px-2 py-1 rounded-full text-xs bg-[#0A0A0A]lue-500/20 text-blue-400 flex items-center gap-1">
+          <span className="size-2 bg-[#0A0A0A]lue-400 rounded-full animate-pulse"></span>
           In Progress
         </span>
       );

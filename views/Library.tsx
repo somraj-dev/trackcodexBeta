@@ -413,7 +413,7 @@ const LibraryDetail = ({
                     Last scan: 10m ago
                   </p>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-black/20 rounded-xl border border-gh-border">
+                <div className="flex items-center gap-3 p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-gh-border">
                   <img
                     src="https://picsum.photos/seed/u1/64"
                     alt="Maintainer Avatar"
@@ -452,7 +452,7 @@ const LibraryDetail = ({
                 </span>
               </div>
               <div className="space-y-4">
-                <div className="p-3 bg-black/20 rounded-xl border border-gh-border">
+                <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-gh-border">
                   <p className="text-[12px] font-bold text-gh-text-secondary">
                     How to extend the...
                   </p>
@@ -460,7 +460,7 @@ const LibraryDetail = ({
                     3 replies • Last by @alex_dev
                   </p>
                 </div>
-                <div className="p-3 bg-black/20 rounded-xl border border-gh-border">
+                <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-gh-border">
                   <p className="text-[12px] font-bold text-gh-text-secondary">
                     Issues with Dock...
                   </p>

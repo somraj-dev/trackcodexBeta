@@ -84,7 +84,7 @@ export const ActivityFeed: React.FC = () => {
         <p className="text-gh-text-secondary text-sm mb-6">Follow users to see their activity here</p>
         <button
           onClick={() => navigate("/explore")}
-          className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-blue-600 transition-colors text-sm"
+          className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-colors text-sm"
         >
           Explore Users
         </button>

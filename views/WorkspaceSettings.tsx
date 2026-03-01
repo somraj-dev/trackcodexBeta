@@ -152,7 +152,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("general")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "general"
-              ? "bg-blue-500/10 text-blue-400"
+              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -164,7 +164,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("members")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "members"
-              ? "bg-blue-500/10 text-blue-400"
+              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -174,7 +174,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("security")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "security"
-              ? "bg-blue-500/10 text-blue-400"
+              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -184,7 +184,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("ide")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "ide"
-              ? "bg-blue-500/10 text-blue-400"
+              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -298,7 +298,7 @@ const WorkspaceSettings: React.FC = () => {
                         <p className="font-bold text-gh-text text-sm">
                           {member.user.name}
                           {member.userId === user?.id && (
-                            <span className="ml-2 px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] rounded-full uppercase tracking-wider">
+                            <span className="ml-2 px-1.5 py-0.5 bg-[#0A0A0A]lue-500/20 text-blue-400 text-[10px] rounded-full uppercase tracking-wider">
                               You
                             </span>
                           )}
@@ -418,9 +418,9 @@ const WorkspaceSettings: React.FC = () => {
                 ))}
               </div>
 
-              <section className="mt-8 p-6 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+              <section className="mt-8 p-6 bg-[#0A0A0A]lue-500/5 border border-blue-500/20 rounded-xl">
                 <div className="flex gap-4">
-                  <div className="size-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                  <div className="size-10 rounded-full bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-400 shrink-0">
                     <span className="material-symbols-outlined">info</span>
                   </div>
                   <div>

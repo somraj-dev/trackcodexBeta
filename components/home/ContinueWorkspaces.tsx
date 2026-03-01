@@ -37,7 +37,7 @@ const ContinueWorkspaces = () => {
 
   if (workspaces.length === 0) {
     return (
-      <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 text-center border-dashed">
+      <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 text-center border-[#1A1A1A]ashed">
         <h3 className="text-gh-text font-bold mb-2">No Active Sessions</h3>
         <p className="text-gh-text-secondary text-sm mb-6">
           You haven't started any workspaces yet.

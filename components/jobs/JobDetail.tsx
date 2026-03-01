@@ -72,7 +72,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                <div className="flex gap-3">
                 <button 
                   onClick={handleStartWork}
-                  className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all border border-border-dark hover:bg-slate-700"
+                  className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all border border-border-[#1A1A1A]ark hover:bg-slate-700"
                 >
                     <span className="material-symbols-outlined text-lg">open_in_new</span>
                     Continue to Workspace
@@ -136,14 +136,14 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
               </section>
             )}
 
-            <section className="bg-[#11141A] border border-border-dark rounded-2xl p-6 relative overflow-hidden group">
+            <section className="bg-[#11141A] border border-border-[#1A1A1A]ark rounded-2xl p-6 relative overflow-hidden group">
                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-10 transition-opacity">
                   <span className="material-symbols-outlined text-[120px]">account_tree</span>
                </div>
                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Associated Workspace</h3>
                <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-4">
-                     <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                     <div className="size-12 rounded-xl bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
                         <span className="material-symbols-outlined !text-3xl">terminal</span>
                      </div>
                      <div>
@@ -186,7 +186,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
             <div className="p-6 rounded-2xl bg-[#11141A] border border-[#1E232E]">
                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">About the Client</h3>
                <div className="flex items-center gap-3 mb-6">
-                  <img src={job.creator.avatar} className="size-12 rounded-full border border-border-dark" />
+                  <img src={job.creator.avatar} className="size-12 rounded-full border border-border-[#1A1A1A]ark" />
                   <div>
                     <p className="text-sm font-bold text-white">{job.creator.name}</p>
                     <div className="flex items-center gap-1">

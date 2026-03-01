@@ -4,7 +4,7 @@ const BlogIndex: React.FC = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Latest Posts</h2>
-      <p className="text-gray-400">No posts available yet.</p>
+      <p className="text-[#a1a1aa]">No posts available yet.</p>
     </div>
   );
 };

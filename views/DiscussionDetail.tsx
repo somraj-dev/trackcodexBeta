@@ -251,7 +251,7 @@ const DiscussionDetail: React.FC = () => {
                 : discussion.category === "Q&A"
                   ? "bg-green-600/20 text-green-400"
                   : discussion.category === "IDEAS"
-                    ? "bg-blue-600/20 text-blue-400"
+                    ? "bg-[#0A0A0A]lue-600/20 text-blue-400"
                     : "bg-gh-bg-tertiary text-gh-text-secondary"
             }`}
           >

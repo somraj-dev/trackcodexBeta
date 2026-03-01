@@ -128,7 +128,7 @@ const CommandPalette = ({
       onClick={onClose}
     >
       {/* Subtle backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"></div>
+      <div className="absolute inset-0 bg-[#0A0A0A]lack/40 backdrop-blur-[2px] transition-opacity"></div>
 
       {/* Main Palette Window */}
       <div

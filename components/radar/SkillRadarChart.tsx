@@ -90,7 +90,7 @@ const SkillRadarChart: React.FC<SkillRadarChartProps> = ({ data, platformAverage
                 </div>
                 {platformAverage && (
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 bg-slate-500/30 border border-slate-500 border-dashed rounded-full"></span>
+                        <span className="w-3 h-3 bg-slate-500/30 border border-slate-500 border-[#1A1A1A]ashed rounded-full"></span>
                         <span className="text-slate-400">Platform Avg</span>
                     </div>
                 )}

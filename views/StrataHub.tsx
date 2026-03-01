@@ -156,7 +156,7 @@ const StrataHub = () => {
                         </div>
                         <button
                             onClick={() => navigate("/strata/new")}
-                            className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+                            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
                         >
                             <span className="material-symbols-outlined text-lg">add</span>
                             New Strata
@@ -165,7 +165,7 @@ const StrataHub = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {MOCK_STRATA.length === 0 ? (
-                            <div className="col-span-full py-16 border-2 border-dashed border-gh-border rounded-2xl text-center">
+                            <div className="col-span-full py-16 border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl text-center">
                                 <span className="material-symbols-outlined text-6xl text-gh-text-secondary mb-4 block">
                                     corporate_fare
                                 </span>
@@ -224,7 +224,7 @@ const StrataHub = () => {
                             <p className="text-gh-text-secondary mt-4">Loading networks...</p>
                         </div>
                     ) : networks.length === 0 ? (
-                        <div className="py-16 border-2 border-dashed border-gh-border rounded-2xl text-center bg-gradient-to-br from-purple-500/5 to-blue-600/5">
+                        <div className="py-16 border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl text-center bg-gradient-to-br from-purple-500/5 to-blue-600/5">
                             <span className="material-symbols-outlined text-6xl text-purple-500 mb-4 block">
                                 domain
                             </span>

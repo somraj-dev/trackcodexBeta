@@ -17,7 +17,7 @@ const BillingSettings = () => {
 
     const usageByRepository = [
         { name: "TrackcodexBeta", color: "bg-emerald-500", amount: "$0.03" },
-        { name: "mits-college", color: "bg-blue-500", amount: "$0.02" },
+        { name: "mits-college", color: "bg-[#0A0A0A]lue-500", amount: "$0.02" },
         { name: "Gitea", color: "bg-purple-500", amount: "$0.01" },
         { name: "trackcodexbeta", color: "bg-red-500", amount: "<$0.01" },
         { name: "trackcodexVersion1.0.0", color: "bg-orange-500", amount: "<$0.01" },
@@ -169,7 +169,7 @@ const BillingSettings = () => {
                                                 <span className="text-xs text-gh-text-secondary">0 GB used / 0.5 GB included</span>
                                             </div>
                                             <div className="h-1.5 bg-gh-bg rounded-full overflow-hidden">
-                                                <div className="h-full bg-blue-500 w-0"></div>
+                                                <div className="h-full bg-[#0A0A0A]lue-500 w-0"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -196,7 +196,7 @@ const BillingSettings = () => {
                         {/* Visual Bar */}
                         <div className="h-2 bg-gh-bg rounded-full overflow-hidden flex mb-4">
                             <div className="bg-emerald-500 w-[40%]"></div>
-                            <div className="bg-blue-500 w-[30%]"></div>
+                            <div className="bg-[#0A0A0A]lue-500 w-[30%]"></div>
                             <div className="bg-purple-500 w-[15%]"></div>
                             <div className="bg-red-500 w-[10%]"></div>
                             <div className="bg-orange-500 w-[5%]"></div>

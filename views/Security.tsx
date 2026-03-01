@@ -24,7 +24,7 @@ const SecurityView = () => {
           <h1 className="text-3xl font-black tracking-tight">Security Dashboard</h1>
           <p className="text-slate-400">Monitor and resolve infrastructure vulnerabilities.</p>
         </div>
-        <button className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+        <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px]">bolt</span>
           Trigger Manual Scan
         </button>
@@ -37,7 +37,7 @@ const SecurityView = () => {
           { label: 'Medium', count: 45, change: '-8 resolved', color: 'bg-amber-500' },
           { label: 'Health Score', count: '84%', change: 'Last scan: 14m ago', color: 'bg-emerald-500' },
         ].map(stat => (
-          <div key={stat.label} className="bg-surface-dark p-5 rounded-xl border border-border-dark relative overflow-hidden">
+          <div key={stat.label} className="bg-surface-dark p-5 rounded-xl border border-border-[#1A1A1A]ark relative overflow-hidden">
             <div className={`absolute top-0 left-0 w-1 h-full ${stat.color}`}></div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{stat.label}</p>
             <h3 className="text-3xl font-bold">{stat.count}</h3>
@@ -49,8 +49,8 @@ const SecurityView = () => {
       </div>
 
       <div className="flex flex-col xl:flex-row gap-6">
-        <div className="flex-1 bg-surface-dark rounded-xl border border-border-dark overflow-hidden flex flex-col">
-          <div className="p-5 border-b border-border-dark flex items-center justify-between">
+        <div className="flex-1 bg-surface-dark rounded-xl border border-border-[#1A1A1A]ark overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-border-[#1A1A1A]ark flex items-center justify-between">
             <h2 className="font-bold text-lg">DAST Alerts</h2>
           </div>
           <table className="w-full text-left">
@@ -62,7 +62,7 @@ const SecurityView = () => {
                 <th className="px-6 py-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-dark">
+            <tbody className="divide-y divide-border-[#1A1A1A]ark">
               {MOCK_SECURITY_ALERTS.map(alert => (
                 <tr key={alert.id} className="hover:bg-white/[0.02] cursor-pointer transition-colors group">
                   <td className="px-6 py-4"><SeverityBadge severity={alert.severity} /></td>
@@ -89,7 +89,7 @@ const SecurityView = () => {
               ForgeAI
             </div>
           </div>
-          <div className="p-6 border-b border-border-dark">
+          <div className="p-6 border-b border-border-[#1A1A1A]ark">
             <h3 className="text-lg font-bold">ForgeAI Suggested Fix</h3>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
               Detected unsanitized user input in the DOM. ForgeAI recommends using DOMPurify.

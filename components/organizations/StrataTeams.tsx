@@ -13,7 +13,7 @@ const StrataTeams = () => {
                     placeholder="Find a team..."
                     className="bg-[#0A0D14] border border-[#1E232E] rounded-lg px-4 py-2 text-sm text-white focus:ring-1 focus:ring-primary outline-none w-80"
                 />
-                <button className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2">
+                <button className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-all flex items-center gap-2">
                     <span className="material-symbols-outlined !text-lg">group_add</span>
                     New team
                 </button>

@@ -99,7 +99,7 @@ const Leaderboard = () => {
                             <div className="text-3xl md:text-4xl font-bold mb-1">255</div>
                             <div className="text-gh-text-secondary text-xs md:text-sm">Total Participated</div>
                         </div>
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0A0A0A]lue-500/20 text-blue-400 flex items-center justify-center">
                             <span className="material-symbols-outlined">emoji_events</span>
                         </div>
                     </div>
@@ -139,7 +139,7 @@ const Leaderboard = () => {
                                 className={`absolute -top-3 left-6 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${user.rank === 1
                                     ? "bg-yellow-500 text-black"
                                     : user.rank === 2
-                                        ? "bg-blue-500 text-white"
+                                        ? "bg-[#0A0A0A]lue-500 text-white"
                                         : "bg-purple-500 text-white"
                                     }`}
                             >
@@ -264,7 +264,7 @@ const Leaderboard = () => {
                             </thead>
                             <tbody>
                                 {[...topUsers, ...upcomingUsers].map((user) => (
-                                    <tr key={user.id} className="border-b last:border-0 border-gh-border hover:bg-gh-bg-tertiary transition-colors">
+                                    <tr key={user.id} className="border-b last:border-[#1A1A1A] border-gh-border hover:bg-gh-bg-tertiary transition-colors">
                                         <td className="p-4 pl-6">
                                             <div className="w-8 h-8 rounded-full bg-gh-bg-tertiary flex items-center justify-center font-mono text-sm">
                                                 {user.rank}

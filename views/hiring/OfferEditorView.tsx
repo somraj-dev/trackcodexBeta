@@ -82,7 +82,7 @@ const OfferEditorView = () => {
                     <button
                         title="Send Offer"
                         onClick={() => navigate(`/offer/${id}/accept`)}
-                        className="px-4 py-1.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-blue-600">Send Offer</button>
+                        className="px-4 py-1.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-[#0A0A0A]lue-600">Send Offer</button>
                 </div>
             </header>
 
@@ -179,11 +179,11 @@ const OfferEditorView = () => {
                 </main>
 
                 {/* Preview Panel */}
-                <aside className="w-[600px] bg-black p-8 shrink-0 flex flex-col items-center">
+                <aside className="w-[600px] bg-[#0A0A0A]lack p-8 shrink-0 flex flex-col items-center">
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-base">visibility</span> Live Offer Preview</p>
                     <div className="w-full bg-white text-slate-800 p-10 rounded-lg shadow-2xl flex-1 overflow-y-auto text-sm leading-relaxed">
                         <header className="flex items-start justify-between mb-8">
-                            <div className="size-10 bg-black rounded-lg"></div>
+                            <div className="size-10 bg-[#0A0A0A]lack rounded-lg"></div>
                             <div className="text-right text-xs text-slate-600">
                                 <p className="font-bold">TRACKCODEX INC.</p>
                                 <p>123 Tech Plaza, Suite 400</p>

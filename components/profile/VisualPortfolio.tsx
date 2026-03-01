@@ -45,7 +45,7 @@ const VisualPortfolio = () => {
             </div>
 
             {/* Stats Overlay on Hover */}
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+            <div className="absolute inset-0 bg-[#0A0A0A]lack/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
               <div className="flex items-center gap-1 text-white font-bold">
                 <span className="material-symbols-outlined filled !text-[18px]">
                   favorite

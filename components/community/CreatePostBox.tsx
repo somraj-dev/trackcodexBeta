@@ -60,7 +60,7 @@ const CreatePostBox = () => {
   return (
     <div className="bg-[#11141A] border border-[#1E232E] rounded-2xl p-6 mb-8 flex flex-col gap-4 shadow-sm group hover:border-[#8b949e] transition-all relative">
       <div className="flex items-start gap-4">
-        <img src={profile.avatar} className="size-11 rounded-full border border-border-dark object-cover" />
+        <img src={profile.avatar} className="size-11 rounded-full border border-border-[#1A1A1A]ark object-cover" />
         <div className="flex-1 space-y-3">
           <input 
             value={title}
@@ -109,7 +109,7 @@ const CreatePostBox = () => {
           <button 
             onClick={handlePost}
             disabled={isAnalyzing || !title.trim() || !content.trim()}
-            className="bg-primary hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-30"
+            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-30"
           >
              Publish
           </button>

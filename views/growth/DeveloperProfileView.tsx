@@ -12,7 +12,7 @@ const DeveloperProfileView = () => {
     <div className="p-8 text-gh-text max-w-4xl mx-auto">
       {/* ... existing header ... */}
       <div className="flex items-center gap-6 mb-8">
-        <div className="size-24 rounded-full bg-gh-bg-secondary border-2 border-primary border-dashed flex items-center justify-center text-4xl font-bold">
+        <div className="size-24 rounded-full bg-gh-bg-secondary border-2 border-primary border-[#1A1A1A]ashed flex items-center justify-center text-4xl font-bold">
           {id?.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1">
@@ -23,7 +23,7 @@ const DeveloperProfileView = () => {
           {currentUser?.id !== id && currentUser?.username !== id && (
             <button
               onClick={() => setShowChat(true)}
-              className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20"
+              className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-[#0A0A0A]lue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20"
             >
               <span className="material-symbols-outlined !text-[20px]">chat</span>
               Message

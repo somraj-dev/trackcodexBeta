@@ -484,7 +484,7 @@ const WorkspaceDetailView = () => {
               {/* Right Side (Added Content) */}
               <div className="overflow-y-auto no-scrollbar bg-gh-bg-secondary relative flex group/gutter">
                 {/* Minimap Placeholder */}
-                <div className="absolute top-0 right-0 w-14 h-full bg-black/20 border-l border-white/5 pointer-events-none z-20 backdrop-blur-sm">
+                <div className="absolute top-0 right-0 w-14 h-full bg-[#0A0A0A]lack/20 border-l border-white/5 pointer-events-none z-20 backdrop-blur-sm">
                   <div className="absolute top-48 left-0 right-0 h-24 bg-emerald-500/20 border-y border-emerald-500/30"></div>
                 </div>
 
@@ -537,7 +537,7 @@ const WorkspaceDetailView = () => {
 
         {/* Modular Activity Side Bar (Right) */}
         <aside className="w-[400px] border-l border-gh-border bg-gh-bg-secondary flex flex-col shrink-0 animate-in slide-in-from-right duration-300">
-          <div className="h-14 px-6 flex items-center justify-between border-b border-gh-border bg-black/20">
+          <div className="h-14 px-6 flex items-center justify-between border-b border-gh-border bg-[#0A0A0A]lack/20">
             <span className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-400">
               {rightPanel === "ai"
                 ? "🤖 AI REVIEW SUMMARY & CI/CD"

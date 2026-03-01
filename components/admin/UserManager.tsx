@@ -24,7 +24,7 @@ const UserManager = () => {
               placeholder="Search users..."
             />
           </div>
-          <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+          <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
             Export CSV
           </button>
         </div>
@@ -52,7 +52,7 @@ const UserManager = () => {
                     <img
                       src={user.avatar}
                       alt={user.name}
-                      className="size-10 rounded-full border border-border-dark object-cover"
+                      className="size-10 rounded-full border border-border-[#1A1A1A]ark object-cover"
                     />
                     <div>
                       <p className="text-sm font-bold text-gh-text">

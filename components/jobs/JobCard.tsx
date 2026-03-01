@@ -14,7 +14,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
     Open: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
     "In Progress": "text-amber-400 bg-amber-400/10 border-amber-400/20",
     Completed: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-    Pending: "text-blue-400 bg-blue-400/10 border-blue-400/20 animate-pulse",
+    Pending: "text-blue-400 bg-[#0A0A0A]lue-400/10 border-blue-400/20 animate-pulse",
   };
 
   const handleRepoClick = (e: React.MouseEvent) => {
@@ -113,7 +113,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
             </span>
           </span>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:bg-blue-600 hover:scale-[1.02] active:scale-95">
+        <button className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:bg-[#0A0A0A]lue-600 hover:scale-[1.02] active:scale-95">
           {job.status === "Completed"
             ? "Review feedback"
             : job.status === "Pending"

@@ -57,7 +57,7 @@ const PullRequestList = ({
           <div
             key={pr.id}
             onClick={() => onSelectPR(pr)}
-            className="flex items-start gap-3 p-3 border-b border-gh-border last:border-0 hover:bg-gh-bg-secondary transition-colors cursor-pointer group"
+            className="flex items-start gap-3 p-3 border-b border-gh-border last:border-[#1A1A1A] hover:bg-gh-bg-secondary transition-colors cursor-pointer group"
           >
             <div
               className={`mt-1 ${pr.status === "open" ? "text-[#3fb950]" : pr.status === "merged" ? "text-[#a371f7]" : "text-[#f85149]"}`}

@@ -476,7 +476,7 @@ const CreateWorkspaceView = () => {
                     value={repoUrl}
                     onChange={(e) => handleRepoUrlChange(e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full bg-black/40 border border-gh-border rounded p-2 text-[10px] text-white focus:ring-1 focus:ring-primary outline-none"
+                    className="w-full bg-[#0A0A0A]lack/40 border border-gh-border rounded p-2 text-[10px] text-white focus:ring-1 focus:ring-primary outline-none"
                     placeholder="https://github.com/username/repo.git"
                   />
                 </div>
@@ -546,7 +546,7 @@ const CreateWorkspaceView = () => {
                 <button
                   onClick={handleCreate}
                   disabled={isCreating}
-                  className="bg-primary hover:bg-blue-600 text-white px-12 py-3.5 rounded-xl font-black uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(19,91,236,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
+                  className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-12 py-3.5 rounded-xl font-black uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(19,91,236,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
                 >
                   {isCreating ? (
                     <>

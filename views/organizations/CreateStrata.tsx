@@ -7,12 +7,12 @@ const CreateStrata: React.FC = () => {
   return (
     <div className="p-8 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold text-white mb-4">Create Strata Organization</h1>
-      <p className="text-gray-400 mb-6">
+      <p className="text-[#a1a1aa] mb-6">
         Set up a new organization to collaborate with your team.
       </p>
       <button
         onClick={() => navigate("/strata")}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+        className="px-4 py-2 bg-[#0A0A0A]lue-600 text-white rounded-lg hover:bg-[#0A0A0A]lue-500 transition-colors"
       >
         ← Back to Strata
       </button>

@@ -37,7 +37,7 @@ export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0A0A]lack/50 backdrop-blur-sm">
       <div className="w-full max-w-md bg-[#11141A] border border-[#1E232E] rounded-lg shadow-xl p-6">
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-xl font-bold text-[#f85149]">Delete Account</h2>

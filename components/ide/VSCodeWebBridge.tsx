@@ -230,7 +230,7 @@ const VSCodeWebBridge: React.FC<VSCodeWebBridgeProps> = ({
       {/* VS Code Web Iframe */}
       <iframe
         ref={iframeRef}
-        className="w-full h-full border-0"
+        className="w-full h-full border-[#1A1A1A]"
         title="TrackCodex IDE (VS Code OSS)"
         allow="cross-origin-isolated; clipboard-read; clipboard-write"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"

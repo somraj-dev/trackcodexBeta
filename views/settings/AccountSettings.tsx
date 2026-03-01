@@ -173,7 +173,7 @@ const AccountSettings = () => {
       <section className="pt-16 border-t border-rose-500/20">
         <h3 className="text-lg font-bold text-rose-500 mb-4">Danger Zone</h3>
         <div className="border border-rose-500/30 rounded-xl overflow-hidden">
-          <div className="p-5 flex items-center justify-between border-b border-gh-border last:border-0 hover:bg-rose-500/[0.02] transition-all">
+          <div className="p-5 flex items-center justify-between border-b border-gh-border last:border-[#1A1A1A] hover:bg-rose-500/[0.02] transition-all">
             <div>
               <p className="text-sm font-bold text-white">Deactivate account</p>
               <p className="text-xs text-gh-text-secondary">

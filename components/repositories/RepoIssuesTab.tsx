@@ -216,7 +216,7 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
 
       {/* Create Issue Modal - Placeholder */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#0A0A0A]lack/50 flex items-center justify-center z-50">
           <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-6 max-w-2xl w-full mx-4">
             <h2 className="text-xl font-bold text-gh-text mb-4">
               Create New Issue

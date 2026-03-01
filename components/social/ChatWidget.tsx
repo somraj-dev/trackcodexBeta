@@ -71,7 +71,7 @@ const ChatWidget = ({ userId = 'user-1' }) => {
                         )}
                         {messages.map((msg, i) => (
                             <div key={i} className={`flex ${msg.senderId === userId ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-xs ${msg.senderId === userId ? 'bg-blue-600 text-white' : 'bg-[#11141A] text-slate-300'}`}>
+                                <div className={`max-w-[80%] rounded-lg px-3 py-2 text-xs ${msg.senderId === userId ? 'bg-[#0A0A0A]lue-600 text-white' : 'bg-[#11141A] text-slate-300'}`}>
                                     {msg.content}
                                 </div>
                             </div>
@@ -88,7 +88,7 @@ const ChatWidget = ({ userId = 'user-1' }) => {
                             placeholder="Type a message..."
                             className="flex-1 bg-[#0A0D14] border border-[#1E232E] rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500"
                         />
-                        <button onClick={handleSend} className="bg-blue-600 hover:bg-blue-500 text-white rounded px-3 py-1 flex items-center justify-center">
+                        <button onClick={handleSend} className="bg-[#0A0A0A]lue-600 hover:bg-[#0A0A0A]lue-500 text-white rounded px-3 py-1 flex items-center justify-center">
                             <span className="material-symbols-outlined !text-sm">send</span>
                         </button>
                     </div>
@@ -97,7 +97,7 @@ const ChatWidget = ({ userId = 'user-1' }) => {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-12 h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+                className="w-12 h-12 bg-[#0A0A0A]lue-600 hover:bg-[#0A0A0A]lue-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
             >
                 <span className="material-symbols-outlined">{isOpen ? 'chat_bubble' : 'chat'}</span>
             </button>

@@ -24,7 +24,7 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
         Design: "bg-purple-500",
         "Needs Design": "bg-red-600",
         Blocked: "bg-red-600",
-        Audit: "bg-blue-600",
+        Audit: "bg-[#0A0A0A]lue-600",
         Interaction: "bg-orange-500",
         Assistance: "bg-purple-500",
     };
@@ -90,7 +90,7 @@ const TaskColumn: React.FC<{ column: Column }> = ({ column }) => {
                 {column.tasks.map((task) => (
                     <TaskCard key={task.id} task={task} />
                 ))}
-                <button className="w-full py-2 text-xs text-gh-text-secondary hover:text-gh-text flex items-center justify-center gap-2 border border-dashed border-gh-border rounded-lg hover:border-primary/50 transition-all">
+                <button className="w-full py-2 text-xs text-gh-text-secondary hover:text-gh-text flex items-center justify-center gap-2 border border-[#1A1A1A]ashed border-gh-border rounded-lg hover:border-primary/50 transition-all">
                     <span className="material-symbols-outlined !text-[16px]">add</span>
                     Add task
                 </button>

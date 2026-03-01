@@ -31,7 +31,7 @@ const CommunitySidebar = () => {
         <div className="space-y-5">
           {contributors.map(user => (
             <div key={user.name} className="flex items-center gap-3 group cursor-pointer" onClick={handleProfileClick}>
-              <img src={user.avatar} className="size-9 rounded-full border border-border-dark group-hover:border-primary transition-all" />
+              <img src={user.avatar} className="size-9 rounded-full border border-border-[#1A1A1A]ark group-hover:border-primary transition-all" />
               <div>
                 <p className="text-[13px] font-bold text-white group-hover:text-primary transition-colors">{user.name}</p>
                 <p className="text-[10px] text-slate-500 font-medium">{user.reputation} reputation</p>
@@ -67,7 +67,7 @@ const CommunitySidebar = () => {
            <span className="text-[11px] font-black uppercase tracking-widest">Weekly Digest</span>
         </div>
         <p className="text-[12px] text-slate-400 leading-relaxed mb-6 font-medium">Get the top engineering discussions delivered to your inbox every Monday.</p>
-        <button className="w-full py-2.5 bg-primary hover:bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all">Subscribe</button>
+        <button className="w-full py-2.5 bg-primary hover:bg-[#0A0A0A]lue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all">Subscribe</button>
       </div>
     </div>
   );

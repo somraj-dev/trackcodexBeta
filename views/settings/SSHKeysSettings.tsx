@@ -63,7 +63,7 @@ const SSHKeysSettings = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center py-12 px-6 text-center border border-dashed border-gh-border rounded-2xl bg-gh-bg/30">
+                    <div className="flex flex-col items-center py-12 px-6 text-center border border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg/30">
                         <div className="size-16 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center text-slate-600 mb-6">
                             <span className="material-symbols-outlined !text-[32px]">
                                 key
@@ -88,7 +88,7 @@ const SSHKeysSettings = () => {
                     </button>
                 </div>
 
-                <div className="flex flex-col items-center py-12 px-6 text-center border border-dashed border-gh-border rounded-2xl bg-gh-bg/30">
+                <div className="flex flex-col items-center py-12 px-6 text-center border border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg/30">
                     <div className="size-16 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center text-slate-600 mb-6">
                         <span className="material-symbols-outlined !text-[32px]">
                             verified_user

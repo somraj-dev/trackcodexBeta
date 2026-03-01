@@ -31,7 +31,7 @@ const JobAcceptanceModal: React.FC<JobAcceptanceModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
+          className="absolute top-6 right-6 z-50 p-2 bg-[#0A0A0A]lack/50 hover:bg-[#0A0A0A]lack/80 rounded-full text-white transition-colors"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
@@ -217,7 +217,7 @@ const JobAcceptanceModal: React.FC<JobAcceptanceModalProps> = ({
                 <div className="mb-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
                   Sign Here
                 </div>
-                <div className="h-16 border-2 border-dashed border-slate-300 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 italic font-cursive text-2xl cursor-pointer hover:bg-slate-100 transition-colors">
+                <div className="h-16 border-2 border-[#1A1A1A]ashed border-slate-300 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400 italic font-cursive text-2xl cursor-pointer hover:bg-slate-100 transition-colors">
                   Click to sign electronically
                 </div>
               </div>

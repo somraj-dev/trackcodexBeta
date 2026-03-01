@@ -76,7 +76,7 @@ const Jobs = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
           >
             <span className="material-symbols-outlined text-lg">post_add</span>
             Post a Gig
@@ -153,7 +153,7 @@ const Jobs = () => {
               </div>
             ))
           ) : (
-            <div className="py-20 text-center bg-gh-bg-secondary border border-gh-border border-dashed rounded-3xl">
+            <div className="py-20 text-center bg-gh-bg-secondary border border-gh-border border-[#1A1A1A]ashed rounded-3xl">
               <span className="material-symbols-outlined text-4xl text-gh-text-secondary opacity-30 mb-4">
                 search_off
               </span>

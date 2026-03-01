@@ -80,7 +80,7 @@ const SecurityAuditLog: React.FC = () => {
                             ? "text-blue-400"
                             : log.action.includes("oauth")
                               ? "text-purple-400"
-                              : "text-gray-400"
+                              : "text-[#a1a1aa]"
                         }`}
                       >
                         {log.action.includes("login") ? "login" : "link"}

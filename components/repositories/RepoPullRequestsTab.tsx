@@ -47,7 +47,7 @@ const RepoPullRequestsTab: React.FC<RepoPullRequestsTabProps> = ({ repo }) => {
     }
     if (pr.draft) {
       return (
-        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-500">
+        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-[#888888]">
           Draft
         </span>
       );

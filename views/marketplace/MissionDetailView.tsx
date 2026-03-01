@@ -249,7 +249,7 @@ const MissionDetailView = () => {
                     alert("Funds Secured in Escrow");
                     window.location.reload();
                   }}
-                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
+                  className="w-full mt-4 py-3 bg-[#0A0A0A]lue-600 hover:bg-[#0A0A0A]lue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
                 >
                   Secure Funding
                 </button>

@@ -159,7 +159,7 @@ const EnvironmentSettings: React.FC<{ repoId: string }> = ({ repoId }) => {
             </div>
           ))
         ) : (
-          <div className="py-16 text-center border-2 border-dashed border-gh-border rounded-2xl bg-gh-bg-secondary/20">
+          <div className="py-16 text-center border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg-secondary/20">
             <span className="material-symbols-outlined !text-[48px] text-[#8b949e] mb-4 opacity-50">
               cloud_off
             </span>

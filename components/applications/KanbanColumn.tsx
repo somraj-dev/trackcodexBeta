@@ -20,7 +20,7 @@ export const KanbanColumn = ({ id, title, applications }: { id: string; title: s
                     <CandidateCard key={app.id} application={app} />
                 ))}
                 {applications.length === 0 && (
-                    <div className="h-24 flex items-center justify-center border border-dashed border-[#1E232E] rounded-lg m-1">
+                    <div className="h-24 flex items-center justify-center border border-[#1A1A1A]ashed border-[#1E232E] rounded-lg m-1">
                         <span className="text-[10px] text-slate-600">Drop here</span>
                     </div>
                 )}

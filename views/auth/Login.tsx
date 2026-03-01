@@ -102,7 +102,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black font-sans text-white px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0A]lack font-sans text-white px-4">
       <div className="w-full max-w-[340px] flex flex-col items-center">
         {/* Vercel-like Triangle Logo */}
         <div className="w-12 h-12 border border-[#333] rounded-full flex items-center justify-center mb-8">
@@ -131,7 +131,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoFocus
-                className="w-full px-4 py-[13px] bg-black border border-[#333] rounded-lg text-white text-sm focus:outline-none focus:border-[#888] focus:ring-1 focus:ring-[#888] hover:border-[#444] transition-all"
+                className="w-full px-4 py-[13px] bg-[#0A0A0A]lack border border-[#333] rounded-lg text-white text-sm focus:outline-none focus:border-[#888] focus:ring-1 focus:ring-[#888] hover:border-[#444] transition-all"
                 required
               />
               <button
@@ -153,7 +153,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
-                className="w-full px-4 py-[13px] bg-black border border-[#333] rounded-lg text-white text-sm focus:outline-none focus:border-[#888] focus:ring-1 focus:ring-[#888] hover:border-[#444] transition-all"
+                className="w-full px-4 py-[13px] bg-[#0A0A0A]lack border border-[#333] rounded-lg text-white text-sm focus:outline-none focus:border-[#888] focus:ring-1 focus:ring-[#888] hover:border-[#444] transition-all"
                 required
               />
               <button
@@ -181,7 +181,7 @@ export default function Login() {
                 <button
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center bg-black border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
+                  className="w-full flex items-center justify-center bg-[#0A0A0A]lack border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
                 >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-[18px] h-[18px] mr-[10px]" alt="Google" />
                   Continue with Google
@@ -190,7 +190,7 @@ export default function Login() {
                 <button
                   onClick={handleGithubLogin}
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center bg-black border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
+                  className="w-full flex items-center justify-center bg-[#0A0A0A]lack border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
                 >
                   <svg className="w-[18px] h-[18px] mr-[10px] fill-white" viewBox="0 0 24 24">
                     <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
@@ -200,7 +200,7 @@ export default function Login() {
 
                 <button
                   type="button"
-                  className="w-full flex items-center justify-center bg-black border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
+                  className="w-full flex items-center justify-center bg-[#0A0A0A]lack border border-[#333] rounded-lg py-[13px] text-[14.5px] hover:bg-[#0A0A0A] hover:border-[#444] transition-all text-[#ededed] font-medium"
                 >
                   <svg className="w-[18px] h-[18px] mr-[10px] fill-white" viewBox="0 0 24 24">
                     <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.19 2.31-.88 3.5-.8 1.56.05 2.89.81 3.63 1.93-3.08 1.77-2.6 5.86.34 7.07-.63 1.54-1.47 3.06-2.55 4.02zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />

@@ -117,7 +117,7 @@ const ManageAccess = ({ repoId }: { repoId: string }) => {
         {collaborators.map((member) => (
           <div
             key={member.user.id}
-            className="flex items-center justify-between p-4 bg-[#0A0D14] border-b border-[#1E232E] last:border-0 hover:bg-[#11141A] transition-colors group"
+            className="flex items-center justify-between p-4 bg-[#0A0D14] border-b border-[#1E232E] last:border-[#1A1A1A] hover:bg-[#11141A] transition-colors group"
           >
             <div className="flex items-center gap-3">
               <img

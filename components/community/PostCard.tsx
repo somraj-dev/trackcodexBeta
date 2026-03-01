@@ -184,7 +184,7 @@ const PostCard: React.FC<{ post: any }> = ({ post }) => {
               onClick={handleProfileClick}
               src={post.author.avatar}
               alt={post.author.name}
-              className="size-11 rounded-full border border-border-dark object-cover"
+              className="size-11 rounded-full border border-border-[#1A1A1A]ark object-cover"
             />
             {post.author.isLive && (
               <span className="absolute -bottom-1 -right-1 size-3 bg-red-500 rounded-full border-2 border-[#161b22] animate-pulse"></span>
@@ -233,7 +233,7 @@ const PostCard: React.FC<{ post: any }> = ({ post }) => {
         {post.image && (
           <div className="rounded-xl overflow-hidden mb-4 border border-[#1E232E] relative group/img">
             <img src={post.image} alt="Post attachment" className="w-full h-auto max-h-[400px] object-cover" />
-            <div className="absolute inset-0 bg-black/20 group-hover/img:bg-transparent transition-all"></div>
+            <div className="absolute inset-0 bg-[#0A0A0A]lack/20 group-hover/img:bg-transparent transition-all"></div>
           </div>
         )}
 
@@ -341,7 +341,7 @@ const PostCard: React.FC<{ post: any }> = ({ post }) => {
                 <button
                   onClick={submitComment}
                   disabled={!commentInput.trim()}
-                  className="bg-primary hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                  className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50"
                 >
                   Post Comment
                 </button>

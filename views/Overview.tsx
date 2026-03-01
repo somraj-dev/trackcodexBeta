@@ -221,7 +221,7 @@ const Overview = () => {
               <div className="rounded-xl border border-gh-border overflow-hidden bg-gh-bg-secondary">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-black/20 text-gh-text-secondary text-[10px] font-bold uppercase tracking-widest border-b border-gh-border">
+                    <tr className="bg-[#0A0A0A]lack/20 text-gh-text-secondary text-[10px] font-bold uppercase tracking-widest border-b border-gh-border">
                       <th className="px-6 py-4">Instance</th>
                       <th className="px-6 py-4">Status</th>
                       <th className="px-6 py-4">Context</th>
@@ -294,7 +294,7 @@ const Overview = () => {
                 {MOCK_AI_TASKS.map((task) => (
                   <div
                     key={task.id}
-                    className="flex gap-3 group cursor-pointer border-b border-gh-border last:border-0 pb-4 last:pb-0"
+                    className="flex gap-3 group cursor-pointer border-b border-gh-border last:border-[#1A1A1A] pb-4 last:pb-0"
                   >
                     <span className="material-symbols-outlined text-primary !text-[20px] mt-0.5">
                       auto_awesome

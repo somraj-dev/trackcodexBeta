@@ -93,7 +93,7 @@ const SettingsView = () => {
           <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-start gap-4">
-                <div className="size-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <div className="size-10 rounded-full bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
                   <span className="material-symbols-outlined">
                     verified_user
                   </span>

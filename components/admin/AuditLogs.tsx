@@ -12,7 +12,7 @@ const AuditLogs = () => {
       case "Warning":
         return "bg-amber-500/10 text-amber-500 border-amber-500/30";
       default:
-        return "bg-blue-500/10 text-blue-500 border-blue-500/30";
+        return "bg-[#0A0A0A]lue-500/10 text-blue-500 border-blue-500/30";
     }
   };
 
@@ -32,7 +32,7 @@ const AuditLogs = () => {
           <button className="bg-gh-bg-secondary border border-gh-border text-gh-text-secondary hover:text-gh-text px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
             Filter logs
           </button>
-          <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+          <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
             Verify Chain
           </button>
         </div>

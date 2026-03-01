@@ -147,7 +147,7 @@ const WalletDashboard = () => {
                                     <td className="p-4 pl-6">
                                         <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${tx.type === 'DEPOSIT' ? 'bg-emerald-500/20 text-emerald-400' :
                                             tx.type === 'WITHDRAWAL' ? 'bg-rose-500/20 text-rose-400' :
-                                                'bg-blue-500/20 text-blue-400'
+                                                'bg-[#0A0A0A]lue-500/20 text-blue-400'
                                             }`}>
                                             {tx.type}
                                         </span>
@@ -167,7 +167,7 @@ const WalletDashboard = () => {
 
             {/* Deposit Modal */}
             {isDepositModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0A0A]lack/80 backdrop-blur-sm">
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 w-[400px] shadow-2xl relative">
                         <button onClick={() => setIsDepositModalOpen(false)} className="absolute top-4 right-4 text-gh-text-secondary hover:text-gh-text">✕</button>
                         <h2 className="text-xl font-black mb-6 text-gh-text">Deposit Funds</h2>

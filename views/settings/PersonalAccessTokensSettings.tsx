@@ -295,7 +295,7 @@ const PersonalAccessTokensSettings = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={handleGenerate}
-            className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all"
+            className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-all"
           >
             Generate token
           </button>
@@ -331,7 +331,7 @@ const PersonalAccessTokensSettings = () => {
       </header>
 
       {tokens.length === 0 ? (
-        <div className="py-20 border-2 border-dashed border-gh-border rounded-2xl bg-gh-bg-secondary/30">
+        <div className="py-20 border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg-secondary/30">
           <EmptyState />
         </div>
       ) : (
@@ -339,7 +339,7 @@ const PersonalAccessTokensSettings = () => {
           {tokens.map((token) => (
             <div
               key={token.id}
-              className="p-5 border-b border-gh-border last:border-0 flex items-center justify-between group"
+              className="p-5 border-b border-gh-border last:border-[#1A1A1A] flex items-center justify-between group"
             >
               <div className="flex items-center gap-4">
                 <span className="material-symbols-outlined text-gh-text-secondary !text-3xl">

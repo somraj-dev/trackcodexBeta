@@ -12,7 +12,7 @@ const SettingsSection: React.FC<{
   description: string;
   children: React.ReactNode;
 }> = ({ title, description, children }) => (
-  <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-gh-border first:pt-0 first:border-0">
+  <section className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-gh-border first:pt-0 first:border-[#1A1A1A]">
     <div className="md:col-span-1">
       <h3 className="text-lg font-bold text-white">{title}</h3>
       <p className="text-sm text-gh-text-secondary mt-1">{description}</p>
@@ -64,7 +64,7 @@ const IntegrationCard: React.FC<{
       onClick={onToggle}
       className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${integration.connected
         ? "bg-transparent border-gh-border text-gh-text-secondary hover:text-white hover:border-red-500/50 hover:bg-red-500/10"
-        : "bg-primary border-transparent text-white hover:bg-blue-600 shadow-lg shadow-primary/20"
+        : "bg-primary border-transparent text-white hover:bg-[#0A0A0A]lue-600 shadow-lg shadow-primary/20"
         }`}
     >
       {integration.connected ? "Disconnect" : "Connect"}
@@ -328,7 +328,7 @@ const IntegrationsSettings = () => {
 
       {/* Token Modal - Fallback for when OAuth is not configured */}
       {showTokenModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0A0A]lack/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-gh-bg-secondary border border-gh-border p-6 rounded-2xl w-full max-w-md shadow-2xl relative">
             <button
               onClick={() => setShowTokenModal(false)}
@@ -382,7 +382,7 @@ const IntegrationsSettings = () => {
                 <button
                   onClick={submitToken}
                   disabled={!tokenInput || isVerifying}
-                  className="px-6 py-2 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-600 transition-all disabled:opacity-50"
+                  className="px-6 py-2 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#0A0A0A]lue-600 transition-all disabled:opacity-50"
                 >
                   {isVerifying ? "Verifying..." : "Connect"}
                 </button>

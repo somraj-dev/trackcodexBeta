@@ -4,7 +4,7 @@ import SecurityAuditLog from "./SecurityAuditLog";
 import DeleteAccountModal from "./DeleteAccountModal";
 
 const SecurityMethod = ({ icon, title, desc, actionLabel, onAction }: any) => (
-  <div className="p-5 border-b border-gh-border last:border-0 flex items-center justify-between hover:bg-white/[0.01] transition-all">
+  <div className="p-5 border-b border-gh-border last:border-[#1A1A1A] flex items-center justify-between hover:bg-white/[0.01] transition-all">
     <div className="flex items-center gap-5">
       <div className="size-10 rounded-lg bg-gh-bg flex items-center justify-center text-slate-500 border border-gh-border">
         {typeof icon === "string" ? (
@@ -71,7 +71,7 @@ const SecuritySettings = () => {
         <h3 className="text-lg font-bold text-gh-text mb-6">
           Two-factor authentication
         </h3>
-        <div className="flex flex-col items-center py-12 px-6 text-center border border-dashed border-gh-border rounded-2xl bg-gh-bg/30">
+        <div className="flex flex-col items-center py-12 px-6 text-center border border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg/30">
           <div className="size-16 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center text-slate-600 mb-6">
             <span className="material-symbols-outlined !text-[32px]">lock</span>
           </div>

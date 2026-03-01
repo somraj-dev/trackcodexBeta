@@ -16,7 +16,7 @@ const StrataPeople = () => {
                     />
                     <button className="px-4 py-2 text-sm bg-[#11141A] border border-[#1E232E] rounded-lg text-white">Role: All</button>
                 </div>
-                <button className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2">
+                <button className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-all flex items-center gap-2">
                     <span className="material-symbols-outlined !text-lg">person_add</span>
                     Invite member
                 </button>

@@ -246,7 +246,7 @@ const PullRequestDetail: React.FC = () => {
                             ? "bg-green-500/20 text-green-500"
                             : review.status === "CHANGES_REQUESTED"
                               ? "bg-red-500/20 text-red-500"
-                              : "bg-gray-500/20 text-gray-500"
+                              : "bg-gray-500/20 text-[#888888]"
                         }`}
                       >
                         {review.status.replace("_", " ")}

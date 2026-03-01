@@ -190,23 +190,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const displayUser = activeConversation ? getOtherParticipant(activeConversation) : targetUser;
 
     return (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[600] flex items-center justify-center bg-[#0A0A0A]lack/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
             <div className="w-full max-w-[90vw] h-[90vh] bg-[#0c0d14] rounded-[2rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex border border-white/5 animate-in zoom-in-95 duration-500 font-sans">
 
                 {/* COLUMN 1: Sidebar List */}
                 <div className="w-80 bg-[#12141d] border-r border-white/5 flex flex-col hidden md:flex">
                     <div className="p-6">
                         <div className="flex items-center justify-between mb-6">
-                            <div className="size-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <div className="size-10 bg-[#0A0A0A]lue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                                 <span className="material-symbols-outlined text-white">chat</span>
                             </div>
-                            <button onClick={onClose} aria-label="Close Chat" className="p-2 hover:bg-white/5 rounded-full text-gray-400 transition-colors">
+                            <button onClick={onClose} aria-label="Close Chat" className="p-2 hover:bg-white/5 rounded-full text-[#a1a1aa] transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
 
                         <div className="relative group">
-                            <Search className="absolute left-4 top-3.5 text-gray-500 group-focus-within:text-white transition-colors" size={18} />
+                            <Search className="absolute left-4 top-3.5 text-[#888888] group-focus-within:text-white transition-colors" size={18} />
                             <input
                                 type="text"
                                 placeholder="Search messages..."
@@ -216,7 +216,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
 
                     <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-1 custom-scrollbar">
-                        <h3 className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-widest">Recent</h3>
+                        <h3 className="px-4 py-2 text-xs font-bold text-[#888888] uppercase tracking-widest">Recent</h3>
                         {conversations.map(conv => {
                             const other = getOtherParticipant(conv);
                             const isActive = conv.id === activeConversationId;
@@ -227,19 +227,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     className={`p-3 rounded-2xl cursor-pointer flex items-center gap-3 transition-all ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}`}
                                 >
                                     <div className="relative shrink-0">
-                                        <img src={other?.avatar || "/default-avatar.png"} className="size-12 rounded-full object-cover bg-gray-800" alt="" />
+                                        <img src={other?.avatar || "/default-avatar.png"} className="size-12 rounded-full object-cover bg-[#111111]" alt="" />
                                         <div className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-[#12141d]"></div>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-baseline mb-0.5">
-                                            <span className={`font-semibold truncate ${isActive ? 'text-white' : 'text-gray-300'}`}>
+                                            <span className={`font-semibold truncate ${isActive ? 'text-white' : 'text-[#ededed]'}`}>
                                                 {other?.username || "Unknown"}
                                             </span>
-                                            <span className="text-[10px] text-gray-500">
+                                            <span className="text-[10px] text-[#888888]">
                                                 {new Date(conv.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-gray-500 truncate">
+                                        <p className="text-xs text-[#888888] truncate">
                                             {conv.messages[0]?.content || "No messages yet"}
                                         </p>
                                     </div>
@@ -263,7 +263,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4 text-gray-400">
+                        <div className="flex items-center gap-4 text-[#a1a1aa]">
                             <button aria-label="Audio Call" className="p-2 hover:bg-white/5 rounded-full transition-colors"><Phone size={20} /></button>
                             <button aria-label="Video Call" className="p-2 hover:bg-white/5 rounded-full transition-colors"><Video size={20} /></button>
                             <button aria-label="Chat Info" className="p-2 hover:bg-white/5 rounded-full transition-colors"><Info size={20} /></button>
@@ -295,7 +295,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
                                         <div
                                             className={`px-5 py-3 rounded-2xl text-[15px] leading-relaxed shadow-sm relative group-hover:shadow-md transition-shadow ${isMe
-                                                    ? 'bg-blue-600 text-white rounded-br-none'
+                                                    ? 'bg-[#0A0A0A]lue-600 text-white rounded-br-none'
                                                     : 'bg-[#1c1e29] text-gray-100 rounded-bl-none border border-white/5'
                                                 }`}
                                         >
@@ -314,7 +314,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     {/* Input Area */}
                     <div className="p-4 bg-[#0c0d14] border-t border-white/5">
                         <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-[#1c1e29] p-2 rounded-[24px] border border-white/5 focus-within:border-blue-500/50 transition-colors">
-                            <button type="button" aria-label="Attach File" className="p-3 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
+                            <button type="button" aria-label="Attach File" className="p-3 text-[#a1a1aa] hover:text-white transition-colors rounded-full hover:bg-white/5">
                                 <Paperclip size={20} />
                             </button>
                             <input
@@ -324,14 +324,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 placeholder="Type a message..."
                                 className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder-gray-500 py-3 max-h-32"
                             />
-                            <button type="button" aria-label="Add Emoji" className="p-3 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
+                            <button type="button" aria-label="Add Emoji" className="p-3 text-[#a1a1aa] hover:text-white transition-colors rounded-full hover:bg-white/5">
                                 <Smile size={20} />
                             </button>
                             <button
                                 type="submit"
                                 aria-label="Send Message"
                                 disabled={!inputValue.trim()}
-                                className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 transition-all transform active:scale-95"
+                                className="p-3 bg-[#0A0A0A]lue-600 text-white rounded-full hover:bg-[#0A0A0A]lue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 transition-all transform active:scale-95"
                             >
                                 <Send size={18} className={inputValue.trim() ? "ml-0.5" : ""} />
                             </button>
@@ -344,7 +344,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="p-8 flex flex-col items-center border-b border-white/5">
                         <img src={displayUser?.avatar || "/default-avatar.png"} className="size-24 rounded-full object-cover mb-4 ring-4 ring-white/5 shadow-2xl" alt="" />
                         <h2 className="text-xl font-bold text-white mb-1">{displayUser?.username}</h2>
-                        <p className="text-sm text-gray-500">Start Coders</p>
+                        <p className="text-sm text-[#888888]">Start Coders</p>
 
                         <div className="flex gap-4 mt-6 w-full">
                             <button className="flex-1 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-medium text-white transition-colors">
@@ -359,7 +359,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
                         <div>
                             <div className="flex items-center justify-between mb-4">
-                                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Shared Media</h4>
+                                <h4 className="text-xs font-bold text-[#888888] uppercase tracking-widest">Shared Media</h4>
                                 <button className="text-xs text-blue-400 hover:text-blue-300">View All</button>
                             </div>
                             <div className="grid grid-cols-3 gap-2">
@@ -371,11 +371,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                         <div>
                             <div className="flex items-center justify-between mb-4">
-                                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Privacy</h4>
+                                <h4 className="text-xs font-bold text-[#888888] uppercase tracking-widest">Privacy</h4>
                             </div>
                             <div className="space-y-1">
                                 <button className="w-full flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors group">
-                                    <span className="text-sm text-gray-300">Read Receipts</span>
+                                    <span className="text-sm text-[#ededed]">Read Receipts</span>
                                     <div className="w-8 h-4 bg-green-500/20 rounded-full relative">
                                         <div className="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-green-500 rounded-full shadow-lg"></div>
                                     </div>

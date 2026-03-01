@@ -98,7 +98,7 @@ const WorkspaceCard: React.FC<{ workspace: Workspace }> = ({ workspace }) => {
           </button>
           <button
             onClick={() => navigate(`/workspace/${workspace.id}`)}
-            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-[#0A0A0A]lue-600 transition-colors"
           >
             Open
           </button>

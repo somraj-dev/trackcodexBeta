@@ -11,7 +11,7 @@ interface MockRepoProps {
 }
 
 const MockRepo = ({ name, description, lang, stars }: MockRepoProps) => (
-  <div className="p-4 border-b border-gh-border last:border-0 hover:bg-gh-bg-secondary/50 group cursor-pointer transition-colors">
+  <div className="p-4 border-b border-gh-border last:border-[#1A1A1A] hover:bg-gh-bg-secondary/50 group cursor-pointer transition-colors">
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-2">
         <img

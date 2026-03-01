@@ -158,7 +158,7 @@ const RepoWikiTab: React.FC<RepoWikiTabProps> = ({ repo }) => {
         </div>
 
         {loading ? (
-          <div className="text-center py-10 text-gray-500">
+          <div className="text-center py-10 text-[#888888]">
             Loading content...
           </div>
         ) : isEditing ? (

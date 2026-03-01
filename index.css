@@ -17,15 +17,15 @@
 }
 
 .dark {
-  /* Premium Vercel-like Theme Mapped from Screenshot */
-  --gh-bg: #0A0D14; /* Vercel Main Dashboard Slate */
-  --gh-bg-secondary: #000000; /* Vercel Header Pitch Black */
-  --gh-bg-tertiary: #11141A; /* Elevated Cards */
-  --gh-border: #1E232E; /* Subtle Blue-grey Border */
-  --gh-text: #EDEDED; /* Vercel Off-White Text */
+  /* Premium Vercel-like Theme */
+  --gh-bg: #000000; /* Pure Black */
+  --gh-bg-secondary: #0A0A0A; /* Secondary Background */
+  --gh-bg-tertiary: #111111; /* Tertiary */
+  --gh-border: #1A1A1A; /* Ultra-subtle Border */
+  --gh-text: #FFFFFF; /* Pure White Text */
   --gh-text-secondary: #A1A1AA; /* Muted Gray Text */
   --gh-primary: #FFFFFF; /* White Accent */
-  --glass-border: #1E232E; /* Matches border for seamless look */
+  --glass-border: #1A1A1A; /* Matches border for seamless look */
   --neon-primary: #FFFFFF;
   --neon-secondary: #333333;
 }
@@ -37,8 +37,8 @@
 }
 
 .dark.high-contrast {
-  --gh-bg: #0A0A0A;
-  --gh-bg-secondary: #000000;
+  --gh-bg: #000000;
+  --gh-bg-secondary: #050505;
   --gh-border: #333333;
   --gh-text: #ffffff;
   --gh-text-secondary: #cccccc;

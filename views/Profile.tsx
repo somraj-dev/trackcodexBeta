@@ -568,7 +568,7 @@ const ProfileView = () => {
                   ].map((job, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-6 border-b border-gh-border last:border-0 hover:bg-gh-bg-tertiary transition-colors"
+                      className="flex items-center justify-between p-6 border-b border-gh-border last:border-[#1A1A1A] hover:bg-gh-bg-tertiary transition-colors"
                     >
                       <div>
                         <h4 className="text-sm font-bold text-gh-text">
@@ -580,7 +580,7 @@ const ProfileView = () => {
                       </div>
                       <div className="flex items-center gap-6">
                         <span
-                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${job.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-blue-500/10 text-blue-500"}`}
+                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${job.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-[#0A0A0A]lue-500/10 text-blue-500"}`}
                         >
                           {job.status}
                         </span>

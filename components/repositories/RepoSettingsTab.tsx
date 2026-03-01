@@ -18,7 +18,7 @@ const Section = ({
   children: React.ReactNode;
   description?: string;
 }) => (
-  <div className="py-8 border-b border-gh-border last:border-0 animate-in fade-in duration-500">
+  <div className="py-8 border-b border-gh-border last:border-[#1A1A1A] animate-in fade-in duration-500">
     <h3 className="text-lg font-semibold text-gh-text mb-1">{title}</h3>
     {description && (
       <p className="text-sm text-gh-text-secondary mb-6">{description}</p>
@@ -656,7 +656,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                 ].map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-red-500/10 last:border-0 hover:bg-red-500/10 transition-all gap-4"
+                    className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-red-500/10 last:border-[#1A1A1A] hover:bg-red-500/10 transition-all gap-4"
                   >
                     <div className="text-center md:text-left">
                       <h4 className="text-[14px] font-black text-gh-text mb-1 uppercase tracking-tight">

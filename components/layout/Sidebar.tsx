@@ -51,10 +51,10 @@ const OrgSwitcher = ({
         <div className="absolute top-full left-0 mt-2 w-64 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-[100] p-1 animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-1">
           {/* Status Placeholder */}
           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gh-bg cursor-pointer border border-transparent hover:border-gh-border transition-all">
-            <span className="material-symbols-outlined text-gray-400 text-sm">
+            <span className="material-symbols-outlined text-[#a1a1aa] text-sm">
               sentiment_satisfied
             </span>
-            <span className="text-xs text-gray-400">Set status</span>
+            <span className="text-xs text-[#a1a1aa]">Set status</span>
           </div>
 
           <div
@@ -71,10 +71,10 @@ const OrgSwitcher = ({
       )}
       <style>{`
         .menu-item-gh {
-            @apply flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600/10 cursor-pointer text-sm text-gh-text hover:text-blue-400 transition-colors;
+            @apply flex items-center gap-3 p-2 rounded-lg hover:bg-[#0A0A0A]lue-600/10 cursor-pointer text-sm text-gh-text hover:text-blue-400 transition-colors;
         }
         .menu-item-gh .icon {
-            @apply text-[18px] text-gray-500;
+            @apply text-[18px] text-[#888888];
         }
         .menu-item-gh:hover .icon {
             @apply text-blue-400;

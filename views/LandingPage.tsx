@@ -23,7 +23,7 @@ const LandingPage = () => {
 
         {/* LEFT COLUMN: Copy & Testimonial */}
         <div className="flex-1 flex flex-col items-start justify-center max-w-xl">
-          <span className="text-gray-500 font-medium text-sm mb-4 uppercase tracking-wider">
+          <span className="text-[#888888] font-medium text-sm mb-4 uppercase tracking-wider">
             End to End Encryption
           </span>
 
@@ -37,7 +37,7 @@ const LandingPage = () => {
 
           {/* Testimonial Card */}
           <div className="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-md border border-gray-100 relative">
-            <div className="absolute top-6 left-6 text-2xl text-gray-300 font-serif leading-none">"</div>
+            <div className="absolute top-6 left-6 text-2xl text-[#ededed] font-serif leading-none">"</div>
             <p className="text-gray-700 text-[15px] leading-relaxed mb-6 mt-4 relative z-10">
               With TrackCodex, Your Code runs on autopilot security, deployed,
               maintained, and scaled through Single Ecosystem with this you never
@@ -45,7 +45,7 @@ const LandingPage = () => {
             </p>
             <div>
               <p className="font-bold text-gray-900">Somraj Lodhi</p>
-              <p className="text-sm text-gray-500">Founder, QuantaForze</p>
+              <p className="text-sm text-[#888888]">Founder, QuantaForze</p>
             </div>
           </div>
         </div>
@@ -72,33 +72,33 @@ const LandingPage = () => {
 
             {/* Editor Body */}
             <div className="flex-1 p-6 font-mono text-[14px] leading-7 overflow-y-auto no-scrollbar">
-              <pre className="text-gray-300">
-                <span className="text-[#ff7b72]">provider</span> <span className="text-[#a5d6ff]">"TrackCodex"</span> <span className="text-gray-400">{'{'}</span>
+              <pre className="text-[#ededed]">
+                <span className="text-[#ff7b72]">provider</span> <span className="text-[#a5d6ff]">"TrackCodex"</span> <span className="text-[#a1a1aa]">{'{'}</span>
                 <br />
                 <span className="text-[#79c0ff]">  api_token</span> <span className="text-[#ff7b72]">=</span> var.welcome_user
                 <br />
                 <span className="text-[#79c0ff]">  network</span>   <span className="text-[#ff7b72]">=</span> var.quanta_network
                 <br />
-                <span className="text-gray-400">{'}'}</span>
+                <span className="text-[#a1a1aa]">{'}'}</span>
                 <br />
                 <br />
-                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"quanta_virtual_network" "core_vnet"</span> <span className="text-gray-400">{'{ }'}</span>
+                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"quanta_virtual_network" "core_vnet"</span> <span className="text-[#a1a1aa]">{'{ }'}</span>
                 <br />
                 <br />
-                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"shieldnet_user_group" "engineers"</span> <span className="text-gray-400">{'{'}</span>
+                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"shieldnet_user_group" "engineers"</span> <span className="text-[#a1a1aa]">{'{'}</span>
                 <br />
                 <span className="text-[#79c0ff]">  name</span> <span className="text-[#ff7b72]">=</span> <span className="text-[#a5d6ff]">"Engineering Team"</span>
                 <br />
-                <span className="text-gray-400">{'}'}</span>
+                <span className="text-[#a1a1aa]">{'}'}</span>
                 <br />
                 <br />
-                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"shieldnet_service_resource" "main_db"</span> <span className="text-gray-400">{'{'}</span>
+                <span className="text-[#ff7b72]">resource</span> <span className="text-[#a5d6ff]">"shieldnet_service_resource" "main_db"</span> <span className="text-[#a1a1aa]">{'{'}</span>
                 <br />
                 <span className="text-[#79c0ff]">  name</span> <span className="text-[#ff7b72]">=</span> <span className="text-[#a5d6ff]">"MainDB Server"</span>
                 <br />
                 <span className="text-[#79c0ff]">  address</span> <span className="text-[#ff7b72]">=</span> <span className="text-[#a5d6ff]">"db.internal"</span>
                 <br />
-                <span className="text-gray-400">{'}'}</span>
+                <span className="text-[#a1a1aa]">{'}'}</span>
               </pre>
             </div>
 

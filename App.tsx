@@ -59,7 +59,7 @@ class ChunkErrorBoundary extends React.Component<
                 sessionStorage.clear();
                 window.location.reload();
               }}
-              className="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+              className="px-6 py-2 bg-primary text-white rounded-md hover:bg-[#0A0A0A]lue-600 transition-colors font-medium"
             >
               Reload Application
             </button>
@@ -641,7 +641,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
         <>
           {/* Dark overlay */}
           <div
-            className="fixed inset-0 bg-black/50 z-[70] animate-in fade-in duration-200"
+            className="fixed inset-0 bg-[#0A0A0A]lack/50 z-[70] animate-in fade-in duration-200"
             onClick={() => setIsSidebarOpen(false)}
           />
           {/* Panel */}

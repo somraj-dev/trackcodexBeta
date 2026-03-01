@@ -43,7 +43,7 @@ const RoleEditor = () => {
             Define administrative scopes and granular permission sets.
           </p>
         </div>
-        <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+        <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">
             shield_with_heart
           </span>

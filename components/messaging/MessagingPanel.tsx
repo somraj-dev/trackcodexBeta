@@ -36,7 +36,7 @@ const MessagingPanel = () => {
     <div className="fixed inset-0 z-[200] flex justify-end animate-in fade-in duration-300">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#0A0A0A]lack/60 backdrop-blur-sm"
         onClick={() => setIsPanelOpen(false)}
       />
 

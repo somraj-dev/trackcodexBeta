@@ -14,7 +14,7 @@ const IDEView: React.FC = () => {
       {/* VS Code Web Iframe - Embedding vscode.dev for now */}
       <iframe
         src="https://vscode.dev"
-        className="w-full h-full border-0"
+        className="w-full h-full border-[#1A1A1A]"
         title="TrackCodex IDE (VS Code OSS)"
         allow="cross-origin-isolated; clipboard-read; clipboard-write; microphone; camera"
         sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox"
