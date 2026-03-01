@@ -261,12 +261,8 @@ const MissionDetailView = () => {
                       addNotification({ type: "error", title: "Application Failed", message: "Could not submit application." } as any);
                     }
                   }}
-<<<<<<< HEAD
                   disabled={hasApplied}
-                  className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ${hasApplied ? 'bg-slate-700 text-slate-400 cursor-not-allowed shadow-none' : 'bg-primary text-white shadow-primary/20 hover:bg-blue-600'}`}
-=======
-                  className="w-full mt-4 py-3 bg-[#0A0A0A]lue-600 hover:bg-[#0A0A0A]lue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
->>>>>>> 222aa5ba75206777ef9eae0693945cbc3def92ff
+                  className={`w-full mt-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ${hasApplied ? 'bg-slate-700 text-slate-400 cursor-not-allowed shadow-none' : 'bg-primary text-white shadow-primary/20 hover:bg-blue-600'}`}
                 >
                   {hasApplied ? "Application Submitted" : "Apply for Mission"}
                 </button>
