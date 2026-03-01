@@ -5,12 +5,16 @@ import { Job, TrialRepo } from "../../types";
 import JobRatingModal from "../../components/jobs/JobRatingModal";
 import { profileService } from "../../services/profile";
 import { directMessageBus } from "../../services/directMessageBus";
+import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/NotificationContext";
 
 const MissionDetailView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [localJob, setLocalJob] = useState<Job | null>(null);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const { user } = useAuth();
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     if (!id) return;
@@ -85,19 +89,13 @@ const MissionDetailView = () => {
   // Assuming we are logged in as 'johndoe' (creator of many mock jobs) or similar.
 
   const handleRatingSubmit = async (rating: number, feedback: string) => {
-    if (!localJob) return;
+    if (!localJob || !user) return;
 
     try {
-      // We need freelancerId. In a real flow, this comes from the accepted application.
-      // For this demo 'real' flow, let's assume the job has an 'acceptedApplicantId'
-      // OR we just assume the first applicant or a specific user 'freelancer-user-id'
-      // Let's use a known ID for the test freelancer 'testuser-id' or 'derived-from-applicant'
+      // Find the accepted applicant ID (or fallback to test user)
+      const freelancerId = localJob.applications?.find((app: any) => app.status === 'Accepted')?.applicantId || "test-user-id-for-demo";
 
-      // BETTER: Retrieve accepted applicant from job applications.
-      // If mocked/missing, we fallback to a hardcoded test ID so the flow works.
-      const freelancerId = "test-user-id-for-demo"; // In prod: localJob.acceptedApplicantId
-
-      await fetch(`http://localhost:4000/api/v1/jobs/${localJob.id}/complete`, {
+      const res = await fetch(`http://localhost:4000/api/v1/jobs/${localJob.id}/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -107,16 +105,29 @@ const MissionDetailView = () => {
         }),
       });
 
+      if (!res.ok) throw new Error("Failed to submit rating");
+
       // Refresh
       setLocalJob({ ...localJob, status: "Completed" }); // Optimistic update
       setIsRatingModalOpen(false);
-      // Optionally navigate to profile to see the rating update?
+      addNotification({
+        type: "success",
+        title: "Mission Completed",
+        message: "Your feedback has been submitted.",
+      } as any);
     } catch (e) {
       console.error("Failed to complete job", e);
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "Failed to mark mission as complete.",
+      } as any);
     }
   };
 
   const isCompleted = localJob?.status === "Completed";
+  const hasApplied = localJob?.applications?.some((app: any) => app.applicantId === user?.id) || false;
+  const isCreator = localJob?.creator.name === user?.name || localJob?.creator.id === user?.id;
 
   return (
     <div className="p-10 max-w-[1400px] mx-auto w-full">
@@ -217,71 +228,109 @@ const MissionDetailView = () => {
             </div>
 
             {/* Financial Actions (Escrow) */}
-            {localJob.status === "Open" && (
+            {localJob.status === "Open" && !isCreator && (
               <div className="space-y-3">
                 <button
                   onClick={async () => {
-                    await fetch(
-                      `http://localhost:4000/api/v1/jobs/${localJob.id}/apply`,
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ applicantId: "user-2" }), // Mock Freelancer
-                      },
-                    );
-                    alert("Application Sent!");
-                  }}
-                  className="w-full py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
-                >
-                  Apply for Mission
-                </button>
-                <button
-                  onClick={async () => {
-                    if (!confirm(`Fund ${localJob.budget} for this mission?`))
+                    if (!user) {
+                      alert("Please login to apply");
                       return;
-                    await fetch(
-                      `http://localhost:4000/api/v1/jobs/${localJob.id}/fund`,
-                      {
-                        method: "POST",
-                        headers: { "x-user-id": "user-1" }, // Mock Employer
-                      },
-                    );
-                    alert("Funds Secured in Escrow");
-                    window.location.reload();
+                    }
+                    if (hasApplied) {
+                      addNotification({ type: "info", title: "Already Applied", message: "You have already applied for this mission." } as any);
+                      return;
+                    }
+                    try {
+                      const res = await fetch(
+                        `http://localhost:4000/api/v1/jobs/${localJob.id}/apply`,
+                        {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ applicantId: user.id }),
+                        },
+                      );
+                      if (!res.ok) throw new Error("Failed to apply");
+                      addNotification({ type: "success", title: "Application Sent!", message: "Your application has been submitted successfully." } as any);
+                      // Optimistic Update
+                      setLocalJob({
+                        ...localJob,
+                        applications: [...(localJob.applications || []), { applicantId: user.id, status: 'Pending' }]
+                      } as any);
+                    } catch (err) {
+                      console.error(err);
+                      addNotification({ type: "error", title: "Application Failed", message: "Could not submit application." } as any);
+                    }
                   }}
-                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
+                  disabled={hasApplied}
+                  className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ${hasApplied ? 'bg-slate-700 text-slate-400 cursor-not-allowed shadow-none' : 'bg-primary text-white shadow-primary/20 hover:bg-blue-600'}`}
                 >
-                  Secure Funding
+                  {hasApplied ? "Application Submitted" : "Apply for Mission"}
                 </button>
               </div>
             )}
 
-            {localJob.status === "Completed" && ( // Should check Escrow status too
+            {localJob.status === "Open" && isCreator && (
+              <div className="space-y-3">
+                <button
+                  onClick={async () => {
+                    if (!confirm(`Fund ${localJob.budget} for this mission?`))
+                      return;
+                    try {
+                      const res = await fetch(
+                        `http://localhost:4000/api/v1/jobs/${localJob.id}/fund`,
+                        {
+                          method: "POST",
+                          headers: { "x-user-id": user?.id || "user-1" },
+                        },
+                      );
+                      if (!res.ok) throw new Error("Failed to fund");
+                      addNotification({ type: "success", title: "Funds Secured", message: "Funds have been placed into Escrow." } as any);
+                      // Mock update status for UI
+                      setLocalJob({ ...localJob, status: "In Progress" });
+                    } catch (err) {
+                      addNotification({ type: "error", title: "Funding Failed", message: "Failed to secure funds. Please check wallet balance." } as any);
+                    }
+                  }}
+                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
+                >
+                  Secure Funding (Escrow)
+                </button>
+              </div>
+            )}
+
+            {localJob.status === "In Progress" && isCreator && (
               <button
                 onClick={async () => {
-                  // Mock Freelancer ID for demo logic
-                  await fetch(
-                    `http://localhost:4000/api/v1/jobs/${localJob.id}/release`,
-                    {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ freelancerId: "freelancer-1" }),
-                    },
-                  );
-                  alert("Payment Released");
-                  window.location.reload();
+                  try {
+                    const freelancerId = localJob.applications?.find((app: any) => app.status === 'Accepted')?.applicantId || "test-user-id-for-demo";
+                    const res = await fetch(
+                      `http://localhost:4000/api/v1/jobs/${localJob.id}/release`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ freelancerId }),
+                      },
+                    );
+                    if (!res.ok) throw new Error("Failed to release funds");
+                    addNotification({ type: "success", title: "Payment Released", message: "Funds released to the freelancer." } as any);
+
+                    // Proceed to rating after release
+                    setIsRatingModalOpen(true);
+                  } catch (err) {
+                    addNotification({ type: "error", title: "Release Failed", message: "Failed to release payment." } as any);
+                  }
                 }}
                 className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
               >
                 <span className="material-symbols-outlined text-sm align-bottom mr-2">
                   payments
                 </span>
-                Release Payment
+                Release Payment & Complete
               </button>
             )}
 
-            {/* Complete Job Action */}
-            {!isCompleted && (
+            {/* Complete Job Action (Fallback if not going through Escrow flow) */}
+            {!isCompleted && isCreator && localJob.status !== 'In Progress' && (
               <button
                 onClick={() => setIsRatingModalOpen(true)}
                 className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"

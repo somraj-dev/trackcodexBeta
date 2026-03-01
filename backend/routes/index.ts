@@ -11,6 +11,8 @@ import { orgRoutes } from "./organizations";
 import { communityRoutes } from "./community";
 import { profileRoutes } from "./profile";
 import { radarRoutes } from "./radar";
+import { hiringRoutes } from "./hiring";
+import { growthRoutes } from "./growth";
 
 import { forgeRoutes } from "./forge";
 import { notificationRoutes } from "./notifications";
@@ -59,6 +61,8 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(orgRoutes);
   await fastify.register(communityRoutes);
   await fastify.register(profileRoutes);
+  await fastify.register(hiringRoutes, { prefix: "/hiring" });
+  await fastify.register(growthRoutes);
   await fastify.register(forgeRoutes);
   await fastify.register(adminRoutes);
   await fastify.register(searchRoutes);

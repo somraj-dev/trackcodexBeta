@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from "../../context/AuthContext";
 
 const MyApplicationsView = () => {
     const [applications, setApplications] = useState<any[]>([]);
@@ -7,19 +8,19 @@ const MyApplicationsView = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Mock API call to get my applications
-        // In real app: GET /api/v1/applications/me
-        // For now, we simulate emptiness or mock data if we had it.
-        // Let's just show an empty state or a mock item for demo feel.
-
-        // Simulate network delay
-        setTimeout(() => {
-            setApplications([
-                { id: '1', job: { id: 'job-123', title: 'AI Core Optimization', budget: '$5,000' }, status: 'Pending', date: '2024-05-20' },
-                { id: '2', job: { id: 'job-456', title: 'React Dashboard Refactor', budget: '$2,000' }, status: 'Interview', date: '2024-05-18' }
-            ]);
-            setLoading(false);
-        }, 500);
+        const fetchApplications = async () => {
+            try {
+                const response = await api.get('/jobs/applications/me');
+                if (response.data.success) {
+                    setApplications(response.data.applications);
+                }
+            } catch (err) {
+                console.error("Failed to fetch applications:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchApplications();
     }, []);
 
     return (
@@ -42,26 +43,33 @@ const MyApplicationsView = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gh-border">
-                            {applications.map(app => (
+                            {applications.length > 0 ? applications.map(app => (
                                 <tr key={app.id} className="hover:bg-gh-bg-tertiary transition-colors group">
-                                    <td className="p-4 pl-6 font-bold text-gh-text group-hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/marketplace/missions/${app.job.id}`)}>
-                                        {app.job.title}
+                                    <td className="p-4 pl-6 font-bold text-gh-text group-hover:text-blue-400 cursor-pointer" onClick={() => navigate(`/marketplace/missions/${app.jobId}`)}>
+                                        {app.job?.title || 'Unknown Mission'}
                                     </td>
-                                    <td className="p-4 text-slate-400">{app.date}</td>
-                                    <td className="p-4 font-mono text-slate-300">{app.job.budget}</td>
+                                    <td className="p-4 text-slate-400">{new Date(app.createdAt).toLocaleDateString()}</td>
+                                    <td className="p-4 font-mono text-slate-300">${app.bidAmount}</td>
                                     <td className="p-4">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${app.status === 'Interview' ? 'bg-amber-500/20 text-amber-500' :
-                                            app.status === 'Accepted' ? 'bg-emerald-500/20 text-emerald-500' :
-                                                'bg-slate-500/20 text-slate-400'
+                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${app.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-500' :
+                                                app.status === 'REJECTED' ? 'bg-red-500/20 text-red-500' :
+                                                    app.status === 'INTERVIEW' ? 'bg-amber-500/20 text-amber-500' :
+                                                        'bg-slate-500/20 text-slate-400'
                                             }`}>
                                             {app.status}
                                         </span>
                                     </td>
                                     <td className="p-4 text-right">
-                                        <button className="text-slate-500 hover:text-white font-bold text-xs">View Details</button>
+                                        <button onClick={() => navigate(`/marketplace/missions/${app.jobId}`)} className="text-slate-500 hover:text-white font-bold text-xs">View Details</button>
                                     </td>
                                 </tr>
-                            ))}
+                            )) : (
+                                <tr>
+                                    <td colSpan={5} className="p-8 text-center text-slate-500">
+                                        No applications found. Start applying to missions!
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

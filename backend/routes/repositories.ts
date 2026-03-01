@@ -115,6 +115,42 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
     },
   );
 
+  // List Trial Repositories (Marketplace)
+  fastify.get(
+    "/repositories/trials",
+    async (request, reply) => {
+      try {
+        const repos = await prisma.repository.findMany({
+          where: { isPublic: true },
+          include: { org: true, owner: true },
+          take: 20,
+          orderBy: { stars: 'desc' }
+        });
+
+        // Map to TrialRepo shape
+        const trials = repos.map(repo => ({
+          id: repo.id,
+          title: repo.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          company: repo.org?.name || repo.owner?.name || "Independent",
+          logo: repo.org?.avatarUrl || repo.owner?.avatar || `https://ui-avatars.com/api/?name=${repo.name}&background=random`,
+          location: "Remote", // Default
+          salaryRange: "$80k - $120k", // Mock salary, could come from metadata later
+          type: "Full-time",
+          tech: repo.language ? repo.language.split(',').map(s => s.trim()) : ["TypeScript", "React"],
+          postedAt: "Just now",
+          applyUrl: `/marketplace/trials/${repo.id}`,
+          repoName: `${repo.org?.name || repo.owner?.username || 'user'}/${repo.name}`,
+          description: repo.description || "Solve this trial issue to get hired."
+        }));
+
+        return { success: true, trials };
+      } catch (error) {
+        request.log.error(error);
+        throw InternalError("Failed to fetch trial repositories");
+      }
+    }
+  );
+
   // Get Repository Details
   fastify.get(
     "/repositories/:id",
