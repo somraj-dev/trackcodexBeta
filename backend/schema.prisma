@@ -609,6 +609,16 @@ model FreelancerProfile {
   rating        Float       @default(0.0)
   isPublic      Boolean     @default(true)
   reviews       JobReview[]
+
+  // --- Hiring (Candidate Discovery) & Growth ---
+  aiComplexityScore Float     @default(0.0)
+  prQuality         Float     @default(0.0)
+  discoveryStatus   String    @default("Idle") // "Passing", "Idle", "Top Match"
+  techStackMatches  Json?     // e.g. [{ skill: "React", alignment: 90 }]
+  
+  // Growth fields
+  skillRadar        Json?     // array of SkillRadarData
+  growthPaths       Json?     // array of GrowthPathItem
 }
 
 // --- Finance ---

@@ -281,6 +281,12 @@ const HiringLayout = React.lazy(() => import("./views/hiring/HiringLayout"));
 const CandidateDiscoveryView = React.lazy(
   () => import("./views/hiring/CandidateDiscoveryView"),
 );
+const HiringJobsView = React.lazy(
+  () => import("./views/hiring/HiringJobsView"),
+);
+const HiringAnalyticsView = React.lazy(
+  () => import("./views/hiring/HiringAnalyticsView"),
+);
 const CandidateScorecardView = React.lazy(
   () => import("./views/hiring/CandidateScorecardView"),
 );
@@ -994,23 +1000,28 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                     path="feedback/:id"
                     element={<InterviewerFeedbackView />}
                   />
+                  <Route path="jobs" element={<HiringJobsView />} />
+                  <Route path="analytics" element={<HiringAnalyticsView />} />
                   <Route path="assessments" element={<AssessmentsView />} />
                   <Route
                     path="*"
-                    element={<Navigate to="discovery" replace />}
+                    element={<Navigate to="/marketplace/hiring/discovery" replace />}
                   />
                 </Route>
 
                 <Route path="growth" element={<GrowthLayout />}>
-                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route index element={<Navigate to="/marketplace/growth/dashboard" replace />} />
                   <Route path="dashboard" element={<SkillDashboardView />} />
+                  <Route path="radar" element={<SkillDashboardView />} />
+                  <Route path="path" element={<SkillDashboardView />} />
+                  <Route path="certifications" element={<SkillDashboardView />} />
                   <Route
                     path="profile/:id"
                     element={<DeveloperProfileView />}
                   />
                   <Route
                     path="*"
-                    element={<Navigate to="dashboard" replace />}
+                    element={<Navigate to="/marketplace/growth/dashboard" replace />}
                   />
                 </Route>
 
