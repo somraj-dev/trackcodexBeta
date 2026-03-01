@@ -2303,30 +2303,5 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
     },
   );
 
-  // Get File Content (Raven Support)
-  fastify.get(
-    "/repositories/:id/content",
-    { preHandler: requireRepoPermission(RepoLevel.READ) },
-    async (request) => {
-      const { id } = request.params as { id: string };
-      const { path: filePath } = request.query as { path: string };
 
-      if (!filePath) throw BadRequest("file path is required");
-
-      const mirrorPath = path.join(
-        process.cwd(),
-        "storage",
-        "mirrors",
-        id,
-        filePath,
-      );
-
-      try {
-        const content = fs.readFileSync(mirrorPath, "utf-8");
-        return { content };
-      } catch (err) {
-        throw NotFound("File not found in mirror");
-      }
-    },
-  );
 }
