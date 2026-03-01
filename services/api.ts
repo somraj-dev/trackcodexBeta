@@ -117,10 +117,10 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ status }),
       }),
-    start: (id: string, repoId?: string) =>
+    start: (id: string, repoId?: string, options?: { liveSync?: boolean }) =>
       request<{ url: string; port: number }>(`/workspaces/${id}/start`, {
         method: "POST",
-        body: JSON.stringify({ repoId }),
+        body: JSON.stringify({ repoId, ...options }),
       }),
     delete: (id: string) =>
       request<void>(`/workspaces/${id}`, { method: "DELETE" }),

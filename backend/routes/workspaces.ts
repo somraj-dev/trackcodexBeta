@@ -1,17 +1,23 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../services/prisma";
 import { gitService } from "../services/gitService";
+import { requireAuth } from "../middleware/auth";
 import bcrypt from "bcryptjs";
 import {
-  AppError,
   BadRequest,
   NotFound,
   InternalError,
+  Unauthorized,
 } from "../utils/AppError";
 
 // Shared prisma instance
 
 export async function workspaceRoutes(fastify: FastifyInstance) {
+  // Health Check
+  fastify.get("/workspaces/health", async () => {
+    return { status: "ok" };
+  });
+
   // List Workspaces
   fastify.get("/workspaces", async (request, reply) => {
     try {
@@ -27,123 +33,112 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
   });
 
   // Create Workspace
-  fastify.post("/workspaces", async (request, reply) => {
-    const {
-      name,
-      description,
-      ownerId,
-      repositoryUrl,
-      gitProvider,
-      setupMode,
-      visibility,
-      accessPassword,
-    } = request.body as any;
+  fastify.post(
+    "/workspaces",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const {
+        name,
+        description,
+        repositoryUrl,
+        gitProvider,
+        setupMode,
+        visibility,
+        accessPassword,
+      } = request.body as any;
 
-    // Validation
-    if (!name || !name.trim()) {
-      throw BadRequest("Workspace name is required");
-    }
+      const user = (request as any).user;
+      if (!user) throw Unauthorized("Unauthorized");
+      const finalOwnerId = user.userId;
 
-    if (
-      visibility === "private" &&
-      (!accessPassword || !accessPassword.trim())
-    ) {
-      throw BadRequest("Password is required for private workspaces");
-    }
-
-    // Fallback if no ownerId sent (demo mode)
-    let finalOwnerId = ownerId;
-    if (!finalOwnerId) {
-      const firstUser = await prisma.user.findFirst();
-      if (!firstUser)
-        return reply
-          .code(400)
-          .send({ message: "No users exist. Register first." });
-      finalOwnerId = firstUser.id;
-    }
-
-    // Validate repository URL if provided
-    if (setupMode === "import" && repositoryUrl) {
-      const repoInfo = await gitService.getRepositoryInfo(repositoryUrl);
-      if (!repoInfo.isValid) {
-        return reply.code(400).send({
-          message:
-            "Invalid Git repository URL. Please provide a valid GitHub, GitLab, or Bitbucket URL.",
-        });
-      }
-    }
-
-    // Hash password if provided
-    let hashedPassword = null;
-    if (visibility === "private" && accessPassword) {
-      hashedPassword = await bcrypt.hash(accessPassword, 10);
-    }
-
-    // Create workspace with repository info
-    const workspace = await prisma.workspace.create({
-      data: {
-        name: name.trim(),
-        description: description?.trim() || null,
-        ownerId: finalOwnerId,
-        status:
-          setupMode === "import" && repositoryUrl ? "Cloning" : "Starting",
-        repoUrl: repositoryUrl || null,
-        visibility: visibility || "public",
-        accessPassword: hashedPassword,
-      },
-    });
-
-    const { NotificationService } = await import("../services/notification");
-    await NotificationService.create(
-      finalOwnerId,
-      "system",
-      "Workspace Provisioned",
-      `New cloud development environment allocated for: ${workspace.name}`,
-      `/workspaces/${workspace.id}`,
-      { workspaceId: workspace.id }
-    );
-
-    // If repository URL provided, trigger real cloning in background
-    if (setupMode === "import" && repositoryUrl) {
-      // Log the cloning request
-      request.log.info(
-        `Cloning repository: ${repositoryUrl} (${gitProvider}) for workspace ${workspace.id}`,
-      );
-
-      // Clone repository asynchronously (don't block response)
-      (async () => {
-        try {
-          // Clone the repository
-          const clonedPath = await gitService.cloneRepository(
-            repositoryUrl,
-            workspace.id,
-          );
-
-          // Update workspace status to Ready
-          await prisma.workspace.update({
-            where: { id: workspace.id },
-            data: { status: "Ready" },
-          });
-
-          request.log.info(
-            `Repository cloned successfully to ${clonedPath} for workspace ${workspace.id}`,
-          );
-        } catch (error: any) {
-          request.log.error(
-            `Failed to clone repository for workspace ${workspace.id}: ${error.message}`,
-          );
-
-          // Update workspace status to Failed
-          await prisma.workspace.update({
-            where: { id: workspace.id },
-            data: { status: "Failed" },
+      // Validate repository URL if provided
+      if (setupMode === "import" && repositoryUrl) {
+        const repoInfo = await gitService.getRepositoryInfo(repositoryUrl);
+        if (!repoInfo.isValid) {
+          return reply.code(400).send({
+            message:
+              "Invalid Git repository URL. Please provide a valid GitHub, GitLab, or Bitbucket URL.",
           });
         }
-      })();
-    }
+      }
 
-    return workspace;
-  });
+      // Hash password if provided
+      let hashedPassword = null;
+      if (visibility === "private" && accessPassword) {
+        hashedPassword = await bcrypt.hash(accessPassword, 10);
+      }
+
+      // Create workspace with repository info
+      const workspace = await prisma.workspace.create({
+        data: {
+          name: name.trim(),
+          description: description?.trim() || null,
+          ownerId: finalOwnerId,
+          status:
+            setupMode === "import" && repositoryUrl ? "Cloning" : "Active",
+          repoUrl: repositoryUrl || null,
+          visibility: visibility || "public",
+          accessPassword: hashedPassword,
+          members: {
+            create: {
+              userId: finalOwnerId,
+              role: "OWNER",
+            },
+          },
+        },
+      });
+
+      const { NotificationService } = await import("../services/notification");
+      await NotificationService.create(
+        finalOwnerId,
+        "system",
+        "Workspace Provisioned",
+        `New cloud development environment allocated for: ${workspace.name}`,
+        `/workspaces/${workspace.id}`,
+        { workspaceId: workspace.id }
+      );
+
+      // If repository URL provided, trigger real cloning in background
+      if (setupMode === "import" && repositoryUrl) {
+        // Log the cloning request
+        request.log.info(
+          `Cloning repository: ${repositoryUrl} (${gitProvider}) for workspace ${workspace.id}`,
+        );
+
+        // Clone repository asynchronously (don't block response)
+        (async () => {
+          try {
+            // Clone the repository
+            const clonedPath = await gitService.cloneRepository(
+              repositoryUrl,
+              workspace.id,
+            );
+
+            // Update workspace status to Ready
+            await prisma.workspace.update({
+              where: { id: workspace.id },
+              data: { status: "Ready" },
+            });
+
+            request.log.info(
+              `Repository cloned successfully to ${clonedPath} for workspace ${workspace.id}`,
+            );
+          } catch (error: any) {
+            request.log.error(
+              `Failed to clone repository for workspace ${workspace.id}: ${error.message}`,
+            );
+
+            // Update workspace status to Failed
+            await prisma.workspace.update({
+              where: { id: workspace.id },
+              data: { status: "Failed" },
+            });
+          }
+        })();
+      }
+
+      return workspace;
+    });
 
   // Get Workspace Details
   fastify.get("/workspaces/:id", async (request, reply) => {
@@ -161,7 +156,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
   // Start Workspace IDE
   fastify.post("/workspaces/:id/start", async (request, reply) => {
     const { id } = request.params as any;
-    const { repoId } = (request.body as any) || {};
+    const { repoId, liveSync } = (request.body as any) || {};
 
     // Look up repo details FIRST (before creating workspace)
     let repoName: string | undefined;
@@ -204,6 +199,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
       const result = await WorkspaceManager.startWorkspace(id, {
         repoName,
         cloneUrl,
+        liveSync,
       });
 
       // Update status

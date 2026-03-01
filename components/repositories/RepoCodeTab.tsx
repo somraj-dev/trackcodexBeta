@@ -245,26 +245,27 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
           </div>
 
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-1 text-sm font-bold text-gh-text mx-4 overflow-hidden">
+          <div className="flex items-center gap-1 text-sm font-bold">
             <button
               onClick={() => setCurrentPath("")}
-              className="hover:text-primary transition-colors shrink-0"
+              className="text-primary hover:underline"
             >
               {repo.name}
             </button>
-            <span className="text-gh-text-secondary">/</span>
-            {currentPath.split("/").filter(Boolean).map((part, i, arr) => (
-              <React.Fragment key={i}>
-                <button
-                  onClick={() =>
-                    setCurrentPath(arr.slice(0, i + 1).join("/"))
-                  }
-                  className="hover:text-primary transition-colors truncate max-w-[120px]"
-                >
-                  {part}
-                </button>
-                {i < arr.length - 1 && (
-                  <span className="text-gh-text-secondary">/</span>
+            {currentPath.split("/").map((part, idx, arr) => (
+              <React.Fragment key={idx}>
+                {part && (
+                  <>
+                    <span className="text-gh-text-secondary">/</span>
+                    <button
+                      onClick={() =>
+                        setCurrentPath(arr.slice(0, idx + 1).join("/"))
+                      }
+                      className="text-primary hover:underline"
+                    >
+                      {part}
+                    </button>
+                  </>
                 )}
               </React.Fragment>
             ))}
@@ -273,88 +274,137 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
           <div className="flex-1"></div>
 
           {/* CLONE & CODESPACE BUTTON */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={async () => {
-                // provision codespace
-                try {
-                  const { url } = await api.workspaces.start(
-                    `codespace-${repo.id}`,
-                    repo.id,
-                  );
-                  window.open(url, "_blank");
-                } catch (e) {
-                  alert("Provisioning failed. Check Docker status.");
-                }
-              }}
-              className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-xs font-bold text-emerald-500 hover:border-emerald-500/50 transition-all flex items-center gap-2"
-            >
+          <button
+            onClick={async () => {
+              try {
+                const { url } = await api.workspaces.start(
+                  `live-${repo.id}`,
+                  repo.id,
+                  { liveSync: true }
+                );
+                window.open(url, "_blank");
+              } catch (e) {
+                alert("Live Sync initialization failed.");
+              }
+            }}
+            className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-xs font-bold text-amber-500 hover:border-amber-500/50 transition-all flex items-center gap-2"
+            title="Edit in Cloud IDE with automatic repo syncing"
+          >
+            <span className="material-symbols-outlined !text-[16px]">
+              sync_saved_locally
+            </span>
+            Live Sync
+          </button>
+
+          <button
+            onClick={() => {
+              const cloneUrl = `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`;
+              const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(cloneUrl)}`;
+              window.location.href = vscodeUri;
+            }}
+            className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-xs font-bold text-blue-400 hover:border-blue-400/50 transition-all flex items-center gap-2"
+            title="Open in your local VS Code application"
+          >
+            <span className="material-symbols-outlined !text-[16px]">
+              terminal
+            </span>
+            VS Code
+          </button>
+
+          <button
+            onClick={async () => {
+              // provision codespace
+              try {
+                const { url } = await api.workspaces.start(
+                  `codespace-${repo.id}`,
+                  repo.id,
+                );
+                window.open(url, "_blank");
+              } catch (e) {
+                alert("Provisioning failed. Check Docker status.");
+              }
+            }}
+            className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-xs font-bold text-emerald-500 hover:border-emerald-500/50 transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[16px]">
+              bolt
+            </span>
+            Codespace
+          </button>
+
+          <div className="relative group">
+            <button className="bg-primary text-white px-3 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 hover:bg-opacity-90 transition-all shadow-sm">
+              Code
               <span className="material-symbols-outlined !text-[16px]">
-                bolt
+                arrow_drop_down
               </span>
-              Codespace
             </button>
 
-            <div className="relative group">
-              <button className="bg-primary text-white px-3 py-1.5 rounded-md text-sm font-bold flex items-center gap-2 hover:bg-opacity-90 transition-all shadow-sm">
-                Code
-                <span className="material-symbols-outlined !text-[16px]">
-                  arrow_drop_down
+            <div className="absolute right-0 top-full mt-2 w-80 bg-gh-bg-secondary border border-gh-border rounded-md shadow-xl p-4 hidden group-hover:block z-50">
+              <div className="flex items-center gap-2 border-b border-gh-border pb-2 mb-3">
+                <span className="material-symbols-outlined text-gh-text-secondary">
+                  terminal
                 </span>
-              </button>
+                <h4 className="font-bold text-sm">Clone</h4>
+              </div>
 
-              <div className="absolute right-0 top-full mt-2 w-80 bg-gh-bg-secondary border border-gh-border rounded-md shadow-xl p-4 hidden group-hover:block z-50">
-                <div className="flex items-center gap-2 border-b border-gh-border pb-2 mb-3">
-                  <span className="material-symbols-outlined text-gh-text-secondary">
-                    terminal
-                  </span>
-                  <h4 className="font-bold text-sm">Clone</h4>
-                </div>
-
-                <div className="text-xs text-gh-text-secondary mb-2">HTTPS</div>
-                <div className="flex items-center gap-0 border border-gh-border rounded-md overflow-hidden bg-gh-bg">
-                  <input
-                    readOnly
-                    aria-label="Clone URL"
-                    title="Repository Clone URL"
-                    value={`${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`}
-                    className="flex-1 bg-transparent px-2 py-1.5 text-xs font-mono outline-none text-gh-text select-all"
-                  />
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(
-                        `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`,
-                      )
-                    }
-                    className="px-2 py-1.5 hover:bg-gh-bg-tertiary border-l border-gh-border"
-                    title="Copy to clipboard"
-                  >
-                    <span className="material-symbols-outlined !text-[14px]">
-                      content_copy
-                    </span>
-                  </button>
-                </div>
-
+              <div className="text-xs text-gh-text-secondary mb-2">HTTPS</div>
+              <div className="flex items-center gap-0 border border-gh-border rounded-md overflow-hidden bg-gh-bg">
+                <input
+                  readOnly
+                  aria-label="Clone URL"
+                  title="Repository Clone URL"
+                  value={`${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`}
+                  className="flex-1 bg-transparent px-2 py-1.5 text-xs font-mono outline-none text-gh-text select-all"
+                />
                 <button
-                  onClick={async () => {
-                    try {
-                      const { url } = await api.workspaces.start(
-                        `codespace-${repo.id}`,
-                        repo.id,
-                      );
-                      window.open(url, "_blank");
-                    } catch (e) {
-                      alert("Provisioning failed.");
-                    }
-                  }}
-                  className="w-full mt-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`,
+                    )
+                  }
+                  className="px-2 py-1.5 hover:bg-gh-bg-tertiary border-l border-gh-border"
+                  title="Copy to clipboard"
                 >
-                  <span className="material-symbols-outlined !text-[16px]">
-                    add_box
+                  <span className="material-symbols-outlined !text-[14px]">
+                    content_copy
                   </span>
-                  Create codespace on main
                 </button>
               </div>
+
+              <button
+                onClick={async () => {
+                  try {
+                    const { url } = await api.workspaces.start(
+                      `codespace-${repo.id}`,
+                      repo.id,
+                    );
+                    window.open(url, "_blank");
+                  } catch (e) {
+                    alert("Provisioning failed.");
+                  }
+                }}
+                className="w-full mt-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined !text-[16px]">
+                  add_box
+                </span>
+                Create codespace on main
+              </button>
+
+              <button
+                onClick={() => {
+                  const cloneUrl = `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`;
+                  const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(cloneUrl)}`;
+                  window.location.href = vscodeUri;
+                }}
+                className="w-full mt-2 py-2 bg-[#2d2d2d] hover:bg-[#3d3d3d] text-[#cccccc] rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-gh-border"
+              >
+                <span className="material-symbols-outlined !text-[16px]">
+                  open_in_new
+                </span>
+                Open with VS Code Desktop
+              </button>
             </div>
           </div>
         </div>

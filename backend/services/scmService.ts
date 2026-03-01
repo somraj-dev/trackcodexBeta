@@ -57,6 +57,43 @@ export class SCMService {
   }
 
   /**
+   * Imports an external repository via clone.
+   */
+  static async importRepository(data: {
+    id: string;
+    sourceUrl: string;
+    sourceUsername?: string;
+    sourceToken?: string;
+  }): Promise<boolean> {
+    console.log(`📡 SCM [Native]: Importing repository from ${data.sourceUrl}...`);
+
+    const repoPath = gitServer.getRepoPath(data.id);
+
+    // Construct authenticated URL if credentials provided
+    let cloneUrl = data.sourceUrl;
+    if (data.sourceUsername && data.sourceToken) {
+      try {
+        const url = new URL(data.sourceUrl);
+        url.username = data.sourceUsername;
+        url.password = data.sourceToken;
+        cloneUrl = url.toString();
+      } catch (e) {
+        console.warn("Invalid source URL for credential injection, using raw URL");
+      }
+    }
+
+    try {
+      // Run git clone --bare <url> <path>
+      await gitServer.spawnGit(["clone", "--bare", cloneUrl, repoPath], process.cwd());
+      console.log(`✅ SCM [Native]: Successfully imported to ${repoPath}`);
+      return true;
+    } catch (e) {
+      console.error("❌ SCM [Native]: Import failed", e);
+      return false;
+    }
+  }
+
+  /**
    * Sync logic for Pull Requests (now powered by native git state)
    */
   static async syncPullRequests(repoId: string) {

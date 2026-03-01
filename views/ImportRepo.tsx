@@ -28,13 +28,13 @@ const ImportRepo: React.FC = () => {
   // Mock owners for the demo/UI based on screenshots
   const owners: Owner[] = [
     {
-      id: "personal",
+      id: user?.id || "personal",
       name: user?.username || "Quantaforge-trackcodex",
       type: "PERSONAL",
       avatar: user?.avatar || `https://ui-avatars.com/api/?name=${user?.username || 'U'}&background=random`,
     },
     {
-      id: "org1",
+      id: "quantaforze", // Static org ID for demo/default
       name: "quantaforze",
       type: "ORG",
       avatar: "https://github.com/quantaforze.png",

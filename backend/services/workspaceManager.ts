@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { execSync } from "child_process";
+import { AutoSyncService } from "./autoSyncService";
 
 // OpenVSCode Server URL (Docker service on port 8080)
 const OPENVSCODE_URL = process.env.OPENVSCODE_URL || "http://localhost:8080";
@@ -17,7 +18,7 @@ export class WorkspaceManager {
    */
   static async startWorkspace(
     workspaceId: string,
-    options?: { repoName?: string; cloneUrl?: string },
+    options?: { repoName?: string; cloneUrl?: string; liveSync?: boolean },
   ): Promise<{ url: string; port: number }> {
     try {
       const repoName = options?.repoName || workspaceId;
@@ -58,6 +59,11 @@ export class WorkspaceManager {
 
       console.warn(`[WorkspaceManager] IDE URL: ${url}`);
 
+      // Start Auto-Sync if requested
+      if (options?.liveSync) {
+        AutoSyncService.start(workspacePath, workspaceId);
+      }
+
       return { url, port: 8080 };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
@@ -70,6 +76,7 @@ export class WorkspaceManager {
   }
 
   static async stopWorkspace(workspaceId: string) {
+    AutoSyncService.stop(workspaceId);
     console.warn(`[WorkspaceManager] Stopped tracking workspace ${workspaceId}`);
   }
 }

@@ -72,8 +72,15 @@ const VSCodeWorkspaceView: React.FC = () => {
             // Start workspace — pass repoId so backend clones from remote
             let url = "http://localhost:8080";
             try {
+                const searchParams = new URLSearchParams(window.location.search);
+                const isLiveSync = searchParams.get("liveSync") === "true";
+                const repoId = searchParams.get("repoId") || id;
+
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const data = await api.post<any>(`/workspaces/${id}/start`, { repoId: id });
+                const data = await api.post<any>(`/workspaces/${id}/start`, {
+                    repoId,
+                    liveSync: isLiveSync
+                });
                 url = data.url || "http://localhost:8080";
             } catch (err) {
                 console.warn("Workspace start API returned error, using default VS Code Web URL", err);
@@ -188,9 +195,21 @@ const VSCodeWorkspaceView: React.FC = () => {
             />
 
             {/* Floating workspace badge */}
-            <div className="absolute top-3 right-3 bg-[#1e1e1e]/80 backdrop-blur-sm border border-[#3c3c3c] rounded-lg px-3 py-1.5 flex items-center gap-2 z-20 pointer-events-none">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-[11px] text-[#858585]">{workspaceName}</span>
+            <div className="absolute top-3 right-3 flex items-center gap-2 z-20">
+                {new URLSearchParams(window.location.search).get("liveSync") === "true" && (
+                    <div className="bg-amber-500/10 backdrop-blur-sm border border-amber-500/30 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-amber-500 !text-[14px] animate-pulse">
+                            sync
+                        </span>
+                        <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+                            Live Sync Active
+                        </span>
+                    </div>
+                )}
+                <div className="bg-[#1e1e1e]/80 backdrop-blur-sm border border-[#3c3c3c] rounded-lg px-3 py-1.5 flex items-center gap-2 pointer-events-none">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="text-[11px] text-[#858585] font-medium">{workspaceName}</span>
+                </div>
             </div>
         </div>
     );

@@ -161,6 +161,14 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           },
         });
 
+        // Initialize physical Git repository
+        await SCMService.createRepository({
+          id: repoData.id,
+          name: repoData.name,
+          description: repoData.description || undefined,
+          techStack: repoData.language || undefined,
+        });
+
         // Audit Log for Repo Creation
         await AuditService.log({
           enterpriseId: (request.user as any).enterpriseId || undefined,
@@ -219,6 +227,16 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             stars: 0,
             forksCount: 0,
           },
+        });
+
+        // Trigger physical import (clone) asynchronously
+        SCMService.importRepository({
+          id: repoData.id,
+          sourceUrl,
+          sourceUsername,
+          sourceToken,
+        }).catch(err => {
+          console.error(`[Import] Failed to import repository ${repoData.id}:`, err);
         });
 
         // Audit Log for Repo Import

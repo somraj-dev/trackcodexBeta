@@ -104,8 +104,8 @@ const CreateWorkspaceView = () => {
       // Get current user ID
       let ownerId: string | undefined;
       try {
-        const me = await api.auth.getMe();
-        ownerId = me?.id || me?.userId;
+        const me = await api.auth.getMe() as any;
+        ownerId = me?.user?.id || me?.user?.userId;
       } catch {
         // If not logged in, backend will use first user as fallback
       }

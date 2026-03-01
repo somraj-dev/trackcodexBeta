@@ -171,7 +171,8 @@ const ProfileView = () => {
     const syncProfile = async () => {
       setIsSyncing(true);
       try {
-        const backendProfile = await api.auth.getMe();
+        const me = await api.auth.getMe() as any;
+        const backendProfile = me?.user;
         if (backendProfile) {
           profileService.updateProfile({
             id: backendProfile.id,
