@@ -28,21 +28,33 @@ export async function verifyGitAuth(req: FastifyRequest, reply: FastifyReply) {
   }
 
   // 4. Verify Password (or PAT in future)
-  const valid = await bcrypt.compare(password, user.passwordHash);
+  const valid = await bcrypt.compare(password, user.password || "");
   if (!valid) {
     // TODO: Check Personal Access Tokens table
     return reply.status(401).send("Invalid credentials");
   }
 
   // 5. Check Repo Permissions
-  const { repoId } = req.params as any;
-  // Map repoId (slug) to DB ID if needed, or assume slug matching
-  // For Native Git, we might use "owner/repo" in URL, but current route is /:repoId.git
-  // We assume repoId IS the slug or ID.
+  const { owner, repo: repoName, repoId } = req.params as any;
 
-  const repo = await prisma.repository.findFirst({
-    where: { OR: [{ id: repoId }, { name: repoId }] }, // Simple lookup
-  });
+  let repo;
+  if (owner && repoName) {
+    // Lookup by owner username and repo name
+    const ownerUser = await prisma.user.findUnique({ where: { username: owner } });
+    if (!ownerUser) return reply.status(404).send("Owner not found");
+
+    repo = await prisma.repository.findFirst({
+      where: {
+        name: repoName,
+        ownerId: ownerUser.id
+      }
+    });
+  } else {
+    // Legacy/ID-based lookup
+    repo = await prisma.repository.findFirst({
+      where: { OR: [{ id: repoId }, { name: repoId }] },
+    });
+  }
 
   if (!repo) {
     return reply.status(404).send("Repository not found");

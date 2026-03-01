@@ -298,7 +298,8 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
 
           <button
             onClick={() => {
-              const cloneUrl = `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`;
+              const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
+              const cloneUrl = repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
               const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(cloneUrl)}`;
               window.location.href = vscodeUri;
             }}
@@ -354,15 +355,18 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                   readOnly
                   aria-label="Clone URL"
                   title="Repository Clone URL"
-                  value={`${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`}
+                  value={(() => {
+                    const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
+                    return repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
+                  })()}
                   className="flex-1 bg-transparent px-2 py-1.5 text-xs font-mono outline-none text-gh-text select-all"
                 />
                 <button
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`,
-                    )
-                  }
+                  onClick={() => {
+                    const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
+                    const cloneUrl = repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
+                    navigator.clipboard.writeText(cloneUrl);
+                  }}
                   className="px-2 py-1.5 hover:bg-gh-bg-tertiary border-l border-gh-border"
                   title="Copy to clipboard"
                 >
@@ -394,7 +398,8 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
 
               <button
                 onClick={() => {
-                  const cloneUrl = `${window.location.protocol}//${window.location.host}/git/${repo.name || repo.id}.git`;
+                  const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
+                  const cloneUrl = repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
                   const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(cloneUrl)}`;
                   window.location.href = vscodeUri;
                 }}

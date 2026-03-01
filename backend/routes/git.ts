@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { GitServer } from "../services/git/gitServer";
 import { verifyGitAuth } from "../middleware/gitAuth";
 
@@ -6,27 +6,55 @@ const gitServer = new GitServer();
 
 export default async function (server: FastifyInstance) {
   // Discovery
-  server.get(
-    "/:repoId.git/info/refs",
-    { preHandler: verifyGitAuth },
-    async (req, reply) => {
-      const { repoId } = req.params as any;
-      return gitServer.handleInfoRefs(req, reply, repoId);
-    },
-  );
+  const refsPath = "/:repoId.git/info/refs";
+  const slugRefsPath = "/:owner/:repo.git/info/refs";
+
+  const handleRefs = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { repoId, owner, repo } = req.params as any;
+    let actualRepoId = repoId;
+
+    if (owner && repo) {
+      const { prisma } = await import("../services/prisma");
+      const ownerUser = await prisma.user.findUnique({ where: { username: owner } });
+      const repository = await prisma.repository.findFirst({
+        where: { name: repo, ownerId: ownerUser?.id }
+      });
+      actualRepoId = repository?.id;
+    }
+
+    if (!actualRepoId) return reply.status(404).send("Repository not found");
+    return gitServer.handleInfoRefs(req, reply, actualRepoId);
+  };
+
+  server.get(refsPath, { preHandler: verifyGitAuth }, handleRefs);
+  server.get(slugRefsPath, { preHandler: verifyGitAuth }, handleRefs);
 
   // Services (Fetch/Push)
-  server.post(
-    "/:repoId.git/:service",
-    { preHandler: verifyGitAuth },
-    async (req, reply) => {
-      const { repoId, service } = req.params as any;
-      return gitServer.handleService(req, reply, repoId, service);
-    },
-  );
+  const servicePath = "/:repoId.git/:service";
+  const slugServicePath = "/:owner/:repo.git/:service";
+
+  const handleService = async (req: FastifyRequest, reply: FastifyReply) => {
+    const { repoId, owner, repo, service } = req.params as any;
+    let actualRepoId = repoId;
+
+    if (owner && repo) {
+      const { prisma } = await import("../services/prisma");
+      const ownerUser = await prisma.user.findUnique({ where: { username: owner } });
+      const repository = await prisma.repository.findFirst({
+        where: { name: repo, ownerId: ownerUser?.id }
+      });
+      actualRepoId = repository?.id;
+    }
+
+    if (!actualRepoId) return reply.status(404).send("Repository not found");
+    return gitServer.handleService(req, reply, actualRepoId, service);
+  };
+
+  server.post(servicePath, { preHandler: verifyGitAuth }, handleService);
+  server.post(slugServicePath, { preHandler: verifyGitAuth }, handleService);
   // Internal Hooks (Called by local git hooks)
   server.post("/internal/hooks/pre-receive", async (req, reply) => {
-    const { repoId, oldrev, newrev, refname } = req.body as any;
+    const { repoId, newrev } = req.body as any;
 
     // 1. Allow branch deletion (newrev=0000...)
     if (newrev.startsWith("0000")) return { status: "ok" };
@@ -74,7 +102,7 @@ export default async function (server: FastifyInstance) {
           );
       }
 
-      const keys = await prisma.userKey.findMany({
+      const keys = await prisma.gPGKey.findMany({
         where: { userId: user.id },
       });
       if (keys.length === 0) {

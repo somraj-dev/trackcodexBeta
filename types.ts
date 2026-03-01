@@ -112,6 +112,8 @@ export interface Repository {
   readme?: string;
   githubId?: number;
   htmlUrl?: string;
+  cloneUrl?: string;
+  sshUrl?: string;
   languages?: LanguageDist[];
   refactors?: RepoRefactor[];
   contributors?: string[];

@@ -90,6 +90,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           }
         },
         include: {
+          owner: { select: { id: true, username: true, avatar: true } },
           org: true,
           securityAlerts: true,
           aiTasks: true,
@@ -124,6 +125,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       const repo = await prisma.repository.findUnique({
         where: { id },
         include: {
+          owner: { select: { id: true, username: true, avatar: true } },
           org: true,
           securityAlerts: true,
           aiTasks: true,
@@ -148,6 +150,9 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       if (!name) throw BadRequest("Repository name is required");
 
       try {
+        const baseUrl = process.env.BACKEND_URL || "https://trackcodex.com";
+        const ownerUsername = user.username || "me";
+
         const repoData = await prisma.repository.create({
           data: {
             name,
@@ -158,6 +163,8 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             owner: { connect: { id: user.userId } },
             stars: 0,
             forksCount: 0,
+            cloneUrl: `${baseUrl}/git/${ownerUsername}/${name}.git`,
+            htmlUrl: `${baseUrl}/repo/${ownerUsername}/${name}`,
           },
         });
 
@@ -217,12 +224,16 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       if (!sourceUrl || !name) throw BadRequest("Source URL and repository name are required");
 
       try {
+        const baseUrl = process.env.BACKEND_URL || "https://trackcodex.com";
+        const ownerUsername = user.username || "me";
+
         const repoData = await prisma.repository.create({
           data: {
             name,
             description: `Imported from ${sourceUrl}`,
             isPublic: visibility === "PUBLIC",
-            cloneUrl: sourceUrl,
+            cloneUrl: `${baseUrl}/git/${ownerUsername}/${name}.git`,
+            htmlUrl: `${baseUrl}/repo/${ownerUsername}/${name}`,
             owner: { connect: { id: user.userId } },
             stars: 0,
             forksCount: 0,
