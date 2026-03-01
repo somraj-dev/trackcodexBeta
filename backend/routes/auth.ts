@@ -1185,6 +1185,55 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
     },
   );
+
+  // Synchronize Firebase User with PostgreSQL
+  fastify.post(
+    "/auth/sync",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const user = (request as any).user;
+
+      try {
+        let dbUser = await prisma.user.findUnique({
+          where: { id: user.userId }
+        });
+
+        if (!dbUser) {
+          const [newUser] = await prisma.$transaction([
+            prisma.user.create({
+              data: {
+                id: user.userId,
+                email: user.email || "",
+                username: user.username || `user_${user.userId.substring(0, 8)}`,
+                name: user.name || user.username || "TrackCodex User",
+                password: "", // Handled by Firebase
+                role: "user",
+              }
+            }),
+            prisma.outboxEvent.create({
+              data: {
+                topic: "user",
+                payload: {
+                  id: user.userId,
+                  email: user.email || "",
+                  username: user.username || `user_${user.userId.substring(0, 8)}`,
+                  name: user.name || user.username || "TrackCodex User",
+                  role: "user",
+                }
+              }
+            })
+          ]);
+          dbUser = newUser;
+        }
+
+        return { success: true, user: { id: dbUser.id, username: dbUser.username } };
+      } catch (error) {
+        request.log.error(error);
+        return reply.code(500).send({ error: "Failed to sync user" });
+      }
+    }
+  );
+
   // --- ORCID OAuth (Mocked for Demo - DISABLED in production) ---
   if (process.env.NODE_ENV === "development") {
     fastify.get("/auth/orcid", async (request, reply) => {

@@ -84,6 +84,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           const idToken = await firebaseUser.getIdToken();
 
+          // Sync user to PostgreSQL backend immediately
+          fetch(`${API_BASE_URL}/auth/sync`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${idToken}`,
+            },
+            credentials: "include"
+          }).catch((err) => console.error("Failed to sync user to database:", err));
+
           // Check provider data for GitHub/Google
           for (const providerData of firebaseUser.providerData) {
             if (providerData.providerId === "github.com") {
