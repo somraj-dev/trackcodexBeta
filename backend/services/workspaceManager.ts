@@ -12,7 +12,7 @@ const WORKSPACES_ROOT = path.join(process.cwd(), "workspaces");
 export class WorkspaceManager {
   /**
    * Start a workspace for a given repo.
-   * Clones the repo from Gitea if not already cloned, then
+   * Clones the repo from the remote source if not already cloned, then
    * returns the OpenVSCode Server URL pointing to the folder.
    */
   static async startWorkspace(
@@ -28,7 +28,7 @@ export class WorkspaceManager {
         fs.mkdirSync(WORKSPACES_ROOT, { recursive: true });
       }
 
-      // Clone from Gitea if folder doesn't exist yet
+      // Clone if folder doesn't exist yet
       if (!fs.existsSync(workspacePath) && options?.cloneUrl) {
         console.warn(`[WorkspaceManager] Cloning ${options.cloneUrl} → ${workspacePath}`);
         try {

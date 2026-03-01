@@ -43,11 +43,24 @@ export interface Workspace {
 
 export interface PullRequest {
   id: string;
-  number: string;
+  number: number | string;
   title: string;
-  status: "Open" | "Merged" | "Closed";
-  ciStatus: "Failing" | "Passing" | "None";
-  author: string;
+  body?: string;
+  status: "Open" | "Merged" | "Closed" | string;
+  ciStatus?: "Failing" | "Passing" | "None" | string;
+  author: {
+    id: string;
+    username: string;
+    avatar?: string;
+  } | string;
+  base?: string;
+  head?: string;
+  createdAt?: string | Date;
+  diffStats?: {
+    additions: number;
+    deletions: number;
+    changedFiles: number;
+  };
 }
 
 export interface AITask {

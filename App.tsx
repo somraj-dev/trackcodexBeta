@@ -108,10 +108,8 @@ const WorkspacesView = React.lazy(() => import("./views/Workspaces"));
 const CreateWorkspaceView = React.lazy(() => import("./views/CreateWorkspace"));
 const PublicProfile = React.lazy(() => import("./views/PublicProfile"));
 const Portfolio = React.lazy(() => import("./views/Portfolio"));
-// const WorkspaceDetailView = React.lazy(
-//   () => import("./views/WorkspaceDetailView"),
-// );
-import WorkspaceIDE from "./views/ide/VSCodeWorkspaceView"; // OpenVSCode Server IDE Integration
+const ReviewMode = React.lazy(() => import("./views/ReviewMode"));
+const VSCodeWorkspaceView = React.lazy(() => import("./views/ide/VSCodeWorkspaceView"));
 const HomeView = React.lazy(() => import("./views/Home"));
 const ExploreView = React.lazy(() => import("./views/Explore"));
 const LibraryView = React.lazy(() => import("./views/Library"));
@@ -905,11 +903,13 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
               <Route path="/workspaces" element={<WorkspacesView />} />
               <Route path="/community" element={<CommunityView />} />
               <Route path="/workspace/new" element={<CreateWorkspaceView />} />
-              <Route path="/workspace/:id" element={<WorkspaceIDE />} />
-              <Route path="/workspace/:id/ide" element={<WorkspaceIDE />} />
+              <Route path="/workspace/:id" element={<VSCodeWorkspaceView />} />
+              <Route path="/workspace/:id/ide" element={<VSCodeWorkspaceView />} />
               <Route path="/repositories" element={<RepositoriesView />} />
               <Route path="/repositories/new" element={<CreateRepoView />} />
               <Route path="/repositories/import" element={<ImportRepoView />} />
+              <Route path="/repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
+              <Route path="/repositories/:id/pulls/:number" element={<ReviewMode />} />
               <Route path="/repo/:id/*" element={<RepoDetailView />} />
               <Route
                 path="/repositories/:id/discussions/:number"

@@ -117,6 +117,11 @@ export const api = {
         method: "PATCH",
         body: JSON.stringify({ status }),
       }),
+    start: (id: string, repoId?: string) =>
+      request<{ url: string; port: number }>(`/workspaces/${id}/start`, {
+        method: "POST",
+        body: JSON.stringify({ repoId }),
+      }),
     delete: (id: string) =>
       request<void>(`/workspaces/${id}`, { method: "DELETE" }),
   },
@@ -166,6 +171,17 @@ export const api = {
       request<any[]>(
         `/repositories/${id}/contents?path=${encodeURIComponent(path)}&ref=${ref}`,
       ),
+    createFile: (id: string, data: {
+      path: string,
+      content: string,
+      message?: string,
+      branch?: string,
+      sha?: string
+    }) =>
+      request<any>(`/repositories/${id}/contents`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     getContent: (id: string, path: string, ref: string = "HEAD") =>
       request<any>(
         `/repositories/${id}/content?path=${encodeURIComponent(path)}&ref=${ref}`,

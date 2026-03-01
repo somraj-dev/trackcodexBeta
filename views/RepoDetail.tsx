@@ -30,6 +30,7 @@ const RepoDetailView = () => {
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
   const [isForking, setIsForking] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [ciStatus, setCiStatus] = useState<{ status: string; conclusion: string } | null>(null);
 
   // Deep linking for Code Viewer
   useEffect(() => {
@@ -101,6 +102,16 @@ const RepoDetailView = () => {
           throw new Error("No repository ID or owner/name provided in URL");
         }
         setRepo(data);
+
+        // Fetch CI status
+        try {
+          const runs = await api.ciRuns.list(data.id);
+          if (runs && runs.length > 0) {
+            setCiStatus({ status: runs[0].status, conclusion: runs[0].conclusion });
+          }
+        } catch (ciErr) {
+          console.warn("Failed to fetch CI status", ciErr);
+        }
       } catch (err) {
         console.error("Failed to fetch repo detail", err);
         // We could still fallback to mock here if we want, but the goal is production-ready
@@ -228,6 +239,23 @@ const RepoDetailView = () => {
                 <span className="px-2 py-0.5 rounded-full border border-gh-border text-[12px] font-medium text-gh-text-secondary capitalize bg-transparent ml-2">
                   {repo.visibility?.toLowerCase() || "public"}
                 </span>
+
+                {ciStatus && (
+                  <div
+                    title={`CI/CD: ${ciStatus.status} (${ciStatus.conclusion || 'running'})`}
+                    className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold border ml-3 transition-all ${ciStatus.conclusion === 'success'
+                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                      : ciStatus.conclusion === 'failure'
+                        ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                        : 'bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse'
+                      }`}
+                  >
+                    <span className="material-symbols-outlined !text-[14px]">
+                      {ciStatus.conclusion === 'success' ? 'check_circle' : ciStatus.conclusion === 'failure' ? 'cancel' : 'sync'}
+                    </span>
+                    {ciStatus.conclusion === 'success' ? 'Pass' : ciStatus.conclusion === 'failure' ? 'Fail' : 'CI Running'}
+                  </div>
+                )}
               </div>
             </div>
 

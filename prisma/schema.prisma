@@ -318,8 +318,9 @@ model Repository {
   openIssuesCount Int       @default(0)
   lastSyncAt      DateTime?
 
-  // Gitea Self-Hosting Integration
-  giteaId  Int?
+  // Repository Integration
+  githubId String? @unique // Using String for flexibility with GitHub IDs
+  htmlUrl  String?
   cloneUrl String?
   sshUrl   String?
 

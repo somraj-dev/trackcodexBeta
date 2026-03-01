@@ -69,7 +69,7 @@ const VSCodeWorkspaceView: React.FC = () => {
                 }
             }
 
-            // Start workspace — pass repoId so backend clones from Gitea
+            // Start workspace — pass repoId so backend clones from remote
             let url = "http://localhost:8080";
             try {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

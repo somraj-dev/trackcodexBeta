@@ -277,8 +277,6 @@ model Repository {
   openIssuesCount Int       @default(0)
   lastSyncAt      DateTime?
 
-  // Gitea Self-Hosting Integration
-  giteaId  Int?
   cloneUrl String?
   sshUrl   String?
 

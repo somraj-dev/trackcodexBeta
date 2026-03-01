@@ -20,12 +20,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
-        "/gitea": {
-          target: "http://127.0.0.1:3000",
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path: string) => path.replace(/^\/gitea/, ""),
-        },
       },
       // Serve the OAuth bridge page for callback paths
       // Google/GitHub redirect to /auth/callback/google (no #), this rewrites

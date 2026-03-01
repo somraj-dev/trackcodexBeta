@@ -52,36 +52,34 @@ export class GitHubService {
       const existingRepo = await prisma.repository.findFirst({
         where: {
           OR: [
-            { githubId: repo.id },
-            { name: repo.name, orgId: null }, // Fallback for legacy
+            { githubId: repo.id.toString() },
+            { name: repo.name, orgId: null },
           ],
         },
       });
 
       const upserted = await prisma.repository.upsert({
         where: {
-          id: existingRepo?.id || "new-id-placeholder", // Upsert requires unique where, using fallback ID trick or better: findFirst checks
+          id: existingRepo?.id || "new-id-placeholder",
         },
-        // Actually, upsert works best on unique constraints.
-        // Our 'githubId' is unique. Let's use that if possible.
-        // If not, we use 'create' and 'update' manually to be safe with UUIDs.
         create: {
           name: repo.name,
           description: repo.description,
           isPublic: !repo.private,
           stars: repo.stargazers_count,
-          forks: repo.forks_count,
+          forksCount: repo.forks_count,
           language: repo.language,
-          githubId: repo.id,
+          githubId: repo.id.toString(),
           htmlUrl: repo.html_url,
           settings: { defaultBranch: repo.default_branch } as any,
+          owner: { connect: { id: userId } },
           updatedAt: new Date(repo.updated_at || Date.now()),
         },
         update: {
           description: repo.description,
           isPublic: !repo.private,
           stars: repo.stargazers_count,
-          forks: repo.forks_count,
+          forksCount: repo.forks_count,
           language: repo.language,
           htmlUrl: repo.html_url,
           updatedAt: new Date(repo.updated_at || Date.now()),
@@ -97,5 +95,232 @@ export class GitHubService {
     // So we can use upsert using githubId.
 
     return syncedRepos;
+  }
+
+  /**
+   * Get an authenticated Octokit instance for a user
+   */
+  static async getOctokit(userId: string): Promise<Octokit> {
+    const oauthAccount = await prisma.oAuthAccount.findFirst({
+      where: { userId, provider: "github" },
+    });
+
+    if (!oauthAccount || !oauthAccount.accessToken) {
+      throw new Error("GitHub account not linked");
+    }
+
+    return new Octokit({
+      auth: decrypt(oauthAccount.accessToken),
+    });
+  }
+
+  /**
+   * Get contents of a directory or file
+   */
+  static async getContents(
+    userId: string,
+    owner: string,
+    repo: string,
+    path: string = "",
+    ref: string = "main",
+  ): Promise<any> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+      ref,
+    });
+    return data;
+  }
+
+  /**
+   * Get raw file content
+   */
+  static async getFileContent(
+    userId: string,
+    owner: string,
+    repo: string,
+    path: string,
+    ref: string = "main",
+  ): Promise<string> {
+    const octokit = await this.getOctokit(userId);
+    const { data }: any = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+      ref,
+      headers: { accept: "application/vnd.github.v3.raw" },
+    });
+    return typeof data === "string" ? data : JSON.stringify(data);
+  }
+
+  /**
+   * Create or update a file
+   */
+  static async createOrUpdateFile(
+    userId: string,
+    owner: string,
+    repo: string,
+    path: string,
+    options: {
+      content: string,
+      message: string,
+      branch?: string,
+      sha?: string, // Required for updates
+    }
+  ): Promise<any> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.repos.createOrUpdateFileContents({
+      owner,
+      repo,
+      path,
+      message: options.message,
+      content: Buffer.from(options.content).toString("base64"),
+      branch: options.branch,
+      sha: options.sha,
+    });
+    return data;
+  }
+
+  /**
+   * List branches
+   */
+  static async getBranches(
+    userId: string,
+    owner: string,
+    repo: string,
+  ): Promise<string[]> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.repos.listBranches({
+      owner,
+      repo,
+    });
+    return data.map(b => b.name);
+  }
+
+  /**
+   * List Pull Requests
+   */
+  static async listPullRequests(
+    userId: string,
+    owner: string,
+    repo: string,
+    status: "open" | "closed" | "all" = "open"
+  ): Promise<any[]> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.pulls.list({
+      owner,
+      repo,
+      state: status,
+    });
+    return data;
+  }
+
+  /**
+   * Create Pull Request
+   */
+  static async createPullRequest(
+    userId: string,
+    owner: string,
+    repo: string,
+    options: {
+      title: string,
+      head: string,
+      base: string,
+      body?: string,
+      draft?: boolean
+    }
+  ): Promise<any> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.pulls.create({
+      owner,
+      repo,
+      title: options.title,
+      head: options.head,
+      base: options.base,
+      body: options.body,
+      draft: options.draft,
+    });
+    return data;
+  }
+
+  /**
+   * Get PR Diff
+   */
+  static async getPullRequestDiff(
+    userId: string,
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Promise<string> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.pulls.get({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      headers: { accept: "application/vnd.github.v3.diff" },
+    });
+    return data as any as string;
+  }
+
+  /**
+   * Merge Pull Request
+   */
+  static async mergePullRequest(
+    userId: string,
+    owner: string,
+    repo: string,
+    pullNumber: number,
+    commitMessage?: string
+  ): Promise<any> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.pulls.merge({
+      owner,
+      repo,
+      pull_number: pullNumber,
+      commit_message: commitMessage,
+    });
+    return data;
+  }
+
+  /**
+   * List Issues
+   */
+  static async listIssues(
+    userId: string,
+    owner: string,
+    repo: string,
+    status: "open" | "closed" | "all" = "open"
+  ): Promise<any[]> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.issues.listForRepo({
+      owner,
+      repo,
+      state: status,
+    });
+    return data;
+  }
+
+  /**
+   * Create Issue
+   */
+  static async createIssue(
+    userId: string,
+    owner: string,
+    repo: string,
+    title: string,
+    body?: string,
+    labels?: string[]
+  ): Promise<any> {
+    const octokit = await this.getOctokit(userId);
+    const { data } = await octokit.issues.create({
+      owner,
+      repo,
+      title,
+      body,
+      labels,
+    });
+    return data;
   }
 }

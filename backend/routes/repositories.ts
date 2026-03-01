@@ -181,76 +181,6 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           { repoId: repoData.id }
         );
 
-        // Create real Git repository in Gitea
-        try {
-          const { GiteaService } = await import("../services/giteaService");
-
-          // Fetch the actual username from DB (session only has userId, not username)
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.userId },
-            select: { email: true, username: true },
-          });
-          const ownerUsername = dbUser?.username;
-
-          if (!ownerUsername) {
-            request.log.warn(`[Gitea] No username found for userId=${user.userId}, skipping Gitea sync`);
-          } else {
-            // Sanitize repo name for Gitea (no spaces, lowercase)
-            const giteaRepoName = name
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9._-]/g, "")
-              .replace(/-+/g, "-")
-              .replace(/^-|-$/g, "");
-
-            request.log.info(`[Gitea] Syncing: user="${ownerUsername}", repo="${name}" -> "${giteaRepoName}"`);
-
-            // Ensure the user exists in Gitea
-            const giteaUser = await GiteaService.getUser(ownerUsername);
-            if (!giteaUser) {
-              request.log.info(`[Gitea] Creating user "${ownerUsername}" in Gitea...`);
-              await GiteaService.createUser(
-                dbUser.email,
-                ownerUsername,
-                "trackcodex-default-" + Date.now(),
-              );
-            }
-
-            // Create the repository
-            const giteaRepo = await GiteaService.createRepo(
-              ownerUsername,
-              giteaRepoName,
-              description,
-              !isPublic,
-            );
-            request.log.info(`[Gitea] Repo created! clone_url=${giteaRepo.clone_url}`);
-
-            // Store Gitea clone URLs and ID in the DB record
-            await prisma.repository.update({
-              where: { id: repoData.id },
-              data: {
-                cloneUrl: giteaRepo.clone_url,
-                sshUrl: giteaRepo.ssh_url,
-                giteaId: giteaRepo.id,
-              },
-            });
-
-            // Auto-register a webhook
-            const backendUrl = process.env.GITEA_WEBHOOK_URL || "http://host.docker.internal:4000";
-            await GiteaService.createWebhook(
-              ownerUsername,
-              giteaRepoName,
-              `${backendUrl}/api/v1/webhooks/gitea/push`,
-              ["push"],
-            ).catch((webhookErr: any) =>
-              request.log.warn(`[Gitea] Webhook failed: ${webhookErr.message}`),
-            );
-          }
-        } catch (err: any) {
-          request.log.error(`[Gitea] FAILED: ${err.message}`);
-        }
-
-
         return repoData;
       } catch (error) {
         if (error instanceof AppError) throw error;
@@ -300,57 +230,6 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           details: { name, sourceUrl, visibility },
           ipAddress: request.ip,
         });
-
-        // Try to clone into Gitea if available
-        try {
-          const { GiteaService } = await import("../services/giteaService");
-
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.userId },
-            select: { email: true, username: true },
-          });
-          const ownerUsername = dbUser?.username;
-
-          if (ownerUsername) {
-            const giteaRepoName = name
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9._-]/g, "")
-              .replace(/-+/g, "-")
-              .replace(/^-|-$/g, "");
-
-            // Ensure user exists in Gitea
-            const giteaUser = await GiteaService.getUser(ownerUsername);
-            if (!giteaUser) {
-              await GiteaService.createUser(
-                dbUser.email,
-                ownerUsername,
-                "trackcodex-default-" + Date.now(),
-              );
-            }
-
-            // Create via migration endpoint (imports from external URL)
-            const giteaRepo = await GiteaService.createRepo(
-              ownerUsername,
-              giteaRepoName,
-              `Imported from ${sourceUrl}`,
-              visibility !== "PUBLIC",
-            );
-
-            await prisma.repository.update({
-              where: { id: repoData.id },
-              data: {
-                cloneUrl: giteaRepo.clone_url,
-                sshUrl: giteaRepo.ssh_url,
-                giteaId: giteaRepo.id,
-              },
-            });
-
-            request.log.info(`[Import] Repo "${name}" imported and synced to Gitea`);
-          }
-        } catch (err: any) {
-          request.log.warn(`[Import] Gitea sync skipped: ${err.message}`);
-        }
 
         return repoData;
       } catch (error) {
@@ -621,6 +500,42 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
     },
   );
 
+  // List Branches
+  fastify.get(
+    "/repositories/:id/branches",
+    { preHandler: requireRepoPermission(RepoLevel.READ) },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+
+      try {
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
+        });
+
+        if (!repo) throw NotFound("Repository not found");
+
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const branches = await GitHubService.getBranches(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name
+          );
+          return branches;
+        }
+
+        const { GitServer } = await import("../services/git/gitServer");
+        const gitServer = new GitServer();
+        const branches = await gitServer.listBranches(id);
+        return branches;
+      } catch (e: any) {
+        request.log.error(e);
+        return ["main", "master"]; // Fallback
+      }
+    }
+  );
+
   // Get Repository Contents (File Tree)
   fastify.get(
     "/repositories/:id/contents",
@@ -633,54 +548,115 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       };
 
       try {
-        const { GitServer } = await import("../services/git/gitServer");
-        const gitServer = new GitServer();
-
-        // 1. List files at path
-        const files = await gitServer.listFiles(
-          id,
-          ref || "HEAD",
-          filePath || "",
-        );
-
-        // 2. Format for UI (UniversalFileList)
-        const contents = files.map((f) => {
-          // Determine if it's a file or directory based on trailing slash or listing logic
-          // Isomorphic-git listFiles returns flat list, we need to process it to hierarchical or flat-level
-          // A simpler approach for now:
-          // If the path exactly matches, it's this file. If it starts with, it might be subfile.
-          // For a true "browse" experience, we need a smarter listFiles in GitServer that does `ls-tree`.
-
-          // REFACTOR: The `listFiles` in GitServer seems to return a flat list of ALL files.
-          // We need to filter for the current directory level.
-
-          return {
-            name: path.basename(f),
-            path: f,
-            type: "file", // Logic needed here for folders
-            size: 0,
-            sha: "unknown",
-          };
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
         });
 
-        // REVISIT: The current `GitServer.listFiles` is recursive.
-        // We need a non-recursive `ls-tree` for adequate browsing.
-        // For MVP, let's assume `listFiles` returns the full flat tree and we filter here?
-        // No, that's inefficient for huge repos.
-        // Let's rely on the existing GitServer behavior for now and refine if needed.
+        if (!repo) throw NotFound("Repository not found");
 
-        // BETTER APPROACH: Use `git ls-tree` directly via spawn in `GitServer` or here.
-        // But `GitServer` is the abstraction.
-        // Let's call a new method `lsTree` on GitServer (we'll add it next).
+        // If it's a GitHub repo, use GitHubService
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const contents = await GitHubService.getContents(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name,
+            filePath || "",
+            ref || (repo.settings as any)?.defaultBranch || "main"
+          );
+
+          // GitHub returns a single object if it's a file, or an array if it's a directory
+          if (Array.isArray(contents)) {
+            return contents.map((item: any) => ({
+              name: item.name,
+              path: item.path,
+              type: item.type === "dir" ? "dir" : "file",
+              size: item.size,
+              sha: item.sha,
+            }));
+          }
+          return contents;
+        }
+
+        const { GitServer } = await import("../services/git/gitServer");
+        const gitServer = new GitServer();
 
         const tree = await gitServer.lsTree(id, ref || "HEAD", filePath || "");
         return tree;
       } catch (e: any) {
         request.log.error(e);
-        // If repo is empty or HEAD missing, return empty list
         return [];
       }
     },
+  );
+
+  // Create or Update Repository Content (File)
+  fastify.post(
+    "/repositories/:id/contents",
+    { preHandler: requireRepoCapability("write_repo") },
+    async (request, reply) => {
+      const { id: repoId } = request.params as { id: string };
+      const { path: filePath, content, message, branch, sha } = request.body as {
+        path: string;
+        content: string; // Plain text
+        message?: string;
+        branch?: string;
+        sha?: string; // If provided, it's an update
+      };
+
+      if (!filePath || content === undefined) {
+        throw BadRequest("path and content are required");
+      }
+
+      const user = request.user!;
+
+      try {
+        const repo = await prisma.repository.findUnique({
+          where: { id: repoId },
+          include: { owner: true }
+        });
+
+        if (!repo || !repo.owner?.username) {
+          throw NotFound("Repository or owner not found");
+        }
+
+        // If it's a GitHub repo, use GitHubService
+        if (repo.githubId) {
+          const { GitHubService } = await import("../services/github");
+          const result = await GitHubService.createOrUpdateFile(
+            user.userId,
+            repo.owner.username,
+            repo.name,
+            filePath,
+            {
+              content,
+              message: message || (sha ? `Update ${filePath}` : `Create ${filePath}`),
+              branch: branch || (repo.settings as any)?.defaultBranch || "main",
+              sha,
+            }
+          );
+
+          // Audit Log
+          await AuditService.log({
+            actorId: user.userId,
+            action: sha ? "FILE_UPDATE" : "FILE_CREATE",
+            resource: `repo:${repoId}/file:${filePath}`,
+            details: { branch, provider: "github" },
+            ipAddress: request.ip,
+          });
+
+          return result;
+        }
+
+        // For non-GitHub repos, we fallback to local git server logic (if implemented)
+        // Currently, we don't have a direct "commit through API" for local git yet
+        throw BadRequest("Only GitHub repositories support web-based file editing currently.");
+      } catch (e: any) {
+        request.log.error(e);
+        throw InternalError(e.message || "Failed to manage repository content");
+      }
+    }
   );
 
   // Get File Content
@@ -697,7 +673,25 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       if (!filePath) throw BadRequest("File path is required");
 
       try {
-        const { GitServer } = await import("../services/git/gitServer");
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
+        });
+
+        if (!repo) throw NotFound("Repository not found");
+
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const content = await GitHubService.getFileContent(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name,
+            filePath,
+            ref || (repo.settings as any)?.defaultBranch || "main"
+          );
+          return { content, path: filePath, ref: ref || "HEAD" };
+        }
+
         const gitServer = new GitServer();
 
         const content = await gitServer.getFileContentByPath(
@@ -728,6 +722,39 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       const { status } = request.query as { status?: string };
 
       try {
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
+        });
+
+        if (!repo) throw NotFound("Repository not found");
+
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const prs = await GitHubService.listPullRequests(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name,
+            status as any || "open"
+          );
+          // Normalize GitHub PRs
+          return prs.map((pr: any) => ({
+            id: pr.node_id,
+            number: pr.number,
+            title: pr.title,
+            body: pr.body,
+            status: pr.state === "open" ? "OPEN" : "CLOSED",
+            author: {
+              username: pr.user?.login,
+              avatar: pr.user?.avatar_url
+            },
+            createdAt: pr.created_at,
+            mergedAt: pr.merged_at,
+            base: pr.base?.ref,
+            head: pr.head?.ref
+          }));
+        }
+
         const { PullRequestService } =
           await import("../services/pullRequestService");
         const prs = await PullRequestService.listPullRequests(id, status);
@@ -759,6 +786,24 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       }
 
       try {
+        const repo = await prisma.repository.findUnique({
+          where: { id: repoId },
+          include: { owner: true }
+        });
+
+        if (!repo) throw NotFound("Repository not found");
+
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const pr = await GitHubService.createPullRequest(
+            user.userId,
+            repo.owner.username,
+            repo.name,
+            { title, head, base, body, draft }
+          );
+          return pr;
+        }
+
         const { PullRequestService } =
           await import("../services/pullRequestService");
         const pr = await PullRequestService.createPullRequest(
@@ -1023,24 +1068,55 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
   // List Issues
   fastify.get(
     "/repositories/:id/issues",
-    { preHandler: requireAuth },
+    { preHandler: requireRepoPermission(RepoLevel.READ) },
     async (request, reply) => {
       const { id } = request.params as { id: string };
-      const { status, assignee, label, milestone } = request.query as {
-        status?: string;
-        assignee?: string;
-        label?: string;
-        milestone?: string;
-      };
+      const { status } = request.query as { status?: string };
 
       try {
-        const { IssueService } = await import("../services/issueService");
-        const issues = await IssueService.listIssues(id, {
-          status,
-          assignee,
-          label,
-          milestone,
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
         });
+
+        if (repo?.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          const issues = await GitHubService.listIssues(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name,
+            status as any || "open"
+          );
+          // Normalize GitHub Issues
+          return issues.map((issue: any) => ({
+            id: issue.node_id,
+            number: issue.number,
+            title: issue.title,
+            body: issue.body,
+            status: issue.state === "open" ? "OPEN" : "CLOSED",
+            author: {
+              username: issue.user?.login,
+              avatar: issue.user?.avatar_url
+            },
+            createdAt: issue.created_at,
+            labels: issue.labels?.map((l: any) => ({ name: l.name, color: `#${l.color}` }))
+          }));
+        }
+
+        const issues = await prisma.issue.findMany({
+          where: {
+            repoId: id,
+            ...(status && { status: status.toUpperCase() }),
+          },
+          include: {
+            author: true,
+            labels: true,
+            assignees: { include: { user: true } },
+            _count: { select: { comments: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
         return issues;
       } catch (e: any) {
         request.log.error(e);
@@ -1052,31 +1128,54 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
   // Create Issue
   fastify.post(
     "/repositories/:id/issues",
-    { preHandler: requireRepoCapability("read_repo") },
+    { preHandler: requireRepoCapability("write_repo") },
     async (request, reply) => {
       const { id: repoId } = request.params as { id: string };
       const user = request.user!;
-      const { title, body, assignees, labels, milestoneId } = request.body as {
+      const { title, body, labels } = request.body as {
         title: string;
         body?: string;
-        assignees?: string[];
         labels?: string[];
-        milestoneId?: string;
       };
 
       if (!title) throw BadRequest("title is required");
 
       try {
-        const { IssueService } = await import("../services/issueService");
-        const issue = await IssueService.createIssue(
-          repoId,
-          title,
-          body || null,
-          user.userId,
-          assignees,
-          labels,
-          milestoneId,
-        );
+        const repo = await prisma.repository.findUnique({
+          where: { id: repoId },
+          include: { owner: true }
+        });
+
+        if (repo?.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../services/github");
+          return await GitHubService.createIssue(
+            user.userId,
+            repo.owner.username,
+            repo.name,
+            title,
+            body,
+            labels
+          );
+        }
+
+        // Native Issue creation
+        const lastIssue = await prisma.issue.findFirst({
+          where: { repoId },
+          orderBy: { number: "desc" },
+        });
+        const number = (lastIssue?.number || 0) + 1;
+
+        const issue = await prisma.issue.create({
+          data: {
+            repoId,
+            number,
+            title,
+            body,
+            authorId: user.userId,
+            status: "OPEN",
+          },
+          include: { author: true },
+        });
 
         // Audit Log
         await AuditService.log({

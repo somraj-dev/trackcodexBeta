@@ -18,7 +18,6 @@ const BillingSettings = () => {
     const usageByRepository = [
         { name: "TrackcodexBeta", color: "bg-emerald-500", amount: "$0.03" },
         { name: "mits-college", color: "bg-[#0A0A0A]lue-500", amount: "$0.02" },
-        { name: "Gitea", color: "bg-purple-500", amount: "$0.01" },
         { name: "trackcodexbeta", color: "bg-red-500", amount: "<$0.01" },
         { name: "trackcodexVersion1.0.0", color: "bg-orange-500", amount: "<$0.01" },
     ];
