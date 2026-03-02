@@ -1,6 +1,7 @@
 import React from "react";
 import { useNotifications } from "../../context/NotificationContext";
 import { useNavigate } from "react-router-dom";
+import EmptyState from "../common/EmptyState";
 
 interface NotificationDropdownProps {
   onClose: () => void;
@@ -37,31 +38,29 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
         {notifications.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 flex flex-col items-center">
-            <img
-              src="/notifications-empty.png"
-              alt="No notifications"
-              className="w-40 mb-4 opacity-80 rounded-lg shadow-md border border-white/5"
+          <div className="h-64 flex items-center justify-center p-2">
+            <EmptyState
+              message="No new notifications"
+              imageSrc="/notifications-empty.png"
             />
-            <span className="text-xs">No new notifications</span>
           </div>
         ) : (
-          notifications.map((notif) => (
+          notifications.map((notif: any) => (
             <div
               key={notif.id}
               onClick={() => handleClick(notif.id, notif.link)}
               className={`p-3 rounded-lg border transition-all cursor-pointer group relative ${notif.read
-                  ? "bg-transparent border-transparent hover:bg-white/5 opacity-60"
-                  : "bg-[#0A0D14] border-blue-500/30 hover:border-blue-500/50"
+                ? "bg-transparent border-transparent hover:bg-white/5 opacity-60"
+                : "bg-[#0A0D14] border-blue-500/30 hover:border-blue-500/50"
                 }`}
             >
               <div className="flex items-start gap-3">
                 <div
                   className={`size-2 mt-1.5 rounded-full shrink-0 ${notif.type === "job_match"
-                      ? "bg-emerald-500"
-                      : notif.type === "alert"
-                        ? "bg-red-500"
-                        : "bg-[#0A0A0A]lue-500"
+                    ? "bg-emerald-500"
+                    : notif.type === "alert"
+                      ? "bg-red-500"
+                      : "bg-[#0A0A0A]lue-500"
                     }`}
                 ></div>
                 <div className="flex-1 min-w-0">

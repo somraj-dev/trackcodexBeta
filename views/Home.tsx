@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ContinueWorkspaces from "../components/home/ContinueWorkspaces";
 import { api } from "../services/api";
 import { Repository } from "../types";
+import EmptyState from "../components/common/EmptyState";
 
 interface RepoItemProps {
   repo: Repository;
@@ -230,10 +231,12 @@ const HomeView = () => {
                   <RepoItem key={repo.id} repo={repo} />
                 ))
               ) : (
-                <div className="p-12 text-center text-gh-text-secondary bg-gh-bg-secondary/10">
-                  <span className="material-symbols-outlined !text-[32px] mb-2 opacity-50">inventory_2</span>
-                  <p className="text-sm font-bold">No activity yet</p>
-                  <p className="text-xs mt-1">Start by creating or syncing a repository.</p>
+                <div className="py-12 bg-gh-bg-secondary/10">
+                  <EmptyState
+                    title="No activity yet"
+                    message="Start by creating or syncing a repository."
+                    imageSrc="/dashboard-empty.png"
+                  />
                 </div>
               )}
             </div>

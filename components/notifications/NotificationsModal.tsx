@@ -1,4 +1,5 @@
 import React from "react";
+import EmptyState from "../common/EmptyState";
 
 interface Notification {
   id: string;
@@ -71,13 +72,12 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({
         {/* List */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
           {notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-              <img
-                src="/notifications-empty.png"
-                alt="No notifications"
-                className="w-64 mb-6 opacity-80 rounded-xl shadow-lg border border-white/5"
+            <div className="h-[400px]">
+              <EmptyState
+                title="No notifications yet"
+                message="We'll let you know when something happens."
+                imageSrc="/notifications-empty.png"
               />
-              <p className="text-sm font-medium">No notifications yet</p>
             </div>
           ) : (
             <div className="flex flex-col gap-1">
@@ -89,12 +89,12 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   {/* Icon */}
                   <div
                     className={`mt-1 size-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 shadow-inner ${notif.type === "job"
-                        ? "bg-amber-500/10 text-amber-500"
-                        : notif.type === "comment"
-                          ? "bg-[#0A0A0A]lue-500/10 text-blue-500"
-                          : notif.type === "community"
-                            ? "bg-purple-500/10 text-purple-500"
-                            : "bg-slate-500/10 text-slate-400"
+                      ? "bg-amber-500/10 text-amber-500"
+                      : notif.type === "comment"
+                        ? "bg-[#0A0A0A]lue-500/10 text-blue-500"
+                        : notif.type === "community"
+                          ? "bg-purple-500/10 text-purple-500"
+                          : "bg-slate-500/10 text-slate-400"
                       }`}
                   >
                     <span className="material-symbols-outlined !text-[20px]">

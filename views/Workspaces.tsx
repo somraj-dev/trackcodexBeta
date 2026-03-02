@@ -166,10 +166,11 @@ const Workspaces = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredWorkspaces.length === 0 ? (
-          <div className="col-span-full py-12">
+          <div className="col-span-full min-h-[600px] flex items-center justify-center bg-gh-bg-secondary/20 rounded-3xl border border-gh-border/50">
             <EmptyState
               title="No Workspaces Found"
               message="Launch a new workspace to get started."
+              imageSrc="/dashboard-empty.png"
             />
           </div>
         ) : (

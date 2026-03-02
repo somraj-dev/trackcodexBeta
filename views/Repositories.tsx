@@ -354,8 +354,12 @@ const Repositories = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredRepos.length === 0 ? (
-              <div className="col-span-full py-12">
-                <EmptyState />
+              <div className="col-span-full h-[500px] flex items-center justify-center bg-gh-bg-secondary/20 rounded-3xl border border-gh-border/50">
+                <EmptyState
+                  title="No Repositories Found"
+                  message="Create or sync a repository to get started."
+                  imageSrc="/dashboard-empty.png"
+                />
               </div>
             ) : (
               filteredRepos.map((repo) => (
