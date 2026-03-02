@@ -186,9 +186,11 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       if (!name) throw BadRequest("Repository name is required");
 
       try {
+        console.log(`[REPO-CREATE] Starting creation for user ${user.userId}: ${name}`);
         const baseUrl = process.env.BACKEND_URL || "https://trackcodex.com";
         const ownerUsername = user.username || "me";
 
+        const startTime = Date.now();
         const repoData = await prisma.repository.create({
           data: {
             name,
@@ -203,16 +205,21 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             htmlUrl: `${baseUrl}/repo/${ownerUsername}/${name}`,
           },
         });
+        console.log(`[REPO-CREATE] DB record created in ${Date.now() - startTime}ms: ${repoData.id}`);
 
         // Initialize physical Git repository
+        console.log(`[REPO-CREATE] Initializing physical Git repo for ${repoData.id}...`);
+        const scmStartTime = Date.now();
         await SCMService.createRepository({
           id: repoData.id,
           name: repoData.name,
           description: repoData.description || undefined,
           techStack: repoData.language || undefined,
         });
+        console.log(`[REPO-CREATE] Physical repo initialized in ${Date.now() - scmStartTime}ms`);
 
         // Audit Log for Repo Creation
+        console.log(`[REPO-CREATE] Logging audit event...`);
         await AuditService.log({
           enterpriseId: (request.user as any).enterpriseId || undefined,
           actorId: user.userId,
@@ -222,6 +229,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           ipAddress: request.ip,
         });
 
+        console.log(`[REPO-CREATE] Creating notification...`);
         const { NotificationService } = await import("../services/notification");
         await NotificationService.create(
           user.userId,
@@ -232,8 +240,10 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           { repoId: repoData.id }
         );
 
+        console.log(`[REPO-CREATE] Success! Returning repoData.`);
         return repoData;
-      } catch (error) {
+      } catch (error: any) {
+        console.error(`[REPO-CREATE] Fatal error:`, error);
         if (error instanceof AppError) throw error;
         throw error;
       }

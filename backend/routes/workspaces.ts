@@ -79,6 +79,8 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
       }
 
       // Create workspace with repository info
+      console.log(`[WS-CREATE] Creating DB record for user ${finalOwnerId}: ${name}`);
+      const startTime = Date.now();
       const workspace = await prisma.workspace.create({
         data: {
           name: name.trim(),
@@ -97,7 +99,9 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
           },
         },
       });
+      console.log(`[WS-CREATE] DB record created in ${Date.now() - startTime}ms: ${workspace.id}`);
 
+      console.log(`[WS-CREATE] Creating notification...`);
       const { NotificationService } = await import("../services/notification");
       await NotificationService.create(
         finalOwnerId,

@@ -169,8 +169,13 @@ const Workspaces = () => {
           <div className="col-span-full min-h-[600px] flex items-center justify-center bg-gh-bg-secondary/20 rounded-3xl border border-gh-border/50">
             <EmptyState
               title="No Workspaces Found"
-              message="Launch a new workspace to get started."
+              message="Provision your first cloud development environment to start building."
               imageSrc="/dashboard-empty.png"
+              action={{
+                label: "Create Workspace",
+                onClick: () => navigate("/workspace/new"),
+                icon: "add_box"
+              }}
             />
           </div>
         ) : (

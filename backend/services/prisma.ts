@@ -11,6 +11,11 @@ const dbUrl = process.env.DATABASE_URL || "";
 const maskedUrl = dbUrl.replace(/:([^:@]+)@/, ":****@");
 console.warn(`[PRISMA] Initialized for: ${maskedUrl || "MISSING DATABASE_URL"}`);
 
+// Test connection on startup
+prismaInstance.$connect()
+    .then(() => console.warn("✅ [PRISMA] Database connection established"))
+    .catch((err) => console.error("❌ [PRISMA] Database connection failed:", err.message));
+
 export const prisma = prismaInstance;
 
 // Graceful shutdown

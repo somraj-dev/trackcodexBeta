@@ -180,7 +180,7 @@ const HomeView = () => {
                       Repositories are where you add code, collaborate, and utilize premium features, like GitHub Actions and Advanced Security.
                     </p>
                     <button
-                      onClick={() => navigate("/repositories")}
+                      onClick={() => navigate("/repositories/new")}
                       className="mt-3 px-4 py-1.5 bg-gh-bg-secondary hover:bg-gh-border border border-gh-border text-gh-text text-xs font-bold rounded-md transition-colors"
                     >
                       Create repository

@@ -357,8 +357,13 @@ const Repositories = () => {
               <div className="col-span-full h-[500px] flex items-center justify-center bg-gh-bg-secondary/20 rounded-3xl border border-gh-border/50">
                 <EmptyState
                   title="No Repositories Found"
-                  message="Create or sync a repository to get started."
+                  message="Establish your digital legacy. Create your first native repository or import from GitHub."
                   imageSrc="/dashboard-empty.png"
+                  action={{
+                    label: "Create Repository",
+                    onClick: () => navigate("/repositories/new"),
+                    icon: "add"
+                  }}
                 />
               </div>
             ) : (

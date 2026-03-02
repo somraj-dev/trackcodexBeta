@@ -303,10 +303,30 @@ export class GitServer {
     return new Promise((resolve, reject) => {
       const p = spawn("git", args, { cwd });
       let out = "";
+      let err = "";
+
+      const timeout = setTimeout(() => {
+        p.kill();
+        reject(new Error(`Git command timed out after 10s: git ${args.join(" ")}`));
+      }, 10000);
+
       p.stdout.on("data", (d) => (out += d));
-      p.on("close", (code) =>
-        code === 0 ? resolve(out) : reject(new Error(`Git exited ${code}`)),
-      );
+      p.stderr.on("data", (d) => (err += d));
+
+      p.on("close", (code) => {
+        clearTimeout(timeout);
+        if (code === 0) {
+          resolve(out);
+        } else {
+          console.error(`Git Error (Code ${code}): git ${args.join(" ")}\nStderr: ${err}`);
+          reject(new Error(`Git exited ${code}: ${err.trim() || 'Unknown error'}`));
+        }
+      });
+
+      p.on("error", (error) => {
+        clearTimeout(timeout);
+        reject(error);
+      });
     });
   }
 }
