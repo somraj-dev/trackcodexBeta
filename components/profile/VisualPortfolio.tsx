@@ -52,7 +52,7 @@ const VisualPortfolio: React.FC<VisualPortfolioProps> = ({ repos, loading }) => 
               className={`w-full h-full opacity-20 group-hover:opacity-30 transition-opacity ${styles.portfolioGradient}`}
               style={
                 {
-                  "--gradient-bg": `linear-gradient(45deg, ${repo.language === 'TypeScript' ? '#3178c6' : repo.language === 'JavaScript' ? '#f1e05a' : '#2ea043'}, var(--gh-bg))`,
+                  "--gradient-start": repo.language === 'TypeScript' ? '#3178c6' : repo.language === 'JavaScript' ? '#f1e05a' : '#2ea043',
                 } as React.CSSProperties
               }
             />

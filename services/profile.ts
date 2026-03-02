@@ -1,6 +1,6 @@
 import { SystemRole } from "../types";
 import { systemBus } from "./systemBus";
-import axios from "axios";
+import { apiInstance } from "./api";
 import { API_BASE_URL } from "../config/api";
 
 export interface Review {
@@ -356,9 +356,7 @@ export const profileService = {
 
     // 3. Fallback to Backend
     try {
-      const response = await axios.get(`${API_BASE_URL}/users/${idOrUsername}`, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.get(`/users/${idOrUsername}`);
       return response.data;
     } catch (error: unknown) {
       console.error("Error fetching profile from backend:", error);
@@ -388,11 +386,7 @@ export const profileService = {
     }
 
     try {
-      await axios.post(
-        `${API_BASE_URL}/users/${userId}/follow`,
-        {},
-        { withCredentials: true },
-      );
+      await apiInstance.post(`/users/${userId}/follow`);
       this.simulateNewFollower();
     } catch (error: unknown) {
       console.error("Error following user:", error);
@@ -411,9 +405,7 @@ export const profileService = {
     }
 
     try {
-      await axios.delete(`${API_BASE_URL}/users/${userId}/follow`, {
-        withCredentials: true,
-      });
+      await apiInstance.delete(`/users/${userId}/follow`);
       this.simulateUnfollow();
     } catch (error: unknown) {
       console.error("Error unfollowing user:", error);
@@ -427,12 +419,7 @@ export const profileService = {
    */
   async getFollowers(userId: string): Promise<UserProfile[]> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/users/${userId}/followers`,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await apiInstance.get(`/users/${userId}/followers`);
       return response.data;
     } catch (error: any) {
       // Fallback for mocks
@@ -445,12 +432,7 @@ export const profileService = {
    */
   async getFollowing(userId: string): Promise<UserProfile[]> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/users/${userId}/following`,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await apiInstance.get(`/users/${userId}/following`);
       return response.data;
     } catch (error: any) {
       // Fallback for mocks
@@ -463,9 +445,7 @@ export const profileService = {
    */
   async getTrendingUsers(): Promise<UserProfile[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/users/trending`, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.get("/users/trending");
       return response.data || [];
     } catch (error) {
       return [];
@@ -477,9 +457,7 @@ export const profileService = {
    */
   async getSuggestedUsers(): Promise<UserProfile[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/users/suggested`, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.get("/users/suggested");
       return response.data || [];
     } catch (error) {
       return [];
@@ -491,9 +469,8 @@ export const profileService = {
    */
   async searchUsers(query: string): Promise<UserProfile[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/users/search`, {
+      const response = await apiInstance.get("/users/search", {
         params: { q: query },
-        withCredentials: true,
       });
 
       // Map backend 'avatar' to frontend 'avatarUrl' and handle other schema differences

@@ -1,3 +1,3 @@
 .portfolioGradient {
-  background: var(--gradient-bg);
+  background: linear-gradient(45deg, var(--gradient-start), var(--gh-bg));
 }

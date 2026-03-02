@@ -64,25 +64,13 @@ class ErrorBoundary extends React.Component<
 
       return (
         <div
-          style={{
-            padding: "2rem",
-            color: isChunkError ? "#f0f0f0" : "#ff4444",
-            backgroundColor: isChunkError ? "#0a0a0a" : "#1a0000",
-            height: "100vh",
-            fontFamily: "monospace",
-            overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className={`p-8 h-screen font-mono overflow-auto flex flex-col items-center justify-center ${isChunkError ? "text-[#f0f0f0] bg-[#0a0a0a]" : "text-[#ff4444] bg-[#1a0000]"
+            }`}
         >
           {isChunkError ? (
             <>
-              <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>
-                Something went wrong
-              </h1>
-              <p style={{ opacity: 0.6, marginBottom: "1.5rem", textAlign: "center", maxWidth: "400px" }}>
+              <h1 className="text-2xl mb-2">Something went wrong</h1>
+              <p className="opacity-60 mb-6 text-center max-w-[400px]">
                 A new version was deployed. Please reload to get the latest update.
               </p>
               <button
@@ -90,32 +78,17 @@ class ErrorBoundary extends React.Component<
                   sessionStorage.removeItem("chunk_reload_attempted");
                   window.location.reload();
                 }}
-                style={{
-                  padding: "0.75rem 2rem",
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: "0.9rem",
-                }}
+                className="px-8 py-3 bg-white text-black border-none rounded-lg cursor-pointer font-bold text-sm"
               >
                 Reload Application
               </button>
             </>
           ) : (
             <>
-              <h1 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
-                Application Crashed
-              </h1>
-              <pre style={{ whiteSpace: "pre-wrap" }}>
-                {this.state.error?.toString()}
-              </pre>
+              <h1 className="text-2xl mb-4">Application Crashed</h1>
+              <pre className="whitespace-pre-wrap">{this.state.error?.toString()}</pre>
               {import.meta.env.DEV && (
-                <pre style={{ marginTop: "1rem", opacity: 0.7 }}>
-                  {this.state.error?.stack}
-                </pre>
+                <pre className="mt-4 opacity-70">{this.state.error?.stack}</pre>
               )}
             </>
           )}

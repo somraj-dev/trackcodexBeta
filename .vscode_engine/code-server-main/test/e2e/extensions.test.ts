@@ -1,7 +1,7 @@
 import { test as base } from "@playwright/test"
 import * as path from "path"
 import { getMaybeProxiedCodeServer } from "../utils/helpers"
-import { describe, test, expect } from "./baseFixture"
+import { describe, test } from "./baseFixture"
 
 function runTestExtensionTests() {
   // This will only work if the test extension is loaded into code-server.

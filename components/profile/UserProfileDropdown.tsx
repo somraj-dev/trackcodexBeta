@@ -99,7 +99,7 @@ const UserProfileDropdown = ({
         {/* Status */}
         <button
           onClick={() => handleNavigate("/settings/profile")}
-          className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] text-gh-text-secondary hover:text-blue-400 group transition-colors border border-transparent hover:border-gh-border/50 rounded-lg mx-2 w-[calc(100%-16px)]"
+          className="flex items-center gap-3 px-3 py-1.5 text-[13px] text-gh-text-secondary hover:text-blue-400 group transition-colors border border-transparent hover:border-gh-border/50 rounded-lg mx-2 w-[calc(100%-16px)]"
         >
           <span className="text-[16px] group-hover:scale-110 transition-transform">
             {profile.techStatus?.emoji || "😊"}

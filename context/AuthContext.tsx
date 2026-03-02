@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
 import { API_BASE_URL } from "../config/api";
 import { profileService } from "../services/profile";
 import { auth } from "../lib/firebase";
 import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from "firebase/auth";
+import { apiInstance } from "../services/api";
 
 interface User {
   id: string;
@@ -38,11 +38,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create axios instance with credentials support
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true, // Essential for sending Cookies
-});
+export const api = apiInstance;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -50,6 +46,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Sync CSRF token to localStorage for the axios interceptor in api.ts
+  useEffect(() => {
+    if (csrfToken) {
+      localStorage.setItem("trackcodex_csrf_token", csrfToken);
+    } else {
+      localStorage.removeItem("trackcodex_csrf_token");
+    }
+  }, [csrfToken]);
 
   // Firebase Auth Listener
   useEffect(() => {
@@ -80,19 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(mappedUser);
         profileService.initFromAuth(mappedUser);
 
-        // Persist OAuth provider tokens to backend (non-blocking)
+        // Sync user to PostgreSQL backend immediately (using apiInstance for auto-token)
         try {
-          const idToken = await firebaseUser.getIdToken();
-
-          // Sync user to PostgreSQL backend immediately
-          fetch(`${API_BASE_URL}/auth/sync`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${idToken}`,
-            },
-            credentials: "include"
-          }).catch((err) => console.error("Failed to sync user to database:", err));
+          apiInstance.post("/auth/sync").catch((err) => console.error("Failed to sync user to database:", err));
 
           // Check provider data for GitHub/Google
           for (const providerData of firebaseUser.providerData) {
@@ -101,16 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               if (ghUsername) {
                 localStorage.setItem("trackcodex_github_username", ghUsername);
               }
-              // Persist to backend (the token was already handled during OAuth flow)
-              fetch(`${API_BASE_URL}/integrations/connect`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${idToken}`,
-                },
-                credentials: "include",
-                body: JSON.stringify({ provider: "github", providerUsername: ghUsername }),
-              }).catch(() => { });
+              // Persist to backend
+              apiInstance.post("/integrations/connect", { provider: "github", providerUsername: ghUsername }).catch(() => { });
             }
           }
         } catch {
@@ -129,36 +116,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       unsubscribe();
     };
   }, []);
-
-  // Configure axios interceptor to attach Firebase ID token
-  useEffect(() => {
-    const interceptor = api.interceptors.request.use(async (config) => {
-      // CSRF token for state-changing requests
-      if (
-        ["post", "put", "delete", "patch"].includes(
-          config.method?.toLowerCase() || "",
-        ) &&
-        csrfToken
-      ) {
-        config.headers["X-CSRF-Token"] = csrfToken;
-      }
-
-      // Attach Firebase ID token as Bearer token
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        try {
-          const idToken = await currentUser.getIdToken();
-          config.headers["Authorization"] = `Bearer ${idToken}`;
-        } catch {
-          // Token refresh failed — session may have expired
-        }
-      }
-
-      return config;
-    });
-
-    return () => api.interceptors.request.eject(interceptor);
-  }, [csrfToken]);
 
   const login = (userData: User, token: string) => {
     setUser(userData);

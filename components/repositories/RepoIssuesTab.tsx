@@ -3,22 +3,44 @@ import { useNavigate } from "react-router-dom";
 import { Repository } from "../../types";
 import { api } from "../../services/api";
 
+interface IssueLabel {
+  id: string;
+  name: string;
+  color: string;
+}
+
+interface Issue {
+  id: string;
+  number: number;
+  title: string;
+  status: "OPEN" | "CLOSED";
+  createdAt: string;
+  author?: {
+    username: string;
+    avatar?: string;
+  };
+  labels?: IssueLabel[];
+  assignees?: any[];
+  milestone?: {
+    title: string;
+  };
+  _count?: {
+    comments: number;
+  };
+}
+
 interface RepoIssuesTabProps {
   repo: Repository;
 }
 
 const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
   const navigate = useNavigate();
-  const [issues, setIssues] = useState<any[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"OPEN" | "CLOSED">("OPEN");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  useEffect(() => {
-    fetchIssues();
-  }, [repo.id, filter]);
-
-  const fetchIssues = async () => {
+  const fetchIssues = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.repositories.getIssues(repo.id, filter);
@@ -28,9 +50,13 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [repo.id, filter]);
 
-  const getStatusBadge = (issue: any) => {
+  useEffect(() => {
+    fetchIssues();
+  }, [fetchIssues]);
+
+  const getStatusBadge = (issue: Issue) => {
     if (issue.status === "CLOSED") {
       return (
         <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-500 flex items-center gap-1">
@@ -156,14 +182,17 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
 
                     {issue.labels && issue.labels.length > 0 && (
                       <div className="flex items-center gap-1">
-                        {issue.labels.slice(0, 3).map((label: any) => (
+                        {issue.labels.slice(0, 3).map((label: IssueLabel) => (
                           <span
                             key={label.id}
                             className="px-2 py-0.5 rounded-full text-xs font-medium"
-                            style={{
-                              backgroundColor: `${label.color}20`,
-                              color: label.color,
-                            }}
+                            style={
+                              {
+                                "--label-color": label.color,
+                                backgroundColor: "var(--label-color)20",
+                                color: "var(--label-color)",
+                              } as React.CSSProperties
+                            }
                           >
                             {label.name}
                           </span>
@@ -194,7 +223,7 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
                       </span>
                     )}
 
-                    {issue._count?.comments > 0 && (
+                    {issue._count && issue._count.comments > 0 && (
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined !text-[14px]">
                           comment
@@ -212,7 +241,7 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
 
       {/* Create Issue Modal - Placeholder */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-[#0A0A0A]lack/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-6 max-w-2xl w-full mx-4">
             <h2 className="text-xl font-bold text-gh-text mb-4">
               Create New Issue

@@ -73,8 +73,9 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
           )}
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Job Title</label>
+            <label htmlFor="job-title" className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Job Title</label>
             <input
+              id="job-title"
               required
               type="text"
               placeholder="e.g. Senior Backend Engineer (Node.js)"
@@ -86,8 +87,9 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Budget / Salary</label>
+              <label htmlFor="job-budget" className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Budget / Salary</label>
               <input
+                id="job-budget"
                 required
                 type="text"
                 placeholder="e.g. $120k - $160k"
@@ -97,8 +99,10 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Job Type</label>
+              <label htmlFor="job-type" className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Job Type</label>
               <select
+                id="job-type"
+                title="Select job type"
                 className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-gh-text focus:border-primary outline-none transition-all appearance-none"
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
@@ -112,8 +116,9 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Description</label>
+            <label htmlFor="job-description" className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Description</label>
             <textarea
+              id="job-description"
               required
               rows={4}
               placeholder="Tell us about the role, challenges, and what you're looking for..."
@@ -124,8 +129,9 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Tech Stack (comma separated)</label>
+            <label htmlFor="job-tech-stack" className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">Tech Stack (comma separated)</label>
             <input
+              id="job-tech-stack"
               required
               type="text"
               placeholder="React, Node.js, TypeScript, PostgreSQL"

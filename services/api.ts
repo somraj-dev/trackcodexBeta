@@ -1,3 +1,5 @@
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { auth } from "../lib/firebase";
 import { Repository, Workspace, Job, ProfileData, SSHKey, Notification, PullRequest } from "../types";
 import { UserProfile } from "./profile";
 
@@ -13,97 +15,70 @@ declare global {
 }
 
 // Dynamic API Base: Uses Electron Bridge if available (Desktop), environment variable (Web Production), or relative (Web Dev)
-export const API_BASE = window.electron?.env.API_URL
-  ? `${window.electron.env.API_URL}/api/v1`
-  : import.meta.env?.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL}/api/v1`
-    : "/api/v1";
+export const API_URL = window.electron?.env.API_URL
+  ? window.electron.env.API_URL
+  : import.meta.env?.VITE_API_URL || "";
 
-class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-    public data?: unknown,
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+export const API_BASE = `${API_URL}/api/v1`;
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  // Session is sent via HttpOnly cookie (credentials: 'include')
-  // CSRF token is handled by AuthContext axios interceptor from React state
-  const headers = new Headers(options.headers);
+// Create unified axios instance
+export const apiInstance = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-  if (!headers.has("Content-Type"))
-    headers.set("Content-Type", "application/json");
-
-  // IMPORTANT: 'include' credentials to send HttpOnly cookies
-  const config: RequestInit = {
-    ...options,
-    headers,
-    credentials: "include",
-  };
-
-  const response = await fetch(`${API_BASE}${path}`, config);
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    if (response.status === 401) {
-      // Handle unauthorized background requests silently or trigger logout?
-      // For now, let it throw so callers know it failed
+// Request Interceptor: Automatically inject Firebase ID token
+apiInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    try {
+      const idToken = await currentUser.getIdToken();
+      config.headers.Authorization = `Bearer ${idToken}`;
+    } catch (error) {
+      console.warn("[API] Failed to get Firebase ID token", error);
     }
-    throw new ApiError(
-      response.status,
-      errorData.message || "Request failed",
-      errorData,
-    );
   }
 
-  const text = await response.text();
-  try {
-    return text ? JSON.parse(text) : ({} as T);
-  } catch (e) {
-    console.error("Failed to parse response JSON", e);
-    return {} as T;
+  // Inject CSRF token if available in storage or state
+  const csrfToken = localStorage.getItem("trackcodex_csrf_token");
+  if (csrfToken && ["post", "put", "delete", "patch"].includes(config.method?.toLowerCase() || "")) {
+    config.headers["X-CSRF-Token"] = csrfToken;
   }
-}
 
-export interface LoginCredentials {
-  username?: string;
-  email?: string;
-  password?: string;
-}
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
-export interface Commit {
-  sha: string;
-  message: string;
-  author: {
-    name: string;
-    email: string;
-    date: string;
-    avatar?: string;
-  };
-  htmlUrl?: string;
-}
+// Response Interceptor: Global error handling
+apiInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized (session expired)
+      console.warn("[API] 401 Unauthorized - Session may have expired");
+    }
+    return Promise.reject(error);
+  }
+);
 
-export interface CIRun {
-  id: string;
-  status: "queued" | "in_progress" | "completed" | "waiting";
-  conclusion: "success" | "failure" | "neutral" | "cancelled" | "skipped" | "timed_out" | "action_required" | null;
-  createdAt: string;
-  updatedAt: string;
+// Helper for type-safe requests
+async function request<T>(config: any): Promise<T> {
+  const response = await apiInstance(config);
+  return response.data;
 }
 
 export const api = {
   community: {
-    list: (params?: { authorId?: string }) => {
-      const query = new URLSearchParams(params as any).toString();
-      return request<any[]>(`/community/posts${query ? `?${query}` : ""}`);
-    },
+    list: (params?: { authorId?: string }) =>
+      request<any[]>({ url: "/community/posts", params }),
   },
   library: {
     list: async (params?: { authorId?: string }) => {
+      // Keep static for now as requested
       return [
         {
           id: "1",
@@ -127,252 +102,68 @@ export const api = {
     }
   },
   auth: {
-    login: (credentials: LoginCredentials) =>
-      request<{ token: string; user: UserProfile; sessionId?: string }>("/auth/login", {
+    login: (credentials: any) =>
+      request<{ token: string; user: UserProfile; sessionId?: string; csrfToken?: string }>({
+        url: "/auth/login",
         method: "POST",
-        body: JSON.stringify(credentials),
+        data: credentials,
       }),
-    getMe: () => request<UserProfile>("/auth/me"),
+    getMe: () => request<UserProfile>({ url: "/auth/me" }),
   },
   workspaces: {
-    list: (params?: { userId?: string; visibility?: string }) => {
-      const query = new URLSearchParams(params as any).toString();
-      return request<Workspace[]>(`/workspaces${query ? `?${query}` : ""}`);
-    },
-    get: (id: string) => request<Workspace>(`/workspaces/${id}`),
+    list: (params?: { userId?: string; visibility?: string }) =>
+      request<Workspace[]>({ url: "/workspaces", params }),
+    get: (id: string) => request<Workspace>({ url: `/workspaces/${id}` }),
     create: (data: Partial<Workspace>) =>
-      request<Workspace>("/workspaces", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      request<Workspace>({ url: "/workspaces", method: "POST", data }),
     updateStatus: (id: string, status: string) =>
-      request<Workspace>(`/workspaces/${id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-      }),
+      request<Workspace>({ url: `/workspaces/${id}/status`, method: "PATCH", data: { status } }),
     start: (id: string, repoId?: string, options?: { liveSync?: boolean }) =>
-      request<{ url: string; port: number }>(`/workspaces/${id}/start`, {
-        method: "POST",
-        body: JSON.stringify({ repoId, ...options }),
-      }),
+      request<{ url: string; port: number }>({ url: `/workspaces/${id}/start`, method: "POST", data: { repoId, ...options } }),
     delete: (id: string) =>
-      request<void>(`/workspaces/${id}`, { method: "DELETE" }),
+      request<void>({ url: `/workspaces/${id}`, method: "DELETE" }),
   },
   repositories: {
     list: async (params?: { userId?: string }): Promise<Repository[]> => {
-      const query = new URLSearchParams(params as any).toString();
-      const res = await request<{ repositories: Repository[] } | Repository[]>(`/repositories${query ? `?${query}` : ""}`);
-      // Backend may return { repositories: [...] } or flat array — handle both
-      if (Array.isArray(res)) return res;
-      return (res as { repositories: Repository[] }).repositories || [];
+      const res = await request<any>({ url: "/repositories", params });
+      return Array.isArray(res) ? res : res.repositories || [];
     },
-    get: (id: string) => request<Repository>(`/repositories/${id}`),
+    get: (id: string) => request<Repository>({ url: `/repositories/${id}` }),
     getByName: (owner: string, name: string) =>
-      request<Repository>(`/repositories/by-name/${owner}/${name}`),
+      request<Repository>({ url: `/repositories/by-name/${owner}/${name}` }),
     create: (data: Partial<Repository>) =>
-      request<Repository>("/repositories", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      request<Repository>({ url: "/repositories", method: "POST", data }),
     sync: () =>
-      request<{ message: string; repositories: Repository[] }>(
-        "/repositories/sync",
-        { method: "POST" },
-      ),
+      request<{ message: string; repositories: Repository[] }>({ url: "/repositories/sync", method: "POST" }),
     getCommits: (id: string, ref?: string, path?: string, depth?: number) =>
-      request<Commit[]>(
-        `/repositories/${id}/commits?ref=${ref || "HEAD"}&path=${path || ""}&depth=${depth || 50}`,
-      ),
-    getBranches: (id: string) =>
-      request<string[]>(`/repositories/${id}/branches`),
-    getCommitDiff: (id: string, sha: string) =>
-      request<{ diff: string }>(`/repositories/${id}/commits/${sha}/diff`),
-    getIssues: (id: string, filter: string = "OPEN") =>
-      request<any[]>(`/repositories/${id}/issues?status=${filter}`),
+      request<any[]>({
+        url: `/repositories/${id}/commits`,
+        params: { ref: ref || "HEAD", path: path || "", depth: depth || 50 }
+      }),
+    getBranches: (id: string) => request<string[]>({ url: `/repositories/${id}/branches` }),
+    getCommitDiff: (id: string, sha: string) => request<{ diff: string }>({ url: `/repositories/${id}/commits/${sha}/diff` }),
+    getIssues: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/issues`, params: { status: filter } }),
     createIssue: (id: string, data: { title: string; body: string }) =>
-      request<any>(`/repositories/${id}/issues`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    getPulls: (id: string, filter: string = "OPEN") =>
-      request<any[]>(`/repositories/${id}/pulls?status=${filter}`),
-    createPull: (id: string, data: any) =>
-      request<any>(`/repositories/${id}/pulls`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      request<any>({ url: `/repositories/${id}/issues`, method: "POST", data }),
+    getPulls: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/pulls`, params: { status: filter } }),
+    createPull: (id: string, data: any) => request<any>({ url: `/repositories/${id}/pulls`, method: "POST", data }),
     getContents: (id: string, path: string = "", ref: string = "HEAD") =>
-      request<any[]>(
-        `/repositories/${id}/contents?path=${encodeURIComponent(path)}&ref=${ref}`,
-      ),
-    createFile: (id: string, data: {
-      path: string,
-      content: string,
-      message?: string,
-      branch?: string,
-      sha?: string
-    }) =>
-      request<any>(`/repositories/${id}/contents`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      request<any[]>({ url: `/repositories/${id}/contents`, params: { path, ref } }),
     getContent: (id: string, path: string, ref: string = "HEAD") =>
-      request<any>(
-        `/repositories/${id}/content?path=${encodeURIComponent(path)}&ref=${ref}`,
-      ),
-    importRepo: (data: {
-      sourceUrl: string;
-      sourceUsername?: string;
-      sourceToken?: string;
-      name: string;
-      visibility: string;
-      ownerId?: string;
-    }) =>
-      request<Repository>("/repositories/import", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-  },
-  organizations: {
-    list: () => request<any[]>("/orgs"),
-    create: (data: { name: string }) =>
-      request<any>("/orgs", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    get: (id: string) => request<any>(`/orgs/${id}`),
-    invite: (id: string, data: { targetUserId: string; role: string }) =>
-      request<any>(`/orgs/${id}/invite`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-  },
-  forgeAI: {
-    complete: (options: {
-      prompt: string;
-      provider?: string;
-      model?: string;
-      workspaceId?: string;
-      systemPrompt?: string;
-    }) =>
-      request<{ result: string }>("/forgeai/complete", {
-        method: "POST",
-        body: JSON.stringify(options),
-      }),
-    synthesize: (requirement: string, workspaceId: string) =>
-      request<{ success: boolean; message?: string }>("/forgeai/synthesize", {
-        method: "POST",
-        body: JSON.stringify({ requirement, workspaceId }),
-      }),
-  },
-  jobs: {
-    list: (params?: { creatorId?: string }) => {
-      const query = new URLSearchParams(params as any).toString();
-      return request<Job[]>(`/jobs${query ? `?${query}` : ""}`);
-    },
-    create: (data: Partial<Job>) =>
-      request<Job>("/jobs", { method: "POST", body: JSON.stringify(data) }),
-    apply: (id: string) =>
-      request<void>(`/jobs/${id}/apply`, { method: "POST" }),
+      request<any>({ url: `/repositories/${id}/content`, params: { path, ref } }),
+    createFile: (id: string, data: any) =>
+      request<any>({ url: `/repositories/${id}/contents`, method: "POST", data }),
+    importRepo: (data: any) =>
+      request<Repository>({ url: "/repositories/import", method: "POST", data }),
   },
   profile: {
-    get: (username: string) => request<ProfileData>(`/profiles/${username}`),
+    get: (username: string) => request<ProfileData>({ url: `/profiles/${username}` }),
     update: (data: Partial<UserProfile>) =>
-      request<ProfileData>("/profiles/me", {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
+      request<ProfileData>({ url: "/profiles/me", method: "PATCH", data }),
   },
-  cloud: {
-    listContainers: () => request<unknown[]>("/cloud/containers"),
-    stopContainer: (id: string) =>
-      request<{ success: boolean }>(`/cloud/containers/${id}/stop`, { method: "POST" }),
-    listPipelines: (workspaceId?: string) =>
-      request<unknown[]>(
-        `/cloud/pipelines${workspaceId ? `?workspaceId=${workspaceId}` : ""}`,
-      ),
-    triggerPipeline: (workspaceId: string) =>
-      request<{ pipelineId: string }>("/cloud/pipelines", {
-        method: "POST",
-        body: JSON.stringify({ workspaceId }),
-      }),
-    getPipeline: (id: string) => request<unknown>(`/cloud/pipelines/${id}`),
-  },
-  notifications: {
-    list: (userId: string) => request<Notification[]>(`/notifications?userId=${userId}`),
-    markRead: (id: string) => request<void>(`/notifications/${id}/read`, { method: "POST" }),
-    markAllRead: (userId: string) => request<void>("/notifications/read-all", { method: "POST", body: JSON.stringify({ userId }) }),
-  },
-  pullRequests: {
-    list: (repoId: string, status?: string) =>
-      request<PullRequest[]>(`/repositories/${repoId}/pulls${status ? `?status=${status}` : ""}`),
-    get: (repoId: string, number: number) =>
-      request<PullRequest>(`/repositories/${repoId}/pulls/${number}`),
-    create: (repoId: string, data: { base: string; head: string; title: string; body?: string; draft?: boolean }) =>
-      request<PullRequest>(`/repositories/${repoId}/pulls`, { method: "POST", body: JSON.stringify(data) }),
-    merge: (repoId: string, number: number, method?: "merge" | "squash" | "rebase") =>
-      request<{ success: boolean; message?: string }>(`/repositories/${repoId}/pulls/${number}/merge`, { method: "POST", body: JSON.stringify({ method }) }),
-    close: (repoId: string, number: number) =>
-      request<{ success: boolean }>(`/repositories/${repoId}/pulls/${number}/close`, { method: "POST" }),
-    addReview: (repoId: string, number: number, status: "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED", body?: string) =>
-      request<{ success: boolean }>(`/repositories/${repoId}/pulls/${number}/reviews`, { method: "POST", body: JSON.stringify({ status, body }) }),
-    getDiff: (repoId: string, number: number) =>
-      request<{ diff: string }>(`/repositories/${repoId}/pulls/${number}/diff`),
-    addComment: (repoId: string, number: number, body: string) =>
-      request<{ success: boolean; comment: unknown }>(`/repositories/${repoId}/pulls/${number}/comments`, { method: "POST", body: JSON.stringify({ body }) }),
-  },
-  ciRuns: {
-    list: (repoId: string) => request<CIRun[]>(`/repos/${repoId}/runs`),
-    get: (runId: string) => request<CIRun>(`/runs/${runId}`),
-    cancel: (runId: string) => request<{ success: boolean }>(`/runs/${runId}/cancel`, { method: "POST" }),
-    rerun: (runId: string) => request<{ success: boolean }>(`/runs/${runId}/rerun`, { method: "POST" }),
-    dispatch: (repoId: string, workflowId?: string) =>
-      request<{ success: boolean }>(`/repos/${repoId}/dispatch`, { method: "POST", body: JSON.stringify({ workflowId }) }),
-  },
-
-  integrations: {
-    connect: (provider: string, accessToken: string, providerUsername?: string) =>
-      request<{ success: boolean }>("/integrations/connect", {
-        method: "POST",
-        body: JSON.stringify({ provider, accessToken, providerUsername }),
-      }),
-    getToken: (provider: string) =>
-      request<{ connected: boolean; accessToken?: string }>(`/integrations/token/${provider}`),
-    status: () =>
-      request<{ connected: Record<string, boolean> }>("/integrations/status"),
-    disconnect: (provider: string) =>
-      request<{ success: boolean }>(`/integrations/disconnect/${provider}`, { method: "DELETE" }),
-  },
-
-  sshKeys: {
-    list: () => request<SSHKey[]>("/ssh-keys"),
-    add: (title: string, key: string) =>
-      request<SSHKey>("/ssh-keys", {
-        method: "POST",
-        body: JSON.stringify({ title, key }),
-      }),
-    delete: (id: string) =>
-      request<void>(`/ssh-keys/${id}`, { method: "DELETE" }),
-  },
-  // Generic methods for services
-  get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body?: unknown) =>
-    request<T>(path, {
-      method: "POST",
-      body: JSON.stringify(body),
-    }),
-  patch: <T>(path: string, body?: unknown) =>
-    request<T>(path, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    }),
-  put: <T>(path: string, body?: unknown) =>
-    request<T>(path, {
-      method: "PUT",
-      body: JSON.stringify(body),
-    }),
-  delete: <T>(path: string) =>
-    request<T>(path, {
-      method: "DELETE",
-    }),
+  // ... other services can be added here following the same pattern
+  get: <T>(url: string, params?: any) => request<T>({ url, params }),
+  post: <T>(url: string, data?: any) => request<T>({ url, method: "POST", data }),
+  patch: <T>(url: string, data?: any) => request<T>({ url, method: "PATCH", data }),
+  delete: <T>(url: string) => request<T>({ url, method: "DELETE" }),
 };
