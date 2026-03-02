@@ -20,12 +20,14 @@ if (!admin.apps.length) {
         });
         console.log("✅ [FIREBASE] Admin SDK initialized with service account");
     } else {
-        // Fallback: try Application Default Credentials (works on GCP/Cloud Run)
+        // Fallback: use Application Default Credentials (works with gcloud auth application-default login)
         try {
             admin.initializeApp({
+                credential: admin.credential.applicationDefault(),
                 projectId: process.env.FIREBASE_PROJECT_ID || "trackcodex-38862",
+                databaseURL: process.env.VITE_FIREBASE_DATABASE_URL || "https://trackcodex-38862-default-rtdb.firebaseio.com",
             });
-            console.log("✅ [FIREBASE] Admin SDK initialized with default credentials");
+            console.log("✅ [FIREBASE] Admin SDK initialized with Application Default Credentials (gcloud)");
         } catch (err) {
             console.error("❌ [FIREBASE] Admin SDK initialization failed:", err);
         }

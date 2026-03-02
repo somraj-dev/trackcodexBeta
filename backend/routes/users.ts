@@ -111,7 +111,7 @@ export async function userRoutes(fastify: FastifyInstance) {
         const follow = await prisma.follow.findUnique({
           where: {
             followerId_followingId: {
-              followerId: currentUser.id,
+              followerId: currentUser.userId,
               followingId: userId,
             },
           },
@@ -144,7 +144,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    if (currentUser.id === userId) {
+    if (currentUser.userId === userId) {
       return reply.code(400).send({ message: "Cannot follow yourself" });
     }
 
@@ -166,7 +166,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       // Create follow relationship
       await prisma.follow.create({
         data: {
-          followerId: currentUser.id,
+          followerId: currentUser.userId,
           followingId: userId,
         },
       });
@@ -178,7 +178,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       });
 
       await prisma.profile.update({
-        where: { userId: currentUser.id },
+        where: { userId: currentUser.userId },
         data: { followingCount: { increment: 1 } },
       });
 
@@ -202,7 +202,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       const follow = await prisma.follow.findUnique({
         where: {
           followerId_followingId: {
-            followerId: currentUser.id,
+            followerId: currentUser.userId,
             followingId: userId,
           },
         },
@@ -216,7 +216,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       await prisma.follow.delete({
         where: {
           followerId_followingId: {
-            followerId: currentUser.id,
+            followerId: currentUser.userId,
             followingId: userId,
           },
         },
@@ -229,7 +229,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       });
 
       await prisma.profile.update({
-        where: { userId: currentUser.id },
+        where: { userId: currentUser.userId },
         data: { followingCount: { decrement: 1 } },
       });
 
@@ -369,7 +369,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       const users = await prisma.user.findMany({
         where: {
           id: {
-            notIn: currentUser ? [...followingIds, currentUser.id] : [],
+            notIn: currentUser ? [...followingIds, currentUser.userId] : [],
           },
         },
         include: { customProfile: true },

@@ -18,7 +18,7 @@ export async function profileRoutes(server: FastifyInstance) {
       const currentUser = (req as any).user;
 
       // Authorization: Only the user themselves can upload
-      if (currentUser.id !== userId) {
+      if (currentUser.userId !== userId) {
         return reply.status(403).send({ error: "Unauthorized" });
       }
 
@@ -108,7 +108,7 @@ export async function profileRoutes(server: FastifyInstance) {
       const currentUser = (req as any).user;
 
       // Authorization
-      if (currentUser.id !== userId) {
+      if (currentUser.userId !== userId) {
         return reply.status(403).send({ error: "Unauthorized" });
       }
 
@@ -149,7 +149,7 @@ export async function profileRoutes(server: FastifyInstance) {
       const currentUser = (req as any).user;
 
       // Authorization
-      if (currentUser.id !== userId) {
+      if (currentUser.userId !== userId) {
         return reply.status(403).send({ error: "Unauthorized" });
       }
 
@@ -196,7 +196,7 @@ export async function profileRoutes(server: FastifyInstance) {
       const currentUser = (req as any).user;
 
       // Authorization
-      if (currentUser.id !== userId) {
+      if (currentUser.userId !== userId) {
         return reply.status(403).send({ error: "Unauthorized" });
       }
 

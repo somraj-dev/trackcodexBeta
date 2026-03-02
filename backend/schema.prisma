@@ -6,7 +6,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 // --- Auth & Security ---
@@ -40,6 +39,11 @@ model User {
   twitter  String?
   linkedin String?
   github   String?
+  
+  profileReadme String? @db.Text
+  showReadme    Boolean @default(true)
+  showResume    Boolean @default(true)
+  resumeUrl     String?
 
   // Relations
   oauthAccounts     OAuthAccount[]
@@ -63,7 +67,7 @@ model User {
   customProfile        Profile?
   sshKeys              SSHKey[]
   gpgKeys              GPGKey[]
-  following            Follow[]              @relation("Following")
+  followings           Follow[]              @relation("Following")
   followers            Follow[]              @relation("Followers")
   activities           Activity[]
   environmentReviewers EnvironmentReviewer[]
@@ -75,6 +79,7 @@ model User {
   workspaceStars          WorkspaceStar[]
   workspaceInvitesSent    WorkspaceMember[] @relation("InvitedBy")
   workspaceInvitesCreated WorkspaceInvite[]
+  repositories            Repository[]
 }
 
 model Profile {
@@ -258,6 +263,8 @@ model Repository {
   statusChecks      StatusCheck[]
 
   // Organizations & Context
+  ownerId      String?
+  owner        User?         @relation(fields: [ownerId], references: [id])
   orgId        String?
   org          Organization? @relation(fields: [orgId], references: [id])
   enterpriseId String? // Denormalized for RLS
@@ -279,6 +286,7 @@ model Repository {
 
   cloneUrl String?
   sshUrl   String?
+  htmlUrl  String?
 
   securityAlerts  SecurityAlert[]
   aiTasks         AITask[]

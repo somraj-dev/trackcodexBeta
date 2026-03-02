@@ -1,4 +1,3 @@
-Error: Email already in use
-Error: Email already in use
-    at Conflict (d:\TrackcodexBeta\backend\utils\AppError.ts:35:3)
-    at Object.<anonymous> (d:\TrackcodexBeta\backend\routes\auth.ts:69:19)
+TypeError: Cannot read properties of undefined (reading 'create')
+TypeError: Cannot read properties of undefined (reading 'create')
+    at Object.<anonymous> (C:\Users\HP\TrackcodexBeta\backend\routes\auth.ts:106:30)
