@@ -51,6 +51,16 @@ export async function requireAuth(
           role: dbUser.role,
         };
         return; // Success with Firebase JWT
+      } else {
+        // User is valid in Firebase but doesn't exist in DB yet. 
+        // Allow request to proceed so `/auth/sync` can create them.
+        (request as any).user = {
+          userId: firebaseUid,
+          email: "", // Will be fetched/synced in `/auth/sync`
+          role: "user",
+          isNewFirebaseUser: true
+        };
+        return;
       }
     }
 

@@ -13,6 +13,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider, useNotifications } from "./context/NotificationContext";
 import { RealtimeProvider } from "./contexts/RealtimeContext";
+import ReactGA from "react-ga4";
 
 // Error boundary to catch stale chunk load failures after redeployments
 class ChunkErrorBoundary extends React.Component<
@@ -426,7 +427,10 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
 
   useEffect(() => {
     if (mainScrollRef.current) mainScrollRef.current.scrollTop = 0;
-  }, [location.pathname]);
+
+    // Track page views automatically on route changes
+    ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const handleNotify = (event: Event) => {

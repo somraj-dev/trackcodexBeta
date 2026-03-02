@@ -87,7 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         // Sync user to PostgreSQL backend immediately (using apiInstance for auto-token)
         try {
-          apiInstance.post("/auth/sync").catch((err) => console.error("Failed to sync user to database:", err));
+          apiInstance.post("/auth/sync").then((res) => {
+            if (res.data?.csrfToken && isMounted) {
+              setCsrfToken(res.data.csrfToken);
+            }
+          }).catch((err) => console.error("Failed to sync user to database:", err));
 
           // Check provider data for GitHub/Google
           for (const providerData of firebaseUser.providerData) {

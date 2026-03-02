@@ -1130,22 +1130,37 @@ export async function authRoutes(fastify: FastifyInstance) {
     { preHandler: requireAuth },
     async (request, reply) => {
       const user = (request as any).user;
+      const ip = request.ip;
+      const userAgent = request.headers["user-agent"] || "unknown";
 
       try {
         let dbUser = await prisma.user.findUnique({
           where: { id: user.userId }
         });
 
+        // 1. If user doesn't exist, we must fetch their full details from Firebase to seed the DB
         if (!dbUser) {
+          let email = user.email || "";
+          let name = "TrackCodex User";
+
+          try {
+            // We can fetch the real data from Firebase Admin Since we only have the UID
+            const fbUser = await firebaseAdmin.auth().getUser(user.userId);
+            email = fbUser.email || "";
+            name = fbUser.displayName || name;
+          } catch (e) {
+            request.log.warn({ uid: user.userId }, "Failed to fetch full firebase user profile during sync");
+          }
+
           const [newUser] = await prisma.$transaction([
             prisma.user.create({
               data: {
                 id: user.userId,
-                email: user.email || "",
-                username: user.username || `user_${user.userId.substring(0, 8)}`,
-                name: user.name || user.username || "TrackCodex User",
+                email: email,
+                username: `user_${user.userId.substring(0, 8)}`,
+                name: name,
                 password: "", // Handled by Firebase
-                role: "user",
+                role: user.role || "user",
               }
             }),
             prisma.outboxEvent.create({
@@ -1153,10 +1168,10 @@ export async function authRoutes(fastify: FastifyInstance) {
                 topic: "user",
                 payload: {
                   id: user.userId,
-                  email: user.email || "",
-                  username: user.username || `user_${user.userId.substring(0, 8)}`,
-                  name: user.name || user.username || "TrackCodex User",
-                  role: "user",
+                  email: email,
+                  username: `user_${user.userId.substring(0, 8)}`,
+                  name: name,
+                  role: user.role || "user",
                 }
               }
             })
@@ -1164,7 +1179,41 @@ export async function authRoutes(fastify: FastifyInstance) {
           dbUser = newUser;
         }
 
-        return { success: true, user: { id: dbUser.id, username: dbUser.username } };
+        // 2. Create the Backend Session identical to Login flow
+        const sessionId = crypto.randomUUID();
+        const { csrfToken } = await createSession(
+          sessionId,
+          {
+            userId: dbUser.id,
+            email: dbUser.email,
+            username: dbUser.username as string,
+            name: dbUser.name as string,
+            role: dbUser.role,
+            tokenVersion: dbUser.tokenVersion,
+          },
+          { ipAddress: ip, userAgent },
+        );
+
+        // 3. Set the Cookie
+        const isProduction = process.env.NODE_ENV === "production";
+        reply.setCookie("session_id", sessionId, {
+          path: "/",
+          httpOnly: true,
+          secure: isProduction || request.headers["x-forwarded-proto"] === "https",
+          sameSite: isProduction ? "none" : "lax",
+          maxAge: 7 * 24 * 60 * 60,
+        });
+
+        return {
+          success: true,
+          csrfToken,
+          user: {
+            id: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email,
+            role: dbUser.role
+          }
+        };
       } catch (error) {
         request.log.error(error);
         return reply.code(500).send({ error: "Failed to sync user" });
