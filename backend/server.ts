@@ -111,13 +111,16 @@ async function bootstrap() {
                 return;
             }
             const allowedHosts = [
-                process.env.FRONTEND_URL || "http://localhost:3001",
+                process.env.FRONTEND_URL || "https://trackcodex.com",
+                "https://trackcodex.onrender.com",
+                "http://localhost:3001",
                 "http://127.0.0.1:3001",
             ];
             if (
                 allowedHosts.includes(origin) ||
                 /http:\/\/localhost:\d+/.test(origin) ||
-                /http:\/\/127\.0\.0\.1:\d+/.test(origin)
+                /http:\/\/127\.0\.0\.1:\d+/.test(origin) ||
+                origin.endsWith(".onrender.com")
             ) {
                 cb(null, true);
                 return;
@@ -432,7 +435,7 @@ async function bootstrap() {
 
     try {
         // 12. Bind to Port Early (to satisfy Render's port scan)
-        const port = process.env.PORT ? parseInt(process.env.PORT) : 4000;
+        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
         await server.listen({ port, host: "0.0.0.0" });
         console.warn(`🚀 TrackCodex Backend operational on port ${port} (Secure Mode)`);
 
