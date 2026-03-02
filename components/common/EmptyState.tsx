@@ -10,9 +10,9 @@ const EmptyState: React.FC<EmptyStateProps> = ({ title, message }) => {
     <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-in fade-in zoom-in-95 duration-300">
       <div className="h-[220px] overflow-hidden mb-6 flex items-start justify-center">
         <img
-          src="/empty-state.png"
+          src="/notifications-empty.png"
           alt="All caught up"
-          className="max-w-[400px] w-full dark:opacity-60 dark:mix-blend-screen dark:[filter:invert(1)_hue-rotate(180deg)_brightness(0.85)_contrast(1.2)_grayscale(100%)] opacity-100 mix-blend-multiply"
+          className="max-w-[400px] w-full rounded-xl shadow-lg border border-white/5 opacity-90 group-hover:opacity-100 transition-opacity"
         />
       </div>
       {title && (

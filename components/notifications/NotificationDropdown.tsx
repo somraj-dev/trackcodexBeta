@@ -37,10 +37,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
         {notifications.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 flex flex-col items-center">
-            <span className="material-symbols-outlined !text-[32px] mb-2 opacity-50">
-              notifications_off
-            </span>
+          <div className="p-6 text-center text-slate-500 flex flex-col items-center">
+            <img
+              src="/notifications-empty.png"
+              alt="No notifications"
+              className="w-40 mb-4 opacity-80 rounded-lg shadow-md border border-white/5"
+            />
             <span className="text-xs">No new notifications</span>
           </div>
         ) : (
@@ -48,27 +50,24 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             <div
               key={notif.id}
               onClick={() => handleClick(notif.id, notif.link)}
-              className={`p-3 rounded-lg border transition-all cursor-pointer group relative ${
-                notif.read
+              className={`p-3 rounded-lg border transition-all cursor-pointer group relative ${notif.read
                   ? "bg-transparent border-transparent hover:bg-white/5 opacity-60"
                   : "bg-[#0A0D14] border-blue-500/30 hover:border-blue-500/50"
-              }`}
+                }`}
             >
               <div className="flex items-start gap-3">
                 <div
-                  className={`size-2 mt-1.5 rounded-full shrink-0 ${
-                    notif.type === "job_match"
+                  className={`size-2 mt-1.5 rounded-full shrink-0 ${notif.type === "job_match"
                       ? "bg-emerald-500"
                       : notif.type === "alert"
                         ? "bg-red-500"
                         : "bg-[#0A0A0A]lue-500"
-                  }`}
+                    }`}
                 ></div>
                 <div className="flex-1 min-w-0">
                   <h4
-                    className={`text-xs font-bold mb-1 truncate ${
-                      notif.read ? "text-slate-400" : "text-white"
-                    }`}
+                    className={`text-xs font-bold mb-1 truncate ${notif.read ? "text-slate-400" : "text-white"
+                      }`}
                   >
                     {notif.title}
                   </h4>
