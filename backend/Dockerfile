@@ -28,15 +28,16 @@ RUN addgroup -S trackcodex && adduser -S trackcodex -G trackcodex
 COPY --from=builder /app/dist-backend ./dist-backend
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/backend/schema.prisma ./backend/schema.prisma
-
 # Install ONLY production dependencies AS ROOT
-# Provide a dummy DATABASE_URL for prisma generate validation
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+
 RUN npm install --production --legacy-peer-deps && \
-    DATABASE_URL="postgresql://localhost:5432" npx prisma generate --schema=backend/schema.prisma
+    npx prisma generate --schema=backend/schema.prisma
 
 # Create data directory and set ownership
 RUN mkdir -p /app/data/repos && \
-    chown -R trackcodex:trackcodex /app
+    chown -R trackcodex:trackcodex /app && \
+    chmod -R 755 /app/data
 
 # Security: Switch to non-root user for runtime
 USER trackcodex
