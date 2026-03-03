@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────
+# TrackCodex — Production Docker Compose (AWS EC2)
+# Place this at /opt/trackcodex/docker-compose.prod.yml on EC2
+# ─────────────────────────────────────────────────────────────
+
+services:
+  backend:
+    # This image tag is updated automatically by GitHub Actions on each deploy
+    image: 275142546612.dkr.ecr.ap-south-1.amazonaws.com/trackcodex-backend:latest
+    container_name: trackcodex-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env.prod          # lives at /opt/trackcodex/.env.prod (never commit this)
+    environment:
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: trackcodex-net

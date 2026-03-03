@@ -25,3 +25,7 @@ data/repos/
 test-features.ts
 test_output.txt
 backend_register_error.log
+
+# AWS Production Secrets (NEVER COMMIT)
+aws/.env.prod
+.env.prod

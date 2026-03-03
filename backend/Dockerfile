@@ -34,4 +34,8 @@ EXPOSE 4000
 
 ENV NODE_ENV=production
 
+# Health check: ECS / Docker will mark container unhealthy if this fails
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:4000/api/health || exit 1
+
 CMD ["node", "dist-backend/index.js"]

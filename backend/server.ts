@@ -112,15 +112,15 @@ async function bootstrap() {
             }
             const allowedHosts = [
                 process.env.FRONTEND_URL || "https://trackcodex.com",
-                "https://trackcodex.onrender.com",
+                process.env.AWS_BACKEND_URL || "",  // AWS EC2 / ALB domain
                 "http://localhost:3001",
                 "http://127.0.0.1:3001",
-            ];
+            ].filter(Boolean);
             if (
                 allowedHosts.includes(origin) ||
                 /http:\/\/localhost:\d+/.test(origin) ||
                 /http:\/\/127\.0\.0\.1:\d+/.test(origin) ||
-                origin.endsWith(".onrender.com")
+                (process.env.AWS_EC2_DOMAIN ? origin.endsWith(process.env.AWS_EC2_DOMAIN) : false)
             ) {
                 cb(null, true);
                 return;
@@ -460,14 +460,14 @@ async function bootstrap() {
                 console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${err.message}`);
 
                 if (process.env.DATABASE_URL?.includes(":5432")) {
-                    console.warn("💡 TIP: You are using port 5432. If this is Render + Supabase, please try port 6543 (Pooler) instead.");
+                    console.warn("💡 TIP: Using port 5432. For AWS RDS + connection pooling, ensure your security group allows inbound on 5432 from EC2.");
                 }
 
                 if (retries === 0) {
                     console.error("❌ [FATAL] Database connection could not be established after all retries.");
-                    console.error("1. Ensure your DATABASE_URL in Render matches Supabase's 'Transaction' mode URL.");
-                    console.error("2. Verify that port 6543 is used if connecting from Render.");
-                    console.error("3. Check Supabase 'Network Restrictions' (Allow all IPs if using Render).");
+                    console.error("1. Ensure DATABASE_URL points to your AWS RDS endpoint.");
+                    console.error("2. Verify RDS security group allows inbound TCP 5432 from EC2 security group.");
+                    console.error("3. Check that the RDS instance is in the same VPC or is publicly accessible (for dev).");
                     break;
                 }
                 console.warn("⏳ Waiting 5 seconds before next attempt...");

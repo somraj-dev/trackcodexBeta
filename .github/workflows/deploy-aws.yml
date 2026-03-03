@@ -1,0 +1,81 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: trackcodex-backend
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-deploy:
+    name: Build, Push & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # ─── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # ─── 2. Configure AWS credentials ───────────────────────────────────────
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ─── 3. Login to Amazon ECR ─────────────────────────────────────────────
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ─── 4. Build Docker image ──────────────────────────────────────────────
+      - name: Build Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            .
+
+      # ─── 5. Push to ECR ──────────────────────────────────────────────────────
+      - name: Push image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+
+      # ─── 6. Deploy to EC2 via SSH ────────────────────────────────────────────
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE,AWS_REGION,ECR_REPOSITORY
+          script: |
+            # Login to ECR from EC2
+            aws ecr get-login-password --region $AWS_REGION | \
+              docker login --username AWS --password-stdin \
+              $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com
+
+            # Pull the new image
+            docker pull $IMAGE
+
+            # Update image tag in docker-compose.prod.yml and restart
+            cd /opt/trackcodex
+            sed -i "s|image: .*trackcodex-backend.*|image: $IMAGE|g" docker-compose.prod.yml
+            docker compose -f docker-compose.prod.yml up -d --no-deps backend
+
+            # Remove dangling images to save disk space
+            docker image prune -f
+
+            echo "✅ Deployment complete: $IMAGE"
