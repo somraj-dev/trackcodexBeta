@@ -14,7 +14,7 @@ async function tryElasticSearch(query: string): Promise<any[]> {
   const timeout = setTimeout(() => controller.abort(), 3000);
 
   try {
-    const indicesString = "server1.public.users,server1.public.repositories,server1.public.jobs,server1.public.workspaces";
+    const indicesString = "*users,*repositories,*jobs,*workspaces";
 
     const esRes = await fetch(`${ELASTICSEARCH_URL}/${indicesString}/_search`, {
       method: "POST",

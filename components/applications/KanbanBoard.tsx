@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { KanbanColumn } from './KanbanColumn';
 import { CandidateCard } from './CandidateCard'; // For overlay
+import { api } from '../../services/api';
 
 const STAGES = ['Applied', 'Phone Screen', 'Interview', 'Offer', 'Hired', 'Rejected'];
 
@@ -12,18 +13,17 @@ const KanbanBoard = ({ jobId }: { jobId: string }) => {
 
     // Fetch Data
     useEffect(() => {
-        fetch(`http://localhost:4000/api/v1/applications/kanban/${jobId}`)
-            .then(res => res.json())
-            .then(data => setColumns(data))
-            .catch(err => console.error(err));
+        api.get(`/applications/kanban/${jobId}`)
+            .then(data => setColumns(data as any))
+            .catch(err => console.error("[Kanban] Fetch failed", err));
     }, [jobId]);
 
-    const handleDragStart = (event) => {
+    const handleDragStart = (event: any) => {
         setActiveId(event.active.id);
         setActiveApp(event.active.data.current.application);
     };
 
-    const handleDragEnd = async (event) => {
+    const handleDragEnd = async (event: any) => {
         const { active, over } = event;
         setActiveId(null);
         setActiveApp(null);
@@ -34,7 +34,6 @@ const KanbanBoard = ({ jobId }: { jobId: string }) => {
         const newStage = over.id; // Droppable ID is the stage name
 
         // Optimistic Update
-        // Find source stage
         let sourceStage = null;
         let application = null;
 
@@ -42,7 +41,7 @@ const KanbanBoard = ({ jobId }: { jobId: string }) => {
 
         // Locate and remove from source
         for (const stage of Object.keys(newColumns)) {
-            const foundIndex = newColumns[stage].findIndex(a => a.id === appId);
+            const foundIndex = newColumns[stage].findIndex((a: any) => a.id === appId);
             if (foundIndex !== -1) {
                 sourceStage = stage;
                 application = newColumns[stage][foundIndex];
@@ -62,13 +61,9 @@ const KanbanBoard = ({ jobId }: { jobId: string }) => {
 
         // Call API
         try {
-            await fetch(`http://localhost:4000/api/v1/applications/${appId}/move`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ stage: newStage })
-            });
+            await api.patch(`/applications/${appId}/move`, { stage: newStage });
         } catch (e) {
-            console.error("Move failed", e);
+            console.error("[Kanban] Move failed", e);
             // Revert logic would go here
         }
     };

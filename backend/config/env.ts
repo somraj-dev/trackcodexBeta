@@ -45,6 +45,11 @@ const envSchema = z.object({
 
   // Frontend
   FRONTEND_URL: z.string().url(),
+
+  // OpenSearch (Elasticsearch)
+  ELASTICSEARCH_URL: z.string().url().optional(),
+  OPENSEARCH_USERNAME: z.string().optional(),
+  OPENSEARCH_PASSWORD: z.string().optional(),
 });
 
 // Parse and validate

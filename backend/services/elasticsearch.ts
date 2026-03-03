@@ -1,10 +1,22 @@
 import { Client } from '@elastic/elasticsearch';
 
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL || 'http://localhost:9200';
+const OPENSEARCH_USERNAME = process.env.OPENSEARCH_USERNAME;
+const OPENSEARCH_PASSWORD = process.env.OPENSEARCH_PASSWORD;
 
 // Global singleton client to avoid exhausting connections
 const globalForElastic = global as unknown as { elasticClient: Client };
-export const elasticClient = globalForElastic.elasticClient || new Client({ node: ELASTICSEARCH_URL });
+
+// Build client options
+const clientOptions: any = { node: ELASTICSEARCH_URL };
+if (OPENSEARCH_USERNAME && OPENSEARCH_PASSWORD) {
+    clientOptions.auth = {
+        username: OPENSEARCH_USERNAME,
+        password: OPENSEARCH_PASSWORD
+    };
+}
+
+export const elasticClient = globalForElastic.elasticClient || new Client(clientOptions);
 
 if (process.env.NODE_ENV !== 'production') {
     globalForElastic.elasticClient = elasticClient;
