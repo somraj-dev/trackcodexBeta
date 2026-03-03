@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Users, Search, TrendingUp, UserPlus, Star } from "lucide-react";
-import { profileService } from "../services/profile";
-import { useNavigate } from "react-router-dom";
+import { Users, Search, TrendingUp, UserPlus, Star, Terminal, Globe, Lock } from "lucide-react";
+import { api } from "../services/api";
+import { Workspace } from "../types";
 import "../styles/Explore.css";
 
 interface User {
@@ -21,6 +21,7 @@ export const Explore: React.FC = () => {
   const [trendingUsers, setTrendingUsers] = useState<User[]>([]);
   const [suggestedUsers, setSuggestedUsers] = useState<User[]>([]);
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -31,12 +32,14 @@ export const Explore: React.FC = () => {
   const loadDiscoveryData = async () => {
     setLoading(true);
     try {
-      const [trending, suggested] = await Promise.all([
-        profileService.getTrendingUsers(),
-        profileService.getSuggestedUsers(),
+      const [trending, suggested, wsList] = await Promise.all([
+        api.get<User[]>("/users/trending"),
+        api.get<User[]>("/users/suggested"),
+        api.workspaces.list({ visibility: "public" })
       ]);
       setTrendingUsers(trending);
       setSuggestedUsers(suggested);
+      setWorkspaces(wsList);
     } catch (error) {
       console.error("Error loading discovery data:", error);
     } finally {
@@ -52,7 +55,7 @@ export const Explore: React.FC = () => {
     }
 
     try {
-      const results = await profileService.searchUsers(query);
+      const results = await api.get<User[]>("/users/search", { q: query });
       setSearchResults(results);
     } catch (error) {
       console.error("Error searching users:", error);
@@ -86,11 +89,12 @@ export const Explore: React.FC = () => {
   };
 
   const renderUserCard = (user: User) => (
-    <div key={user.id} className="user-card">
+    <div key={user.id} className="user-card" onClick={() => navigate(`/profile/${user.username}`)}>
       <div className="user-card-header">
         <img
           src={
             user.avatarUrl ||
+            user.avatar ||
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`
           }
           alt={user.name}
@@ -102,20 +106,51 @@ export const Explore: React.FC = () => {
         </div>
         <button
           className={`follow-btn ${user.isFollowing ? "following" : ""}`}
-          onClick={() =>
-            user.isFollowing ? handleUnfollow(user.id) : handleFollow(user.id)
-          }
+          onClick={(e) => {
+            e.stopPropagation();
+            user.isFollowing ? handleUnfollow(user.id) : handleFollow(user.id);
+          }}
         >
           {user.isFollowing ? "Following" : "Follow"}
         </button>
       </div>
-      {user.bio && <p className="user-bio">{user.bio}</p>}
+      {(user.bio) && <p className="user-bio">{user.bio}</p>}
       <div className="user-stats">
         <span>
           <strong>{user.followersCount || 0}</strong> followers
         </span>
         <span>
           <strong>{user.followingCount || 0}</strong> following
+        </span>
+      </div>
+    </div>
+  );
+
+  const renderWorkspaceCard = (ws: Workspace) => (
+    <div key={ws.id} className="user-card workspace-card" onClick={() => navigate(`/workspace/${ws.id}`)}>
+      <div className="user-card-header">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+          <Terminal size={24} />
+        </div>
+        <div className="user-info">
+          <h3 className="user-name">{ws.name}</h3>
+          <p className="user-username flex items-center gap-1">
+            {ws.visibility === 'public' ? <Globe size={12} /> : <Lock size={12} />}
+            {ws.visibility}
+          </p>
+        </div>
+        <div className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${ws.status === 'Running' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-500/10 text-slate-500'}`}>
+          {ws.status}
+        </div>
+      </div>
+      {ws.description && <p className="user-bio">{ws.description}</p>}
+      <div className="user-stats">
+        <span className="flex items-center gap-1">
+          <Users size={14} />
+          <strong>{ws.members?.length || 1}</strong> members
+        </span>
+        <span className="truncate max-w-[150px]">
+          {ws.repoUrl || "No repo linked"}
         </span>
       </div>
     </div>
@@ -216,11 +251,26 @@ export const Explore: React.FC = () => {
 
       {activeTab === "workspaces" && (
         <div className="explore-content">
-          <div className="coming-soon">
-            <Star size={48} />
-            <h2>Workspace Discovery Coming Soon</h2>
-            <p>Explore trending and starred workspaces</p>
-          </div>
+          <section className="explore-section">
+            <h2>
+              <Star size={24} /> Public Workspaces
+            </h2>
+            <p className="section-subtitle">
+              Discover and join active cloud development environments
+            </p>
+            {loading ? (
+              <div className="loading">Loading...</div>
+            ) : workspaces.length === 0 ? (
+              <div className="coming-soon">
+                <Globe size={48} className="opacity-20 mb-4" />
+                <p>No public workspaces found.</p>
+              </div>
+            ) : (
+              <div className="user-grid">
+                {workspaces.map(renderWorkspaceCard)}
+              </div>
+            )}
+          </section>
         </div>
       )}
     </div>

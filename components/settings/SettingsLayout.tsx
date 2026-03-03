@@ -130,9 +130,9 @@ const SettingsLayout: React.FC = () => {
                 icon="accessibility"
               />
               <SettingsSidebarItem
-                to="/settings/privacy"
-                label="Privacy"
-                icon="lock"
+                to="/settings/data"
+                label="Data & Privacy"
+                icon="database"
               />
             </nav>
           </section>

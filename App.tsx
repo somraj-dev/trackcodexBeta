@@ -202,6 +202,9 @@ const ForgeAIUsageSettings = React.lazy(
 const AccessibilitySettings = React.lazy(
   () => import("./views/settings/AccessibilitySettings"),
 );
+const DataManagementView = React.lazy(
+  () => import("./views/settings/DataManagementView"),
+);
 const NotificationsSettings = React.lazy(
   () => import("./views/settings/NotificationsSettings"),
 );
@@ -1094,10 +1097,8 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                   path="forge-ai-usage"
                   element={<ForgeAIUsageSettings />}
                 />
-                <Route
-                  path="tokens"
-                  element={<PersonalAccessTokensSettings />}
-                />
+                <Route path="tokens" element={<PersonalAccessTokensSettings />} />
+                <Route path="data" element={<DataManagementView />} />
                 <Route path="integrations" element={<IntegrationsSettings />} />
                 <Route path="sessions" element={<SessionsSettings />} />
                 <Route path="ssh-keys" element={<SSHKeysSettings />} />
