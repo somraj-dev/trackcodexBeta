@@ -31,6 +31,9 @@ FROM node:20.20.0-alpine
 
 WORKDIR /app
 
+# Install native dependencies required by Prisma
+RUN apk add --no-cache openssl libc6-compat
+
 # Create non-root user for security
 RUN addgroup -S trackcodex && adduser -S trackcodex -G trackcodex
 
@@ -39,6 +42,8 @@ COPY --from=builder /app/dist-backend ./dist-backend
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/backend/schema.prisma ./backend/schema.prisma
+# Restore placeholder for any runtime generation needs (though primarily using copied nodules)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 
 # Create data directory and set ownership
 RUN mkdir -p /app/data/repos && \
