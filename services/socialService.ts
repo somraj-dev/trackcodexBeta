@@ -1,5 +1,4 @@
-import axios from "axios";
-import { API_BASE_URL } from "../config/api";
+import { apiInstance } from "./api";
 
 export interface SocialUser {
   id: string;
@@ -34,8 +33,6 @@ export interface Post {
   createdAt: string;
   comments: Comment[];
   likes: number;
-
-  // Rich Media / Context (Optional for real hardware data)
   mediaUrl?: string;
   codeSnippet?: {
     language: string;
@@ -85,14 +82,10 @@ export interface Community {
   };
 }
 
-// MOCK_POSTS removed to ensure real database usage
-
 export const socialService = {
   getFeed: async (): Promise<Post[]> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/community/posts`, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.get("/community/posts");
       return response.data || [];
     } catch (err) {
       console.error("❌ Failed to fetch community feed:", err);
@@ -102,11 +95,7 @@ export const socialService = {
 
   likePost: async (postId: string) => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/community/posts/${postId}/like`,
-        {},
-        { withCredentials: true },
-      );
+      await apiInstance.post(`/community/posts/${postId}/like`);
       return true;
     } catch (err) {
       return false;
@@ -115,17 +104,10 @@ export const socialService = {
 
   createPost: async (content: string, title?: string) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/community/posts`,
-        {
-          content,
-          title,
-          // Backend handles authorId from session in a real app,
-          // but our current mock backend might need it explicitly if session isn't linked.
-          // Let's assume the backend handles it.
-        },
-        { withCredentials: true },
-      );
+      const response = await apiInstance.post("/community/posts", {
+        content,
+        title,
+      });
       return response.data;
     } catch (err) {
       console.error("❌ Failed to create post:", err);
@@ -133,16 +115,13 @@ export const socialService = {
     }
   },
 
-  // Community Management
   createCommunity: async (data: {
     name: string;
     description?: string;
     avatar?: string;
   }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/community`, data, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.post("/community", data);
       return response.data;
     } catch (err) {
       console.error("❌ Failed to create community:", err);
@@ -152,9 +131,7 @@ export const socialService = {
 
   getCommunity: async (slug: string): Promise<Community | null> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/community/${slug}`, {
-        withCredentials: true,
-      });
+      const response = await apiInstance.get(`/community/${slug}`);
       return response.data;
     } catch (err) {
       console.error("❌ Failed to fetch community:", err);
@@ -164,11 +141,7 @@ export const socialService = {
 
   joinCommunity: async (slug: string) => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/community/${slug}/join`,
-        {},
-        { withCredentials: true },
-      );
+      await apiInstance.post(`/community/${slug}/join`);
       return true;
     } catch (err) {
       console.error("❌ Failed to join community:", err);
@@ -178,9 +151,8 @@ export const socialService = {
 
   getCommunityFeed: async (communityId: string): Promise<Post[]> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/community/posts`, {
+      const response = await apiInstance.get("/community/posts", {
         params: { communityId },
-        withCredentials: true,
       });
       return response.data;
     } catch (err) {

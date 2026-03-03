@@ -11,6 +11,7 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+  BACKEND_URL: z.string().url().default("http://localhost:4000"),
 
   // Security
   ENCRYPTION_KEY: z

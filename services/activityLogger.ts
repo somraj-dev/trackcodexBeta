@@ -1,4 +1,6 @@
 // services/activityLogger.ts
+import { apiInstance } from "./api";
+
 export const logActivity = async (action: string, metadata: any = {}) => {
     try {
         // In a real app, we'd get the user ID from context/auth
@@ -8,14 +10,10 @@ export const logActivity = async (action: string, metadata: any = {}) => {
         // For Parity, we need to pass the username or ID.
         // Let's hardcode 'testuser' if no auth context is available yet.
 
-        await fetch('http://localhost:4000/api/v1/profile/activity', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: 'johndoe', // Default for demo
-                action, // 'save', 'commit', 'run'
-                metadata
-            })
+        await apiInstance.post('/profile/activity', {
+            username: 'johndoe', // Default for demo
+            action, // 'save', 'commit', 'run'
+            metadata
         });
         console.log(`[Analytics] Logged action: ${action}`);
     } catch (err) {

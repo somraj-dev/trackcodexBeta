@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MOCK_JOBS, MOCK_TRIAL_REPOS } from "../../constants";
-import { Job, TrialRepo } from "../../types";
+import { Job } from "../../types";
 import JobRatingModal from "../../components/jobs/JobRatingModal";
-import { profileService } from "../../services/profile";
 import { directMessageBus } from "../../services/directMessageBus";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
+import { api } from "../../services/api";
 
 const MissionDetailView = () => {
   const { id } = useParams();
@@ -18,12 +18,11 @@ const MissionDetailView = () => {
 
   useEffect(() => {
     if (!id) return;
-    if (!id) return;
 
     // Check local mocks first for immediate display (Search results mainly return mocks)
     const localMock = MOCK_JOBS.find((j) => j.id === id);
     if (localMock) {
-      setLocalJob(localMock);
+      setLocalJob(localMock as Job);
       return;
     }
 
@@ -36,37 +35,31 @@ const MissionDetailView = () => {
         title: trialMock.title,
         description: trialMock.description,
         longDescription: trialMock.description, // Fallback
+        techStack: trialMock.tech,
         budget: trialMock.salaryRange,
         type: "Contract", // Or 'Full-time' based on trial
-        status: "Open",
+        status: trialMock.status === "Newly Active" ? "Open" : "InProgress",
+        repoId: trialMock.repoName, // Assuming logic handles strings or IDs
         creator: {
           id: "company-" + trialMock.company,
           name: trialMock.company,
           avatar: trialMock.logo,
-          role: "Enterprise Client",
         },
-        techStack: trialMock.tech,
-        postedAt: "Now",
-        repoId: trialMock.repoName, // Assuming logic handles strings or IDs
-        applications: 0,
-        readme: trialMock.readme, // Map readme
-      } as any; // Cast as any if Job type is strict and we miss fields, but try to match mostly.
+        postedDate: "Now",
+        applications: [],
+        applicationsCount: 0,
+      };
 
       setLocalJob(adaptedJob);
       return;
     }
 
-    fetch(`http://localhost:4000/api/v1/jobs/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Job not found");
-        return res.json();
-      })
-      .then((data) => {
+    api.get(`/jobs/${id}`)
+      .then((data: any) => {
         setLocalJob(data);
       })
       .catch((err) => {
         console.warn("Failed to fetch job", err);
-        // Fallback or show error
       });
   }, [id]);
 
@@ -95,17 +88,11 @@ const MissionDetailView = () => {
       // Find the accepted applicant ID (or fallback to test user)
       const freelancerId = localJob.applications?.find((app: any) => app.status === 'Accepted')?.applicantId || "test-user-id-for-demo";
 
-      const res = await fetch(`http://localhost:4000/api/v1/jobs/${localJob.id}/complete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rating,
-          feedback,
-          freelancerId,
-        }),
+      await api.post(`/jobs/${localJob.id}/complete`, {
+        rating,
+        feedback,
+        freelancerId,
       });
-
-      if (!res.ok) throw new Error("Failed to submit rating");
 
       // Refresh
       setLocalJob({ ...localJob, status: "Completed" }); // Optimistic update
@@ -241,15 +228,7 @@ const MissionDetailView = () => {
                       return;
                     }
                     try {
-                      const res = await fetch(
-                        `http://localhost:4000/api/v1/jobs/${localJob.id}/apply`,
-                        {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ applicantId: user.id }),
-                        },
-                      );
-                      if (!res.ok) throw new Error("Failed to apply");
+                      await api.post(`/jobs/${localJob.id}/apply`, { applicantId: user.id });
                       addNotification({ type: "success", title: "Application Sent!", message: "Your application has been submitted successfully." } as any);
                       // Optimistic Update
                       setLocalJob({
@@ -276,14 +255,7 @@ const MissionDetailView = () => {
                     if (!confirm(`Fund ${localJob.budget} for this mission?`))
                       return;
                     try {
-                      const res = await fetch(
-                        `http://localhost:4000/api/v1/jobs/${localJob.id}/fund`,
-                        {
-                          method: "POST",
-                          headers: { "x-user-id": user?.id || "user-1" },
-                        },
-                      );
-                      if (!res.ok) throw new Error("Failed to fund");
+                      await api.post(`/jobs/${localJob.id}/fund`, {});
                       addNotification({ type: "success", title: "Funds Secured", message: "Funds have been placed into Escrow." } as any);
                       // Mock update status for UI
                       setLocalJob({ ...localJob, status: "In Progress" });
@@ -303,15 +275,7 @@ const MissionDetailView = () => {
                 onClick={async () => {
                   try {
                     const freelancerId = localJob.applications?.find((app: any) => app.status === 'Accepted')?.applicantId || "test-user-id-for-demo";
-                    const res = await fetch(
-                      `http://localhost:4000/api/v1/jobs/${localJob.id}/release`,
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ freelancerId }),
-                      },
-                    );
-                    if (!res.ok) throw new Error("Failed to release funds");
+                    await api.post(`/jobs/${localJob.id}/release`, { freelancerId });
                     addNotification({ type: "success", title: "Payment Released", message: "Funds released to the freelancer." } as any);
 
                     // Proceed to rating after release

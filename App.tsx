@@ -13,6 +13,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider, useNotifications } from "./context/NotificationContext";
 import { RealtimeProvider } from "./contexts/RealtimeContext";
+import { MessagingProvider, useMessaging } from "./context/MessagingContext";
 import ReactGA from "react-ga4";
 
 // Error boundary to catch stale chunk load failures after redeployments
@@ -593,9 +594,10 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isAddMenuOpen, isNotificationsOpen, isProfileDropdownOpen]);
 
-  // Use notification context
+  // Use messaging context
   const { notifications } = useNotifications();
-  const { logout } = useAuth(); // Restore logout for UserProfileDropdown
+  const { logout } = useAuth();
+  const { totalUnreadCount, setIsPanelOpen } = useMessaging();
 
   // Listen for Real-Time Notification Events (Toast only)
   useEffect(() => {
@@ -842,13 +844,18 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
                 {/* Divider */}
                 <div className="w-px h-5 bg-[#11141A] mx-1" />
 
-                {/* Issues */}
+                {/* Inbox (Repurposed from Issues) */}
                 <button
-                  onClick={() => navigate("/repositories")}
-                  className="text-gh-text-secondary hover:text-white transition-colors h-8 w-8 flex items-center justify-center rounded-md hover:bg-[#11141A]"
-                  aria-label="Issues"
+                  onClick={() => setIsPanelOpen(true)}
+                  className="text-gh-text-secondary hover:text-white transition-colors relative h-8 w-8 flex items-center justify-center rounded-md hover:bg-[#11141A]"
+                  aria-label="Inbox"
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path></svg>
+                  {totalUnreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 rounded-full ring-2 ring-[#010409] text-[10px] font-bold text-white flex items-center justify-center">
+                      {totalUnreadCount}
+                    </span>
+                  )}
                 </button>
 
                 {/* Pull Requests */}
@@ -1220,7 +1227,9 @@ const AppWithProviders = () => {
     <NotificationProvider>
       {isAuthenticated && user ? (
         <RealtimeProvider userId={user.id}>
-          <AppContent />
+          <MessagingProvider>
+            <AppContent />
+          </MessagingProvider>
         </RealtimeProvider>
       ) : (
         <AppContent />

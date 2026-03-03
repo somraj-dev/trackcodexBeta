@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { API_URL } from "./api";
 
 export type RealtimeEvent = {
   type: string;
@@ -20,10 +21,9 @@ class RealtimeService {
     this.userId = userId;
     this.workspaceId = workspaceId || null;
 
-    const host =
-      window.location.hostname === "localhost"
-        ? "http://localhost:4000"
-        : `https://${window.location.host}`;
+    // Use centralized API_URL, fallback to location.origin for relative calls, 
+    // or localhost:4000 for local dev if API_URL is missing.
+    const host = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
 
     console.log(`🔌 Connecting to Realtime via Socket.io: ${host}`);
 

@@ -1,5 +1,4 @@
-import axios from "axios";
-import { API_BASE_URL } from "../config/api";
+import { apiInstance } from "./api";
 
 export interface Activity {
   id: string;
@@ -43,17 +42,15 @@ export const activityService = {
     limit: number = 20,
   ): Promise<{ activities: Activity[]; total: number }> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/users/${userId}/activity`,
+      const response = await apiInstance.get(
+        `/users/${userId}/activity`,
         {
           params: { page, limit },
-          withCredentials: true,
         },
       );
       return response.data;
     } catch (error: any) {
       console.error("Error fetching activity:", error);
-      // Return empty data instead of throwing
       return { activities: [], total: 0 };
     }
   },
@@ -66,17 +63,15 @@ export const activityService = {
     limit: number = 20,
   ): Promise<{ activities: Activity[]; total: number }> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/activity/following`,
+      const response = await apiInstance.get(
+        "/activity/following",
         {
           params: { page, limit },
-          withCredentials: true,
         },
       );
       return response.data;
     } catch (error: any) {
       console.error("Error fetching following feed:", error);
-      // Return empty data instead of throwing to prevent UI crashes
       return { activities: [], total: 0 };
     }
   },
@@ -86,9 +81,8 @@ export const activityService = {
    */
   async getActivityStats(userId: string): Promise<ActivityStats> {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/users/${userId}/activity/stats`,
-        { withCredentials: true },
+      const response = await apiInstance.get(
+        `/users/${userId}/activity/stats`,
       );
       return response.data;
     } catch (error: any) {

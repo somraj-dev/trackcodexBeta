@@ -88,6 +88,8 @@ async function bootstrap() {
                     "ws://localhost:3001",
                     "ws://localhost:4000",
                     "http://localhost:4000",
+                    env.BACKEND_URL,
+                    env.BACKEND_URL.replace(/^http/, 'ws'),
                 ],
             },
         },
@@ -427,7 +429,7 @@ async function bootstrap() {
             ? "Internal Server Error (Ref: " + Date.now() + ")"
             : (error as Error).message || "Unknown error";
 
-        reply.status(statusCode).send({
+        reply.status(statusCode || 500).send({
             success: false,
             code: "INTERNAL_SERVER_ERROR",
             message: diagnosticMessage,

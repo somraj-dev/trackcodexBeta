@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { X, Smile, Phone, Video, Info, Search, Paperclip, Send } from "lucide-react";
 import { api } from "../../context/AuthContext";
 import { io, Socket } from "socket.io-client";
+import { API_URL } from "../../services/api";
 
 interface ChatInterfaceProps {
     isOpen: boolean;
@@ -73,8 +74,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     useEffect(() => {
         if (!isOpen) return;
 
+        const socketHost = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
+
         // Connect to Socket.IO
-        const newSocket = io(import.meta.env.VITE_API_URL || "http://localhost:4000", {
+        const newSocket = io(socketHost, {
             query: { userId: currentUser.id },
             withCredentials: true,
             transports: ["websocket"]
@@ -295,8 +298,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     <div className={`max-w-[70%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
                                         <div
                                             className={`px-5 py-3 rounded-2xl text-[15px] leading-relaxed shadow-sm relative group-hover:shadow-md transition-shadow ${isMe
-                                                    ? 'bg-[#0A0A0A]lue-600 text-white rounded-br-none'
-                                                    : 'bg-[#1c1e29] text-gray-100 rounded-bl-none border border-white/5'
+                                                ? 'bg-[#0A0A0A]lue-600 text-white rounded-br-none'
+                                                : 'bg-[#1c1e29] text-gray-100 rounded-bl-none border border-white/5'
                                                 }`}
                                         >
                                             {msg.content}

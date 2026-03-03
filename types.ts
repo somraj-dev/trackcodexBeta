@@ -203,9 +203,10 @@ export interface Job {
   techStack: string[];
   budget: string;
   type: "Contract" | "Gig" | "Full-time" | "Bounty";
-  status: "Open" | "InProgress" | "Completed" | "Pending";
+  status: "Open" | "InProgress" | "Completed" | "Pending" | "In Progress";
   repoId: string;
   creator: {
+    id?: string;
     name: string;
     avatar: string;
   };
@@ -213,6 +214,8 @@ export interface Job {
   targetUserId?: string;
   personalNote?: string;
   offerDetails?: OfferDetails; // New field for rich offers
+  applications?: any[];
+  applicationsCount?: number;
 }
 
 // --- Community Enhancement Types ---

@@ -1,4 +1,4 @@
-import { UserProfile } from "./profile";
+import { apiInstance } from "./api";
 
 export type AccessRole = "owner" | "admin" | "write" | "read";
 
@@ -84,43 +84,27 @@ const MOCK_COLLABORATORS: Record<string, Collaborator[]> = {
   ],
 };
 
-const MOCK_SETTINGS: Record<string, FullRepoSettings> = {
-  "my-repo-1": {
-    name: "meeting_1",
-    isTemplate: false,
-    requireCommitSignOff: true,
-    defaultBranch: "main",
-    releaseImmutability: true,
-    features: {
-      wikis: true,
-      issues: true,
-      discussions: true,
-      projects: true,
-    },
-    pullRequests: {
-      allowMerge: true,
-      allowSquash: true,
-      allowRebase: true,
-      deleteHead: true,
-    },
-  },
-};
-
 class RepoService {
-  private apiUrl = "http://localhost:4000/api/v1";
-
   async getCollaborators(repoId: string): Promise<Collaborator[]> {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return MOCK_COLLABORATORS[repoId] || MOCK_COLLABORATORS["my-repo-1"]; // Fallback for demo
+    try {
+      // In a real production app, this would be a real API call.
+      // For now, using mock data as a fallback to ensure the UI works.
+      return MOCK_COLLABORATORS[repoId] || MOCK_COLLABORATORS["my-repo-1"];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
   async getSettings(repoId: string): Promise<FullRepoSettings> {
     try {
-      const resp = await fetch(`${this.apiUrl}/repositories/${repoId}`);
-      if (!resp.ok) return {};
-      const data = await resp.json();
-      return (data.settings as FullRepoSettings) || {};
+      const resp = await apiInstance.get(`/repositories/${repoId}`);
+      const data = resp.data;
+      return {
+        ...(data.settings as object),
+        name: data.name,
+        isTemplate: data.isTemplate,
+      };
     } catch (e) {
       console.error(e);
       return {};
@@ -131,12 +115,7 @@ class RepoService {
     repoId: string,
     settings: FullRepoSettings,
   ): Promise<void> {
-    const resp = await fetch(`${this.apiUrl}/repositories/${repoId}/settings`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ settings }),
-    });
-    if (!resp.ok) throw new Error("Failed to update settings");
+    await apiInstance.patch(`/repositories/${repoId}/settings`, { settings });
   }
 
   async updateRole(
@@ -144,6 +123,7 @@ class RepoService {
     userId: string,
     newRole: AccessRole,
   ): Promise<void> {
+    // This should also be an API call in production
     await new Promise((resolve) => setTimeout(resolve, 500));
     const collaborators =
       MOCK_COLLABORATORS[repoId] || MOCK_COLLABORATORS["my-repo-1"];
@@ -158,8 +138,8 @@ class RepoService {
     email: string,
     role: AccessRole,
   ): Promise<void> {
+    // This should also be an API call in production
     await new Promise((resolve) => setTimeout(resolve, 600));
-    // Mock adding them
     const collaborators =
       MOCK_COLLABORATORS[repoId] || MOCK_COLLABORATORS["my-repo-1"];
     collaborators.push({
@@ -173,7 +153,7 @@ class RepoService {
     });
   }
 
-  // Permission Check Helper
+  // Permission Check Helpers
   canMerge(userRole: AccessRole): boolean {
     return ["owner", "admin", "write"].includes(userRole);
   }

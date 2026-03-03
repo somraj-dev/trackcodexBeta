@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import { FastifyRequest, FastifyReply } from "fastify";
 import * as git from "isomorphic-git";
+import { env } from "../../config/env";
 
 /**
  * Native Git Server (Standalone Engine)
@@ -238,12 +239,14 @@ export class GitServer {
 
   private installHooks(repoPath: string) {
     const hookPath = path.join(repoPath, "hooks", "pre-receive");
+    const backendUrl = env.BACKEND_URL || "http://localhost:4000";
+
     // Hook script calls back to the running backend
     const script = `#!/bin/sh
       while read oldrev newrev refname; do
         curl -f -s -X POST -H "Content-Type: application/json" \\
           -d "{\\"oldrev\\":\\"$oldrev\\", \\"newrev\\":\\"$newrev\\", \\"refname\\":\\"$refname\\", \\"repoId\\":\\"$TRACKCODEX_REPO_ID\\"}" \\
-          http://localhost:4000/git/internal/hooks/pre-receive || exit 1
+          ${backendUrl}/api/v1/git/internal/hooks/pre-receive || exit 1
       done
     `;
     try {

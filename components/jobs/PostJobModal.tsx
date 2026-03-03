@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MOCK_REPOS } from '../../constants';
 import { Job } from '../../types';
 import { GoogleGenAI } from "@google/genai";
+import { api } from '../../context/AuthContext';
 
 interface PostJobModalProps {
   isOpen: boolean;
@@ -32,12 +33,8 @@ const PostJobModal: React.FC<PostJobModalProps> = ({ isOpen, onClose, onSubmit, 
     e.preventDefault();
     // Post to Backend
     try {
-      const res = await fetch('http://localhost:4000/api/v1/jobs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const newJob = await res.json();
+      const res = await api.post('/jobs', formData);
+      const newJob = res.data;
       onSubmit(newJob);
       onClose();
     } catch (e) {

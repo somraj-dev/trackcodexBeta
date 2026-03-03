@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
+import { API_URL } from '../../services/api';
 
 const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = [] }: { workspaceId?: string; onClose?: () => void; onMaximize?: () => void; logs?: string[] }) => {
     const terminalRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,10 @@ const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = []
         fitAddonRef.current = fitAddon;
 
         // Connect to WebSocket
-        const ws = new WebSocket(`ws://localhost:4000/api/v1/forge/terminal/${workspaceId}`);
+        const baseUrl = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
+        const wsProto = baseUrl.startsWith('https') ? 'wss' : 'ws';
+        const wsUrl = `${baseUrl.replace(/^https?/, wsProto)}/api/v1/forge/terminal/${workspaceId}`;
+        const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
 
         ws.onopen = () => {
