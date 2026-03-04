@@ -12,7 +12,7 @@ services:
       - ENCRYPTION_KEY=e0f54592-d6c4-4b47-8178-5e5898394236
       - COOKIE_SECRET=cookie-secret-change-this-min-32-chars
       - FRONTEND_URL=https://trackcodex.com
-      - OPENVSCODE_URL=http://65.2.146.75:8080
+      - OPENVSCODE_URL=https://ide.trackcodex.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     user: "0:0"
@@ -49,7 +49,7 @@ services:
       context: .
       dockerfile: docker/ide.Dockerfile
     ports:
-      - "8080:8080"   # OpenVSCode Web UI (TrackCodex Custom)
+      - "80:8080"   # OpenVSCode Web UI — mapped to 80 for Cloudflare SSL proxy
     volumes:
       - ./workspaces:/home/workspace   # Bind mount so backend + container share files
     environment:
