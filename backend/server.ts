@@ -185,7 +185,7 @@ async function bootstrap() {
     await server.register(websocket);
 
     // Initialize RealtimeService with the IO instance
-    RealtimeService.init((server as unknown as { io: unknown }).io);
+    RealtimeService.init((server as unknown as { io: any }).io);
 
     // 8. GraphQL API (Mercurius)
     try {
@@ -461,7 +461,7 @@ async function bootstrap() {
                 console.warn("✅ Connected to PostgreSQL database successfully");
             } catch (err: unknown) {
                 retries--;
-                console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${err.message}`);
+                console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${(err as Error).message}`);
 
                 if (process.env.DATABASE_URL?.includes(":5432")) {
                     console.warn("💡 TIP: Using port 5432. For AWS RDS + connection pooling, ensure your security group allows inbound on 5432 from EC2.");

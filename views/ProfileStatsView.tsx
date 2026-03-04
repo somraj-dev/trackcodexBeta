@@ -65,13 +65,13 @@ export const ProfileView: React.FC = () => {
     }
 
     return (
-        <div className="h-full overflow-y-auto bg-[#0A0A0A]lack text-zinc-100 p-6">
+        <div className="h-full overflow-y-auto bg-black text-zinc-100 p-6">
             {/* Header Section */}
             <div className="flex items-start justify-between mb-8">
                 <div className="flex gap-4">
                     <div className="w-20 h-20 rounded-full bg-zinc-800 border-2 border-zinc-700 overflow-hidden">
                         {profileData.user.avatar ? (
-                            <img src={profileData.user.avatar} className="w-full h-full object-cover" />
+                            <img src={profileData.user.avatar} className="w-full h-full object-cover" alt={`${profileData.user.username}'s avatar`} />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-2xl">👤</div>
                         )}
@@ -126,7 +126,7 @@ export const ProfileView: React.FC = () => {
                         <h3 className="text-sm font-semibold text-zinc-300 mb-3">Badges</h3>
                         <div className="flex flex-wrap gap-2">
                             <span className="px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded border border-purple-500/20">Forge AI Pro</span>
-                            <span className="px-2 py-1 bg-[#0A0A0A]lue-500/10 text-blue-400 text-xs rounded border border-blue-500/20">Early Adopter</span>
+                            <span className="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded border border-blue-500/20">Early Adopter</span>
                             <span className="px-2 py-1 bg-orange-500/10 text-orange-400 text-xs rounded border border-orange-500/20">Top Contributor</span>
                         </div>
                     </div>

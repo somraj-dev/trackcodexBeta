@@ -337,7 +337,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     const renderMessageContent = (msg: Message) => {
         const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-        const matches = [...msg.content.matchAll(codeBlockRegex)];
+        const matches = Array.from(msg.content.matchAll(codeBlockRegex));
 
         if (matches.length === 0) return <span>{msg.content}</span>;
 
@@ -529,7 +529,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <div className="px-4 py-2 flex items-center justify-between text-[14px] font-semibold">
                             <span className="text-white">Messages</span>
-                            <button className="text-white/50 hover:text-white transition-colors">Requests</button>
+                            <button className="text-white/50 hover:text-white transition-colors" aria-label="View Requests" title="View Requests">Requests</button>
                         </div>
                         {filteredConversations.map(conv => {
                             const other = getOtherParticipant(conv);
@@ -545,7 +545,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                         <div className={`absolute -inset-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity p-[1.5px] ${isActive ? 'opacity-100' : ''}`}>
                                             <div className="w-full h-full bg-black rounded-full" />
                                         </div>
-                                        <img src={other?.avatar || "/default-avatar.png"} className="relative size-14 rounded-full object-cover border-2 border-black" alt="" />
+                                        <img src={other?.avatar || "/default-avatar.png"} className="relative size-14 rounded-full object-cover border-2 border-black" alt={`${other?.username || 'User'}'s avatar`} />
                                         <div className="absolute bottom-0.5 right-0.5 size-3.5 bg-green-500 rounded-full border-[3px] border-black"></div>
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -581,7 +581,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                         <div className="absolute -inset-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity p-[1px]">
                                             <div className="w-full h-full bg-black rounded-full" />
                                         </div>
-                                        <img src={displayUser?.avatar || "/default-avatar.png"} className="relative size-10 rounded-full object-cover border border-white/10" alt="" />
+                                        <img src={displayUser?.avatar || "/default-avatar.png"} className="relative size-10 rounded-full object-cover border border-white/10" alt={`${displayUser?.username || 'User'}'s avatar`} />
                                     </div>
                                     <div>
                                         <h3 className="text-[16px] font-bold text-white leading-tight cursor-pointer hover:text-white/70 transition-colors">
@@ -601,10 +601,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     >
                                         {isHackerMode ? '>_ HACKER' : '>_ NORMAL'}
                                     </button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Call"><Phone size={24} strokeWidth={1.5} /></button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Video Call"><Video size={26} strokeWidth={1.5} /></button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Details"><Info size={24} strokeWidth={1.5} /></button>
-                                    <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full md:hidden transition-colors" aria-label="Back"><ChevronLeft size={24} /></button>
+                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Call" title="Call"><Phone size={24} strokeWidth={1.5} /></button>
+                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Video Call" title="Video Call"><Video size={26} strokeWidth={1.5} /></button>
+                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Details" title="Details"><Info size={24} strokeWidth={1.5} /></button>
+                                    <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full md:hidden transition-colors" aria-label="Back" title="Back"><ChevronLeft size={24} /></button>
                                 </div>
                             </div>
 
@@ -617,7 +617,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 ) : (
                                     <>
                                         <div className="flex flex-col items-center py-10 opacity-50">
-                                            <img src={displayUser?.avatar || "/default-avatar.png"} className="size-20 rounded-full mb-3" alt="" />
+                                            <img src={displayUser?.avatar || "/default-avatar.png"} className="size-20 rounded-full mb-3" alt={`${displayUser?.username || 'User'}'s avatar`} />
                                             <h4 className="text-xl font-bold text-white">{displayUser?.username}</h4>
                                             <p className="text-sm">Instagram · {displayUser?.username}</p>
                                             <button className="mt-4 px-4 py-1.5 bg-[#262626] hover:bg-[#363636] transition-colors rounded-lg text-sm font-semibold text-white">
@@ -638,7 +638,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                         {!isMe && (
                                                             <div className="w-8 shrink-0 mr-2 flex items-end">
                                                                 {showAvatar && (
-                                                                    <img src={msg.sender.avatar || "/default-avatar.png"} className="size-7 rounded-full mb-1 border border-white/5" alt="" />
+                                                                    <img src={msg.sender.avatar || "/default-avatar.png"} className="size-7 rounded-full mb-1 border border-white/5" alt={`${msg.sender.username}'s avatar`} />
                                                                 )}
                                                             </div>
                                                         )}
@@ -708,7 +708,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                 </div>
                                             </div>
                                         )}
-                                        <div ref={messagesEndRef} />
+                                        <div ref={messagesEndRef} aria-hidden="true" />
                                     </>
                                 )}
                             </div>
@@ -719,7 +719,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     onSubmit={handleSendMessage}
                                     className="flex items-center gap-3 bg-black border border-white/20 rounded-[2rem] px-4 py-2 focus-within:border-white/40 transition-all"
                                 >
-                                    <button type="button" className="p-1 hover:text-white/60 transition-colors text-white" aria-label="Emoji">
+                                    <button type="button" className="p-1 hover:text-white/60 transition-colors text-white" aria-label="Emoji Picker" title="Emoji Picker">
                                         <Smile size={26} strokeWidth={1.5} />
                                     </button>
 
@@ -761,7 +761,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             >
                                                 <ImageIcon size={26} strokeWidth={1.5} />
                                             </button>
-                                            <button type="button" className="p-1 hover:text-white/60 transition-colors" aria-label="Like"><Heart size={26} strokeWidth={1.5} /></button>
+                                            <button type="button" className="p-1 hover:text-white/60 transition-colors text-white" aria-label="Like Message" title="Like Message"><Heart size={26} strokeWidth={1.5} /></button>
                                         </div>
                                     )}
                                 </form>

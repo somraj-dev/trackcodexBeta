@@ -529,7 +529,7 @@ const ProfileView = () => {
                       </div>
                       <div className="flex items-center gap-6">
                         <span
-                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${job.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-[#0A0A0A]lue-500/10 text-blue-500"}`}
+                          className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${job.status === "Completed" ? "bg-emerald-500/10 text-emerald-500" : "bg-blue-500/10 text-blue-500"}`}
                         >
                           {job.status}
                         </span>
