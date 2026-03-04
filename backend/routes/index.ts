@@ -80,7 +80,7 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(radarRoutes);
   await fastify.register(portfolioRoutes, { prefix: "/portfolio" });
   await fastify.register(statsRoutes, { prefix: "/stats" });
-  await fastify.register(messageRoutes);
+  await fastify.register(messageRoutes, { prefix: "/messages" });
   await fastify.register(leaderboardRoutes);
   await fastify.register(extensionRoutes);
   await fastify.register(ideConfigRoutes);

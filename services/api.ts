@@ -164,6 +164,7 @@ export const api = {
   // ... other services can be added here following the same pattern
   get: <T>(url: string, params?: any) => request<T>({ url, params }),
   post: <T>(url: string, data?: any) => request<T>({ url, method: "POST", data }),
+  put: <T>(url: string, data?: any) => request<T>({ url, method: "PUT", data }),
   patch: <T>(url: string, data?: any) => request<T>({ url, method: "PATCH", data }),
   delete: <T>(url: string) => request<T>({ url, method: "DELETE" }),
 };

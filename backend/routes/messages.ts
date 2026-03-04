@@ -2,10 +2,13 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../services/prisma";
 import { AppError, BadRequest, NotFound, Forbidden } from "../utils/AppError";
 import { RealtimeService } from "../services/realtime";
+import { requireAuth } from "../middleware/auth";
 
 // Shared prisma instance
 
 export async function messageRoutes(fastify: FastifyInstance) {
+  // Apply auth to all message routes
+  fastify.addHook("preHandler", requireAuth);
   // 1. Get All Conversations for Current User
   fastify.get("/conversations", async (request, reply) => {
     const user = (request as any).user;
@@ -15,7 +18,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       where: {
         participants: {
           some: {
-            userId: user.id,
+            userId: user.userId,
           },
         },
       },
@@ -51,7 +54,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
     const { targetUserId } = request.body as { targetUserId: string };
     if (!targetUserId) throw BadRequest("Target User ID required");
 
-    if (user.id === targetUserId) {
+    if (user.userId === targetUserId) {
       throw BadRequest("Cannot message yourself");
     }
 
@@ -66,7 +69,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       where: {
         type: "DIRECT",
         AND: [
-          { participants: { some: { userId: user.id } } },
+          { participants: { some: { userId: user.userId } } },
           { participants: { some: { userId: targetUserId } } },
         ],
       },
@@ -90,7 +93,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       data: {
         type: "DIRECT",
         participants: {
-          create: [{ userId: user.id }, { userId: targetUserId }],
+          create: [{ userId: user.userId }, { userId: targetUserId }],
         },
       },
       include: {
@@ -117,7 +120,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       where: {
         conversationId_userId: {
           conversationId: id,
-          userId: user.id,
+          userId: user.userId,
         },
       },
     });
@@ -152,7 +155,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       where: {
         conversationId_userId: {
           conversationId: id,
-          userId: user.id,
+          userId: user.userId,
         },
       },
     });
@@ -162,7 +165,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
     const message = await prisma.message.create({
       data: {
         conversationId: id,
-        senderId: user.id,
+        senderId: user.userId,
         content: content.trim(),
       },
       include: {
@@ -206,7 +209,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       where: {
         conversationId_userId: {
           conversationId: id,
-          userId: user.id,
+          userId: user.userId,
         },
       },
       data: {
