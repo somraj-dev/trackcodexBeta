@@ -191,8 +191,8 @@ export async function messageRoutes(fastify: FastifyInstance) {
         type: "new_message",
         ...message,
       });
-    } catch (e) {
-      request.log.warn("Failed to broadcast message via socket", e);
+    } catch (e: any) {
+      request.log.warn(e, "Failed to broadcast message via socket");
     }
 
     return message;
@@ -217,54 +217,54 @@ export async function messageRoutes(fastify: FastifyInstance) {
       },
     });
 
-    // 6. Toggle Emoji Reaction on a Message
-    fastify.put("/:id/react", async (request, reply) => {
-      const user = (request as any).user;
-      const { id } = request.params as { id: string };
-      const { emoji } = request.body as { emoji: string };
+    return { success: true };
+  });
 
-      if (!user) throw new AppError("Unauthorized", 401);
+  // 6. Toggle Emoji Reaction on a Message
+  fastify.put("/messages/:id/react", async (request, reply) => {
+    const user = (request as any).user;
+    const { id } = request.params as { id: string };
+    const { emoji } = request.body as { emoji: string };
 
-      const message = await prisma.message.findUnique({
-        where: { id },
-      });
+    if (!user) throw new AppError("Unauthorized", 401);
 
-      if (!message) {
-        throw NotFound("Message not found");
-      }
-
-      const metadata: any = message.metadata || {};
-      metadata.reactions = metadata.reactions || {};
-
-      // Toggle reaction for this user
-      if (metadata.reactions[emoji]?.includes(user.userId)) {
-        metadata.reactions[emoji] = metadata.reactions[emoji].filter(
-          (uId: string) => uId !== user.userId
-        );
-        if (metadata.reactions[emoji].length === 0) {
-          delete metadata.reactions[emoji];
-        }
-      } else {
-        metadata.reactions[emoji] = metadata.reactions[emoji] || [];
-        metadata.reactions[emoji].push(user.userId);
-      }
-
-      const updatedMessage = await prisma.message.update({
-        where: { id },
-        data: { metadata },
-      });
-
-      // Broadcast the update via sockets
-      RealtimeService.broadcastReaction(
-        message.conversationId,
-        id,
-        user.userId,
-        emoji
-      );
-
-      return { success: true, message: updatedMessage };
+    const message = await prisma.message.findUnique({
+      where: { id },
     });
 
-    return { success: true };
+    if (!message) {
+      throw NotFound("Message not found");
+    }
+
+    const metadata: any = message.metadata || {};
+    metadata.reactions = metadata.reactions || {};
+
+    // Toggle reaction for this user
+    if (metadata.reactions[emoji]?.includes(user.userId)) {
+      metadata.reactions[emoji] = metadata.reactions[emoji].filter(
+        (uId: string) => uId !== user.userId
+      );
+      if (metadata.reactions[emoji].length === 0) {
+        delete metadata.reactions[emoji];
+      }
+    } else {
+      metadata.reactions[emoji] = metadata.reactions[emoji] || [];
+      metadata.reactions[emoji].push(user.userId);
+    }
+
+    const updatedMessage = await prisma.message.update({
+      where: { id },
+      data: { metadata },
+    });
+
+    // Broadcast the update via sockets
+    RealtimeService.broadcastReaction(
+      message.conversationId,
+      id,
+      user.userId,
+      emoji
+    );
+
+    return { success: true, message: updatedMessage };
   });
 }

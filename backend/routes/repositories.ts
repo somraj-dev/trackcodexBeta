@@ -2241,12 +2241,5 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         throw InternalError("Failed to toggle reaction");
       }
     },
-  });
-}
-
-
-
-
-
-
+  );
 }

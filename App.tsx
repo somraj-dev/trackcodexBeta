@@ -117,6 +117,7 @@ const ExploreView = React.lazy(() => import("./views/Explore"));
 const LibraryView = React.lazy(() => import("./views/Library"));
 const ForgeAIView = React.lazy(() => import("./views/ForgeAI"));
 const NotificationsView = React.lazy(() => import("./views/NotificationsView"));
+const MessagesView = React.lazy(() => import("./views/messages/MessagesView"));
 const AcceptInvite = React.lazy(() => import("./views/AcceptInvite"));
 const WorkspaceSettings = React.lazy(() => import("./views/WorkspaceSettings"));
 const Leaderboard = React.lazy(() => import("./views/Leaderboard"));
@@ -950,6 +951,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
               />
 
               <Route path="/notifications" element={<NotificationsView />} />
+              <Route path="/messages" element={<MessagesView />} />
 
               {/* Documentation & Blog */}
               <Route path="/docs" element={<DocsLayout />}>

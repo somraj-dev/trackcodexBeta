@@ -161,6 +161,11 @@ export const api = {
     update: (data: Partial<UserProfile>) =>
       request<ProfileData>({ url: "/profiles/me", method: "PATCH", data }),
   },
+  notifications: {
+    list: (userId: string) => request<any[]>({ url: `/notifications` }),
+    markRead: (id: string) => request<any>({ url: `/notifications/${id}/read`, method: "POST" }),
+    markAllRead: (userId: string) => request<any>({ url: `/notifications/read-all`, method: "POST" }),
+  },
   // ... other services can be added here following the same pattern
   get: <T>(url: string, params?: any) => request<T>({ url, params }),
   post: <T>(url: string, data?: any) => request<T>({ url, method: "POST", data }),

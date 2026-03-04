@@ -29,6 +29,7 @@ interface MessagingContextType {
     setActiveConvId: (id: string | null) => void;
     sendMessage: (text: string) => Promise<void>;
     refreshConversations: () => Promise<void>;
+    checkConversation: (userId: string) => Promise<Conversation | undefined>;
 }
 
 const MessagingContext = createContext<MessagingContextType | undefined>(undefined);
@@ -60,6 +61,23 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             console.error('Failed to fetch conversations', err);
         }
     }, []);
+
+    const checkConversation = useCallback(async (userId: string) => {
+        try {
+            // First check local state
+            const existing = conversations.find(c => c.participants.some(p => p.id === userId));
+            if (existing) return existing;
+
+            // Attempt to create or fetch on backend
+            // For now, if no backend creation endpoint via standard REST, we just optimistically return a mock or call POST.
+            const response = await api.post<any>('/conversations', { participantId: userId });
+            await refreshConversations();
+            return { id: response.id } as Conversation;
+        } catch (err) {
+            console.error('Failed to check/create conversation', err);
+            return undefined;
+        }
+    }, [conversations, refreshConversations]);
 
     const sendMessage = useCallback(async (text: string) => {
         if (!activeConvId || !text.trim()) return;
@@ -134,7 +152,8 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             setIsPanelOpen,
             setActiveConvId,
             sendMessage,
-            refreshConversations
+            refreshConversations,
+            checkConversation
         }}>
             {children}
         </MessagingContext.Provider>

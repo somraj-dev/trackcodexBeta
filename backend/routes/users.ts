@@ -250,6 +250,136 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // Unfollow a user
+  fastify.delete("/users/:userId/follow", async (request, reply) => {
+    const currentUser = (request as any).user;
+    if (!currentUser) {
+      return reply.code(401).send({ message: "Unauthorized" });
+    }
+
+    const { userId: targetUserId } = request.params as { userId: string };
+
+    try {
+      // Find the existing follow
+      const follow = await prisma.follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: currentUser.userId,
+            followingId: targetUserId,
+          },
+        },
+      });
+
+      if (!follow) {
+        return reply.code(404).send({ message: "Not following this user" });
+      }
+
+      // Delete the follow
+      await prisma.follow.delete({
+        where: {
+          followerId_followingId: {
+            followerId: currentUser.userId,
+            followingId: targetUserId,
+          },
+        },
+      });
+
+      // Update counters in Profile
+      await prisma.profile.update({
+        where: { userId: targetUserId },
+        data: { followersCount: { decrement: 1 } },
+      }).catch(e => console.error("Could not decrement followersCount for target user", e));
+
+      await prisma.profile.update({
+        where: { userId: currentUser.userId },
+        data: { followingCount: { decrement: 1 } },
+      }).catch(e => console.error("Could not decrement followingCount for current user", e));
+
+      return { success: true, message: "Successfully unfollowed user" };
+    } catch (error) {
+      console.error("Unfollow error:", error);
+      return reply.code(500).send({ message: "Failed to unfollow user" });
+    }
+  });
+
+  // Get user followers
+  fastify.get("/users/:userId/followers", async (request, reply) => {
+    const { userId } = request.params as { userId: string };
+    try {
+      const followers = await prisma.follow.findMany({
+        where: { followingId: userId },
+        include: {
+          follower: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+              customProfile: {
+                select: {
+                  followersCount: true,
+                  followingCount: true,
+                }
+              }
+            },
+          },
+        },
+      });
+      return followers.map(f => {
+        const u = f.follower;
+        const mapped = {
+          ...u,
+          followersCount: (u as any).customProfile?.followersCount || 0,
+          followingCount: (u as any).customProfile?.followingCount || 0,
+        };
+        delete (mapped as any).customProfile;
+        return mapped;
+      });
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      return reply.code(500).send({ message: "Failed to fetch followers" });
+    }
+  });
+
+  // Get users followed by user
+  fastify.get("/users/:userId/following", async (request, reply) => {
+    const { userId } = request.params as { userId: string };
+    try {
+      const following = await prisma.follow.findMany({
+        where: { followerId: userId },
+        include: {
+          following: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+              customProfile: {
+                select: {
+                  followersCount: true,
+                  followingCount: true,
+                }
+              }
+            },
+          },
+        },
+      });
+      return following.map(f => {
+        const u = f.following;
+        const mapped = {
+          ...u,
+          followersCount: (u as any).customProfile?.followersCount || 0,
+          followingCount: (u as any).customProfile?.followingCount || 0,
+        };
+        delete (mapped as any).customProfile;
+        return mapped;
+      });
+    } catch (error) {
+      console.error("Error fetching following:", error);
+      return reply.code(500).send({ message: "Failed to fetch following users" });
+    }
+  });
+
   // Get Pending Follow Requests
   fastify.get(
     "/users/follow-requests",

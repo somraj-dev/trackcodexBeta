@@ -214,4 +214,23 @@ export class RealtimeService {
       this.io.to(id).emit(event.type, event);
     });
   }
+
+  /**
+   * Broadcasts a reaction update to a specific conversation room
+   */
+  static broadcastReaction(
+    conversationId: string,
+    messageId: string,
+    userId: string,
+    emoji: string
+  ) {
+    if (!this.io) return;
+    this.io.to(conversationId).emit("REACTION_UPDATE", {
+      type: "REACTION_UPDATE",
+      conversationId,
+      messageId,
+      userId,
+      emoji,
+    });
+  }
 }
