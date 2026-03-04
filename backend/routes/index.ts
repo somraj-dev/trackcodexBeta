@@ -61,7 +61,6 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(orgRoutes);
   await fastify.register(communityRoutes);
   await fastify.register(profileRoutes);
-  await fastify.register(hiringRoutes, { prefix: "/hiring" });
   await fastify.register(growthRoutes);
   await fastify.register(forgeRoutes);
   await fastify.register(adminRoutes);
@@ -91,9 +90,6 @@ export async function routes(fastify: FastifyInstance) {
 
   const { walletRoutes } = await import("./wallet");
   await fastify.register(walletRoutes, { prefix: "/wallet" });
-
-  const { securityRoutes } = await import("./security");
-  await fastify.register(securityRoutes);
 
   const { default: deploymentRoutes } = await import("./deployments");
   await fastify.register(deploymentRoutes);

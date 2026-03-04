@@ -12,6 +12,9 @@ services:
       - ENCRYPTION_KEY=e0f54592-d6c4-4b47-8178-5e5898394236
       - COOKIE_SECRET=cookie-secret-change-this-min-32-chars
       - FRONTEND_URL=https://trackcodex.com
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: "0:0"
     depends_on:
       - db
 

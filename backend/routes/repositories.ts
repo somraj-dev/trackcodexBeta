@@ -2241,113 +2241,12 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         throw InternalError("Failed to toggle reaction");
       }
     },
-  );
+  });
+}
 
-  // Security API Endpoints
 
-  // ========== SECURITY ENDPOINTS ==========
 
-  // List Security Alerts
-  fastify.get(
-    "/repositories/:id/security/alerts",
-    { preHandler: requireRepoCapability("read_repo") },
-    async (request, reply) => {
-      const { id } = request.params as { id: string };
-      try {
-        const { SecurityService } = await import("../services/securityService");
-        const alerts = await SecurityService.getAlerts(id);
-        return alerts;
-      } catch (e: any) {
-        request.log.error(e);
-        throw InternalError("Failed to fetch security alerts");
-      }
-    },
-  );
 
-  // Trigger Full Security Scan
-  fastify.post(
-    "/repositories/:id/security/scan",
-    { preHandler: requireRepoCapability("write_repo") },
-    async (request, reply) => {
-      const { id: repoId } = request.params as { id: string };
-      const user = request.user!;
-
-      try {
-        const { SecurityService } = await import("../services/securityService");
-
-        // Audit Log
-        await AuditService.log({
-          actorId: user.userId,
-          action: "SECURITY_SCAN_TRIGGER",
-          resource: `repo:${repoId}`,
-          ipAddress: request.ip,
-        });
-
-        const alerts = await SecurityService.performFullScan(repoId);
-        // Also try real SCA if environment allows
-        try {
-          await SecurityService.auditRepoDependencies(repoId);
-        } catch (scaErr) {
-          request.log.warn(
-            "Real SCA scan failed, falling back to mocks",
-            scaErr,
-          );
-        }
-
-        return { message: "Scan completed", alertCount: alerts.length };
-      } catch (e: any) {
-        request.log.error(e);
-        throw InternalError("Failed to perform security scan");
-      }
-    },
-  );
-
-  // Update Alert Status
-  fastify.patch(
-    "/security/alerts/:id",
-    { preHandler: requireAuth },
-    async (request, reply) => {
-      const { id } = request.params as { id: string };
-      const { status } = request.body as {
-        status: "FIXED" | "DISMISSED" | "OPEN";
-      };
-
-      if (!["FIXED", "DISMISSED", "OPEN"].includes(status)) {
-        throw BadRequest("Invalid status");
-      }
-
-      try {
-        const { SecurityService } = await import("../services/securityService");
-        const alert = await SecurityService.updateAlertStatus(
-          id,
-          status as any,
-        );
-        return alert;
-      } catch (e: any) {
-        request.log.error(e);
-        throw InternalError("Failed to update alert status");
-      }
-    },
-  );
-
-  // Upload SARIF (Advanced SAST)
-  fastify.post(
-    "/repositories/:id/security/sarif",
-    { preHandler: requireRepoCapability("write_repo") },
-    async (request, reply) => {
-      const { id: repoId } = request.params as { id: string };
-      const sarif = request.body;
-
-      try {
-        const { SecurityService } = await import("../services/securityService");
-        const alerts = await SecurityService.uploadSarif(repoId, sarif);
-        return { message: "SARIF ingested", alertCount: alerts.length };
-      } catch (e: any) {
-        request.log.error(e);
-        throw InternalError("Failed to ingest SARIF data");
-      }
-    },
-  );
 
 
 }

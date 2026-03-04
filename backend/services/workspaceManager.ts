@@ -2,6 +2,9 @@ import path from "path";
 import fs from "fs";
 import { execSync } from "child_process";
 import { AutoSyncService } from "./autoSyncService";
+import { DockerService } from "./docker";
+import getPort from "get-port";
+import { env } from "../config/env";
 
 // OpenVSCode Server URL (Docker service on port 8080)
 const OPENVSCODE_URL = process.env.OPENVSCODE_URL || "http://localhost:8080";
@@ -52,19 +55,32 @@ export class WorkspaceManager {
         fs.mkdirSync(workspacePath, { recursive: true });
       }
 
-      // Build OpenVSCode URL pointing to the workspace folder
-      // The bind mount maps ./workspaces → /home/workspace in the container
-      const folderPath = `/home/workspace/${repoName}`;
-      const url = `${OPENVSCODE_URL}/?tkn=${OPENVSCODE_TOKEN}&folder=${folderPath}`;
+      // --- Provision Dedicated Docker Container ---
+      console.warn(`[WorkspaceManager] Provisioning container for ${repoName}...`);
 
-      console.warn(`[WorkspaceManager] IDE URL: ${url}`);
+      // 1. Find a free port on the host
+      const port = await getPort({
+        port: [3000, 3001, 3002, 3003, 3004, 3005, 3000 + Math.floor(Math.random() * 1000)]
+      });
+
+      // 2. Start the container via DockerService
+      // Note: DockerService.createContainer handles removing old ones and starting the new one
+      const { port: hostPort } = await DockerService.createContainer(workspaceId, "gitpod/openvscode-server:latest", port);
+
+      // 3. Build the IDE URL
+      // Use the frontend's origin hostname or env.BACKEND_URL to ensure it's reachable
+      const host = env.BACKEND_URL.replace(/https?:\/\//, "").split(":")[0];
+      const protocol = env.BACKEND_URL.startsWith("https") ? "https" : "http";
+      const url = `${protocol}://${host}:${hostPort}/?folder=/home/workspace`;
+
+      console.warn(`[WorkspaceManager] IDE URL (Provisioned): ${url}`);
 
       // Start Auto-Sync if requested
       if (options?.liveSync) {
         AutoSyncService.start(workspacePath, workspaceId);
       }
 
-      return { url, port: 8080 };
+      return { url, port: hostPort };
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(`[WorkspaceManager] Failed: ${msg}`);
