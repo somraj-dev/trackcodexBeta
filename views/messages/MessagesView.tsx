@@ -28,7 +28,7 @@ const MessagesView = () => {
     // Load messages for active conversation
     useEffect(() => {
         if (activeConvId) {
-            api.get(`/conversations/${activeConvId}/messages`)
+            api.get(`/messages/conversations/${activeConvId}/messages`)
                 .then((res: any) => {
                     setMessages(Array.isArray(res) ? res : []);
                     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
@@ -44,9 +44,9 @@ const MessagesView = () => {
         if (!inputValue.trim() || !activeConvId) return;
 
         try {
-            await api.post(`/conversations/${activeConvId}/messages`, { content: inputValue });
+            await api.post(`/messages/conversations/${activeConvId}/messages`, { content: inputValue });
             // Refresh messages
-            api.get(`/conversations/${activeConvId}/messages`).then(res => setMessages(res as any));
+            api.get(`/messages/conversations/${activeConvId}/messages`).then(res => setMessages(res as any));
             setInputValue("");
             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         } catch (err) {

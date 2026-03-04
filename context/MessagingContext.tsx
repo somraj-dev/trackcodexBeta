@@ -42,7 +42,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const refreshConversations = useCallback(async () => {
         try {
-            const data = await api.get('/conversations');
+            const data: any[] = await api.get('/messages/conversations') as any;
             // Map backend data to local structure
             const mapped = data.map((c: any) => ({
                 id: c.id,
@@ -70,7 +70,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
             // Attempt to create or fetch on backend
             // For now, if no backend creation endpoint via standard REST, we just optimistically return a mock or call POST.
-            const response = await api.post<any>('/conversations', { participantId: userId });
+            const response = await api.post<any>('/messages/conversations', { targetUserId: userId });
             await refreshConversations();
             return { id: response.id } as Conversation;
         } catch (err) {
@@ -83,7 +83,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (!activeConvId || !text.trim()) return;
 
         try {
-            const msg = await api.post(`/conversations/${activeConvId}/messages`, { content: text });
+            const msg = await api.post(`/messages/conversations/${activeConvId}/messages`, { content: text });
 
             // Update local state optimistically or via refresh
             setConversations(prev => prev.map(c => {
@@ -93,7 +93,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                         lastMessage: text,
                         lastTimestamp: 'Now',
                         messages: [...(c.messages || []), {
-                            id: msg.id,
+                            id: (msg as any).id,
                             senderId: 'current',
                             content: text,
                             timestamp: new Date().toLocaleTimeString(),

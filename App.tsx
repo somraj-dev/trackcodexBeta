@@ -521,6 +521,9 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
     (path) => location.pathname.includes(path),
   ) || isStandalone;
 
+  // Full-screen views that need overflow-hidden on <main> for proper h-full behavior
+  const isFullScreenView = isIdeView || ["/messages", "/notifications"].includes(location.pathname);
+
   const isFullPageAction = ["/repositories/new", "/repositories/import"].includes(location.pathname);
 
   // Global Key Handlers
@@ -734,7 +737,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
 
         <main
           ref={mainScrollRef}
-          className={`flex-1 min-w-0 flex flex-col bg-gh-bg relative ${isIdeView || isFocusMode ? "overflow-hidden" : "overflow-y-auto custom-scrollbar"}`}
+          className={`flex-1 min-w-0 flex flex-col bg-gh-bg relative ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto custom-scrollbar"}`}
         >
           {/* GitHub-Style Navigation Header */}
           {!isIdeView && !isFocusMode && (
