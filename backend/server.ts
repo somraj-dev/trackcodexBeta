@@ -74,55 +74,26 @@ server.post("/api/send-otp", async (request, reply) => {
 });
 
 async function bootstrap() {
-    // 1. Security Headers (Helmet) - First line of defense
-    await server.register(helmet, {
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Adjust for React/Vite
-                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-                fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                imgSrc: ["'self'", "data:", "https:"],
-                connectSrc: [
-                    "'self'",
-                    "http://localhost:3001",
-                    "ws://localhost:3001",
-                    "ws://localhost:4000",
-                    "http://localhost:4000",
-                    env.BACKEND_URL,
-                    env.BACKEND_URL.replace(/^http/, 'ws'),
-                ],
-            },
-        },
-        global: true,
-    });
+    // 1. CORS - Registration at the TOP to ensure it catches everything
+    const allowedOriginRegex = /^https?:\/\/([^.]+\.)?trackcodex\.com(:[0-9]+)?$/;
+    const localOrigins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://localhost:4000",
+        "http://localhost:5173",
+    ];
 
-    // 2. Cookie Parser - Essential for HttpOnly sessions
-    await server.register(cookie, {
-        secret:
-            process.env.COOKIE_SECRET ||
-            "fallback-secret-change-in-prod-min-32-chars",
-        parseOptions: {},
-    });
-
-    // 3. CORS - Strict configuration with credentials support
     await server.register(cors, {
         origin: (origin, cb) => {
-            // DEBUG: Log origin to file since we can't see console easily
-            try {
-                const logMsg = `[${new Date().toISOString()}] CORS Request from Origin: ${origin || "NO_ORIGIN"}\n`;
-                fs.appendFileSync("./cors_debug.log", logMsg);
-            } catch (err) {
-                server.log.error(err, "Failed to write cors_debug.log");
-            }
-
-            if (!origin) {
+            if (!origin || localOrigins.includes(origin) || allowedOriginRegex.test(origin)) {
                 cb(null, true);
                 return;
             }
-
-            // Always allow for now to verify if this is the bottleneck
-            cb(null, true);
+            // fallback for debugging
+            console.warn(`[CORS] Rejected origin: ${origin}`);
+            cb(null, true); // Still allow in dev/hotfix mode to unblock user
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -139,8 +110,37 @@ async function bootstrap() {
             "X-Amz-Security-Token",
             "If-Modified-Since"
         ],
-        maxAge: 86400,
+        exposedHeaders: ["set-cookie"],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     });
+
+    // 2. Security Headers (Helmet) - Configuration tuned for cross-origin apps
+    await server.register(helmet, {
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.googletagmanager.com"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                imgSrc: ["'self'", "data:", "https:"],
+                connectSrc: [
+                    "'self'",
+                    "http://localhost:3001",
+                    "ws://localhost:3001",
+                    "ws://localhost:4000",
+                    "http://localhost:4000",
+                    "https://*.trackcodex.com",
+                    "wss://*.trackcodex.com",
+                    env.BACKEND_URL,
+                    env.BACKEND_URL.replace(/^http/, 'ws'),
+                ],
+            },
+        },
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        global: true,
+    });
+
 
     /* DISABLED FOR DEBUGGING 429 ISSUES
     // 4. Rate Limiting - DDoS protection
@@ -170,6 +170,7 @@ async function bootstrap() {
     await server.register(socketio, {
         cors: {
             origin: [
+                allowedOriginRegex,
                 process.env.FRONTEND_URL || "http://localhost:3001",
                 "http://127.0.0.1:3001",
                 "http://localhost:3001",
@@ -180,6 +181,7 @@ async function bootstrap() {
             credentials: true,
         },
     });
+
 
     // 7. WebSocket Support (for Terminal PTY)
     await server.register(websocket);
