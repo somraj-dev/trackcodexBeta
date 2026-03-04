@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { ResumeService } from "../services/resumeService";
 import { requireAuth } from "../middleware/auth";
+import { prisma } from "../services/prisma";
 
 export async function profileRoutes(server: FastifyInstance) {
   /**
@@ -201,19 +202,19 @@ export async function profileRoutes(server: FastifyInstance) {
       }
 
       try {
-        const result = await ResumeService.updatePrivacy(
-          userId,
-          showResume,
-          showReadme,
-        );
-
-        if (!result.success) {
-          return reply.status(400).send({ error: result.error });
-        }
+        const result = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            showResume: showResume !== undefined ? showResume : undefined,
+            showReadme: showReadme !== undefined ? showReadme : undefined,
+            isPrivate: (req.body as any).isPrivate !== undefined ? (req.body as any).isPrivate : undefined,
+          },
+        });
 
         return reply.send({
           success: true,
           message: "Privacy settings updated successfully",
+          isPrivate: result.isPrivate,
         });
       } catch (error) {
         console.error("Privacy update error:", error);
@@ -258,6 +259,7 @@ export async function profileRoutes(server: FastifyInstance) {
             showReadme: true,
             showResume: true,
             resumeUrl: true,
+            isPrivate: true,
           },
         });
 
@@ -280,6 +282,7 @@ export async function profileRoutes(server: FastifyInstance) {
             linkedin: user.linkedin,
             readme: user.showReadme ? user.profileReadme : null,
             hasResume: user.showResume && !!user.resumeUrl,
+            isPrivate: user.isPrivate,
           },
           profileUrl: `${process.env.FRONTEND_URL || "http://localhost:3001"}/profile/${userId}`,
         });

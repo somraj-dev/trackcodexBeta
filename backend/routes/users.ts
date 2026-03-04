@@ -1,5 +1,7 @@
 import { prisma } from "../services/prisma";
 import { requireAuth } from "../middleware/auth";
+import { NotificationService } from "../services/notification";
+import { FastifyInstance } from "fastify";
 
 // Shared prisma instance
 
@@ -137,43 +139,92 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // Follow a user
   fastify.post("/users/:userId/follow", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    const { userId: targetUserId } = request.params as { userId: string };
     const currentUser = (request as any).user;
 
     if (!currentUser) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    if (currentUser.userId === userId) {
+    if (currentUser.userId === targetUserId) {
       return reply.code(400).send({ message: "Cannot follow yourself" });
     }
 
     try {
-      // Check if already following
-      const existing = await prisma.follow.findUnique({
+      // 1. Check if already following
+      const existingFollow = await prisma.follow.findUnique({
         where: {
           followerId_followingId: {
-            followerId: currentUser.id,
-            followingId: userId,
+            followerId: currentUser.userId,
+            followingId: targetUserId,
           },
         },
       });
 
-      if (existing) {
+      if (existingFollow) {
         return reply.code(400).send({ message: "Already following this user" });
       }
 
-      // Create follow relationship
+      // 2. Check target user privacy
+      const targetUser = await prisma.user.findUnique({
+        where: { id: targetUserId },
+        select: { id: true, username: true, isPrivate: true },
+      });
+
+      if (!targetUser) {
+        return reply.code(404).send({ message: "User not found" });
+      }
+
+      if (targetUser.isPrivate) {
+        // Handle Follow Request
+        const existingRequest = await prisma.followRequest.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId: currentUser.userId,
+              followingId: targetUserId,
+            },
+          },
+        });
+
+        if (existingRequest) {
+          return reply.code(400).send({
+            message: "Follow request already pending",
+            status: existingRequest.status,
+          });
+        }
+
+        await prisma.followRequest.create({
+          data: {
+            followerId: currentUser.userId,
+            followingId: targetUserId,
+            status: "PENDING",
+          },
+        });
+
+        // Notify target user
+        await NotificationService.create(
+          targetUserId,
+          "FOLLOW_REQUEST",
+          "New Follow Request",
+          `@${currentUser.username} wants to follow you.`,
+          `/users/${currentUser.id}`,
+          { followerId: currentUser.userId }
+        );
+
+        return { success: true, message: "Follow request sent" };
+      }
+
+      // 3. Public Account - Direct Follow
       await prisma.follow.create({
         data: {
           followerId: currentUser.userId,
-          followingId: userId,
+          followingId: targetUserId,
         },
       });
 
-      // Update follower/following counts
+      // Update counts
       await prisma.profile.update({
-        where: { userId },
+        where: { userId: targetUserId },
         data: { followersCount: { increment: 1 } },
       });
 
@@ -182,12 +233,108 @@ export async function userRoutes(fastify: FastifyInstance) {
         data: { followingCount: { increment: 1 } },
       });
 
+      // Notify target user
+      await NotificationService.create(
+        targetUserId,
+        "FOLLOW",
+        "New Follower",
+        `@${currentUser.username} is now following you.`,
+        `/users/${currentUser.id}`,
+        { followerId: currentUser.userId }
+      );
+
       return { success: true, message: "Successfully followed user" };
     } catch (error) {
       console.error("Follow error:", error);
       return reply.code(500).send({ message: "Failed to follow user" });
     }
   });
+
+  // Get Pending Follow Requests
+  fastify.get(
+    "/users/follow-requests",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const currentUser = (request as any).user;
+      try {
+        const requests = await prisma.followRequest.findMany({
+          where: {
+            followingId: currentUser.userId,
+            status: "PENDING",
+          },
+          include: {
+            follower: {
+              select: { id: true, username: true, name: true, avatar: true },
+            },
+          },
+        });
+        return requests;
+      } catch (error) {
+        return reply.code(500).send({ message: "Failed to fetch follow requests" });
+      }
+    }
+  );
+
+  // Accept/Reject Follow Request
+  fastify.post(
+    "/users/follow-requests/:requestId/action",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const { requestId } = request.params as { requestId: string };
+      const { action } = request.body as { action: "ACCEPT" | "REJECT" };
+      const currentUser = (request as any).user;
+
+      try {
+        const followReq = await prisma.followRequest.findUnique({
+          where: { id: requestId },
+        });
+
+        if (!followReq || followReq.followingId !== currentUser.userId) {
+          return reply.code(404).send({ message: "Request not found" });
+        }
+
+        if (action === "ACCEPT") {
+          await prisma.$transaction([
+            // Create follow
+            prisma.follow.create({
+              data: {
+                followerId: followReq.followerId,
+                followingId: followReq.followingId,
+              },
+            }),
+            // Update counts
+            prisma.profile.update({
+              where: { userId: followReq.followingId },
+              data: { followersCount: { increment: 1 } },
+            }),
+            prisma.profile.update({
+              where: { userId: followReq.followerId },
+              data: { followingCount: { increment: 1 } },
+            }),
+            // Delete request
+            prisma.followRequest.delete({ where: { id: requestId } }),
+          ]);
+
+          // Notify follower
+          await NotificationService.create(
+            followReq.followerId,
+            "FOLLOW_ACCEPTED",
+            "Follow Request Accepted",
+            `@${currentUser.username} accepted your follow request.`,
+            `/users/${currentUser.id}`,
+            { followingId: currentUser.userId }
+          );
+
+          return { success: true, message: "Request accepted" };
+        } else {
+          await prisma.followRequest.delete({ where: { id: requestId } });
+          return { success: true, message: "Request rejected" };
+        }
+      } catch (error) {
+        return reply.code(500).send({ message: "Failed to process request" });
+      }
+    }
+  );
 
   // Unfollow a user
   fastify.delete("/users/:userId/follow", async (request, reply) => {

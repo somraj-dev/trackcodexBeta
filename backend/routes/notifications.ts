@@ -1,36 +1,42 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from "../services/prisma";
 import { NotificationService } from '../services/notification';
+import { requireAuth } from '../middleware/auth';
 
 export async function notificationRoutes(fastify: FastifyInstance) {
 
     // Get My Notifications
-    fastify.get('/notifications', async (request, reply) => {
-        const { userId } = request.query as any; // In real app, from Token
-        if (!userId) return reply.code(400).send({ error: "UserId required" });
+    fastify.get('/notifications', { preHandler: requireAuth }, async (request, reply) => {
+        const currentUser = (request as any).user;
 
         try {
-            // Shared prisma instance
-            const list = await NotificationService.getAll(userId);
+            const list = await NotificationService.getAll(currentUser.userId);
             return list;
         } catch (error: any) {
             console.error("[Notifications] Error fetching:", error.message);
-            // Return empty array instead of 500 to prevent UI crashes
             return [];
         }
     });
 
-    // Mark Read
-    fastify.post('/notifications/:id/read', async (request, reply) => {
-        const { id } = request.params as any;
+    // Mark as Read
+    fastify.post('/notifications/:id/read', { preHandler: requireAuth }, async (request, reply) => {
+        const { id } = request.params as { id: string };
+        const currentUser = (request as any).user;
+
+        // Security check: ensure notification belongs to user
+        const notif = await prisma.notification.findUnique({ where: { id } });
+        if (!notif || notif.userId !== currentUser.userId) {
+            return reply.code(404).send({ message: "Notification not found" });
+        }
+
         await NotificationService.markRead(id);
         return { success: true };
     });
 
     // Mark All Read
-    fastify.post('/notifications/read-all', async (request, reply) => {
-        const { userId } = request.body as any;
-        await NotificationService.markAllRead(userId);
+    fastify.post('/notifications/read-all', { preHandler: requireAuth }, async (request, reply) => {
+        const currentUser = (request as any).user;
+        await NotificationService.markAllRead(currentUser.userId);
         return { success: true };
     });
 }

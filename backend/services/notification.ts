@@ -1,8 +1,6 @@
 import { prisma } from "./prisma";
-import { ChatService } from './chat';
+import { RealtimeService } from './realtime';
 import { emailService } from './emailService';
-
-// Shared prisma instance
 
 export class NotificationService {
 
@@ -22,11 +20,13 @@ export class NotificationService {
                 }
             });
 
-            // 2. Push via WebSocket (Using ChatService's connection map)
-            ChatService.sendNotification(userId, notif);
+            // 2. Push via WebSocket
+            RealtimeService.sendToUser(userId, {
+                type: "NOTIFICATION",
+                data: notif
+            });
 
             // 3. Send Email Notification asynchronously
-            // We shouldn't await this so it doesn't block the caller
             prisma.user.findUnique({
                 where: { id: userId },
                 select: { email: true }

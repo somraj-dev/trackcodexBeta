@@ -104,29 +104,6 @@ export async function jobRoutes(fastify: FastifyInstance) {
         return job;
     });
 
-    // Apply to Job
-    fastify.post('/jobs/:id/apply', async (request, reply) => {
-        const { id } = request.params as any;
-        const { applicantId } = request.body as any;
-
-        if (!applicantId) return reply.code(400).send({ message: 'Applicant ID required' });
-
-        const existingApp = await prisma.jobApplication.findFirst({
-            where: { jobId: id, applicantId }
-        });
-
-        if (existingApp) return reply.code(409).send({ message: 'Already applied' });
-
-        const application = await prisma.jobApplication.create({
-            data: {
-                jobId: id,
-                applicantId,
-                status: 'Pending'
-            }
-        });
-
-        return { success: true, applicationId: application.id };
-    });
     // Complete Job & Rate (Transaction)
     fastify.post('/jobs/:id/complete', async (request, reply) => {
         const { id } = request.params as any;

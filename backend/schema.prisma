@@ -24,6 +24,7 @@ model User {
   twoFactorEnabled Boolean   @default(false)
   accountLocked    Boolean   @default(false)
   tokenVersion     Int       @default(1)
+  isPrivate        Boolean   @default(false)
 
   deletedAt          DateTime?
   deleteScheduledFor DateTime?
@@ -80,6 +81,9 @@ model User {
   workspaceInvitesSent    WorkspaceMember[] @relation("InvitedBy")
   workspaceInvitesCreated WorkspaceInvite[]
   repositories            Repository[]
+  notifications           Notification[]
+  followRequestsSent      FollowRequest[] @relation("FollowRequestsSent")
+  followRequestsReceived  FollowRequest[] @relation("FollowRequestsReceived")
 }
 
 model Profile {
@@ -1277,4 +1281,33 @@ model OutboxEvent {
   processedAt DateTime?
 
   @@index([processed, createdAt]) 
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // e.g., "FOLLOW", "FOLLOW_REQUEST", "SYSTEM"
+  title     String
+  message   String
+  link      String?
+  metadata  Json?    @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model FollowRequest {
+  id          String   @id @default(uuid())
+  followerId  String
+  follower    User     @relation("FollowRequestsSent", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("FollowRequestsReceived", fields: [followingId], references: [id], onDelete: Cascade)
+  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([followerId, followingId])
 }
