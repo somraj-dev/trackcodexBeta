@@ -138,7 +138,8 @@ const Login = () => {
                 <label className="block text-sm font-medium text-[#e6edf3]">
                   Password
                 </label>
-                <Link to="/forgot-password" className="text-xs text-[#2f81f7] hover:underline transition-colors">
+                <Link to="/forgot-password" size="sm" className="text-xs text-[#2f81f7] hover:underline transition-colors font-medium">
+                  Forgot password?
                 </Link>
               </div>
               <div className="mt-1 relative">

@@ -58,7 +58,7 @@ export async function userRoutes(fastify: FastifyInstance) {
         });
 
         // Clear session cookie
-        reply.setCookie("session_id", "", { path: "/", expires: new Date(0) });
+        reply.cookie("session_id", "", { path: "/", expires: new Date(0) });
 
         return { success: true, message: "Account deleted successfully" };
       } catch (error) {

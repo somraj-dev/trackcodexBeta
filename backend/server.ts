@@ -115,6 +115,12 @@ async function bootstrap() {
         optionsSuccessStatus: 204,
     });
 
+    // 1.5 Cookie Support - Required for session management
+    await server.register(cookie, {
+        secret: process.env.COOKIE_SECRET || "cookie-secret-change-this-min-32-chars",
+        parseOptions: {}
+    });
+
     // 2. Security Headers (Helmet) - Configuration tuned for cross-origin apps
     await server.register(helmet, {
         contentSecurityPolicy: {
