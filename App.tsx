@@ -77,6 +77,7 @@ class ChunkErrorBoundary extends React.Component<
 const Login = React.lazy(() => import("./views/auth/Login"));
 const Signup = React.lazy(() => import("./views/auth/Signup"));
 const OAuthCallback = React.lazy(() => import("./views/auth/OAuthCallback"));
+const DesktopBridge = React.lazy(() => import("./views/auth/DesktopBridge"));
 const ForgotPassword = React.lazy(() => import("./views/auth/ForgotPassword"));
 const ResetPassword = React.lazy(() => import("./views/auth/ResetPassword"));
 const Onboarding = React.lazy(() => import("./views/auth/Onboarding"));
@@ -1202,6 +1203,7 @@ const AppContent = () => {
                   path="/auth/callback/:provider"
                   element={<OAuthCallback />}
                 />
+                <Route path="/auth/desktop-login" element={<DesktopBridge />} />
                 {!isAuthenticated && (
                   <>
                     <Route path="/login" element={<Login />} />
