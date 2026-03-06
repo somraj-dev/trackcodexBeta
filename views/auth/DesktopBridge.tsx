@@ -1,28 +1,49 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { API_BASE } from "../../services/api";
+import { auth } from "../../lib/firebase";
 import TrackCodexLogo from "../../components/branding/TrackCodexLogo";
 
 const DesktopBridge = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Derive status from state instead of calling setState in effect
+  const status = errorMsg ? "error" : isAuthenticated ? "handoff" : "checking";
 
   useEffect(() => {
     if (isLoading) return;
 
     if (!isAuthenticated) {
-      // User is not logged in. Save intention to redirect back here after login.
       localStorage.setItem("redirect_after_login", "/auth/desktop-login");
       navigate("/login", { replace: true });
     } else {
-      // User IS logged in. Handoff to backend to generate token and deep link!
-      // Wait a tiny bit so the user can see the "Handing off..." UI
-      const timer = setTimeout(() => {
-        window.location.href = `${API_BASE}/auth/desktop-redirect`;
-      }, 1500);
+      // User IS logged in. Get Firebase ID token directly and hand off to desktop!
+      const performHandoff = async () => {
+        try {
+          const currentUser = auth.currentUser;
+          if (!currentUser) {
+            setErrorMsg("No active session found. Please try logging in again.");
+            return;
+          }
 
-      return () => clearTimeout(timer);
+          // Get the Firebase ID token directly from the client
+          const idToken = await currentUser.getIdToken(true);
+
+          // Small delay so user sees the "Connecting" UI
+          await new Promise((resolve) => setTimeout(resolve, 1200));
+
+          // Redirect to the desktop app via custom protocol with the token
+          window.location.href = `trackcodex://auth?token=${idToken}`;
+        } catch (err: unknown) {
+          console.error("Desktop handoff failed:", err);
+          const message = err instanceof Error ? err.message : "Failed to generate authentication token.";
+          setErrorMsg(message);
+        }
+      };
+
+      performHandoff();
     }
   }, [isAuthenticated, isLoading, navigate]);
 
@@ -31,6 +52,25 @@ const DesktopBridge = () => {
       <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
         <TrackCodexLogo size="lg" collapsed={false} clickable={false} />
         <p className="mt-8 text-[#8b949e]">Checking secure session...</p>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
+        <TrackCodexLogo size="lg" collapsed={false} clickable={false} />
+        <div className="mt-12 flex flex-col items-center">
+          <span className="text-red-500 text-4xl mb-4">⚠</span>
+          <h2 className="text-[20px] font-medium text-[#e6edf3] mb-2">Handoff Failed</h2>
+          <p className="text-[14px] text-[#8b949e] max-w-sm text-center mb-6">{errorMsg}</p>
+          <button
+            onClick={() => navigate("/dashboard/home")}
+            className="text-[#2f81f7] hover:underline text-[13px]"
+          >
+            Go to dashboard instead
+          </button>
+        </div>
       </div>
     );
   }
@@ -47,7 +87,7 @@ const DesktopBridge = () => {
           <div className="w-8 h-8 border-2 border-[#2f81f7] border-t-transparent rounded-full animate-spin mb-4"></div>
           <h2 className="text-[20px] font-medium text-[#e6edf3] mb-2">Connecting to Desktop App</h2>
           <p className="text-[14px] text-[#8b949e] max-w-sm text-center">
-            {isAuthenticated ? "Please accept the browser prompt to open TrackCodex." : "Preparing secure handoff..."}
+            Please accept the browser prompt to open TrackCodex.
           </p>
           <div className="mt-8">
             <button
