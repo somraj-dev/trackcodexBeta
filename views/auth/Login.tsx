@@ -13,6 +13,14 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Intercept desktop app handoff parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("source") === "desktop") {
+      localStorage.setItem("redirect_after_login", "/auth/desktop-login");
+    }
+  }, []);
+
   // Safety net: If auth state becomes true, redirect away from login
   useEffect(() => {
     if (isAuthenticated) {
