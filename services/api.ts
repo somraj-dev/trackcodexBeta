@@ -108,6 +108,12 @@ export const api = {
         method: "POST",
         data: credentials,
       }),
+    register: (data: any) =>
+      request<{ message: string; csrfToken?: string; user: any }>({
+        url: "/auth/register",
+        method: "POST",
+        data,
+      }),
     getMe: () => request<UserProfile>({ url: "/auth/me" }),
   },
   workspaces: {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, googleProvider, githubProvider } from "../../lib/firebase";
+import { api } from "../../services/api";
 import {
   signInWithPopup
 } from "firebase/auth";
@@ -145,64 +146,23 @@ const Signup = () => {
 
     try {
       // 1. Backend Registration (Syncs with Prisma and handles Firebase creation)
-      let response;
-      let backendUrl = (import.meta as any).env.VITE_BACKEND_URL || "";
-
-      // Fix for IPv6 localhost vs IPv4 0.0.0.0 Fastify issues
-      if (backendUrl.includes("localhost")) {
-        console.warn("VITE_BACKEND_URL uses 'localhost'. If connection fails, switch to '127.0.0.1'");
-      }
-
       try {
-        response = await fetch(`${backendUrl}/api/v1/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            password,
-            name: username,
-            username,
-            country,
-            emailPreferences: emailPrefs
-          }),
+        await api.auth.register({
+          email,
+          password,
+          name: username,
+          username,
+          country,
+          emailPreferences: emailPrefs
         });
-      } catch (fetchErr: any) {
-        console.error("Fetch failed (Network Error):", fetchErr);
-        // Fallback to relative path which relies on Vite proxy
-        if (backendUrl) {
-          console.log("Attempting fallback to relative Vite proxy route (/api/v1/...)");
-          try {
-            response = await fetch(`/api/v1/auth/register`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email,
-                password,
-                name: username,
-                username,
-                country,
-                emailPreferences: emailPrefs
-              }),
-            });
-          } catch (fallbackErr) {
-            throw new Error("Unable to connect to the server. Please check your network connection or ensure the backend is running.");
-          }
-        } else {
-          throw new Error("Unable to connect to the server. Please check your network connection or ensure the backend is running.");
+      } catch (apiErr: any) {
+        // If Axios error has a response from the backend
+        if (apiErr.response && apiErr.response.data) {
+          throw new Error(apiErr.response.data.message || apiErr.response.data.error || "Signup failed");
         }
-      }
-
-      let data: any = {};
-      try {
-        const text = await response.text();
-        data = text ? JSON.parse(text) : {};
-      } catch (err: any) {
-        console.error("Non-JSON response received:", err);
-        data = { message: "Unexpected server response. Please try again later." };
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || data.error || "Signup failed");
+        // If there was no response, it's a network error (CORS, offline, server down)
+        console.error("Signup network error:", apiErr);
+        throw new Error("Unable to connect to the TrackCodex server. Please ensure you are connected to the internet and the backend is running.");
       }
 
       // 2. Success - Verification email is sent by backend via Resend
@@ -216,10 +176,10 @@ const Signup = () => {
       console.error("Signup validation error:", error);
       const err = error as Error;
 
-      if (err.message.includes("Email already registered") || err.message.includes("auth/email-already-in-use")) {
+      if (err.message.includes("Email already registered") || err.message.includes("auth/email-already-in-use") || err.message.includes("taken")) {
         setIsEmailAlreadyInUse(true);
         setError(""); // Clear general error
-      } else if (err.message.includes("Failed to fetch") || err.message.includes("Unable to connect")) {
+      } else if (err.message.includes("Failed to fetch") || err.message.includes("Unable to connect") || err.message === "Network Error") {
         setError("Unable to connect to the TrackCodex server. Please ensure you are connected to the internet and the backend is running.");
       } else {
         setError(err.message || "Signup failed. Please try again.");
