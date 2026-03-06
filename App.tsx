@@ -441,6 +441,14 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
   }, [location.pathname, location.search]);
 
   useEffect(() => {
+    // Intercept OAuth logins that skipped the Login.tsx redirect
+    const pendingRedirect = localStorage.getItem("redirect_after_login");
+    if (pendingRedirect) {
+      localStorage.removeItem("redirect_after_login");
+      navigate(pendingRedirect, { replace: true });
+      return;
+    }
+
     const handleNotify = (event: Event) => {
       const e = event as CustomEvent<NotificationItem>;
       setNotification(e.detail);
@@ -457,7 +465,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
         "trackcodex-notification",
         handleNotify as EventListener,
       );
-  }, []);
+  }, [navigate]);
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -1193,6 +1201,7 @@ const AppContent = () => {
                   </>
                 }
               >
+                <Route path="/auth/desktop-login" element={<DesktopBridge />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/status" element={<Status />} />
@@ -1203,7 +1212,6 @@ const AppContent = () => {
                   path="/auth/callback/:provider"
                   element={<OAuthCallback />}
                 />
-                <Route path="/auth/desktop-login" element={<DesktopBridge />} />
                 {!isAuthenticated && (
                   <>
                     <Route path="/login" element={<Login />} />
