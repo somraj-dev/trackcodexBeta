@@ -1276,6 +1276,30 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   );
 
+  // --- Desktop App Deep Link Bridge ---
+  fastify.get(
+    "/auth/desktop-redirect",
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      try {
+        const user = (request as any).user;
+        const uid = user.userId;
+
+        // Generate a Firebase Custom Token
+        const customToken = await firebaseAdmin.auth().createCustomToken(uid);
+
+        // Redirect the user back to the Desktop App via the custom protocol
+        const deepLinkUrl = `trackcodex://auth?token=${customToken}`;
+
+        // Tell the browser to open TrackCodex desktop application
+        return reply.redirect(deepLinkUrl);
+      } catch (error) {
+        request.log.error(error);
+        return reply.code(500).send({ error: "Internal Server Error during desktop handoff" });
+      }
+    }
+  );
+
   // --- ORCID OAuth (Mocked for Demo - DISABLED in production) ---
   if (process.env.NODE_ENV === "development") {
     fastify.get("/auth/orcid", async (request, reply) => {
