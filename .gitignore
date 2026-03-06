@@ -21,6 +21,9 @@ d i s t /
 # Repositories & Data
 data/repos/
 
+# User Workspaces (contain embedded git repos, must never be tracked)
+workspaces/
+
 # Test Scripts & Logs
 test-features.ts
 test_output.txt
