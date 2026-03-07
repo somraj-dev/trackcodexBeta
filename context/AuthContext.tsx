@@ -145,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setCsrfToken(null);
       localStorage.removeItem("trackcodex_github_username");
       profileService.clearProfile();
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 

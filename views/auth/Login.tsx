@@ -24,7 +24,7 @@ const Login = () => {
   // Safety net: If auth state becomes true, redirect away from login
   useEffect(() => {
     if (isAuthenticated) {
-      const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+      const redirectPath = localStorage.getItem("redirect_after_login") || "/";
       localStorage.removeItem("redirect_after_login");
       navigate(redirectPath, { replace: true });
     }
@@ -83,7 +83,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, loginEmail, password);
 
       // State update is handled by onAuthStateChanged in AuthContext
-      const redirectPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+      const redirectPath = localStorage.getItem("redirect_after_login") || "/";
       localStorage.removeItem("redirect_after_login");
       navigate(redirectPath);
     } catch (err: any) {
@@ -146,7 +146,7 @@ const Login = () => {
                 <label className="block text-sm font-medium text-[#e6edf3]">
                   Password
                 </label>
-                <Link to="/forgot-password" size="sm" className="text-xs text-[#2f81f7] hover:underline transition-colors font-medium">
+                <Link to="/forgot-password" className="text-xs text-[#2f81f7] hover:underline transition-colors font-medium">
                   Forgot password?
                 </Link>
               </div>

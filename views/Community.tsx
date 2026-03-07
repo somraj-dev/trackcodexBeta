@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { socialService, Post } from "../services/socialService";
 import { profileService, UserProfile } from "../services/profile";
 import PostCard from "../components/community/PostCard";

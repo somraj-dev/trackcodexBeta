@@ -14,7 +14,7 @@ const SignOut: React.FC = () => {
 
     const handleSignout = async () => {
         await logout();
-        navigate("/login");
+        navigate("/");
     };
 
     const displayName = user?.name || profile.name || "User";

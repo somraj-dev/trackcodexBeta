@@ -927,7 +927,7 @@ const ProtectedApp = ({ isFocusMode }: { isFocusMode: boolean }) => {
           <ErrorBoundary>
             <Routes>
               <Route path="/taskvault" element={<TaskVault />} />
-              <Route path="/" element={<Navigate to="/dashboard/home" />} />
+              <Route path="/" element={<HomeView />} />
               <Route path="/dashboard/home" element={<HomeView />} />
               <Route path="/onboarding/welcome" element={<WelcomeView />} />
 
