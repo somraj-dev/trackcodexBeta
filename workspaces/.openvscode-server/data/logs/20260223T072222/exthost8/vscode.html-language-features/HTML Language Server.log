@@ -1,5 +1,0 @@
-2026-02-23 07:54:47.522 [error] Request textDocument/documentColor failed.
-Error: Starting server failed
-	at T.$start (/home/.openvscode-server/extensions/html-language-features/client/dist/node/htmlClientMain.js:2:60692)
-	at async T.sendRequest (/home/.openvscode-server/extensions/html-language-features/client/dist/node/htmlClientMain.js:2:44293)
-	at async RA.provideColors (file:///home/.openvscode-server/out/vs/workbench/api/node/extensionHostProcess.js:142:152256)

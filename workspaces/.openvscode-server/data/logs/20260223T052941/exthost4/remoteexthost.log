@@ -1,8 +1,0 @@
-2026-02-23 06:03:00.380 [info] Extension host with pid 966 started
-2026-02-23 06:03:00.599 [info] ExtensionService#_doActivateExtension vscode.emmet, startup: false, activationEvent: 'onLanguage'
-2026-02-23 06:03:00.602 [info] ExtensionService#_doActivateExtension vscode.extension-editing, startup: false, activationEvent: 'onLanguage:markdown'
-2026-02-23 06:03:00.603 [info] ExtensionService#_doActivateExtension vscode.markdown-language-features, startup: false, activationEvent: 'onLanguage:markdown'
-2026-02-23 06:03:00.921 [info] Lock '/home/workspace/.openvscode-server/data/User/workspaceStorage/-8268ac9/vscode.lock': Lock acquired.
-2026-02-23 06:03:00.925 [info] Extension host terminating: received terminate message from renderer
-2026-02-23 06:03:00.927 [info] Lock '/home/workspace/.openvscode-server/data/User/workspaceStorage/-8268ac9/vscode.lock': Marking the lockfile as scheduled to be released in 6000 ms.
-2026-02-23 06:03:00.929 [info] Extension host with pid 966 exiting with code 0
