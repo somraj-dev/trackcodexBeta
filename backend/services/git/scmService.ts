@@ -110,3 +110,8 @@ export class SCMService {
     return await prisma.issue.findMany({ where: { repoId } });
   }
 }
+
+
+
+
+

@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 
 // Shared prisma instance
 
@@ -321,3 +321,7 @@ export async function communityRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

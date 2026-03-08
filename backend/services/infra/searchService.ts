@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 
 // Shared prisma instance
 
@@ -169,3 +169,8 @@ export const searchService = {
     }
   },
 };
+
+
+
+
+

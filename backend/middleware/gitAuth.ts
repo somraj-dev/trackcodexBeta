@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 import bcrypt from "bcryptjs";
 
 // Shared prisma instance
@@ -84,3 +84,6 @@ export async function verifyGitAuth(req: FastifyRequest, reply: FastifyReply) {
   // Attach user to request
   req.user = user;
 }
+
+
+

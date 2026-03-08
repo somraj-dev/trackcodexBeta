@@ -65,3 +65,8 @@ export async function deleteDocument(indexName: string, id: string) {
         console.error(`[Elasticsearch] Failed to delete document ID ${id} from ${indexName}:`, error);
     }
 }
+
+
+
+
+

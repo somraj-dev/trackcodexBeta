@@ -12,7 +12,7 @@ jest.mock('@prisma/client', () => ({
 }));
 
 // Mock Session Service
-jest.mock('../services/session', () => ({
+jest.mock('../services/auth/session', () => ({
     getSession: jest.fn(async (id: string) => {
         if (id === 'valid-session') {
             return {
@@ -32,3 +32,6 @@ jest.mock('../services/session', () => ({
 beforeEach(() => {
     mockReset(prismaMock);
 });
+
+
+

@@ -19,7 +19,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     fastify.get("/radar/:userId", async (request: FastifyRequest) => {
         const { userId } = request.params as { userId: string };
         try {
-            const { radarService } = await import("../services/radar/RadarService");
+            const { radarService } = await import("../../services/radar/RadarService");
             // Shared prisma instance
             const data = await radarService.getUserRadar(userId);
             if (data) return data;
@@ -45,7 +45,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
         const { userId } = request.params as { userId: string };
         const { days } = request.query as { days?: string };
         try {
-            const { radarService } = await import("../services/radar/RadarService");
+            const { radarService } = await import("../../services/radar/RadarService");
             return await radarService.getHistory(userId, days ? parseInt(days) : 90);
         } catch (e) {
             console.warn("Radar history unavailable", e);
@@ -57,7 +57,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     fastify.get("/radar/:userId/domains", async (request: FastifyRequest) => {
         const { userId } = request.params as { userId: string };
         try {
-            const { radarService } = await import("../services/radar/RadarService");
+            const { radarService } = await import("../../services/radar/RadarService");
             return await radarService.getDomainScores(userId);
         } catch (e) {
             console.warn("Domain scores unavailable", e);
@@ -69,7 +69,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     fastify.get("/radar/governance/:userId", async (request: FastifyRequest) => {
         const { userId } = request.params as { userId: string };
         try {
-            const { governanceEngine } = await import("../services/radar/GovernanceEngine");
+            const { governanceEngine } = await import("../../services/radar/GovernanceEngine");
             return await governanceEngine.getPermissions(userId);
         } catch (e) {
             console.warn("Governance unavailable", e);
@@ -86,7 +86,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     // ─── GET /radar/governance/rules — List all rules ────────────
     fastify.get("/radar/governance/rules", async () => {
         try {
-            const { governanceEngine } = await import("../services/radar/GovernanceEngine");
+            const { governanceEngine } = await import("../../services/radar/GovernanceEngine");
             return await governanceEngine.listRules();
         } catch (e) {
             console.warn("Governance rules unavailable", e);
@@ -127,7 +127,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
             }
 
             // Trigger radar aggregation
-            const { radarEventBus } = await import("../services/radar/RadarService");
+            const { radarEventBus } = await import("../../services/radar/RadarService");
             radarEventBus.emit("domain:updated", userId);
 
             return { success: true, message: `Recalculation triggered for ${domain} domain(s)` };
@@ -141,7 +141,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     // ─── POST /radar/decay — Trigger decay (admin/cron) ──────────
     fastify.post("/radar/decay", async (_request: FastifyRequest, reply: FastifyReply) => {
         try {
-            const { radarService } = await import("../services/radar/RadarService");
+            const { radarService } = await import("../../services/radar/RadarService");
             const decayed = await radarService.applyDecay();
             return { success: true, decayedCount: decayed };
         } catch (e: unknown) {
@@ -153,7 +153,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
     // ─── POST /radar/governance/seed — Seed default rules ────────
     fastify.post("/radar/governance/seed", async (_request: FastifyRequest) => {
         try {
-            const { governanceEngine } = await import("../services/radar/GovernanceEngine");
+            const { governanceEngine } = await import("../../services/radar/GovernanceEngine");
             await governanceEngine.seedDefaultRules();
             return { success: true, message: "Default governance rules seeded" };
         } catch (e: unknown) {
@@ -162,3 +162,7 @@ export async function radarRoutes(fastify: FastifyInstance) {
         }
     });
 }
+
+
+
+

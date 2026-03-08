@@ -11,7 +11,7 @@
  * DESIGN RULE: This engine NEVER knows domain internals.
  * It only consumes normalized 0-100 scores from domain tables.
  */
-import { prisma } from "../prisma";
+import { prisma } from "../infra/prisma";
 import { EventEmitter } from "events";
 
 // Shared prisma instance
@@ -229,3 +229,8 @@ export interface RadarState {
 }
 
 export const radarService = new RadarService();
+
+
+
+
+

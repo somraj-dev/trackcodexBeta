@@ -25,7 +25,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
         };
 
         try {
-            const { openVSXService } = await import("../services/openvsx/OpenVSXService");
+            const { openVSXService } = await import("../../services/openvsx/OpenVSXService");
             return await openVSXService.search(query, {
                 category,
                 offset: offset ? parseInt(offset) : undefined,
@@ -43,7 +43,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
     // ─── GET /extensions/popular — Trending extensions ───────────
     fastify.get("/extensions/popular", async () => {
         try {
-            const { openVSXService } = await import("../services/openvsx/OpenVSXService");
+            const { openVSXService } = await import("../../services/openvsx/OpenVSXService");
             return await openVSXService.getPopular(16);
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Failed";
@@ -55,7 +55,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
     fastify.get("/extensions/:ns/:name", async (request: FastifyRequest, reply: FastifyReply) => {
         const { ns, name } = request.params as { ns: string; name: string };
         try {
-            const { openVSXService } = await import("../services/openvsx/OpenVSXService");
+            const { openVSXService } = await import("../../services/openvsx/OpenVSXService");
             return await openVSXService.getExtension(ns, name);
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Not found";
@@ -67,7 +67,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
     fastify.get("/extensions/user/:userId", async (request: FastifyRequest) => {
         const { userId } = request.params as { userId: string };
         try {
-            const { extensionManager } = await import("../services/openvsx/ExtensionManager");
+            const { extensionManager } = await import("../../services/openvsx/ExtensionManager");
             return await extensionManager.getUserExtensions(userId);
         } catch (e: unknown) {
             console.error("Failed to get user extensions:", e);
@@ -90,7 +90,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
         }
 
         try {
-            const { extensionManager } = await import("../services/openvsx/ExtensionManager");
+            const { extensionManager } = await import("../../services/openvsx/ExtensionManager");
             const ext = await extensionManager.install(userId, extensionId, publisher || "", name || "", version || "latest");
             return { success: true, extension: ext };
         } catch (e: unknown) {
@@ -111,7 +111,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
         }
 
         try {
-            const { extensionManager } = await import("../services/openvsx/ExtensionManager");
+            const { extensionManager } = await import("../../services/openvsx/ExtensionManager");
             await extensionManager.uninstall(userId, extensionId);
             return { success: true };
         } catch (e: unknown) {
@@ -133,7 +133,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
         }
 
         try {
-            const { extensionManager } = await import("../services/openvsx/ExtensionManager");
+            const { extensionManager } = await import("../../services/openvsx/ExtensionManager");
             const ext = await extensionManager.toggle(userId, extensionId, enabled);
             return { success: true, extension: ext };
         } catch (e: unknown) {
@@ -142,3 +142,7 @@ export async function extensionRoutes(fastify: FastifyInstance) {
         }
     });
 }
+
+
+
+

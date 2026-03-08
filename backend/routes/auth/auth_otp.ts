@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from "../../services/infra/prisma";
 import crypto from 'crypto';
-import { emailService } from '../../services/emailService';
+import { emailService } from '../../services/infra/emailService';
 
 // Shared prisma instance
 
@@ -105,3 +105,7 @@ export async function authOtpRoutes(fastify: FastifyInstance) {
         };
     });
 }
+
+
+
+

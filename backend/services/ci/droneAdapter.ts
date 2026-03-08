@@ -79,3 +79,8 @@ export class DroneAdapter implements CIEngine {
     return Readable.from(["[Drone] Mock Log Stream used.\n"]);
   }
 }
+
+
+
+
+

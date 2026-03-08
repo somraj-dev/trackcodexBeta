@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireRepoPermission } from "../middleware/repoAuth";
+import { requireRepoPermission } from "../../middleware/repoAuth";
 import { RepoLevel } from "../../services/auth/iamService";
-import { CollaborationService } from "../../services/collaborationService";
+import { CollaborationService } from "../../services/workspace/collaborationService";
 import { SCMService } from "../../services/git/scmService";
 
 // Shared prisma instance
@@ -145,3 +145,7 @@ export async function collaborationRoutes(fastify: FastifyInstance) {
     return reply.send(comment);
   });
 }
+
+
+
+

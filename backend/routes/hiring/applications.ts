@@ -100,3 +100,7 @@ export async function applicationRoutes(fastify: FastifyInstance) {
     return { success: true, application: updated };
   });
 }
+
+
+
+

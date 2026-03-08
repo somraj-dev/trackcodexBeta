@@ -19,3 +19,6 @@ declare module "fastify" {
     csrfToken?: string;
   }
 }
+
+
+

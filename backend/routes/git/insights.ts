@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { GitServer } from "../../services/git/gitServer";
-import { requireRepoPermission, RepoLevel } from "../middleware/repoAuth";
-import { prisma } from "../lib/prisma"; // Ensure this import exists
+import { requireRepoPermission, RepoLevel } from "../../middleware/repoAuth";
+import { prisma } from "../../lib/prisma"; // Ensure this import exists
 
 export async function insightsRoutes(fastify: FastifyInstance) {
   // GET /repositories/:id/insights/pulse
@@ -97,3 +97,7 @@ export async function insightsRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

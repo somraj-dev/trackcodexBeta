@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { GitServer } from "../../services/git/gitServer";
-import { verifyGitAuth } from "../middleware/gitAuth";
+import { verifyGitAuth } from "../../middleware/gitAuth";
 
 const gitServer = new GitServer();
 
@@ -14,7 +14,7 @@ export default async function (server: FastifyInstance) {
     let actualRepoId = repoId;
 
     if (owner && repo) {
-      const { prisma } = await import("../services/prisma");
+      const { prisma } = await import("../../services/infra/prisma");
       const ownerUser = await prisma.user.findUnique({ where: { username: owner } });
       const repository = await prisma.repository.findFirst({
         where: { name: repo, ownerId: ownerUser?.id }
@@ -38,7 +38,7 @@ export default async function (server: FastifyInstance) {
     let actualRepoId = repoId;
 
     if (owner && repo) {
-      const { prisma } = await import("../services/prisma");
+      const { prisma } = await import("../../services/infra/prisma");
       const ownerUser = await prisma.user.findUnique({ where: { username: owner } });
       const repository = await prisma.repository.findFirst({
         where: { name: repo, ownerId: ownerUser?.id }
@@ -82,7 +82,7 @@ export default async function (server: FastifyInstance) {
 
     if (authorEmail) {
       // Import Prisma
-      const { prisma } = await import("../services/prisma");
+      const { prisma } = await import("../../services/infra/prisma");
 
       // Find user by email (assuming User has email, or we check UserKey directly if linked)
       // Schema: UserKey linked to User. User has email?
@@ -126,3 +126,7 @@ export default async function (server: FastifyInstance) {
     return { status: "ok" };
   });
 }
+
+
+
+

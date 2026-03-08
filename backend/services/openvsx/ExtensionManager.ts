@@ -4,7 +4,7 @@
  * Manages per-user extension install/uninstall/enable/disable state.
  * Persists to UserExtension table.
  */
-import { prisma } from "../prisma";
+import { prisma } from "../infra/prisma";
 
 // Shared prisma instance
 
@@ -113,3 +113,8 @@ export class ExtensionManager {
 }
 
 export const extensionManager = new ExtensionManager();
+
+
+
+
+

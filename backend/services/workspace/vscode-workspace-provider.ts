@@ -253,3 +253,8 @@ export function registerVSCodeRoutes(
 
   console.log("✅ VS Code API routes registered");
 }
+
+
+
+
+

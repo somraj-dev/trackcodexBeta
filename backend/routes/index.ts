@@ -96,3 +96,6 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(integrationRoutes);
   await fastify.register(applicationRoutes);
 }
+
+
+

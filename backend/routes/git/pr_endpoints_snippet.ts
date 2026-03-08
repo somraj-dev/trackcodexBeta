@@ -11,7 +11,7 @@ fastify.get(
 
     try {
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const prs = await PullRequestService.listPullRequests(id, status);
       return prs;
     } catch (e: any) {
@@ -42,7 +42,7 @@ fastify.post(
 
     try {
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const pr = await PullRequestService.createPullRequest(
         repoId,
         base,
@@ -136,7 +136,7 @@ fastify.get(
       if (!pr) throw NotFound("Pull request not found");
 
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const diff = await PullRequestService.getDiff(repoId, pr.base, pr.head);
 
       return { diff };
@@ -174,7 +174,7 @@ fastify.post(
       if (!pr) throw NotFound("Pull request not found");
 
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const merged = await PullRequestService.mergePullRequest(
         pr.id,
         user.userId,
@@ -223,7 +223,7 @@ fastify.post(
       if (!pr) throw NotFound("Pull request not found");
 
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const closed = await PullRequestService.closePullRequest(pr.id);
 
       // Audit Log
@@ -274,7 +274,7 @@ fastify.post(
       if (!pr) throw NotFound("Pull request not found");
 
       const { PullRequestService } =
-        await import("../services/pullRequestService");
+        await import("../../services/pullRequestService");
       const review = await PullRequestService.addReview(
         pr.id,
         user.userId,
@@ -299,3 +299,7 @@ fastify.post(
     }
   },
 );
+
+
+
+

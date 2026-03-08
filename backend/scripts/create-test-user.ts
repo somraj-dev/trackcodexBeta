@@ -1,4 +1,4 @@
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 import bcrypt from "bcryptjs";
 
 // Shared prisma instance
@@ -51,3 +51,6 @@ async function createTestUser() {
 }
 
 createTestUser();
+
+
+

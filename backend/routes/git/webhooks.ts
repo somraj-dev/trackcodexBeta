@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { WebhookService } from "../../services/git/webhookService";
-import { requireRepoPermission, RepoLevel } from "../middleware/repoAuth";
+import { requireRepoPermission, RepoLevel } from "../../middleware/repoAuth";
 
 // Shared prisma instance
 
@@ -60,3 +60,7 @@ export async function webhookRoutes(fastify: FastifyInstance) {
     return { message: "Ping dispatched" };
   });
 }
+
+
+
+

@@ -36,3 +36,6 @@ export const Conflict = (message: string, code = "CONFLICT") =>
 
 export const InternalError = (message = "Internal Server Error") =>
   new AppError(message, 500, "INTERNAL_ERROR"); // Use sparingly
+
+
+

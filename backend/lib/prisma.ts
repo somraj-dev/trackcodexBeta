@@ -1,3 +1,6 @@
-import { prisma as sharedPrisma } from "../services/prisma";
+import { prisma as sharedPrisma } from "../services/infra/prisma";
 
 export const prisma = sharedPrisma;
+
+
+

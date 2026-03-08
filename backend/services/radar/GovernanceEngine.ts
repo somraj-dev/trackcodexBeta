@@ -10,7 +10,7 @@
  *   Professional Reliability < 55 → Reduce ranking visibility
  *   Security Leadership > 85  → Grant advanced review privileges
  */
-import { prisma } from "../prisma";
+import { prisma } from "../infra/prisma";
 import { radarEventBus, RadarAxis, RADAR_AXES } from "./RadarService";
 
 // Shared prisma instance
@@ -295,3 +295,8 @@ export interface MergeGateResult {
 }
 
 export const governanceEngine = new GovernanceEngine();
+
+
+
+
+

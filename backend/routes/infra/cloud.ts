@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { docker } from "../../services/docker";
-import { PipelineService } from "../../services/pipelineService";
+import { docker } from "../../services/workspace/terminal";
+import { PipelineService } from "../../services/infra/pipelineService";
 
 export async function cloudRoutes(fastify: FastifyInstance) {
   // List all running TrackCodex containers
@@ -69,3 +69,7 @@ export async function cloudRoutes(fastify: FastifyInstance) {
     return pipeline;
   });
 }
+
+
+
+

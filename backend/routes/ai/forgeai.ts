@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { AIOrchestrator } from "../../services/ai/aiOrchestrator";
-import { ContextGraph } from "../../services/contextGraph";
+import { ContextGraph } from "../../services/infra/contextGraph";
 
 export async function forgeAIRoutes(fastify: FastifyInstance) {
   // Context-Aware Completion
@@ -57,3 +57,8 @@ User Question: ${prompt}
     };
   });
 }
+
+
+
+
+

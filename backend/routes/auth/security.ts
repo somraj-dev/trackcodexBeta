@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { SecurityService } from "../../services/infra/securityService";
-import { requireRepoPermission, RepoLevel } from "../middleware/repoAuth";
+import { requireRepoPermission, RepoLevel } from "../../middleware/repoAuth";
 
 /**
  * Security API: Vulnerability Management
@@ -40,3 +40,7 @@ export async function securityRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

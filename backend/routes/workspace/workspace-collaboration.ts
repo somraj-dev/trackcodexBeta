@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 
 // Shared prisma instance
 
@@ -129,7 +129,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
         const workspaceName = invite.workspace.name;
 
         // We don't await this to avoid blocking the response if email service is slow
-        import("../services/emailService").then(({ emailService }) => {
+        import("../../services/infra/emailService").then(({ emailService }) => {
           emailService.sendWorkspaceInvite(
             email,
             workspaceName,
@@ -819,3 +819,7 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+

@@ -1,5 +1,5 @@
 
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 import { env } from '../config/env';
 
 // Shared prisma instance
@@ -50,3 +50,8 @@ export async function setFeatureFlag(flagName: FeatureFlagName, enabled: boolean
         create: { name: flagName, enabled }
     });
 }
+
+
+
+
+

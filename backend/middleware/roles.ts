@@ -1,4 +1,4 @@
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 
 // Shared prisma instance
 
@@ -46,3 +46,6 @@ export class RoleGuard {
         return this.hasRole(userId, orgId, OrgRole.OWNER);
     }
 }
+
+
+

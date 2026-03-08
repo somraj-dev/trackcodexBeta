@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 
 // Shared prisma instance
 
@@ -76,3 +76,8 @@ export class PolicyService {
     return cidrs.includes(ip) || cidrs.includes("0.0.0.0/0");
   }
 }
+
+
+
+
+

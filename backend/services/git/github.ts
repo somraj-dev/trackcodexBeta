@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { prisma } from "../infra/prisma";
-import { decrypt } from "./encryption";
+import { decrypt } from "../auth/encryption";
 
 // Shared prisma instance
 
@@ -324,3 +324,8 @@ export class GitHubService {
     return data;
   }
 }
+
+
+
+
+

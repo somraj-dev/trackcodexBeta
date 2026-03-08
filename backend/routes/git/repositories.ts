@@ -4,7 +4,7 @@ import path from "path";
 import { prisma } from "../../services/infra/prisma";
 import { SCMService } from "../../services/git/scmService";
 import { GitHubService } from "../../services/git/github";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import { RepoLevel } from "../../services/auth/iamService";
 import { GovernanceService } from "../../services/git/governanceService";
 import { AuditService } from "../../services/activity/audit";
@@ -14,11 +14,11 @@ import {
   NotFound,
   BadRequest,
   AppError,
-} from "../utils/AppError";
+} from "../../utils/AppError";
 import {
   requireRepoPermission,
   requireRepoCapability,
-} from "../middleware/repoAuth";
+} from "../../middleware/repoAuth";
 
 // Shared prisma instance
 
@@ -104,7 +104,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       // since we bypassed `requireRepoPermission` to do the initial lookup.
       if (!repo.isPublic && repo.ownerId !== request.user?.userId) {
         // Full RBAC check using IAMService
-        const { IAMService } = await import("../services/iamService");
+        const { IAMService } = await import("../../services/auth/iamService");
         const actualLevel = request.user ? await IAMService.getRepoPermission(request.user.userId, repo.id) : null;
 
         if (!actualLevel && request.user?.role !== "super_admin") {
@@ -230,7 +230,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         });
 
         console.log(`[REPO-CREATE] Creating notification...`);
-        const { NotificationService } = await import("../services/notification");
+        const { NotificationService } = await import("../../services/infra/notification");
         await NotificationService.create(
           user.userId,
           "system",
@@ -384,7 +384,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { RepositoryService } =
-          await import("../services/repositoryService");
+          await import("../../services/repositoryService");
         const newRepo = await RepositoryService.forkRepository(
           id,
           user.userId,
@@ -422,7 +422,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { RepositoryService } =
-          await import("../services/repositoryService");
+          await import("../../services/repositoryService");
         const newRepo = await RepositoryService.createFromTemplate(
           templateId,
           user.userId,
@@ -502,7 +502,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { RepositoryService } =
-          await import("../services/repositoryService");
+          await import("../../services/repositoryService");
         await RepositoryService.deleteRepository(id);
 
         // Audit Log
@@ -532,7 +532,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DependencyService } =
-          await import("../services/dependencyService");
+          await import("../../services/dependencyService");
         const graph = await DependencyService.getDependencies(id);
 
         return (
@@ -554,7 +554,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DependencyService } =
-          await import("../services/dependencyService");
+          await import("../../services/dependencyService");
         const graph = await DependencyService.analyzeDependencies(id);
 
         // Audit Log
@@ -591,7 +591,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!repo) throw NotFound("Repository not found");
 
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const branches = await GitHubService.getBranches(
             request.user!.userId,
             repo.owner.username,
@@ -600,7 +600,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           return branches;
         }
 
-        const { GitServer } = await import("../services/git/gitServer");
+        const { GitServer } = await import("../../services/git/gitServer");
         const gitServer = new GitServer();
         const branches = await gitServer.listBranches(id);
         return branches;
@@ -632,7 +632,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         // If it's a GitHub repo, use GitHubService
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const contents = await GitHubService.getContents(
             request.user!.userId,
             repo.owner.username,
@@ -654,7 +654,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           return contents;
         }
 
-        const { GitServer } = await import("../services/git/gitServer");
+        const { GitServer } = await import("../../services/git/gitServer");
         const gitServer = new GitServer();
 
         const tree = await gitServer.lsTree(id, ref || "HEAD", filePath || "");
@@ -698,7 +698,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         // If it's a GitHub repo, use GitHubService
         if (repo.githubId) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const result = await GitHubService.createOrUpdateFile(
             user.userId,
             repo.owner.username,
@@ -756,7 +756,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!repo) throw NotFound("Repository not found");
 
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const content = await GitHubService.getFileContent(
             request.user!.userId,
             repo.owner.username,
@@ -805,7 +805,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!repo) throw NotFound("Repository not found");
 
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const prs = await GitHubService.listPullRequests(
             request.user!.userId,
             repo.owner.username,
@@ -831,7 +831,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         }
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const prs = await PullRequestService.listPullRequests(id, status);
         return prs;
       } catch (e: any) {
@@ -869,7 +869,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!repo) throw NotFound("Repository not found");
 
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const pr = await GitHubService.createPullRequest(
             user.userId,
             repo.owner.username,
@@ -880,7 +880,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         }
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const pr = await PullRequestService.createPullRequest(
           repoId,
           base,
@@ -974,7 +974,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!pr) throw NotFound("Pull request not found");
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const diff = await PullRequestService.getDiff(repoId, pr.base, pr.head);
 
         return { diff };
@@ -1012,7 +1012,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!pr) throw NotFound("Pull request not found");
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const merged = await PullRequestService.mergePullRequest(
           pr.id,
           user.userId,
@@ -1061,7 +1061,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!pr) throw NotFound("Pull request not found");
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const closed = await PullRequestService.closePullRequest(pr.id);
 
         // Audit Log
@@ -1112,7 +1112,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!pr) throw NotFound("Pull request not found");
 
         const { PullRequestService } =
-          await import("../services/pullRequestService");
+          await import("../../services/pullRequestService");
         const review = await PullRequestService.addReview(
           pr.id,
           user.userId,
@@ -1155,7 +1155,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         });
 
         if (repo?.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           const issues = await GitHubService.listIssues(
             request.user!.userId,
             repo.owner.username,
@@ -1222,7 +1222,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         });
 
         if (repo?.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../services/github");
+          const { GitHubService } = await import("../../services/github");
           return await GitHubService.createIssue(
             user.userId,
             repo.owner.username,
@@ -1342,7 +1342,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const updated = await IssueService.updateIssue(issue.id, {
           title,
           body,
@@ -1393,7 +1393,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const closed = await IssueService.closeIssue(
           issue.id,
           user.userId,
@@ -1441,7 +1441,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const reopened = await IssueService.reopenIssue(issue.id);
 
         // Audit Log
@@ -1487,7 +1487,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const assignee = await IssueService.addAssignee(issue.id, userId);
 
         return assignee;
@@ -1525,7 +1525,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         await IssueService.removeAssignee(issue.id, userId);
 
         return { success: true };
@@ -1561,7 +1561,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const updated = await IssueService.addLabel(issue.id, labelId);
 
         return updated;
@@ -1599,7 +1599,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
         if (!issue) throw NotFound("Issue not found");
 
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const updated = await IssueService.removeLabel(issue.id, labelId);
 
         return updated;
@@ -1621,7 +1621,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       const { status } = request.query as { status?: string };
 
       try {
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const milestones = await IssueService.listMilestones(id, status);
         return milestones;
       } catch (e: any) {
@@ -1647,7 +1647,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       if (!title) throw BadRequest("title is required");
 
       try {
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const milestone = await IssueService.createMilestone(
           repoId,
           title,
@@ -1686,7 +1686,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       };
 
       try {
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const milestone = await IssueService.updateMilestone(milestoneId, {
           title,
           description,
@@ -1710,7 +1710,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       const { milestoneId } = request.params as { milestoneId: string };
 
       try {
-        const { IssueService } = await import("../services/issueService");
+        const { IssueService } = await import("../../services/issueService");
         const milestone = await IssueService.closeMilestone(milestoneId);
 
         return milestone;
@@ -1735,7 +1735,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const boards = await ProjectBoardService.listBoards(id);
         return boards;
       } catch (e: any) {
@@ -1762,7 +1762,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const board = await ProjectBoardService.createBoard(
           repoId,
           name,
@@ -1797,7 +1797,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const board = await ProjectBoardService.getBoard(id);
         if (!board) throw NotFound("Board not found");
         return board;
@@ -1822,7 +1822,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const board = await ProjectBoardService.updateBoard(id, {
           name,
           description,
@@ -1845,7 +1845,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         await ProjectBoardService.deleteBoard(id);
         return { success: true };
       } catch (e: any) {
@@ -1870,7 +1870,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const column = await ProjectBoardService.addColumn(
           boardId,
           name,
@@ -1894,7 +1894,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const column = await ProjectBoardService.updateColumn(id, { name });
         return column;
       } catch (e: any) {
@@ -1913,7 +1913,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         await ProjectBoardService.deleteColumn(id);
         return { success: true };
       } catch (e: any) {
@@ -1939,7 +1939,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const card = await ProjectBoardService.addCard(
           columnId,
           { issueId, prId, noteTitle, noteBody },
@@ -1970,7 +1970,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const card = await ProjectBoardService.moveCard(
           cardId,
           columnId,
@@ -1997,7 +1997,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         const card = await ProjectBoardService.updateCard(cardId, {
           noteTitle,
           noteBody,
@@ -2019,7 +2019,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { ProjectBoardService } =
-          await import("../services/projectBoardService");
+          await import("../../services/projectBoardService");
         await ProjectBoardService.deleteCard(cardId);
         return { success: true };
       } catch (e: any) {
@@ -2046,7 +2046,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const discussions = await DiscussionService.listDiscussions(id, {
           category,
           authorId,
@@ -2076,7 +2076,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const discussion = await DiscussionService.createDiscussion(
           repoId,
           user.userId,
@@ -2115,7 +2115,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const discussion = await DiscussionService.getDiscussion(
           repoId,
           parseInt(number),
@@ -2145,7 +2145,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const comment = await DiscussionService.addComment(
           discussionId,
           user.userId,
@@ -2172,7 +2172,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const discussion = await DiscussionService.markAnswer(
           discussionId,
           commentId,
@@ -2198,7 +2198,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const result = await DiscussionService.toggleReaction(
           user.userId,
           emoji,
@@ -2227,7 +2227,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         const { DiscussionService } =
-          await import("../services/discussionService");
+          await import("../../services/discussionService");
         const result = await DiscussionService.toggleReaction(
           user.userId,
           emoji,
@@ -2243,3 +2243,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

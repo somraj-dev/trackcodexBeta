@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { ResumeService } from "../../services/activity/resumeService";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import { prisma } from "../../services/infra/prisma";
 
 export async function profileRoutes(server: FastifyInstance) {
@@ -249,7 +249,7 @@ export async function profileRoutes(server: FastifyInstance) {
       const { userId } = req.params;
 
       try {
-        const { prisma } = await import("../services/prisma");
+        const { prisma } = await import("../../services/infra/prisma");
         // Shared prisma instance
 
         const user = await prisma.user.findUnique({
@@ -311,3 +311,7 @@ export async function profileRoutes(server: FastifyInstance) {
     },
   );
 }
+
+
+
+

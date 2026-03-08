@@ -1,5 +1,5 @@
-import { prisma } from "../services/prisma";
-import { ensureIndexExists, indexDocument } from "../services/elasticsearch";
+import { prisma } from "../services/infra/prisma";
+import { ensureIndexExists, indexDocument } from "../services/infra/elasticsearch";
 
 /**
  * Migration script to perform a full sync from RDS to AWS OpenSearch.
@@ -72,3 +72,6 @@ reindexAll()
     .finally(async () => {
         await prisma.$disconnect();
     });
+
+
+

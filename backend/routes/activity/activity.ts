@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { ActivityService } from "../../services/activityService";
-import { requireRepoPermission, RepoLevel } from "../middleware/repoAuth";
+import { ActivityService } from "../../services/activity/activityService";
+import { requireRepoPermission, RepoLevel } from "../../middleware/repoAuth";
 
 /**
  * Activity API: Collaboration Visibility
@@ -59,3 +59,7 @@ export async function activityRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+

@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import { AuditService } from "../../services/activity/audit";
 import {
   AppError,
@@ -8,7 +8,7 @@ import {
   Unauthorized,
   NotFound,
   Conflict,
-} from "../utils/AppError";
+} from "../../utils/AppError";
 
 /**
  * Organization Routes (GitHub Parity)
@@ -135,4 +135,8 @@ export async function orgRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+
 

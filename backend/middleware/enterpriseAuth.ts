@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 import { requireAuth } from "./auth";
-import { IAMService, EnterpriseRole } from "../services/iamService";
-import { PolicyService, PolicyType } from "../services/policyService";
+import { IAMService, EnterpriseRole } from "../services/auth/iamService";
+import { PolicyService, PolicyType } from "../services/infra/policyService";
 
 // Shared prisma instance
 
@@ -116,3 +116,6 @@ export function requireEnterpriseMember(requiredRoles: EnterpriseRole[] = []) {
     request.enterpriseId = enterprise.id;
   };
 }
+
+
+

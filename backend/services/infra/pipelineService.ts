@@ -72,3 +72,8 @@ export class PipelineService {
     return workspaceId ? all.filter((p) => p.workspaceId === workspaceId) : all;
   }
 }
+
+
+
+
+

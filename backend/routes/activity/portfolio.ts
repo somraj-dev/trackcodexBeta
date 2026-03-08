@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { PortfolioService } from "../../services/activity/portfolioService";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 
 interface CreatePortfolioBody {
   title: string;
@@ -324,3 +324,7 @@ export default async function (server: FastifyInstance) {
     },
   );
 }
+
+
+
+

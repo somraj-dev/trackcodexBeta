@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 import { RealtimeService } from './realtime';
 import { emailService } from './emailService';
 
@@ -75,3 +75,8 @@ export class NotificationService {
         });
     }
 }
+
+
+
+
+

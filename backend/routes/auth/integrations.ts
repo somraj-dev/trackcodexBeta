@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { encrypt, decrypt } from "../../services/auth/encryption";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 
 export default async function integrationRoutes(fastify: FastifyInstance) {
     // Save or update an OAuth provider token for the current user
@@ -171,3 +171,7 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         }
     );
 }
+
+
+
+

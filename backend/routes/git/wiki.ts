@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import fs from "fs";
 import path from "path";
-import { requireRepoPermission, RepoLevel } from "../middleware/repoAuth";
+import { requireRepoPermission, RepoLevel } from "../../middleware/repoAuth";
 
 const WIKI_BASE_DIR = path.join(process.cwd(), "data", "wikis");
 
@@ -78,3 +78,7 @@ export async function wikiRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { TerminalService } from "./terminal";
+import { TerminalService } from "../workspace/terminal";
 
 interface Presence {
   userId: string;
@@ -234,3 +234,9 @@ export class RealtimeService {
     });
   }
 }
+
+
+
+
+
+

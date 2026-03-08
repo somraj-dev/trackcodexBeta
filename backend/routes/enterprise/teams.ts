@@ -1,9 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth, requireOrgRole } from "../middleware/auth"; // We might need to implement requireOrgRole
+import { requireAuth, requireOrgRole } from "../../middleware/auth"; // We might need to implement requireOrgRole
 import { AuditService } from "../../services/activity/audit";
-import { AppError, BadRequest, NotFound, Forbidden } from "../utils/AppError";
-import { TeamRole, OrgRole } from "../types";
+import { AppError, BadRequest, NotFound, Forbidden } from "../../utils/AppError";
+import { TeamRole, OrgRole } from "../../types";
 
 // Shared prisma instance
 
@@ -91,3 +91,7 @@ export async function teamRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

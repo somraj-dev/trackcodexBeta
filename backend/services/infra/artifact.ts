@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
@@ -98,3 +98,8 @@ export class ArtifactService {
     });
   }
 }
+
+
+
+
+

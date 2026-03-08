@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
-import { requireEnterpriseMember } from "../middleware/enterpriseAuth";
+import { requireAuth } from "../../middleware/auth";
+import { requireEnterpriseMember } from "../../middleware/enterpriseAuth";
 import { EnterpriseService } from "../../services/infra/enterpriseService";
 import { EnterpriseRole } from "../../services/auth/iamService";
 import { AuditService } from "../../services/activity/audit";
@@ -201,3 +201,7 @@ export async function enterpriseRoutes(fastify: FastifyInstance) {
     },
   );
 }
+
+
+
+

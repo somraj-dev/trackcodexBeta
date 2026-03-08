@@ -52,3 +52,8 @@ export class SecurityScanner {
     return Math.floor(Math.random() * 20); // Low risk (0-20)
   }
 }
+
+
+
+
+

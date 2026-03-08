@@ -1,5 +1,5 @@
 import { Kafka, logLevel } from 'kafkajs';
-import { indexDocument, deleteDocument, ensureIndexExists } from './elasticsearch';
+import { indexDocument, deleteDocument, ensureIndexExists } from '../infra/';
 
 const KAFKA_BROKER_URL = process.env.KAFKA_BROKER_URL || 'localhost:9092';
 
@@ -98,3 +98,8 @@ export async function startKafkaConsumer() {
         process.exit(1);
     }
 }
+
+
+
+
+

@@ -1,9 +1,9 @@
 
 import { FastifyInstance } from 'fastify';
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth, requireRole } from '../middleware/auth';
-import { logSensitiveOperation } from '../../services/auditLogger';
-import { revokeAllUserSessions } from '../../services/session';
+import { requireAuth, requireRole } from '../../middleware/auth';
+import { logSensitiveOperation } from '../../services/activity/auditLogger';
+import { revokeAllUserSessions } from '../../services/auth/session';
 
 // Shared prisma instance
 
@@ -127,3 +127,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
     });
 }
+
+
+
+

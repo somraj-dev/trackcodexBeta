@@ -1,4 +1,4 @@
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 
 // Shared prisma instance
 
@@ -20,3 +20,6 @@ async function debug() {
 }
 
 debug();
+
+
+

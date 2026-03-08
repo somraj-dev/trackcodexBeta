@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { getSession } from "../services/session";
-import { prisma } from "../services/prisma";
-import { firebaseAdmin } from "../services/firebase";
-import { logSensitiveOperation } from "../services/auditLogger";
+import { getSession } from "../services/auth/session";
+import { prisma } from "../services/infra/prisma";
+import { firebaseAdmin } from "../services/infra/firebase";
+import { logSensitiveOperation } from "../services/activity/auditLogger";
 
 // Shared prisma instance
 
@@ -377,3 +377,6 @@ export async function requireCompleteProfile(
     });
   }
 }
+
+
+

@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { prisma } from "../services/prisma";
+import { prisma } from "../services/infra/prisma";
 import { requireAuth } from "./auth";
-import { IAMService, RepoLevel } from "../services/iamService";
-import { PolicyService, PolicyType } from "../services/policyService";
+import { IAMService, RepoLevel } from "../services/auth/iamService";
+import { PolicyService, PolicyType } from "../services/infra/policyService";
 
 export { RepoLevel };
 
@@ -116,7 +116,7 @@ export function requireRepoPermission(
 /**
  * Middleware to require a specific granular capability
  */
-import { hasRepoPermission } from "../../auth/AccessMatrix";
+import { hasRepoPermission } from "../auth/AccessMatrix";
 import { RepoPermission } from "../../types";
 
 export function requireRepoCapability(capability: RepoPermission) {
@@ -155,3 +155,6 @@ export function requireRepoCapability(capability: RepoPermission) {
     }
   };
 }
+
+
+

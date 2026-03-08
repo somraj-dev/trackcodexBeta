@@ -84,3 +84,8 @@ export class ScanQueue {
 
 // Singleton
 export const scanQueue = new ScanQueue();
+
+
+
+
+

@@ -4,7 +4,7 @@
  */
 
 import { FastifyRequest, FastifyReply } from "fastify";
-import { validateCsrfToken } from "../services/session";
+import { validateCsrfToken } from "../services/auth/session";
 
 /**
  * CSRF middleware - validates CSRF tokens on state-changing requests
@@ -87,3 +87,6 @@ export const csrfExemptPaths = [
 export function isCsrfExempt(path: string): boolean {
   return csrfExemptPaths.some((exemptPath) => path.startsWith(exemptPath));
 }
+
+
+

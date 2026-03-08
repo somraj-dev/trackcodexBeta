@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "../infra/prisma";
 import { AuditService } from "../activity/audit";
 
 // Shared prisma instance
@@ -174,3 +174,8 @@ export class SecurityService {
     return alerts;
   }
 }
+
+
+
+
+

@@ -52,3 +52,7 @@ export async function ideConfigRoutes(fastify: FastifyInstance) {
         }
     });
 }
+
+
+
+

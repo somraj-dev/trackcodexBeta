@@ -1,31 +1,31 @@
 import { FastifyInstance } from "fastify";
-import { env } from "../config/env";
-import { emailService } from "../../services/emailService";
+import { env } from "../../config/env";
+import { emailService } from "../../services/infra/emailService";
 import { prisma } from "../../services/infra/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import fs from "fs";
-import { requireAuth, requireCsrf } from "../middleware/auth";
+import { requireAuth, requireCsrf } from "../../middleware/auth";
 import {
   createSession,
   getSession,
   revokeSession,
   revokeAllUserSessions,
-} from "../../services/session";
-import { firebaseAdmin } from "../../services/firebase";
+} from "../../services/auth/session";
+import { firebaseAdmin } from "../../services/infra/firebase";
 import {
   logLoginAttempt,
   checkSuspiciousActivity,
   logSensitiveOperation,
 } from "../../services/activity/auditLogger";
-import { rateLimitConfig, loginKeyGenerator, passwordResetKeyGenerator } from "../middleware/rateLimit";
+import { rateLimitConfig, loginKeyGenerator, passwordResetKeyGenerator } from "../../middleware/rateLimit";
 import {
   AppError,
   BadRequest,
   Conflict,
   InternalError,
   Forbidden,
-} from "../utils/AppError";
+} from "../../utils/AppError";
 
 // Shared prisma instance
 
@@ -1313,3 +1313,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     });
   }
 }
+
+
+
+

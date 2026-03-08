@@ -62,3 +62,7 @@ export default async function statsRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+

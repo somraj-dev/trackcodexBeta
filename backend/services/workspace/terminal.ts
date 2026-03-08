@@ -101,7 +101,7 @@ export class TerminalService {
         // Better: provide a broadcast mechanism
       });
       // Emit to a room named after the workspace terminal
-      import("./realtime").then(({ RealtimeService }) => {
+      import("../infra/realtime").then(({ RealtimeService }) => {
         RealtimeService.broadcastToRoom(`terminal-${workspaceId}`, {
           type: "TERMINAL_OUTPUT",
           data,
@@ -110,7 +110,7 @@ export class TerminalService {
     });
 
     stream.on("end", () => {
-      import("./realtime").then(({ RealtimeService }) => {
+      import("../infra/realtime").then(({ RealtimeService }) => {
         RealtimeService.broadcastToRoom(`terminal-${workspaceId}`, {
           type: "TERMINAL_OUTPUT",
           data: "\r\n[System] PTY Session Ended.\r\n",
@@ -137,3 +137,9 @@ export class TerminalService {
     }
   }
 }
+
+
+
+
+
+

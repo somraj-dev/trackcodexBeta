@@ -269,3 +269,7 @@ async function createDemoWorkspace(workspaceDir: string) {
 
   console.log("✅ Created demo workspace:", workspaceDir);
 }
+
+
+
+

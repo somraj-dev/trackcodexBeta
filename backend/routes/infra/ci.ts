@@ -53,7 +53,7 @@ export default async function (server: FastifyInstance) {
       // 1. Get HEAD SHA if ref not provided
       let commitSha = ref;
       if (!commitSha) {
-        const { GitServer } = await import("../services/git/gitServer");
+        const { GitServer } = await import("../../services/git/gitServer");
         const gitServer = new GitServer();
         const output = await gitServer.spawnGit(
           ["rev-parse", "HEAD"],
@@ -208,7 +208,7 @@ export default async function (server: FastifyInstance) {
 
       // 2. Call Engine to cancel
       if (jobs.length > 0) {
-        const { DroneAdapter } = await import("../services/ci/droneAdapter");
+        const { DroneAdapter } = await import("../../services/ci/droneAdapter");
         const engine = new DroneAdapter();
         for (const job of jobs) {
           if ((job as any).externalId) {
@@ -260,3 +260,7 @@ export default async function (server: FastifyInstance) {
     }
   });
 }
+
+
+
+

@@ -1,14 +1,14 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { gitService } from "../../services/git/gitService";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import bcrypt from "bcryptjs";
 import {
   BadRequest,
   NotFound,
   InternalError,
   Unauthorized,
-} from "../utils/AppError";
+} from "../../utils/AppError";
 
 // Shared prisma instance
 
@@ -102,7 +102,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
       console.log(`[WS-CREATE] DB record created in ${Date.now() - startTime}ms: ${workspace.id}`);
 
       console.log(`[WS-CREATE] Creating notification...`);
-      const { NotificationService } = await import("../services/notification");
+      const { NotificationService } = await import("../../services/infra/notification");
       await NotificationService.create(
         finalOwnerId,
         "system",
@@ -208,7 +208,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
     }
 
     try {
-      const { WorkspaceManager } = await import("../services/workspaceManager");
+      const { WorkspaceManager } = await import("../../services/workspaceManager");
 
       const result = await WorkspaceManager.startWorkspace(id, {
         repoName,
@@ -284,3 +284,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+

@@ -27,3 +27,8 @@ export interface CIEngine {
    */
   getLogs(externalId: string, jobId: string): Promise<NodeJS.ReadableStream>;
 }
+
+
+
+
+

@@ -2,7 +2,7 @@
  * OAuth Service for Google and GitHub authentication
  * Handles OAuth2 flows, token exchange, and user profile fetching
  */
-import { encrypt } from "./encryption";
+import { encrypt } from "../auth/encryption";
 
 // Access env vars lazily to avoid import order issues
 const getGoogleClientId = () => process.env.GOOGLE_CLIENT_ID || "";
@@ -445,3 +445,8 @@ export function getPrimaryEmail(emails: GitHubEmail[]): string | null {
 
   return emails[0]?.email || null;
 }
+
+
+
+
+

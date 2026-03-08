@@ -13,7 +13,7 @@
  *  7. Radar/Governance integration
  */
 
-import { prisma } from "../prisma";
+import { prisma } from "../infra/prisma";
 import { VulnerabilityDetector, VulnerabilityHypothesis } from "./VulnerabilityDetector";
 import { AHIService, AHIInput } from "./AHIService";
 import { shannonAdapter, ShannonCategory, ShannonFinding } from "../shannon-adapter/ShannonAdapter";
@@ -506,3 +506,8 @@ interface ValidatedVulnerability {
 }
 
 export const cssService = new CSSService();
+
+
+
+
+

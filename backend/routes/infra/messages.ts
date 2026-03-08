@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { AppError, BadRequest, NotFound, Forbidden } from "../utils/AppError";
+import { AppError, BadRequest, NotFound, Forbidden } from "../../utils/AppError";
 import { RealtimeService } from "../../services/infra/realtime";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 
 // Shared prisma instance
 
@@ -268,3 +268,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
     return { success: true, message: updatedMessage };
   });
 }
+
+
+
+

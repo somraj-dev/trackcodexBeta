@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import { searchService } from "../../services/infra/searchService";
 
 const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL || "https://bumpy-snakes-guess.loca.lt";
@@ -395,3 +395,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+

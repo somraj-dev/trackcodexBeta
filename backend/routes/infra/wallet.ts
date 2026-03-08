@@ -75,3 +75,7 @@ export async function walletRoutes(fastify: FastifyInstance) {
         return txs;
     });
 }
+
+
+
+

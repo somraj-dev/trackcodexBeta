@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { DockerService } from '../../services/docker';
-import { TerminalService } from '../../services/terminal';
+import { DockerService } from '../../services/infra/docker';
+import { TerminalService } from '../../services/workspace/terminal';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -131,3 +131,8 @@ export async function forgeRoutes(fastify: FastifyInstance) {
         }
     });
 }
+
+
+
+
+

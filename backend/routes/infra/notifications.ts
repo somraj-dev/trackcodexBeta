@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from "../../services/infra/prisma";
-import { NotificationService } from '../../services/notification';
-import { requireAuth } from '../middleware/auth';
+import { NotificationService } from '../../services/infra/notification';
+import { requireAuth } from '../../middleware/auth';
 
 export async function notificationRoutes(fastify: FastifyInstance) {
 
@@ -40,3 +40,7 @@ export async function notificationRoutes(fastify: FastifyInstance) {
         return { success: true };
     });
 }
+
+
+
+

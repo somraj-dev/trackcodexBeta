@@ -26,9 +26,9 @@ import { routes } from "./routes/index";
 // Removed unused imports and variables for clean startup
 
 // import { csrfProtection } from "./middleware/csrf";
-import { RealtimeService } from "./services/realtime";
+import { RealtimeService } from "./services/infra/realtime";
 import { AppError } from "./utils/AppError";
-import { prisma } from "./services/prisma";
+import { prisma } from "./services/infra/prisma";
 import { startOutboxWorker } from "./workers/outboxWorker";
 
 const server = Fastify({
@@ -43,7 +43,7 @@ const server = Fastify({
     trustProxy: true,
 });
 
-// Shared prisma instance imported from services/prisma
+// Shared prisma instance imported from services/infra/prisma
 
 // import { Resend } from "resend";
 // const resend = new Resend(process.env.RESEND_API_KEY || "re_123456789");
@@ -511,3 +511,6 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+
+

@@ -147,3 +147,8 @@ export class ShannonAdapter {
 
 // Singleton export
 export const shannonAdapter = new ShannonAdapter();
+
+
+
+
+

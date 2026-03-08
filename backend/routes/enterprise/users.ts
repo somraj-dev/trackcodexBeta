@@ -1,5 +1,5 @@
 import { prisma } from "../../services/infra/prisma";
-import { requireAuth } from "../middleware/auth";
+import { requireAuth } from "../../middleware/auth";
 import { NotificationService } from "../../services/infra/notification";
 import { FastifyInstance } from "fastify";
 
@@ -637,3 +637,7 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 }
+
+
+
+
