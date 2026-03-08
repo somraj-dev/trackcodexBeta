@@ -72,10 +72,10 @@ const ForgeAIView = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#1a1a1a] text-[#e3e3e3] font-sans selection:bg-primary/30">
+    <div className="flex-1 flex flex-col bg-gh-bg text-gh-text font-sans selection:bg-primary/30 relative">
       {/* Top Navigation / Badge */}
-      <div className="pt-12 flex justify-center">
-        <div className="px-4 py-1.5 bg-[#262626] border border-[#333] rounded-full text-[13px] text-[#999] font-medium flex items-center gap-2 cursor-pointer hover:bg-[#2a2a2a] transition-colors shadow-sm">
+      <div className="pt-12 flex justify-center sticky top-0 bg-gh-bg/80 backdrop-blur-md z-10 pb-4">
+        <div className="px-4 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[13px] text-gh-text-secondary font-medium flex items-center gap-2 cursor-pointer hover:bg-gh-tertiary transition-colors shadow-sm">
           <span>Free plan</span>
           <span className="opacity-40">•</span>
           <span className="text-[#bbb]">Upgrade</span>
@@ -83,7 +83,7 @@ const ForgeAIView = () => {
       </div>
 
       {/* Main Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center -mt-20 px-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 flex flex-col items-center pt-20 pb-32 px-6">
         <div className="w-full max-w-3xl flex flex-col items-center gap-10">
 
           {/* Header with Serif Font */}
@@ -93,7 +93,7 @@ const ForgeAIView = () => {
                 blur_on
               </span>
             </div>
-            <h1 className="text-[44px] font-serif font-medium text-[#d1d1d1] tracking-tight">
+            <h1 className="text-[44px] font-serif font-medium text-gh-text tracking-tight text-center lg:text-left">
               Golden hour thinking
             </h1>
           </div>
@@ -102,8 +102,8 @@ const ForgeAIView = () => {
           {results.length > 0 && (
             <div className="w-full space-y-4 mb-4">
               {results.slice(0, 3).map((res, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-[#222] border border-[#333] shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <p className="text-sm leading-relaxed text-[#bbb]">
+                <div key={i} className="p-5 rounded-2xl bg-gh-bg-secondary border border-gh-border shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <p className="text-sm leading-relaxed text-gh-text-secondary">
                     {res.content.length > 300 ? res.content.substring(0, 300) + "..." : res.content}
                   </p>
                 </div>
@@ -115,7 +115,7 @@ const ForgeAIView = () => {
           <div className="w-full">
             <div className="relative group">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-[#d97757]/10 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-              <div className="relative bg-[#222222] border border-[#333] rounded-[28px] p-2 pr-4 shadow-2xl">
+              <div className="relative bg-gh-bg-secondary border border-gh-border rounded-[28px] p-2 pr-4 shadow-2xl">
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
@@ -123,29 +123,29 @@ const ForgeAIView = () => {
                     e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleAsk())
                   }
                   placeholder="How can I help you today?"
-                  className="w-full bg-transparent border-none px-6 py-5 text-[17px] text-white placeholder-[#666] focus:ring-0 outline-none min-h-[140px] resize-none leading-relaxed"
+                  className="w-full bg-transparent border-none px-6 py-5 text-[17px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none min-h-[140px] resize-none leading-relaxed"
                 />
 
-                <div className="flex items-center justify-between pl-3 pb-2 pt-2 border-t border-[#333]/10 mt-2">
+                <div className="flex items-center justify-between pl-3 pb-2 pt-2 border-t border-gh-border/10 mt-2">
                   <div className="flex items-center gap-1">
                     <button className="size-10 flex items-center justify-center text-[#888] hover:text-white hover:bg-white/5 rounded-full transition-all">
                       <span className="material-symbols-outlined !text-[22px]">add</span>
                     </button>
-                    <div className="h-4 w-[1px] bg-[#333] mx-1"></div>
+                    <div className="h-4 w-[1px] bg-gh-border mx-1"></div>
                     <button
                       onClick={() => setShowSettings(!showSettings)}
                       className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/5 rounded-full text-[#999] text-[13px] font-medium transition-all hover:text-white"
                     >
                       <span className="text-xs">Sonnet 4.6</span>
-                      <span className="text-[#666]">Extended</span>
-                      <span className="material-symbols-outlined !text-[16px] opacity-60">expand_more</span>
+                      <span className="text-gh-text-secondary">Extended</span>
+                      <span className="material-symbols-outlined !text-[16px] text-gh-text-secondary opacity-60">expand_more</span>
                     </button>
                   </div>
 
                   <button
                     onClick={handleAsk}
                     disabled={isAnalyzing || !prompt.trim()}
-                    className={`size-10 rounded-full flex items-center justify-center transition-all ${prompt.trim() ? "bg-[#d97757] text-white shadow-lg shadow-[#d97757]/20" : "bg-[#333] text-[#555] opacity-50"
+                    className={`size-10 rounded-full flex items-center justify-center transition-all ${prompt.trim() ? "bg-[#d97757] text-white shadow-lg shadow-[#d97757]/20" : "bg-gh-tertiary text-gh-text-secondary opacity-50"
                       }`}
                   >
                     <span className={`material-symbols-outlined !text-[20px] ${isAnalyzing ? "animate-spin" : ""}`}>

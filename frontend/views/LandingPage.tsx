@@ -13,7 +13,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="landing-container min-h-screen w-full flex bg-[#f5f5f7] relative overflow-hidden font-sans">
+    <div className="landing-container min-h-screen w-full flex bg-[#f5f5f7] relative font-sans">
 
       {/* Background Subtle Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-[#f5f5f7] pointer-events-none" />

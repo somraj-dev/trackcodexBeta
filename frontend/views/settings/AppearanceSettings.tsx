@@ -66,7 +66,7 @@ const ThemePreviewCard = ({
       </div>
       <div className="flex items-center justify-between px-1">
         <span
-          className={`text-sm font-medium ${isActive ? "text-white" : "text-gh-text-secondary group-hover:text-slate-300"}`}
+          className={`text-sm font-medium ${isActive ? "text-gh-text" : "text-gh-text-secondary group-hover:text-gh-text"}`}
         >
           {item.name}
         </span>
@@ -105,7 +105,7 @@ const AppearanceSettings = () => {
   return (
     <div className="space-y-8 max-w-4xl">
       <header className="border-b border-gh-border pb-6">
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <h1 className="text-2xl font-black text-gh-text tracking-tight">
           Theme preferences
         </h1>
         <p className="text-sm text-gh-text-secondary mt-1">
@@ -117,7 +117,7 @@ const AppearanceSettings = () => {
 
       {/* Theme Mode Selector */}
       <section>
-        <h2 className="text-sm font-bold text-white mb-2" id="theme-mode-label">
+        <h2 className="text-sm font-bold text-gh-text mb-2" id="theme-mode-label">
           Theme mode
         </h2>
         <div className="relative inline-block w-[300px]">
@@ -125,7 +125,7 @@ const AppearanceSettings = () => {
             value={themeMode}
             onChange={(e) => setThemeMode(e.target.value as any)}
             aria-labelledby="theme-mode-label"
-            className="w-full appearance-none bg-gh-bg-secondary border border-gh-border text-white text-sm rounded-md px-3 py-2 pr-8 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer hover:bg-gh-border/50 transition-colors"
+            className="w-full appearance-none bg-gh-bg-secondary border border-gh-border text-gh-text text-sm rounded-md px-3 py-2 pr-8 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer hover:bg-gh-tertiary transition-colors"
           >
             <option value="single">Single theme</option>
             <option value="system">Sync with system</option>
@@ -195,7 +195,7 @@ const AppearanceSettings = () => {
       <section>
         <div className="flex items-center justify-between p-4 border border-gh-border rounded-md bg-gh-bg-secondary">
           <div>
-            <h3 className="text-sm font-bold text-white">Increase contrast</h3>
+            <h3 className="text-sm font-bold text-gh-text">Increase contrast</h3>
             <p className="text-xs text-gh-text-secondary mt-0.5">
               Enable high contrast for light or dark mode (or both) based on
               your system settings
@@ -216,7 +216,7 @@ const AppearanceSettings = () => {
       {/* Emoji Skin Tone Preference */}
       <section>
         <div className="flex items-center justify-between mb-3 pt-6">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-gh-text">
             Emoji skin tone preference
           </h2>
           <span className="text-green-500 material-symbols-outlined !text-lg">
@@ -267,7 +267,7 @@ const AppearanceSettings = () => {
       <section className="space-y-8">
         {/* Tab Size */}
         <div>
-          <h2 className="text-xl font-bold text-white mb-4">
+          <h2 className="text-xl font-bold text-gh-text mb-4">
             Tab size preference
           </h2>
           <p className="text-sm text-gh-text-secondary mb-2">
@@ -278,7 +278,7 @@ const AppearanceSettings = () => {
               value={tabSize}
               aria-label="Tab Size"
               onChange={(e) => setTabSize(parseInt(e.target.value, 10))}
-              className="appearance-none bg-gh-bg-secondary border border-gh-border text-white text-sm rounded-md px-3 py-1.5 pr-8 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer hover:bg-gh-border/50 transition-colors"
+              className="appearance-none bg-gh-bg-secondary border border-gh-border text-gh-text text-sm rounded-md px-3 py-1.5 pr-8 focus:ring-2 focus:ring-primary focus:border-primary cursor-pointer hover:bg-gh-tertiary transition-colors"
             >
               <option value={2}>2 spaces</option>
               <option value={4}>4 (Default)</option>
@@ -294,7 +294,7 @@ const AppearanceSettings = () => {
 
         {/* Markdown Font */}
         <div>
-          <h2 className="text-xl font-bold text-white mb-4">
+          <h2 className="text-xl font-bold text-gh-text mb-4">
             Markdown editor font preference
           </h2>
           <p className="text-sm text-gh-text-secondary mb-3">
@@ -308,7 +308,7 @@ const AppearanceSettings = () => {
               onChange={(e) => setUseMonospaceForMarkdown(e.target.checked)}
               className="rounded text-primary focus:ring-primary bg-gh-bg border-gh-border"
             />
-            <span className="text-sm text-white group-hover:text-primary transition-colors">
+            <span className="text-sm text-gh-text group-hover:text-primary transition-colors">
               Use a fixed-width (monospace) font when editing Markdown
             </span>
           </label>

@@ -43,7 +43,7 @@ export const PublicProfile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gh-bg flex flex-col items-center justify-center">
+      <div className="min-h-full bg-gh-bg flex flex-col items-center justify-center">
         <div className="size-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
         <p className="text-gh-text-secondary font-bold animate-pulse">
           Decrypting Profile...
@@ -54,7 +54,7 @@ export const PublicProfile: React.FC = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gh-bg flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-full bg-gh-bg flex flex-col items-center justify-center p-6 text-center">
         <span className="material-symbols-outlined !text-6xl text-rose-500 mb-4">
           person_off
         </span>
@@ -78,7 +78,7 @@ export const PublicProfile: React.FC = () => {
   const tabs = ["Overview", "Repositories", "Workspaces", "Community", "Jobs", "Library"];
 
   return (
-    <div className="min-h-screen bg-gh-bg text-gh-text font-display">
+    <div className="min-h-full bg-gh-bg text-gh-text font-display">
       <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           {/* Sidebar */}

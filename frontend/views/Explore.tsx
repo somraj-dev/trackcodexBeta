@@ -137,7 +137,7 @@ export const Explore: React.FC = () => {
         <div className="user-info">
           <h3 className="user-name">{ws.name}</h3>
           <p className="user-username flex items-center gap-1">
-            {ws.visibility === 'public' ? <Globe size={12} /> : <Lock size={12} />}
+            {(ws.visibility === 'public' || ws.visibility === 'Public') ? <Globe size={12} /> : <Lock size={12} />}
             {ws.visibility}
           </p>
         </div>
@@ -149,7 +149,7 @@ export const Explore: React.FC = () => {
       <div className="user-stats">
         <span className="flex items-center gap-1">
           <Users size={14} />
-          <strong>{ws.members?.length || 1}</strong> members
+          <strong>{Array.isArray(ws.members) ? ws.members.length : (typeof ws.members === 'number' ? ws.members : 1)}</strong> members
         </span>
         <span className="truncate max-w-[150px]">
           {ws.repoUrl || "No repo linked"}
@@ -159,7 +159,7 @@ export const Explore: React.FC = () => {
   );
 
   return (
-    <div className="explore-container">
+    <div className="explore-container min-h-full">
       <div className="explore-header">
         <h1>
           <Users size={32} /> Explore

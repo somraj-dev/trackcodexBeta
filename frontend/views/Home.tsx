@@ -14,7 +14,7 @@ const RepoItem = ({ repo }: RepoItemProps) => {
   return (
     <div
       onClick={() => navigate(`/repositories/${repo.id}`)}
-      className="p-4 border-b border-gh-border last:border-[#1A1A1A] hover:bg-gh-bg-secondary/50 group cursor-pointer transition-colors"
+      className="p-4 border-b border-gh-border last:border-gh-border hover:bg-gh-bg-secondary/50 group cursor-pointer transition-colors"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ const HomeView = () => {
   }, []);
 
   return (
-    <div className="flex-1 p-8 font-display h-full overflow-y-auto custom-scrollbar">
+    <div className="flex-1 p-8 font-display">
       <div className="max-w-[1000px] mx-auto">
         <h1 className="text-2xl font-bold text-gh-text mb-6">Home</h1>
 

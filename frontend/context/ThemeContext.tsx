@@ -219,17 +219,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const root = document.documentElement;
 
-    // 1. Reset specific classes
-    root.classList.remove("dark", "light");
-
-    // 2. Apply base dark class if dark type (for Tailwind 'dark:' prefix support)
+    // 2. Apply base class for Tailwind 'dark:' support
     if (resolvedTheme.type === "dark") {
       root.classList.add("dark");
+    } else {
+      root.classList.add("light");
     }
 
     // 3. Apply CSS Variables directly to :root
-    // In a real app with Tailwind, we might map these to custom properties defined in tailwind.config
-    // For now, we'll set standard properties that the app hopefully uses, or simple overrides
     root.style.setProperty("--gh-bg", resolvedTheme.colors.bg);
     root.style.setProperty("--gh-bg-secondary", resolvedTheme.colors.secondary);
     root.style.setProperty("--gh-bg-tertiary", resolvedTheme.colors.tertiary);
@@ -240,12 +237,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     );
     root.style.setProperty("--gh-border", resolvedTheme.colors.border);
     root.style.setProperty("--gh-primary", resolvedTheme.colors.primary);
-    // Rough hack for background if the app uses utility classes mostly
-    // We can't easily override tailwind 'bg-slate-900' unless we use important or CSS vars in config.
-    // Assuming the app has *some* generic background set, or we force it on body.
+
+    // Apply basic background and color to body for full coverage
     document.body.style.backgroundColor = resolvedTheme.colors.bg;
     document.body.style.color = resolvedTheme.colors.text;
-  }, [resolvedTheme]);
+
+    // Apply animation density as a class
+    root.classList.remove("anim-standard", "anim-fast", "anim-none");
+    root.classList.add(`anim-${animationDensity}`);
+
+    // Apply motion reduction
+    if (isMotionReduced) {
+      root.classList.add("reduce-motion");
+    } else {
+      root.classList.remove("reduce-motion");
+    }
+  }, [resolvedTheme, animationDensity, isMotionReduced]);
 
   const [emojiSkinTone, setEmojiSkinTone] = useState<string>(() => {
     return localStorage.getItem("tc_emoji_skin_tone") || "default";

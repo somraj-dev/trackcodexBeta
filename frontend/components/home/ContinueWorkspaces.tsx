@@ -37,14 +37,14 @@ const ContinueWorkspaces = () => {
 
   if (workspaces.length === 0) {
     return (
-      <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 text-center border-[#1A1A1A]ashed">
+      <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 text-center border-dashed">
         <h3 className="text-gh-text font-bold mb-2">No Active Sessions</h3>
         <p className="text-gh-text-secondary text-sm mb-6">
           You haven't started any workspaces yet.
         </p>
         <button
           onClick={() => navigate("/workspace/new")}
-          className="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:opacity-90 transition-opacity text-sm"
+          className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity text-sm"
         >
           Launch New Workspace
         </button>

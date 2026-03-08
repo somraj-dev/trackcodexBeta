@@ -528,7 +528,7 @@ const LibraryView = () => {
   }
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-gh-bg font-display">
+    <div className="flex-1 flex bg-gh-bg font-display min-h-full">
       {/* Internal Library Sidebar */}
       <aside className="w-[280px] border-r border-gh-border flex flex-col shrink-0">
         <div className="p-6 border-b border-gh-border">
@@ -551,11 +551,10 @@ const LibraryView = () => {
                     cat.name === activeCategory ? null : cat.name,
                   )
                 }
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-[13px] font-medium group ${
-                  activeCategory === cat.name
-                    ? "bg-primary/10 text-primary shadow-sm"
-                    : "text-gh-text-secondary hover:bg-white/5 hover:text-gh-text"
-                }`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-[13px] font-medium group ${activeCategory === cat.name
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-gh-text-secondary hover:bg-white/5 hover:text-gh-text"
+                  }`}
               >
                 <span
                   className={`material-symbols-outlined !text-[20px] ${activeCategory === cat.name ? "text-primary" : "text-gh-text-secondary group-hover:text-gh-text"}`}
@@ -725,7 +724,7 @@ const LibraryView = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+        <div className="flex-1 p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
             {filteredResources.length > 0 ? (
               filteredResources.map((resource) => (

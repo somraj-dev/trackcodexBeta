@@ -207,9 +207,9 @@ const ProfileSettings = () => {
   const sectionTitleStyle = "text-xl font-normal text-gh-text pb-2 border-b border-gh-border mb-4";
 
   return (
-    <div className="max-w-[1000px] text-[#c9d1d9]">
-      <h1 className="text-3xl font-normal text-white mb-2">Public profile</h1>
-      <div className="border-b border-[#1E232E] mb-8"></div>
+    <div className="max-w-[1000px] text-gh-text-secondary">
+      <h1 className="text-3xl font-normal text-gh-text mb-2">Public profile</h1>
+      <div className="border-b border-gh-border mb-8"></div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         {/* Left Column: Form Fields */}

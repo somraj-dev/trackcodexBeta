@@ -14,6 +14,16 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --neon-primary: #8b5cf6;
   --neon-secondary: #38bdf8;
+  
+  /* Legacy Aliases */
+  --primary-color: var(--gh-primary);
+  --primary-hover: #085cc1;
+  --bg-secondary: var(--gh-bg-secondary);
+  --bg-tertiary: var(--gh-bg-tertiary);
+  --border-color: var(--gh-border);
+  --text-primary: var(--gh-text);
+  --text-secondary: var(--gh-text-secondary);
+  --bg-hover: rgba(0, 0, 0, 0.05);
 }
 
 .dark {
@@ -28,6 +38,16 @@
   --glass-border: #1A1A1A; /* Matches border for seamless look */
   --neon-primary: #FFFFFF;
   --neon-secondary: #333333;
+
+  /* Legacy Aliases - Dark Mode */
+  --primary-color: var(--gh-primary);
+  --primary-hover: #e5e5e5;
+  --bg-secondary: var(--gh-bg-secondary);
+  --bg-tertiary: var(--gh-bg-tertiary);
+  --border-color: var(--gh-border);
+  --text-primary: var(--gh-text);
+  --text-secondary: var(--gh-text-secondary);
+  --bg-hover: rgba(255, 255, 255, 0.05);
 }
 
 :root.high-contrast {
@@ -45,19 +65,21 @@
 }
 
 /* ===== Base Styles ===== */
-html {
-  scroll-behavior: smooth;
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 body {
-  margin: 0;
-  padding: 0;
   font-family: "Inter", sans-serif;
-  overflow: hidden;
-  height: 100vh;
   background-color: var(--gh-bg);
   color: var(--gh-text);
-  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ===== Glass Panel ===== */

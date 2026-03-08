@@ -3,9 +3,11 @@
 .trackcodex-footer {
   width: 100%;
   padding: 12px 24px;
-  background: var(--gh-bg); /* Dark background */
-  border-top: 1px solid var(--gh-border); /* Subtle border */
+  background: var(--gh-bg);
+  border-top: 1px solid var(--gh-border);
   margin-top: auto;
+  position: relative;
+  z-index: 5;
 }
 
 .footer-content {

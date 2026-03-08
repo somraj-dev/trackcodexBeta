@@ -14,6 +14,9 @@ export interface Workspace {
   hasPassword?: boolean;
   ownerId?: string;
   updatedAt?: string;
+  visibility?: "Public" | "Private" | "public" | "private";
+  description?: string;
+  members?: any;
 }
 
 export interface LiveSession {
