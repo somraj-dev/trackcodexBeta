@@ -1,0 +1,564 @@
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { profileService, UserProfile } from "../../services/activity/profile";
+import { useAuth } from "../../context/AuthContext";
+import { locationService, LocationError } from "../../services/infra/location";
+import { detectSocialPlatform } from "../../utils/socialMediaDetector";
+
+const ProfileSettings = () => {
+  const { logout } = useAuth();
+  const location = useLocation();
+  const [profile, setProfile] = useState<UserProfile>(() =>
+    profileService.getProfile(),
+  );
+
+  // ... existing state ...
+
+  useEffect(() => {
+    // Check for ORCID callback param
+    const params = new URLSearchParams(location.search);
+    const orcidId = params.get("orcid_id");
+
+    if (orcidId) {
+      // Update profile with new ID
+      setProfile(prev => ({ ...prev, orcidId }));
+      profileService.updateProfile({ orcidId });
+
+      // Notify user
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-realtime-notification", {
+          detail: {
+            id: `orcid-connect-${Date.now()}`,
+            title: "ORCID Connected",
+            message: `Successfully linked ORCID iD: ${orcidId}`,
+            type: "success",
+            createdAt: new Date().toISOString(),
+            read: false,
+          },
+        }),
+      );
+
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [location]);
+
+  // ... existing useEffects ...
+
+  const handleOrcidConnect = () => {
+    // Redirect to backend auth route
+    window.location.href = "http://localhost:5000/auth/orcid";
+  };
+
+  const handleOrcidDisconnect = () => {
+    setProfile(prev => ({ ...prev, orcidId: undefined }));
+    profileService.updateProfile({ orcidId: undefined });
+
+    window.dispatchEvent(
+      new CustomEvent("trackcodex-realtime-notification", {
+        detail: {
+          id: `orcid-disconnect-${Date.now()}`,
+          title: "ORCID Disconnected",
+          message: "Unlinked your ORCID iD.",
+          type: "info",
+          createdAt: new Date().toISOString(),
+          read: false,
+        },
+      }),
+    );
+  };
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Sync with service
+    const unsubscribe = profileService.subscribe(setProfile);
+
+    // Update local time clock every second
+    const interval = setInterval(() => {
+      if (profile.timezone) {
+        try {
+          const timeString = new Date().toLocaleTimeString("en-US", {
+            timeZone: profile.timezone,
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZoneName: "short"
+          });
+          setCurrentTime(timeString);
+        } catch (e) {
+          // Fallback if timezone is invalid
+          setCurrentTime(new Date().toLocaleTimeString());
+        }
+      } else {
+        // Default to system time if no timezone set yet
+        setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }));
+      }
+    }, 1000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
+  }, [profile.timezone]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      let updates: any = { [name]: checked };
+
+      // If enabling local time, auto-detect timezone if missing
+      if (name === "displayLocalTime" && checked && !profile.timezone) {
+        const detectedZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        updates.timezone = detectedZone;
+      }
+
+      setProfile({ ...profile, ...updates });
+    } else {
+      setProfile({ ...profile, [name]: value });
+    }
+  };
+
+  const handleSocialLinkChange = (index: number, value: string) => {
+    const newLinks = [...(profile.socialLinks || ["", "", "", ""])];
+    newLinks[index] = value;
+    setProfile({ ...profile, socialLinks: newLinks });
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, avatar: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGetLocation = async () => {
+    setIsLoadingLocation(true);
+    setLocationError(null);
+    try {
+      const locationData = await locationService.getCurrentLocation();
+      const detectedZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setProfile({
+        ...profile,
+        location: locationData.address,
+        gpsLatitude: locationData.latitude,
+        gpsLongitude: locationData.longitude,
+        useGPSLocation: true,
+        timezone: detectedZone // Auto-update timezone with location
+      });
+
+      // Dispatch silent notification to bell
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-realtime-notification", {
+          detail: {
+            id: `loc-update-${Date.now()}`,
+            title: "Location Updated",
+            message: `Set to: ${locationData.city || locationData.address}`,
+            type: "info",
+            createdAt: new Date().toISOString(),
+            read: false,
+            skipToast: true // Key change: Suppress popup
+          },
+        }),
+      );
+
+    } catch (error: any) {
+      setLocationError(error.message || "Failed to get location");
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
+  const handleSave = () => {
+    setIsSaving(true);
+    profileService.updateProfile(profile);
+    setTimeout(() => {
+      setIsSaving(false);
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-realtime-notification", {
+          detail: {
+            id: `prof-update-${Date.now()}`,
+            title: "Profile Updated",
+            message: "Your public profile has been updated.",
+            type: "info",
+            createdAt: new Date().toISOString(),
+            read: false,
+            skipToast: true // Key change: Suppress popup
+          },
+        }),
+      );
+    }, 800);
+  };
+
+  // Helper Styles
+  const labelStyle = "block text-sm font-semibold text-white mb-2";
+  const inputStyle = "w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 text-sm text-gh-text focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors placeholder-gh-text-secondary";
+  const sectionTitleStyle = "text-xl font-normal text-gh-text pb-2 border-b border-gh-border mb-4";
+
+  return (
+    <div className="max-w-[1000px] text-[#c9d1d9]">
+      <h1 className="text-3xl font-normal text-white mb-2">Public profile</h1>
+      <div className="border-b border-[#1E232E] mb-8"></div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        {/* Left Column: Form Fields */}
+        <div className="md:col-span-8 space-y-6">
+
+          <div>
+            <label htmlFor="name" className={labelStyle}>Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+            <p className="text-xs text-[#8b949e] mt-1">Your name may appear around TrackCodex where you contribute or are mentioned. You can remove it at any time.</p>
+          </div>
+
+          <div>
+            <label htmlFor="publicEmail" className={labelStyle}>Public email</label>
+            <div className="flex gap-2">
+              <select
+                id="publicEmail"
+                name="publicEmail"
+                value={profile.publicEmail || ""}
+                onChange={handleChange}
+                className={inputStyle}
+              >
+                <option value="">Select a verified email to display</option>
+                {profile.email && <option value={profile.email}>{profile.email}</option>}
+                <option value="private">Don't show my email</option>
+              </select>
+            </div>
+            <p className="text-xs text-[#8b949e] mt-1">You can manage verified email addresses in your <a href="#" className="text-blue-400 hover:underline">email settings</a>.</p>
+          </div>
+
+          <div>
+            <label htmlFor="bio" className={labelStyle}>Bio</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={profile.bio}
+              onChange={handleChange}
+              className={`${inputStyle} min-h-[100px] resize-y`}
+              placeholder="Tell us a little bit about yourself"
+            />
+            <p className="text-xs text-[#8b949e] mt-1">You can <strong>@mention</strong> other users and organizations to link to them.</p>
+          </div>
+
+          <div>
+            <label htmlFor="pronouns" className={labelStyle}>Pronouns</label>
+            <select
+              id="pronouns"
+              name="pronouns"
+              value={profile.pronouns || "Don't specify"}
+              onChange={handleChange}
+              className={inputStyle}
+            >
+              <option value="Don't specify">Don't specify</option>
+              <option value="they/them">they/them</option>
+              <option value="she/her">she/her</option>
+              <option value="he/him">he/him</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="website" className={labelStyle}>URL</label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              value={profile.website}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label className={labelStyle}>Social accounts</label>
+            <p className="text-xs text-[#8b949e] mb-3">
+              Paste your social media profile URLs and we'll automatically detect the platform
+            </p>
+            <div className="space-y-2">
+              {(profile.socialLinks || ["", "", "", ""]).map((link, idx) => {
+                const platform = link ? detectSocialPlatform(link) : null;
+
+                return (
+                  <div key={idx} className="relative">
+                    <span className={`absolute left-3 top-2 ${platform ? platform.color : "text-[#8b949e]"}`}>
+                      <span className="material-symbols-outlined !text-[16px]">
+                        {platform ? platform.icon : "link"}
+                      </span>
+                    </span>
+                    <input
+                      type="text"
+                      value={link}
+                      onChange={(e) => handleSocialLinkChange(idx, e.target.value)}
+                      className={`${inputStyle} pl-9`}
+                      placeholder={`Link to social profile ${idx + 1}`}
+                    />
+                    {platform && (
+                      <span className="absolute right-3 top-2 text-xs text-[#8b949e] bg-[#11141A] px-2 py-0.5 rounded border border-[#1E232E]">
+                        {platform.name}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="company" className={labelStyle}>Company</label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              value={profile.company}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+            <p className="text-xs text-[#8b949e] mt-1">You can <strong>@mention</strong> your company's TrackCodex organization to link it.</p>
+          </div>
+
+          <div>
+            <label htmlFor="location" className={labelStyle}>Location</label>
+            <div className="relative">
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={profile.location}
+                onChange={handleChange}
+                className={`${inputStyle} pr-10`}
+                placeholder="City, Country"
+              />
+              <button
+                onClick={handleGetLocation}
+                disabled={isLoadingLocation}
+                title="Use current location"
+                className="absolute right-2 top-1.5 p-1 text-[#8b949e] hover:text-blue-400 disabled:opacity-50 transition-colors"
+              >
+                <span className={`material-symbols-outlined !text-[18px] ${isLoadingLocation ? "animate-spin" : ""}`}>
+                  {isLoadingLocation ? "progress_activity" : "my_location"}
+                </span>
+              </button>
+            </div>
+            {locationError && (
+              <p className="text-xs text-rose-500 mt-1">{locationError}</p>
+            )}
+            <p className="text-xs text-[#8b949e] mt-1">Click the <span className="material-symbols-outlined !text-[12px] align-text-bottom">my_location</span> icon to use your current GPS location.</p>
+          </div>
+
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="displayLocalTime"
+              name="displayLocalTime"
+              checked={profile.displayLocalTime || false}
+              onChange={handleChange}
+              className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0"
+            />
+            <div>
+              <label htmlFor="displayLocalTime" className="text-sm font-semibold text-white flex items-center gap-2">
+                Display current local time
+                {profile.displayLocalTime && (
+                  <span className="text-xs font-normal text-[#8b949e] bg-[#11141A] px-2 py-0.5 rounded-full border border-[#1E232E]">
+                    {currentTime} (Live Preview)
+                  </span>
+                )}
+              </label>
+              <p className="text-xs text-[#8b949e]">Other users will see the time difference from their local time.</p>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-[#1E232E]">
+            <h3 className="font-semibold text-white mb-2">ORCID ID</h3>
+            <p className="text-xs text-[#8b949e] mb-3">ORCID provides a persistent identifier - an ORCID iD - that distinguishes you from other researchers. Learn more at <a href="#" className="text-blue-400 hover:underline">ORCID.org</a>.</p>
+
+            {profile.orcidId ? (
+              <div className="flex items-center gap-2">
+                <div className="relative flex-grow">
+                  <div className="absolute left-3 top-2 text-[#a6ce39]">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.306v7.444h2.297c3.325 0 3.325-5.044 0-5.044h-2.297z" /></svg>
+                  </div>
+                  <input
+                    type="text"
+                    value={profile.orcidId}
+                    readOnly
+                    className={`${inputStyle} pl-9 pr-20`}
+                  />
+                  <div className="absolute right-3 top-2 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span className="text-xs text-[#8b949e]">Verified</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleOrcidDisconnect}
+                  className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] hover:text-red-400 border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors"
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleOrcidConnect}
+                  className="flex-grow flex items-center justify-center gap-2 px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors"
+                >
+                  <span className="text-[#a6ce39]">
+                    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.306v7.444h2.297c3.325 0 3.325-5.044 0-5.044h-2.297z" /></svg>
+                  </span>
+                  Connect your ORCID iD
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-6">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="px-4 py-1.5 bg-[#1f6feb] hover:bg-[#1a5cbf] text-white rounded-md text-sm font-semibold transition-colors disabled:opacity-50"
+            >
+              {isSaving ? "Update profile..." : "Update profile"}
+            </button>
+          </div>
+
+        </div>
+
+        {/* Right Column: Avatar */}
+        <div className="md:col-span-4 pl-0 md:pl-8">
+          <h3 className="text-sm font-semibold text-white mb-2">Profile picture</h3>
+          <div className="relative group w-fit">
+            <img
+              src={profile.avatar}
+              alt="Profile"
+              className="size-48 rounded-full border border-[#1E232E]"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-2 left-0 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] text-[#c9d1d9] text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 transition-colors"
+            >
+              <span className="material-symbols-outlined !text-[14px]">edit</span>
+              Edit
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleAvatarChange}
+              className="hidden"
+              accept="image/*"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Sections */}
+      <div className="mt-12 space-y-10">
+
+        {/* Contributions */}
+        <section>
+          <h2 className={sectionTitleStyle}>Contributions & activity</h2>
+          <div className="space-y-4">
+            <div className="flex items-start gap-2">
+              <input type="checkbox" className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <div>
+                <label className="text-sm font-semibold text-white">Make profile private and hide activity</label>
+                <p className="text-xs text-[#8b949e]">Enabling this will hide your contributions and activity from your TrackCodex profile and from social features like followers, stars, feeds, leaderboards and releases.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <input type="checkbox" defaultChecked className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <div>
+                <label className="text-sm font-semibold text-white">Include private contributions on my profile</label>
+                <p className="text-xs text-[#8b949e]">Your contribution graph, achievements, and activity overview will show your private contributions without revealing any repository or organization information. <a href="#" className="text-blue-400 hover:underline">Read more</a>.</p>
+              </div>
+            </div>
+            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+              Update preferences
+            </button>
+          </div>
+        </section>
+
+        {/* Profile Settings */}
+        <section>
+          <h2 className={sectionTitleStyle}>Profile settings</h2>
+          <div className="space-y-4">
+            <div className="flex items-start gap-2">
+              <input type="checkbox" defaultChecked className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <div>
+                <label className="text-sm font-semibold text-white">Show Achievements on my profile</label>
+                <p className="text-xs text-[#8b949e]">Your achievements will be shown on your profile.</p>
+              </div>
+            </div>
+            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+              Update preferences
+            </button>
+          </div>
+        </section>
+
+        {/* TrackCodex Developer Program */}
+        <section>
+          <h2 className={sectionTitleStyle}>TrackCodex Developer Program</h2>
+          <div className="p-4 border border-[#1E232E] rounded-md bg-[#0A0D14]">
+            <p className="text-sm text-white">
+              Building an application, service, or tool that integrates with TrackCodex? <a href="#" className="text-blue-400 hover:underline">Join the TrackCodex Developer Program</a>, or read more about it at our <a href="#" className="text-blue-400 hover:underline">developer program</a>.
+            </p>
+          </div>
+        </section>
+
+        {/* Jobs Profile */}
+        <section>
+          <h2 className={sectionTitleStyle}>Jobs profile</h2>
+          <div className="space-y-4">
+            <div className="flex items-start gap-2">
+              <input type="checkbox" className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <div>
+                <label className="text-sm font-semibold text-white">Available for hire</label>
+              </div>
+            </div>
+            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+              Save jobs profile
+            </button>
+          </div>
+        </section>
+
+        {/* Trending Settings */}
+        <section>
+          <h2 className={sectionTitleStyle}>Trending settings</h2>
+          <div className="space-y-4">
+            <div>
+              <label className={labelStyle}>Preferred spoken language</label>
+              <select className={inputStyle}>
+                <option>English</option>
+                <option>Spanish</option>
+                <option>French</option>
+              </select>
+            </div>
+            <p className="text-xs text-[#8b949e]">We'll use this language preference to filter the trending repository lists on <a href="#" className="text-blue-400 hover:underline">Explore</a> our <a href="#" className="text-blue-400 hover:underline">Trending Repositories</a> page.</p>
+            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+              Save Trending settings
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileSettings;

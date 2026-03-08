@@ -1,42 +1,42 @@
 import { FastifyInstance } from "fastify";
-import { authRoutes } from "./auth";
+import { authRoutes } from "./auth/auth";
 import { rateLimiter } from "../middleware/rateLimiter";
-import { authOtpRoutes } from "./auth_otp";
-import { workspaceRoutes } from "./workspaces";
-import { workspaceStarsRoutes } from "./workspace-stars";
-import { repositoryRoutes } from "./repositories";
-import { jobRoutes } from "./jobs";
-import { orgRoutes } from "./organizations";
-import { communityRoutes } from "./community";
-import { profileRoutes } from "./profile";
-import { radarRoutes } from "./radar";
-import { hiringRoutes } from "./hiring";
-import { growthRoutes } from "./growth";
+import { authOtpRoutes } from "./auth/auth_otp";
+import { workspaceRoutes } from "./workspace/workspaces";
+import { workspaceStarsRoutes } from "./workspace/workspace-stars";
+import { repositoryRoutes } from "./git/repositories";
+import { jobRoutes } from "./hiring/jobs";
+import { orgRoutes } from "./enterprise/organizations";
+import { communityRoutes } from "./community/community";
+import { profileRoutes } from "./activity/profile";
+import { radarRoutes } from "./activity/radar";
+import { hiringRoutes } from "./hiring/hiring";
+import { growthRoutes } from "./hiring/growth";
 
-import { forgeRoutes } from "./forge";
-import { notificationRoutes } from "./notifications";
-import { adminRoutes } from "./admin";
-import { searchRoutes } from "./search";
-import { workspaceCollaborationRoutes } from "./workspace-collaboration";
-import { fileRoutes } from "./files";
-import { enterpriseRoutes } from "./enterprise";
-import { collaborationRoutes } from "./collaboration";
-import { executionRoutes } from "./execution";
-import { webhookRoutes } from "./webhooks";
-import { activityRoutes } from "./activity";
-import { teamRoutes } from "./teams";
-import { insightsRoutes } from "./insights";
-import { wikiRoutes } from "./wiki";
-import { messageRoutes } from "./messages";
-import portfolioRoutes from "./portfolio";
-import statsRoutes from "./stats";
-import { userRoutes } from "./users";
-import { leaderboardRoutes } from "./leaderboard";
-import { extensionRoutes } from "./extensions";
-import { ideConfigRoutes } from "./ideconfig";
-import { galleryRoutes } from "./gallery";
-import integrationRoutes from "./integrations";
-import { applicationRoutes } from "./applications";
+import { forgeRoutes } from "./ai/forge";
+import { notificationRoutes } from "./infra/notifications";
+import { adminRoutes } from "./admin/admin";
+import { searchRoutes } from "./infra/search";
+import { workspaceCollaborationRoutes } from "./workspace/workspace-collaboration";
+import { fileRoutes } from "./workspace/files";
+import { enterpriseRoutes } from "./enterprise/enterprise";
+import { collaborationRoutes } from "./workspace/collaboration";
+import { executionRoutes } from "./workspace/execution";
+import { webhookRoutes } from "./git/webhooks";
+import { activityRoutes } from "./activity/activity";
+import { teamRoutes } from "./enterprise/teams";
+import { insightsRoutes } from "./git/insights";
+import { wikiRoutes } from "./git/wiki";
+import { messageRoutes } from "./infra/messages";
+import portfolioRoutes from "./activity/portfolio";
+import statsRoutes from "./activity/stats";
+import { userRoutes } from "./enterprise/users";
+import { leaderboardRoutes } from "./activity/leaderboard";
+import { extensionRoutes } from "./workspace/extensions";
+import { ideConfigRoutes } from "./workspace/ideconfig";
+import { galleryRoutes } from "./infra/gallery";
+import integrationRoutes from "./auth/integrations";
+import { applicationRoutes } from "./hiring/applications";
 
 export async function routes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", async (request) => {
@@ -85,13 +85,13 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(ideConfigRoutes);
   await fastify.register(galleryRoutes, { prefix: "/api/gallery" });
 
-  const { forgeAIRoutes } = await import("./forgeai");
+  const { forgeAIRoutes } = await import("./ai/forgeai");
   await fastify.register(forgeAIRoutes, { prefix: "/forgeai" });
 
-  const { walletRoutes } = await import("./wallet");
+  const { walletRoutes } = await import("./infra/wallet");
   await fastify.register(walletRoutes, { prefix: "/wallet" });
 
-  const { default: deploymentRoutes } = await import("./deployments");
+  const { default: deploymentRoutes } = await import("./infra/deployments");
   await fastify.register(deploymentRoutes);
   await fastify.register(integrationRoutes);
   await fastify.register(applicationRoutes);
