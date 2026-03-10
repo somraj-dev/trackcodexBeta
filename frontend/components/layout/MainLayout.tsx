@@ -175,6 +175,7 @@ const MainLayout: React.FC = () => {
                       {[
                         { icon: "terminal", label: "New Workspace", to: "/workspace/new" },
                         { icon: "account_tree", label: "New Repository", to: "/repositories/new" },
+                        { icon: "add_box", label: "New Post", to: "/community?action=create-post" },
                         { icon: "upload", label: "Import Repository", to: "/repositories/import" },
                       ].map((item) => (
                         <button key={item.label} onClick={() => { setIsAddMenuOpen(false); navigate(item.to); }} className="w-full px-3 py-1.5 flex items-center gap-2 text-[13px] text-gh-text hover:bg-gh-bg-secondary hover:text-white transition-colors">

@@ -2,19 +2,42 @@ import React, { useState, useEffect } from "react";
 import { socialService, Post } from "../../services/social/socialService";
 import { profileService, UserProfile } from "../../services/activity/profile";
 import PostCard from "../../components/community/PostCard";
-import { CreatePostModal } from "../../components/community/CreatePostModal";
+import { CreateCommunityModal } from "../../components/community/CreateCommunityModal";
+import CommunityLeftSidebar from "../../components/community/CommunityLeftSidebar";
+import ManageCommunities from "../../components/community/ManageCommunities";
+import CreatePostView from "../../components/community/CreatePostView";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const CommunityView = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [view, setView] = useState<'feed' | 'manage' | 'create-post'>('feed');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateCommunityModal, setShowCreateCommunityModal] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     loadFeed();
     setCurrentUser(profileService.getProfile());
-  }, []);
+
+    // Check URL for actions
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'create-post') {
+      setView('create-post');
+      // Clear the param to avoid re-opening on manual refresh after cancel
+      navigate('/community', { replace: true });
+    }
+
+    // Subscribe to profile updates
+    const unsubscribe = profileService.subscribe((updatedProfile) => {
+      setCurrentUser(updatedProfile);
+    });
+
+    return () => unsubscribe();
+  }, [location.search, navigate]); // Add location.search and navigate to dependencies
 
   const loadFeed = async () => {
     setLoading(true);
@@ -63,88 +86,115 @@ const CommunityView = () => {
 
   return (
     <div className="h-full overflow-hidden flex bg-[#030303]">
+      {/* Left Sidebar */}
+      <CommunityLeftSidebar
+        user={currentUser}
+        onStartCommunity={() => setShowCreateCommunityModal(true)}
+        onNavigateHome={() => {
+          setView('feed');
+          loadFeed();
+        }}
+        onManageCommunities={() => setView('manage')}
+      />
+
+      {/* Main Content Area */}
+      {view === 'feed' ? (
+        <>
+          {/* Main Feed */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#030303]">
+            <div className="max-w-[740px] mx-auto py-8 px-4">
+              {/* Header with Plus Dropdown */}
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl font-bold text-white">Community</h1>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowAddMenu(!showAddMenu)}
+                    aria-label="Create menu"
+                    className="size-10 rounded-full bg-[#1A1A1B] border border-[#343536] flex items-center justify-center text-white hover:border-white transition-all active:scale-95"
+                  >
+                    <span className="material-symbols-outlined !text-[24px]">{showAddMenu ? 'close' : 'add'}</span>
+                  </button>
+
+                  {showAddMenu && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowAddMenu(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-56 rounded-md bg-[#1A1A1B] border border-[#343536] shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
+                        <button
+                          onClick={() => {
+                            setView('create-post');
+                            setShowAddMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#D7DADC] hover:bg-[#272729] transition-colors"
+                        >
+                          <span className="material-symbols-outlined !text-[20px]">edit_note</span>
+                          Create Post
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowCreateCommunityModal(true);
+                            setShowAddMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#D7DADC] hover:bg-[#272729] transition-colors"
+                        >
+                          <span className="material-symbols-outlined !text-[20px]">groups</span>
+                          Create Community
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
 
 
-      {/* Main Feed */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#030303]">
-        <div className="max-w-[740px] mx-auto py-8 px-4">
-          {/* Create Post Widget (Reddit Style) */}
-          <div className="bg-[#1A1A1B] border border-[#343536] rounded-md p-3 mb-4 flex items-center gap-2">
-            <div className="size-9 rounded-full bg-[#343536] overflow-hidden shrink-0">
-              <img src={currentUser?.avatar || "https://ui-avatars.com/api/?name=U"} alt="Avatar" className="size-full object-cover" />
+              {/* Feed Posts */}
+              <div className="space-y-0">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-[#818384]">
+                    <span className="material-symbols-outlined !text-4xl animate-spin mb-4 text-[#0079D3]">
+                      progress_activity
+                    </span>
+                    <p className="font-bold">Fetching feed...</p>
+                  </div>
+                ) : (
+                  posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))
+                )}
+              </div>
             </div>
-            <input
-              readOnly
-              onClick={() => setShowCreateModal(true)}
-              placeholder="Create Post"
-              className="flex-1 bg-[#272729] border border-[#343536] rounded-md px-4 py-2 text-sm text-[#D7DADC] hover:bg-[#1A1A1B] hover:border-[#D7DADC] transition-all cursor-pointer"
-            />
-            <button className="p-2 text-[#818384] hover:bg-[#272729] rounded-md">
-              <span className="material-symbols-outlined !text-[24px]">image</span>
-            </button>
-            <button className="p-2 text-[#818384] hover:bg-[#272729] rounded-md">
-              <span className="material-symbols-outlined !text-[24px]">link</span>
-            </button>
           </div>
 
-
-
-          {/* Feed */}
-          <div className="space-y-0">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 text-[#818384]">
-                <span className="material-symbols-outlined !text-4xl animate-spin mb-4 text-[#0079D3]">
-                  progress_activity
-                </span>
-                <p className="font-bold">Fetching feed...</p>
-              </div>
-            ) : (
-              posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))
-            )}
+          {/* Right Sidebar */}
+          <div className="w-[312px] p-6 hidden xl:block overflow-y-auto">
+            {/* Empty or more content can go here later */}
           </div>
-        </div>
-      </div>
-
-      {/* Right Sidebar: Trending & Guidelines */}
-      <div className="w-[312px] p-6 hidden xl:block overflow-y-auto">
-        <div className="bg-[#1A1A1B] border border-[#343536] rounded-md overflow-hidden mb-4">
-          <div className="h-8 bg-[#0079D3]"></div>
-          <div className="p-4 pt-0 -mt-4">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="size-10 rounded-full bg-primary flex items-center justify-center text-white font-bold border-2 border-[#1A1A1B]">TC</div>
-              <h4 className="text-[16px] font-bold text-[#D7DADC] mt-4">r/trackcodex</h4>
-            </div>
-            <p className="text-[12px] text-[#D7DADC] mb-4">
-              The official community for TrackCodex developers. Share your projects, get help, and stay updated.
-            </p>
-            <div className="flex justify-between border-t border-[#343536] py-3 text-[14px]">
-              <div>
-                <div className="font-bold text-[#D7DADC]">1.2k</div>
-                <div className="text-[12px] text-[#717273]">Members</div>
-              </div>
-              <div>
-                <div className="font-bold text-[#D7DADC]">42</div>
-                <div className="text-[12px] text-[#717273]">Online</div>
-              </div>
-            </div>
-            <button className="w-full bg-[#D7DADC] hover:bg-[#ebedef] text-[#1A1A1B] font-bold py-1.5 rounded-full text-[14px] transition-colors">
-              Create Post
-            </button>
-          </div>
-        </div>
-
-
-      </div>
-
-      {/* Create Post Modal */}
-      {showCreateModal && (
-        <CreatePostModal
-          onClose={() => setShowCreateModal(false)}
+        </>
+      ) : view === 'manage' ? (
+        <ManageCommunities />
+      ) : (
+        <CreatePostView
+          communities={[
+            { id: 'c1', name: 'r/trackcodex', slug: 'trackcodex', avatar: 'https://ui-avatars.com/api/?name=T', description: 'Official community', memberCount: 1200, isMember: true },
+            { id: 'c2', name: 'r/developersIndia', slug: 'developersIndia', avatar: 'https://styles.redditmedia.com/t5_2sk9r/styles/communityIcon_v0b5j9z6z5z51.png', description: 'Developers of India', memberCount: 500000, isMember: true }
+          ]}
+          onCancel={() => setView('feed')}
           onPostCreated={() => {
+            setView('feed');
             loadFeed();
-            setShowCreateModal(false);
+          }}
+        />
+      )}
+
+      {/* Modals */}
+
+      {showCreateCommunityModal && (
+        <CreateCommunityModal
+          onClose={() => setShowCreateCommunityModal(false)}
+          onCommunityCreated={() => {
+            // Refresh communities or redirect
           }}
         />
       )}
@@ -153,5 +203,3 @@ const CommunityView = () => {
 };
 
 export default CommunityView;
-
-
