@@ -75,7 +75,9 @@ server.post("/api/send-otp", async (request, reply) => {
 
 async function bootstrap() {
     // 1. CORS - Registration at the TOP to ensure it catches everything
-    const allowedOriginRegex = /^https?:\/\/([^.]+\.)?trackcodex\.com(:[0-9]+)?$/;
+    const trackcodexRegex = /^https?:\/\/([^.]+\.)?trackcodex\.com(:[0-9]+)?$/;
+    const vercelRegex = /^https?:\/\/.*\.vercel\.app$/;
+
     const localOrigins = [
         "http://localhost:3000",
         "http://localhost:3001",
@@ -87,7 +89,7 @@ async function bootstrap() {
 
     await server.register(cors, {
         origin: (origin, cb) => {
-            if (!origin || localOrigins.includes(origin) || allowedOriginRegex.test(origin)) {
+            if (!origin || localOrigins.includes(origin) || trackcodexRegex.test(origin) || vercelRegex.test(origin)) {
                 cb(null, true);
                 return;
             }
@@ -176,7 +178,8 @@ async function bootstrap() {
     await server.register(socketio, {
         cors: {
             origin: [
-                allowedOriginRegex,
+                trackcodexRegex,
+                vercelRegex,
                 "https://trackcodex.com",
                 "https://api.trackcodex.com",
                 "https://www.trackcodex.com",
