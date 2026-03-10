@@ -235,7 +235,7 @@ const HomeView = () => {
                   <EmptyState
                     title="No activity yet"
                     message="Start by creating or syncing a repository."
-                    imageSrc="/dashboard-empty.png"
+                    imageSrc="/inbox-zero-dark.svg"
                   />
                 </div>
               )}
