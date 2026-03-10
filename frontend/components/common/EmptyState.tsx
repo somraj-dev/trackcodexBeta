@@ -5,6 +5,7 @@ interface EmptyStateProps {
   message?: string; // Legacy support
   description?: string;
   imageSrc?: string;
+  illustration?: React.ReactNode;
   action?: {
     label: string;
     onClick: () => void;
@@ -17,18 +18,23 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   message,
   description,
   imageSrc = "/notifications-empty.png",
+  illustration,
   action
 }) => {
   const displayDescription = description || message;
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full text-center p-8">
-      <div className="w-full max-w-[360px] mb-6 flex items-center justify-center">
-        <img
-          src={imageSrc}
-          alt={title || "Empty state"}
-          className="w-full h-auto object-contain"
-        />
+      <div className="w-full max-w-[480px] mb-4 flex items-center justify-center">
+        {illustration ? (
+          illustration
+        ) : (
+          <img
+            src={imageSrc}
+            alt={title || "Empty state"}
+            className="w-full h-auto object-contain"
+          />
+        )}
       </div>
       <div className="max-w-md flex flex-col items-center">
         {title && (
@@ -61,5 +67,3 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 };
 
 export default EmptyState;
-
-
