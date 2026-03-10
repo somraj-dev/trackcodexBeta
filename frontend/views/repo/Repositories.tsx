@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { api } from "../../services/infra/api";
 import { useNavigate } from "react-router-dom";
 import { Repository } from "../../types";
-import { githubService, GitHubRepo } from "../../services/git/github";
-import { gitlabService, GitLabRepo } from "../../services/git/gitlab";
 import EmptyState from "../../components/common/EmptyState";
 
 const getTimeAgo = (dateStr?: string) => {
@@ -159,71 +157,11 @@ const Repositories = () => {
           }
         }
 
-        const mapGitHubRepos = (ghRepos: GitHubRepo[]): Repository[] =>
-          ghRepos.map((repo) => ({
-            id: `gh-${repo.id}`,
-            name: repo.name,
-            description: repo.description || "No description",
-            stars: repo.stargazers_count,
-            forks: repo.forks_count,
-            language: repo.language || "Unknown",
-            isPublic: !repo.private,
-            visibility: repo.private ? "PRIVATE" : "PUBLIC",
-            updatedAt: repo.updated_at,
-            lastUpdated: new Date(repo.updated_at).toLocaleDateString(),
-            htmlUrl: repo.html_url,
-            logo: repo.owner?.avatar_url || "",
-            aiHealth: repo.stargazers_count > 500 ? "A+" : "B",
-            aiHealthLabel: repo.stargazers_count > 500 ? "Excellent" : "Stable",
-            securityStatus: "Passing",
-            techStack: repo.language || "Unknown",
-            techColor: repo.language === "Python" ? "#facc15" : "#3178c6",
-            source: "github",
-          } as any));
 
-        const mapGitLabRepos = (glRepos: GitLabRepo[]): Repository[] =>
-          glRepos.map((repo) => ({
-            id: `gl-${repo.id}`,
-            name: repo.name,
-            description: repo.description || "No description",
-            stars: repo.star_count,
-            forks: repo.forks_count,
-            language: "Unknown",
-            isPublic: repo.visibility === "public",
-            visibility: repo.visibility === "public" ? "PUBLIC" : "PRIVATE",
-            updatedAt: repo.last_activity_at,
-            lastUpdated: new Date(repo.last_activity_at).toLocaleDateString(),
-            htmlUrl: repo.web_url,
-            logo: repo.namespace?.avatar_url || "",
-            aiHealth: repo.star_count > 100 ? "A+" : "B",
-            aiHealthLabel: repo.star_count > 100 ? "Excellent" : "Stable",
-            securityStatus: "Passing",
-            techStack: "Unknown",
-            techColor: "#e24329",
-            source: "gitlab",
-          } as any));
 
-        if (allRepos.length === 0) {
-          try {
-            const backendToken = await (api as any).integrations.getToken("github");
-            if (backendToken.connected && backendToken.accessToken) {
-              const ghRepos = await githubService.getRepos(backendToken.accessToken);
-              allRepos = [...allRepos, ...mapGitHubRepos(ghRepos)];
-            }
-          } catch {
-            // No GitHub token — skip
-          }
-        }
-
-        try {
-          const backendToken = await (api as any).integrations.getToken("gitlab");
-          if (backendToken.connected && backendToken.accessToken) {
-            const glRepos = await gitlabService.getRepos(backendToken.accessToken);
-            allRepos = [...allRepos, ...mapGitLabRepos(glRepos)];
-          }
-        } catch {
-          // No GitLab token — skip
-        }
+        // Note: Direct GitHub/GitLab token fetching via api.integrations is not
+        // available. Repos are fetched via the backend API and sync endpoints.
+        // If those fail (e.g. CORS/network), we gracefully show an empty state.
 
         setRepos(allRepos);
       } catch (e) {
