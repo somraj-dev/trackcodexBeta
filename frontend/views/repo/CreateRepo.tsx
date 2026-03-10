@@ -20,6 +20,7 @@ const CreateRepo: React.FC = () => {
   const [suggestion, setSuggestion] = useState("");
   const [initReadme, setInitReadme] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setSuggestion(
@@ -32,6 +33,7 @@ const CreateRepo: React.FC = () => {
     if (!repoName) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const created = await api.repositories.create({
         name: repoName,
@@ -53,11 +55,13 @@ const CreateRepo: React.FC = () => {
       navigate(`/repo/${created.id}`);
     } catch (err: any) {
       console.error("Failed to create repository:", err);
+      const errorMessage = err?.response?.data?.message || err?.message || "Failed to create repository";
+      setError(errorMessage);
       window.dispatchEvent(
         new CustomEvent("trackcodex-notification", {
           detail: {
             title: "Error",
-            message: err?.message || "Failed to create repository",
+            message: errorMessage,
             type: "error",
           },
         }),
@@ -270,7 +274,13 @@ const CreateRepo: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-end pt-8 animate-in fade-in slide-in-from-top-4 duration-500 delay-300">
+          <div className="flex flex-col items-end gap-4 pt-8 animate-in fade-in slide-in-from-top-4 duration-500 delay-300">
+            {error && (
+              <div className="bg-[#f85149]/10 border border-[#f85149]/50 text-[#f85149] px-4 py-3 rounded-md text-[13px] flex items-center gap-3 w-full max-w-[400px]">
+                <span className="material-symbols-outlined !text-[18px]">error</span>
+                <span>{error}</span>
+              </div>
+            )}
             <button
               disabled={isSubmitting || !repoName}
               type="submit"

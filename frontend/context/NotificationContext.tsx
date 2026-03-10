@@ -118,12 +118,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     window.addEventListener(
-      "trackcodex-realtime-notification",
+      "trackcodex-notification",
       handleRealTimeNotif as EventListener,
     );
     return () =>
       window.removeEventListener(
-        "trackcodex-realtime-notification",
+        "trackcodex-notification",
         handleRealTimeNotif as EventListener,
       );
   }, []);
