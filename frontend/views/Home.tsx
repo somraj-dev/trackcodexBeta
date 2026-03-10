@@ -58,6 +58,18 @@ const HomeView = () => {
   const [repos, setRepos] = useState<Repository[]>([]);
   const [loadingRepos, setLoadingRepos] = useState(true);
 
+  const [showBusinessBanner, setShowBusinessBanner] = useState(() => {
+    if (localStorage.getItem("hideBusinessBanner") === "true") return false;
+    const visitCount = parseInt(localStorage.getItem("homeVisitCount") || "0");
+    return visitCount < 5; 
+  });
+
+  const [showRepoBanner, setShowRepoBanner] = useState(() => {
+    if (localStorage.getItem("hideRepoBanner") === "true") return false;
+    const visitCount = parseInt(localStorage.getItem("homeVisitCount") || "0");
+    return visitCount < 5; 
+  });
+
   useEffect(() => {
     const fetchRepos = async () => {
       setLoadingRepos(true);
@@ -71,7 +83,20 @@ const HomeView = () => {
       }
     };
     fetchRepos();
+
+    const visitCount = parseInt(localStorage.getItem("homeVisitCount") || "0");
+    localStorage.setItem("homeVisitCount", (visitCount + 1).toString());
   }, []);
+
+  const dismissBusinessBanner = () => {
+    setShowBusinessBanner(false);
+    localStorage.setItem("hideBusinessBanner", "true");
+  };
+
+  const dismissRepoBanner = () => {
+    setShowRepoBanner(false);
+    localStorage.setItem("hideRepoBanner", "true");
+  };
 
   return (
     <div className="flex-1 p-8 font-display">
@@ -143,57 +168,61 @@ const HomeView = () => {
         </div>
 
         {/* Dashboard Cards */}
-        <div className="space-y-4 mb-10">
-          {/* Copilot Card */}
-          <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-[#6e40c9]/10 to-[#2f2f2f]/30 p-5 group hover:border-[#6e40c9]/50 transition-all">
-            <div className="flex items-start justify-between">
-              <div className="flex gap-4">
-                <div className="size-10 rounded-lg bg-[#6e40c9] flex items-center justify-center text-white shadow-lg shadow-[#6e40c9]/20">
-                  <span className="material-symbols-outlined">auto_awesome</span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-gh-text mb-1">TrackCodex Business is available for you</h3>
-                  <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
-                    AI-powered coding for your team. Empower your developers with advanced context-aware suggestions and security monitoring.
-                  </p>
-                  <button className="mt-3 px-4 py-1.5 bg-[#6e40c9] hover:bg-[#5a32a3] text-white text-xs font-bold rounded-md transition-colors shadow-md shadow-[#6e40c9]/20">
-                    Activate Business
+        {(showBusinessBanner || (showRepoBanner && repos.length === 0 && !loadingRepos)) && (
+          <div className="space-y-4 mb-10">
+            {/* Copilot Card */}
+            {showBusinessBanner && (
+              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-[#6e40c9]/10 to-[#2f2f2f]/30 p-5 group hover:border-[#6e40c9]/50 transition-all">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-4">
+                    <div className="size-10 rounded-lg bg-[#6e40c9] flex items-center justify-center text-white shadow-lg shadow-[#6e40c9]/20">
+                      <span className="material-symbols-outlined">auto_awesome</span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gh-text mb-1">TrackCodex Business is available for you</h3>
+                      <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
+                        AI-powered coding for your team. Empower your developers with advanced context-aware suggestions and security monitoring.
+                      </p>
+                      <button className="mt-3 px-4 py-1.5 bg-[#6e40c9] hover:bg-[#5a32a3] text-white text-xs font-bold rounded-md transition-colors shadow-md shadow-[#6e40c9]/20">
+                        Activate Business
+                      </button>
+                    </div>
+                  </div>
+                  <button onClick={dismissBusinessBanner} className="text-gh-text-secondary hover:text-gh-text transition-colors">
+                    <span className="material-symbols-outlined !text-[18px]">close</span>
                   </button>
                 </div>
               </div>
-              <button className="text-gh-text-secondary hover:text-gh-text transition-colors">
-                <span className="material-symbols-outlined !text-[18px]">close</span>
-              </button>
-            </div>
-          </div>
+            )}
 
-          {repos.length === 0 && !loadingRepos && (
-            <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-amber-500/5 to-[#2f2f2f]/30 p-5 group hover:border-amber-500/30 transition-all">
-              <div className="flex items-start justify-between">
-                <div className="flex gap-4">
-                  <div className="size-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
-                    <span className="material-symbols-outlined">book</span>
+            {showRepoBanner && repos.length === 0 && !loadingRepos && (
+              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-amber-500/5 to-[#2f2f2f]/30 p-5 group hover:border-amber-500/30 transition-all">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-4">
+                    <div className="size-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
+                      <span className="material-symbols-outlined">book</span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-gh-text mb-1">Create your first repository</h3>
+                      <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
+                        Repositories are where you add code, collaborate, and utilize premium features, like GitHub Actions and Advanced Security.
+                      </p>
+                      <button
+                        onClick={() => navigate("/repositories/new")}
+                        className="mt-3 px-4 py-1.5 bg-gh-bg-secondary hover:bg-gh-border border border-gh-border text-gh-text text-xs font-bold rounded-md transition-colors"
+                      >
+                        Create repository
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gh-text mb-1">Create your first repository</h3>
-                    <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
-                      Repositories are where you add code, collaborate, and utilize premium features, like GitHub Actions and Advanced Security.
-                    </p>
-                    <button
-                      onClick={() => navigate("/repositories/new")}
-                      className="mt-3 px-4 py-1.5 bg-gh-bg-secondary hover:bg-gh-border border border-gh-border text-gh-text text-xs font-bold rounded-md transition-colors"
-                    >
-                      Create repository
-                    </button>
-                  </div>
+                  <button onClick={dismissRepoBanner} className="text-gh-text-secondary hover:text-gh-text transition-colors">
+                    <span className="material-symbols-outlined !text-[18px]">close</span>
+                  </button>
                 </div>
-                <button className="text-gh-text-secondary hover:text-gh-text transition-colors">
-                  <span className="material-symbols-outlined !text-[18px]">close</span>
-                </button>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* Feed Section */}
         <div>
