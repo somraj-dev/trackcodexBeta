@@ -63,37 +63,7 @@ const CommunityView = () => {
 
   return (
     <div className="h-full overflow-hidden flex bg-[#030303]">
-      {/* Left Sidebar: Navigation & Communities */}
-      <div className="w-64 border-r border-[#1A1A1B] p-4 hidden lg:block overflow-y-auto">
-        <div className="space-y-1 mb-8">
-          <button className="w-full text-left px-3 py-2 rounded-md bg-[#1A1A1B] text-[#D7DADC] text-sm font-bold border-l-2 border-[#0079D3]">
-            Home
-          </button>
-          <button className="w-full text-left px-3 py-2 rounded-md hover:bg-[#1A1A1B] text-[#818384] text-sm font-medium transition-colors">
-            Popular
-          </button>
-          <button className="w-full text-left px-3 py-2 rounded-md hover:bg-[#1A1A1B] text-[#818384] text-sm font-medium transition-colors">
-            Global News
-          </button>
-        </div>
 
-        <h3 className="px-3 text-xs font-bold text-[#717273] uppercase tracking-wider mb-2">
-          Communities
-        </h3>
-        <div className="space-y-1">
-          {["r/rust", "r/reactjs", "r/trackcodex", "r/osint"].map(
-            (c) => (
-              <button
-                key={c}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-[#1A1A1B] text-[#D7DADC] text-sm transition-colors group"
-              >
-                <div className="size-5 rounded-full bg-primary/10 flex items-center justify-center text-[10px]">r/</div>
-                {c}
-              </button>
-            ),
-          )}
-        </div>
-      </div>
 
       {/* Main Feed */}
       <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#030303]">
@@ -117,25 +87,7 @@ const CommunityView = () => {
             </button>
           </div>
 
-          {/* Filter Bar */}
-          <div className="bg-[#1A1A1B] border border-[#343536] rounded-md p-2 mb-4 flex gap-2">
-            <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#272729] text-[#D7DADC] text-[14px] font-bold">
-              <span className="material-symbols-outlined !text-[20px]">rocket</span>
-              Best
-            </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-[#272729] text-[#818384] text-[14px] font-bold transition-colors">
-              <span className="material-symbols-outlined !text-[20px]">local_fire_department</span>
-              Hot
-            </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-[#272729] text-[#818384] text-[14px] font-bold transition-colors">
-              <span className="material-symbols-outlined !text-[20px]">new_releases</span>
-              New
-            </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-[#272729] text-[#818384] text-[14px] font-bold transition-colors">
-              <span className="material-symbols-outlined !text-[20px]">trending_up</span>
-              Top
-            </button>
-          </div>
+
 
           {/* Feed */}
           <div className="space-y-0">
@@ -183,38 +135,7 @@ const CommunityView = () => {
           </div>
         </div>
 
-        <div className="bg-[#1A1A1B] border border-[#343536] rounded-md p-4">
-          <h3 className="text-xs font-bold text-[#717273] uppercase tracking-widest mb-4">
-            Recent Communities
-          </h3>
-          <div className="space-y-4">
-            {[
-              { name: "r/reactjs", members: "1.2M", icon: "https://ui-avatars.com/api/?name=R&background=61DAFB" },
-              { name: "r/programming", members: "5.4M", icon: "https://ui-avatars.com/api/?name=P&background=FF4500" },
-              { name: "r/developer", members: "234k", icon: "https://ui-avatars.com/api/?name=D&background=3fb950" },
-            ].map((r) => (
-              <div
-                key={r.name}
-                className="flex items-center justify-between group cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <img src={r.icon} className="size-8 rounded-full" alt={r.name} />
-                  <div>
-                    <div className="text-[12px] font-bold text-[#D7DADC] group-hover:underline">
-                      {r.name}
-                    </div>
-                    <div className="text-[10px] text-[#717273]">
-                      {r.members} members
-                    </div>
-                  </div>
-                </div>
-                <button className="bg-[#D7DADC] hover:bg-[#ebedef] text-[#1A1A1B] text-[12px] font-bold px-3 py-1 rounded-full transition-colors">
-                  Join
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
 
       {/* Create Post Modal */}
