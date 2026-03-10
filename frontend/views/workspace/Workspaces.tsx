@@ -166,11 +166,11 @@ const Workspaces = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredWorkspaces.length === 0 ? (
-          <div className="col-span-full min-h-[600px] flex items-center justify-center bg-gh-bg-secondary/20 rounded-3xl border border-gh-border/50">
+          <div className="col-span-full flex items-center justify-center pt-8 pb-12">
             <EmptyState
               title="No Workspaces Found"
               message="Provision your first cloud development environment to start building."
-              imageSrc="/dashboard-empty.png"
+              imageSrc="/inbox-zero-dark.svg"
               action={{
                 label: "Create Workspace",
                 onClick: () => navigate("/workspace/new"),
