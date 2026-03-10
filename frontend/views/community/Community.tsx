@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { socialService, Post } from "../../services/social/socialService";
+import { socialService, Post, Community } from "../../services/social/socialService";
 import { profileService, UserProfile } from "../../services/activity/profile";
 import PostCard from "../../components/community/PostCard";
 import { CreateCommunityModal } from "../../components/community/CreateCommunityModal";
@@ -18,9 +18,20 @@ const CommunityView = () => {
   const [showCreateCommunityModal, setShowCreateCommunityModal] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [communities, setCommunities] = useState<Community[]>([]);
+
+  const loadCommunities = async () => {
+    try {
+      const fetchedCommunities = await socialService.getCommunities();
+      setCommunities(fetchedCommunities);
+    } catch (e) {
+      console.error("Failed to load communities:", e);
+    }
+  };
 
   useEffect(() => {
     loadFeed();
+    loadCommunities();
     setCurrentUser(profileService.getProfile());
 
     // Check URL for actions
@@ -89,6 +100,7 @@ const CommunityView = () => {
       {/* Left Sidebar */}
       <CommunityLeftSidebar
         user={currentUser}
+        communities={communities}
         onStartCommunity={() => setShowCreateCommunityModal(true)}
         onNavigateHome={() => {
           setView('feed');
@@ -176,10 +188,7 @@ const CommunityView = () => {
         <ManageCommunities />
       ) : (
         <CreatePostView
-          communities={[
-            { id: 'c1', name: 'r/trackcodex', slug: 'trackcodex', avatar: 'https://ui-avatars.com/api/?name=T', description: 'Official community', memberCount: 1200, isMember: true },
-            { id: 'c2', name: 'r/developersIndia', slug: 'developersIndia', avatar: 'https://styles.redditmedia.com/t5_2sk9r/styles/communityIcon_v0b5j9z6z5z51.png', description: 'Developers of India', memberCount: 500000, isMember: true }
-          ]}
+          communities={communities}
           onCancel={() => setView('feed')}
           onPostCreated={() => {
             setView('feed');
@@ -194,7 +203,9 @@ const CommunityView = () => {
         <CreateCommunityModal
           onClose={() => setShowCreateCommunityModal(false)}
           onCommunityCreated={() => {
-            // Refresh communities or redirect
+            setShowCreateCommunityModal(false);
+            loadCommunities();
+            loadFeed();
           }}
         />
       )}

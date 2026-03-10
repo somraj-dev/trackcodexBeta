@@ -83,7 +83,7 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
             }
             // In a real app, we'd also save the topic and visibility
             onCommunityCreated(community);
-            setStep(4); // Move to configuration step
+            setStep(6); // Move to configuration/success step
         } catch (err) {
             console.error(err);
         } finally {
@@ -151,7 +151,7 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
 
                             <div className="pt-4 border-t border-[#1A1A1A] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-[#818384]">eighteen_plus</span>
+                                    <span className="material-symbols-outlined text-[#818384] text-[20px]">warning</span>
                                     <div>
                                         <div className="text-[14px] font-bold text-white">Mature (18+)</div>
                                         <div className="text-[12px] text-[#A1A1AA]">Users must be over 18 to view</div>
@@ -228,6 +228,70 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
             case 4:
                 return (
                     <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                        <h2 className="text-2xl font-bold text-white mb-2">Customize your community's look</h2>
+                        <p className="text-sm text-[#A1A1AA] mb-6">Upload an avatar that represents your community.</p>
+
+                        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#1A1A1A] rounded-xl hover:border-[#333333] transition-colors group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
+                            <input
+                                type="file"
+                                ref={avatarInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                aria-label="Upload Avatar"
+                                onChange={(e) => handleFileChange(e, 'avatar')}
+                            />
+                            {avatarUrl ? (
+                                <div className="relative size-32 rounded-full overflow-hidden mb-4 border-4 border-[#1A1A1B]">
+                                    <img src={avatarUrl} alt="Avatar Preview" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-white !text-3xl">add_a_photo</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="size-32 rounded-full bg-[#111111] border-4 border-[#1A1A1A] flex items-center justify-center mb-4 text-[#818384] group-hover:text-white transition-colors">
+                                    <span className="material-symbols-outlined !text-4xl">add_a_photo</span>
+                                </div>
+                            )}
+                            <h3 className="text-white font-bold mb-1">{avatarUrl ? 'Change Avatar' : 'Upload Avatar'}</h3>
+                            <p className="text-[#A1A1AA] text-xs">Recommended size: 256x256px</p>
+                        </div>
+                    </div>
+                );
+            case 5:
+                return (
+                    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                        <h2 className="text-2xl font-bold text-white mb-2">Give it a banner</h2>
+                        <p className="text-sm text-[#A1A1AA] mb-6">A banner helps set the theme and mood of your community.</p>
+
+                        <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#1A1A1A] rounded-xl hover:border-[#333333] transition-colors group cursor-pointer" onClick={() => bannerInputRef.current?.click()}>
+                            <input
+                                type="file"
+                                ref={bannerInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                aria-label="Upload Banner"
+                                onChange={(e) => handleFileChange(e, 'banner')}
+                            />
+                            {bannerUrl ? (
+                                <div className="relative w-full h-32 rounded-lg overflow-hidden mb-4 border border-[#1A1A1B]">
+                                    <img src={bannerUrl} alt="Banner Preview" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-white !text-3xl">add_a_photo</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-32 rounded-lg bg-[#111111] border border-[#1A1A1A] flex items-center justify-center mb-4 text-[#818384] group-hover:text-white transition-colors">
+                                    <span className="material-symbols-outlined !text-4xl">add_a_photo</span>
+                                </div>
+                            )}
+                            <h3 className="text-white font-bold mb-1">{bannerUrl ? 'Change Banner' : 'Upload Banner'}</h3>
+                            <p className="text-[#A1A1AA] text-xs">Recommended size: 1920x384px</p>
+                        </div>
+                    </div>
+                );
+            case 6:
+                return (
+                    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="flex flex-col md:flex-row h-full min-h-[400px]">
                             <div className="flex-1 p-6 flex flex-col justify-center">
                                 <h2 className="text-3xl font-bold text-white mb-6">You launched a new community!</h2>
@@ -250,23 +314,6 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
                             </div>
 
                             <div className="w-full md:w-[350px] bg-gradient-to-br from-[#1e1e1e] to-black p-8 flex flex-col items-center justify-center relative">
-                                {/* Hidden File Inputs */}
-                                <input
-                                    type="file"
-                                    ref={avatarInputRef}
-                                    className="hidden"
-                                    accept="image/*"
-                                    aria-label="Upload Avatar"
-                                    onChange={(e) => handleFileChange(e, 'avatar')}
-                                />
-                                <input
-                                    type="file"
-                                    ref={bannerInputRef}
-                                    className="hidden"
-                                    accept="image/*"
-                                    aria-label="Upload Banner"
-                                    onChange={(e) => handleFileChange(e, 'banner')}
-                                />
                                 <div className="w-full max-w-[280px] bg-[#1A1A1B] border border-[#343536] rounded-xl overflow-hidden shadow-2xl relative">
                                     {/* Banner */}
                                     <div
@@ -349,31 +396,35 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
-            <div className={`bg-[#0A0A0A] border border-[#1A1A1A] w-full ${step === 4 ? 'max-w-[900px]' : 'max-w-[650px]'} rounded-xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300`}>
+            <div className={`bg-[#0A0A0A] border border-[#1A1A1A] w-full ${step === 6 ? 'max-w-[900px]' : 'max-w-[650px]'} rounded-xl shadow-2xl flex flex-col transition-all duration-300`}>
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-[#1A1A1A]">
-                    <div className="flex gap-2">
-                        {[1, 2, 3, 4].map((s) => (
-                            <div
-                                key={s}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${s === step ? 'w-8 bg-white' : s < step ? 'w-3 bg-white/40' : 'w-3 bg-[#1A1A1A]'
-                                    }`}
-                            />
-                        ))}
-                    </div>
+                    {step < 6 ? (
+                        <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                                <div
+                                    key={s}
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${s === step ? 'w-8 bg-white' : s < step ? 'w-3 bg-white/40' : 'w-3 bg-[#1A1A1A]'
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-white font-bold">Community Created</div>
+                    )}
                     <button onClick={onClose} aria-label="Close modal" className="text-[#818384] hover:text-white transition-colors">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className={`${step === 4 ? 'p-0' : 'p-8'} flex-1`}>
+                <div className={`${step === 6 ? 'p-0' : 'p-8'} flex-1`}>
                     {renderStep()}
                 </div>
 
                 {/* Footer */}
-                <div className="p-5 border-t border-[#1A1A1A] flex justify-between bg-[#050505]">
-                    {step === 4 ? (
+                <div className="p-5 border-t border-[#1A1A1A] flex justify-between bg-[#050505] rounded-b-xl">
+                    {step === 6 ? (
                         <div className="w-full flex justify-end gap-3">
                             <button
                                 onClick={onClose}
@@ -397,10 +448,10 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
                                 {step === 1 ? 'Cancel' : 'Back'}
                             </button>
                             <div className="flex gap-3">
-                                {step < 3 ? (
+                                {step < 5 ? (
                                     <button
                                         onClick={nextStep}
-                                        disabled={step === 1 && !selectedTopic}
+                                        disabled={step === 1 && !selectedTopic || step === 3 && (!name.trim() || !description.trim())}
                                         className="px-8 py-2.5 rounded-full bg-white text-black text-[14px] font-bold hover:bg-[#E5E5E5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Next
@@ -408,7 +459,7 @@ export const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onCl
                                 ) : (
                                     <button
                                         onClick={handleCreate}
-                                        disabled={loading || !name.trim() || !description.trim()}
+                                        disabled={loading}
                                         className="px-8 py-2.5 rounded-full bg-white text-black text-[14px] font-bold hover:bg-[#E5E5E5] transition-colors disabled:opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                                     >
                                         {loading ? 'Creating...' : 'Create Community'}

@@ -31,7 +31,12 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
             let finalContent = content;
             if (activeTab === 'link') finalContent = linkUrl;
 
-            await socialService.createPost(finalContent, title);
+            await socialService.createPost({
+                title: title.trim(),
+                content: finalContent,
+                type: activeTab,
+                communityId: selectedCommunity.id
+            });
             onPostCreated();
         } catch (err) {
             console.error(err);
@@ -103,8 +108,8 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold transition-colors border-b-2 hover:bg-[#272729] ${activeTab === tab.id
-                                        ? 'text-white border-white'
-                                        : 'text-[#818384] border-transparent'
+                                    ? 'text-white border-white'
+                                    : 'text-[#818384] border-transparent'
                                     }`}
                             >
                                 <span className="material-symbols-outlined !text-[20px]">{tab.icon}</span>

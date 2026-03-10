@@ -1,66 +1,48 @@
-import React, { useState } from 'react';
-
-interface ManagedCommunity {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-    avatar: string;
-    isStarred: boolean;
-    isJoined: boolean;
-}
-
-const MOCK_COMMUNITIES: ManagedCommunity[] = [
-    {
-        id: '1',
-        name: 'r/ProgrammerHumor',
-        slug: 'ProgrammerHumor',
-        description: 'For anything funny related to programming and software development.',
-        avatar: 'https://styles.redditmedia.com/t5_2tex6/styles/communityIcon_vbd689m1ktq21.png',
-        isStarred: true,
-        isJoined: true
-    },
-    {
-        id: '2',
-        name: 'r/programming',
-        slug: 'programming',
-        description: 'Computer Programming',
-        avatar: 'https://styles.redditmedia.com/t5_2fwo/styles/communityIcon_188z7y8si7811.png',
-        isStarred: false,
-        isJoined: true
-    },
-    {
-        id: '3',
-        name: 'r/somraj',
-        slug: 'somraj',
-        description: 'somraj',
-        avatar: 'https://picsum.photos/seed/som/32',
-        isStarred: false,
-        isJoined: true
-    }
-];
+import React, { useState, useEffect } from 'react';
+import { socialService, Community } from '../../services/social/socialService';
 
 const ManageCommunities = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'favorites'>('all');
-    const [communities, setCommunities] = useState<ManagedCommunity[]>(MOCK_COMMUNITIES);
+    const [communities, setCommunities] = useState<Community[]>([]);
+    const [starredIds, setStarredIds] = useState<Set<string>>(new Set());
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadCommunities();
+    }, []);
+
+    const loadCommunities = async () => {
+        setLoading(true);
+        try {
+            const fetchedCommunities = await socialService.getCommunities();
+            setCommunities(fetchedCommunities);
+        } catch (e) {
+            console.error("Failed to load communities:", e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const toggleStar = (id: string) => {
-        setCommunities(prev => prev.map(c =>
-            c.id === id ? { ...c, isStarred: !c.isStarred } : c
-        ));
+        setStarredIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
     };
 
     const toggleJoined = (id: string) => {
         setCommunities(prev => prev.map(c =>
-            c.id === id ? { ...c, isJoined: !c.isJoined } : c
+            c.id === id ? { ...c, isMember: !c.isMember } : c
         ));
     };
 
     const filteredCommunities = communities.filter(c => {
         const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.description.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesTab = activeTab === 'all' || (activeTab === 'favorites' && c.isStarred);
+            (c.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesTab = activeTab === 'all' || (activeTab === 'favorites' && starredIds.has(c.id));
         return matchesSearch && matchesTab;
     });
 
@@ -83,46 +65,48 @@ const ManageCommunities = () => {
                         />
                     </div>
 
-                    {/* Communities List */}
-                    <div className="space-y-6">
-                        {filteredCommunities.map(community => (
-                            <div key={community.id} className="flex items-start justify-between group">
-                                <div className="flex items-center gap-4 flex-1">
-                                    <img src={community.avatar} alt={community.name} className="size-10 rounded-full" />
-                                    <div className="overflow-hidden">
-                                        <h3 className="text-[15px] font-bold text-white mb-0.5">{community.name}</h3>
-                                        <p className="text-[13px] text-[#A1A1AA] line-clamp-1">{community.description}</p>
+                    {loading ? (
+                        <div className="flex justify-center p-10">
+                            <span className="material-symbols-outlined animate-spin text-white !text-4xl">progress_activity</span>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {filteredCommunities.map(community => (
+                                <div key={community.id} className="flex items-start justify-between group">
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <img src={community.avatar} alt={community.name} className="size-10 rounded-full" />
+                                        <div className="overflow-hidden">
+                                            <h3 className="text-[15px] font-bold text-white mb-0.5">{community.name}</h3>
+                                            <p className="text-[13px] text-[#A1A1AA] line-clamp-1">{community.description}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <button
+                                            onClick={() => toggleStar(community.id)}
+                                            className={`material-symbols-outlined !text-[20px] transition-colors ${starredIds.has(community.id) ? 'text-yellow-500 filled' : 'text-[#575757] hover:text-[#A1A1AA]'
+                                                }`}
+                                        >
+                                            star
+                                        </button>
+                                        <button
+                                            onClick={() => toggleJoined(community.id)}
+                                            className={`px-4 py-1.5 rounded-full border border-[#343536] text-[12px] font-black tracking-tight transition-all text-white bg-transparent hover:border-white`}
+                                        >
+                                            {community.isMember ? 'Joined' : 'Join'}
+                                        </button>
                                     </div>
                                 </div>
+                            ))}
 
-                                <div className="flex items-center gap-4">
-                                    <button
-                                        onClick={() => toggleStar(community.id)}
-                                        className={`material-symbols-outlined !text-[20px] transition-colors ${community.isStarred ? 'text-yellow-500 filled' : 'text-[#575757] hover:text-[#A1A1AA]'
-                                            }`}
-                                    >
-                                        star
-                                    </button>
-                                    <button
-                                        onClick={() => toggleJoined(community.id)}
-                                        className={`px-4 py-1.5 rounded-full border border-[#343536] text-[12px] font-black tracking-tight transition-all ${community.isJoined
-                                                ? 'text-white bg-transparent hover:border-white'
-                                                : 'bg-white text-black hover:bg-[#D7DADC]'
-                                            }`}
-                                    >
-                                        {community.isJoined ? 'Joined' : 'Join'}
-                                    </button>
+                            {filteredCommunities.length === 0 && (
+                                <div className="text-center py-20">
+                                    <span className="material-symbols-outlined text-6xl text-[#1A1A1A] mb-4">group_off</span>
+                                    <p className="text-[#A1A1AA]">No communities found.</p>
                                 </div>
-                            </div>
-                        ))}
-
-                        {filteredCommunities.length === 0 && (
-                            <div className="text-center py-20">
-                                <span className="material-symbols-outlined text-6xl text-[#1A1A1A] mb-4">group_off</span>
-                                <p className="text-[#A1A1AA]">No communities found.</p>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

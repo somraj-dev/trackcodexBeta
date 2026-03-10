@@ -81,18 +81,36 @@ export const socialService = {
     }
   },
 
-  createPost: async (content: string, title?: string) => {
+  createPost: async (data: {
+    title?: string;
+    content: string;
+    type?: string;
+    repoLink?: any;
+    codeSnippet?: any;
+    jobDetails?: any;
+    communityId?: string;
+    mediaUrl?: string;
+    mediaUrls?: string[];
+  }) => {
     try {
-      const response = await apiInstance.post("/community/posts", {
-        content,
-        title,
-      });
+      const response = await apiInstance.post("/community/posts", data);
       return response.data;
     } catch (err) {
       console.error("❌ Failed to create post:", err);
       throw err;
     }
   },
+
+  getCommunities: async (): Promise<Community[]> => {
+    try {
+      const response = await apiInstance.get("/community");
+      return response.data || [];
+    } catch (err) {
+      console.error("❌ Failed to fetch communities:", err);
+      return [];
+    }
+  },
+
 
   createCommunity: async (data: {
     name: string;
