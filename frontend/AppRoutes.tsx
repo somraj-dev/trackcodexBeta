@@ -166,6 +166,7 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/auth/resolve-conflict" element={<ResolveConflict />} />
+            <Route path="/logout" element={<Navigate to="/login" replace />} />
             <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<RedirectToLogin />} />
           </>

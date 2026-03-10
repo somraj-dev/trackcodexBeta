@@ -11,7 +11,8 @@ const RedirectToLogin = () => {
     if (
       !location.pathname.startsWith("/auth") &&
       !location.pathname.startsWith("/login") &&
-      !location.pathname.startsWith("/signup")
+      !location.pathname.startsWith("/signup") &&
+      !location.pathname.startsWith("/logout")
     ) {
       localStorage.setItem(
         "redirect_after_login",
