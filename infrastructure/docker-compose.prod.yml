@@ -16,7 +16,24 @@ services:
     environment:
       NODE_ENV: production
     volumes:
-      - /opt/trackcodex/data:/app/data  # Persistent storage for cloned repositories
+      - /opt/trackcodex/data:/app/data          # Persistent storage for general data
+      - /opt/trackcodex/workspaces:/app/workspaces  # Shared with IDE container
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ide:
+    image: 275142546612.dkr.ecr.ap-south-1.amazonaws.com/trackcodex-ide:latest
+    container_name: trackcodex-ide
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /opt/trackcodex/workspaces:/home/workspace   # Same host dir as backend
+    environment:
+      CONNECTION_TOKEN: trackcodex
     logging:
       driver: "json-file"
       options:

@@ -7,7 +7,8 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: trackcodex-backend
+  ECR_BACKEND_REPO: trackcodex-backend
+  ECR_IDE_REPO: trackcodex-ide
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
@@ -33,25 +34,41 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # ─── 4. Build Docker image ──────────────────────────────────────────────
-      - name: Build Docker image
+      # ─── 4. Build & Push Backend Docker image ───────────────────────────────
+      - name: Build Backend image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
             -f backend/Dockerfile \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_BACKEND_REPO:latest \
             .
 
-      # ─── 5. Push to ECR ──────────────────────────────────────────────────────
-      - name: Push image to ECR
+      - name: Push Backend image to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          echo "IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_BACKEND_REPO:latest
+
+      # ─── 5. Build & Push IDE Docker image ───────────────────────────────────
+      - name: Build IDE image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build \
+            -f infrastructure/docker/ide.Dockerfile \
+            -t $ECR_REGISTRY/$ECR_IDE_REPO:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_IDE_REPO:latest \
+            .
+
+      - name: Push IDE image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker push $ECR_REGISTRY/$ECR_IDE_REPO:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_IDE_REPO:latest
 
       # ─── 6. Deploy to ECS ────────────────────────────────────────────────────
       - name: Deploy to Amazon ECS
@@ -59,6 +76,10 @@ jobs:
           aws ecs update-service --cluster trackcodex-cluster --service trackcodex-service --force-new-deployment --region $AWS_REGION
 
       - name: Verify Deployment
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          echo "✅ Deployment triggered for image: $IMAGE"
-          echo "The ECS service will now pull the 'latest' image from ECR."
+          echo "✅ Deployment triggered!"
+          echo "   Backend: $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG"
+          echo "   IDE:     $ECR_REGISTRY/$ECR_IDE_REPO:$IMAGE_TAG"
+          echo "The ECS service will now pull the 'latest' images from ECR."
