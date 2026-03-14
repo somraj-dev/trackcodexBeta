@@ -32,6 +32,24 @@ const teamMembers: TeamMember[] = [
     role: "CMO & Co-Founder",
     image: "https://media.licdn.com/dms/image/v2/D4E03AQHaMuxVRsuIsA/profile-displayphoto-scale_200_200/B4EZqD6E4rHEAY-/0/1763149631659?e=1775088000&v=beta&t=xZqoclmUQzteMAjYD8Jn7LfxgBuUY1ZcmB_7-H2pBr8",
     linkedin: "https://www.linkedin.com/in/vatsal-singh-bhadoria-17451035a"
+  },
+  {
+    name: "Yug Mittal",
+    role: "Co-Founder",
+    image: "",
+    linkedin: "#"
+  },
+  {
+    name: "Abhay Gupta",
+    role: "Co-Founder",
+    image: "",
+    linkedin: "#"
+  },
+  {
+    name: "Sudhanshu Patel",
+    role: "CTO",
+    image: "",
+    linkedin: "#"
   }
 ];
 
@@ -59,7 +77,7 @@ const TeamPage: React.FC = () => {
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=222222&color=ffffff&size=512&font-size=0.33`;
+                      (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`;
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
