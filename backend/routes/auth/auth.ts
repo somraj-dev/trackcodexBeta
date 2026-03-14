@@ -74,7 +74,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           throw BadRequest("Password must be at least 8 characters");
         }
 
-        // 2. Register user with Firebase (Optional)
+        // 2. Register user with Firebase (Optional & Resilient)
         let firebaseUid: string | undefined;
 
         if (isFirebaseConfigured) {
@@ -87,13 +87,14 @@ export async function authRoutes(fastify: FastifyInstance) {
             firebaseUid = firebaseUser.uid;
             console.log(`✅ [AUTH] Firebase user created: ${firebaseUid}`);
           } catch (fbErr: any) {
+            // Log as warning, don't throw unless it's a specific user-error like email taken
             if (fbErr.code === "auth/email-already-exists") {
-              throw Conflict("Email already registered in Firebase");
+              throw Conflict("Email already registered");
             }
-            console.error("❌ [AUTH] Firebase registration failed (continuing with local only):", fbErr.message);
+            console.warn("⚠️ [AUTH] Firebase registration failed (falling back to local):", fbErr.message);
           }
         } else {
-          console.log("ℹ️ [AUTH] Firebase not configured, skipping cloud registration.");
+          console.log("ℹ️ [AUTH] Firebase not configured, skipping cloud sync.");
         }
 
         const userId = firebaseUid || crypto.randomUUID();
@@ -155,15 +156,42 @@ export async function authRoutes(fastify: FastifyInstance) {
           throw BadRequest("Database error during user creation. Please try again or choose a different username.");
         }
 
-        // 3.5 Send verification email via Resend (Optional)
-        if (isFirebaseConfigured) {
-          try {
-            const verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
-            await emailService.sendVerificationEmail(email, verificationLink);
-          } catch (emailErr: any) {
-            console.error("Failed to send verification email:", emailErr);
-            request.log.error({ msg: "Email Verification Dispatch Failed", detail: emailErr.message });
+        // 3.5 Send verification email via Resend (Primary/Fallback)
+        try {
+          let verificationLink = "";
+          const token = crypto.randomBytes(32).toString("hex");
+          
+          // Try to get link from Firebase if available
+          if (isFirebaseConfigured && firebaseUid) {
+            try {
+              verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
+            } catch (fbLinkErr) {
+              console.warn("⚠️ [AUTH] Failed to get Firebase verification link, using local fallback");
+            }
           }
+
+          // Fallback to local verification link if Firebase failed or wasn't configured
+          if (!verificationLink) {
+            // Update the verification record we created earlier in transaction
+            await prisma.userVerification.update({
+              where: { userId },
+              data: {
+                otpCode: token,
+                otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
+              }
+            });
+            const frontendUrl = process.env.FRONTEND_URL || "https://trackcodex.com";
+            verificationLink = `${frontendUrl}/verify-email?token=${token}&userId=${userId}`;
+          }
+
+          // ALWAYS send via Resend if configured
+          const sent = await emailService.sendVerificationEmail(email, verificationLink);
+          if (!sent) {
+            console.warn("⚠️ [AUTH] Resend failed to send verification email");
+          }
+        } catch (emailErr: any) {
+          console.error("❌ [AUTH] CRITICAL: Verification email dispatch failed:", emailErr.message);
+          // We don't throw here to avoid blocking a successful DB registration
         }
 
         // 4. Create Session
@@ -734,17 +762,43 @@ export async function authRoutes(fastify: FastifyInstance) {
       config: { rateLimit: rateLimitConfig.verifyEmail },
     },
     async (request: any) => {
-      const user = request.user;
+      const user = (request as any).user;
+      const email = user.email;
+      const userId = user.userId;
 
       try {
-        // Generate email verification link via Firebase Admin
-        const verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(user.email);
+        let verificationLink = "";
+        const token = crypto.randomBytes(32).toString("hex");
+
+        if (isFirebaseConfigured) {
+          try {
+            verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
+          } catch (fbErr) {
+            console.warn("⚠️ [AUTH] Failed to generate Firebase verification link, using local fallback");
+          }
+        }
+
+        if (!verificationLink) {
+          await prisma.userVerification.upsert({
+            where: { userId },
+            create: {
+              userId,
+              otpCode: token,
+              otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            },
+            update: {
+              otpCode: token,
+              otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            }
+          });
+          const frontendUrl = process.env.FRONTEND_URL || "https://trackcodex.com";
+          verificationLink = `${frontendUrl}/verify-email?token=${token}&userId=${userId}`;
+        }
 
         // Send verification email via Resend
-        await emailService.sendVerificationEmail(user.email, verificationLink);
+        await emailService.sendVerificationEmail(email, verificationLink);
 
-        request.log.info(`Verification email sent to ${user.email} via Resend`);
-
+        request.log.info(`Verification email sent to ${email} via Resend`);
         return { message: "Verification email sent" };
       } catch (error: any) {
         request.log.error(error);
@@ -754,24 +808,49 @@ export async function authRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post("/auth/verify-email/confirm", async (request, reply) => {
-    const { token, email } = request.body as { token: string; email: string };
+    const { token, userId } = request.body as { token: string; userId: string };
 
-    if (!token || !email) {
-      throw BadRequest("Token and email required");
+    if (!token || !userId) {
+      throw BadRequest("Token and userId required");
     }
 
     try {
       // With Firebase, email verification is handled by Firebase's email link.
-      // This endpoint can be used to manually mark a user as verified.
-      const user = await prisma.user.findFirst({
-        where: { email },
+      // This endpoint supports BOTH Firebase-verified users (manually) AND local tokens.
+      
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { verification: true }
       });
 
       if (!user) {
         throw BadRequest("User not found");
       }
 
-      // Mark verified in our database
+      // Check for local token if provided
+      if (token && token.length > 32) { // Local tokens are longer hex strings in this impl
+        const verification = user.verification;
+        if (!verification || verification.otpCode !== token) {
+           throw BadRequest("Invalid or expired verification token");
+        }
+        
+        if (verification.otpExpiresAt && verification.otpExpiresAt < new Date()) {
+           throw BadRequest("Verification token has expired");
+        }
+
+        // Token matches! Clear it.
+        await prisma.userVerification.update({
+          where: { userId: user.id },
+          data: {
+            otpCode: null,
+            otpExpiresAt: null,
+            emailVerified: true,
+            emailVerifiedAt: new Date()
+          }
+        });
+      }
+
+      // Mark verified in core user table
       await prisma.user.update({
         where: { id: user.id },
         data: {

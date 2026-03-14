@@ -18,6 +18,7 @@ const ResetPassword = React.lazy(() => import("./views/auth/ResetPassword"));
 const Onboarding = React.lazy(() => import("./views/auth/Onboarding"));
 const ResolveConflict = React.lazy(() => import("./views/auth/ResolveConflict"));
 const SignOut = React.lazy(() => import("./views/auth/SignOut"));
+const VerifyEmail = React.lazy(() => import("./views/auth/VerifyEmail"));
 const LandingPage = React.lazy(() => import("./views/LandingPage"));
 
 // Core
@@ -159,6 +160,7 @@ const AppRoutes = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/auth/resolve-conflict" element={<ResolveConflict />} />
             <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<RedirectToLogin />} />
