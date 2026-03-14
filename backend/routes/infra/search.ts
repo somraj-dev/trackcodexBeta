@@ -123,22 +123,23 @@ export async function searchRoutes(fastify: FastifyInstance) {
         return { results: [] };
       }
 
-      const query = q.toLowerCase();
+      const query = q; // Prisma mode: "insensitive" handles the original case
 
       try {
         // ── Strategy: Try ElasticSearch first (for performance), fallback to Prisma ──
         let esResults: any[] | null = null;
+        let esSearchPerformed = false;
 
-        // Skip ES if a specific type is requested that ES might not filter well, 
-        // or just let ES handle it if ES is available.
-        // For now, we'll try ES and then filter by type if needed.
         try {
-          esResults = await tryElasticSearch(q);
-          if (esResults && type) {
-            esResults = esResults.filter(r => r.type === type || (type === 'repositories' && r.type === 'repo'));
+          if (ELASTICSEARCH_URL && ELASTICSEARCH_URL.includes("http") && !ELASTICSEARCH_URL.includes("loca.lt")) {
+            esSearchPerformed = true;
+            esResults = await tryElasticSearch(q);
+            if (esResults && type) {
+               esResults = esResults.filter(r => r.type === type || (type === 'repositories' && r.type === 'repo'));
+            }
           }
-        } catch (esError) {
-          request.log.warn({ esError }, "ElasticSearch unavailable, using Prisma fallback");
+        } catch (esError: any) {
+          request.log.warn({ error: esError.message }, "ElasticSearch failed or skipped, using Prisma fallback");
         }
 
         if (esResults && esResults.length > 0) {
@@ -150,18 +151,21 @@ export async function searchRoutes(fastify: FastifyInstance) {
 
         // 1. Search Users
         if (!type || type === "users") {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q);
           const users = await prisma.user.findMany({
             where: {
               OR: [
                 { username: { contains: query, mode: "insensitive" } },
                 { name: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                ...(isUuid ? [{ id: q }] : []),
               ],
             },
             include: { profile: true },
             take: type === "users" ? 30 : 5,
           });
 
-          request.log.info({ query, userCount: users.length }, "Prisma search found users");
+          request.log.info({ q, esSearchPerformed, userCount: users.length }, "Prisma fallback found users");
 
           users.forEach((u) => {
             results.push({
