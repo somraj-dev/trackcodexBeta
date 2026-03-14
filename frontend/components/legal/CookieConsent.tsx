@@ -29,6 +29,16 @@ export const CookieConsent: React.FC<CookieConsentProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      setIsVisible(true);
+      setShowSettings(true);
+    };
+
+    window.addEventListener("open-cookie-settings", handleOpenSettings);
+    return () => window.removeEventListener("open-cookie-settings", handleOpenSettings);
+  }, []);
+
   const handleAcceptAll = () => {
     const newPrefs = { essential: true, analytics: true, marketing: true };
     savePreferences(newPrefs);

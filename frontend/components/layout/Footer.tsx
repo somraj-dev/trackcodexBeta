@@ -9,11 +9,18 @@ const Footer: React.FC = () => {
         <div className="footer-copyright">© 2026 TrackCodex, Inc.</div>
 
         <nav className="footer-links">
-          <Link to="/terms" className="footer-link">Terms</Link>
-          <Link to="/privacy" className="footer-link">Privacy</Link>
-          <Link to="/security" className="footer-link">Security</Link>
-          <Link to="/status" className="footer-link">Status</Link>
-          <Link to="/community" className="footer-link">Community</Link>
+          <a href="https://docs.trackcodex.com/governance/policies/terms" className="footer-link" target="_blank" rel="noopener noreferrer">Terms</a>
+          <a href="https://docs.trackcodex.com/governance/policies/privacy" className="footer-link" target="_blank" rel="noopener noreferrer">Privacy</a>
+          <a href="https://docs.trackcodex.com/governance/security" className="footer-link" target="_blank" rel="noopener noreferrer">Security</a>
+          <a href="https://status.trackcodex.com" className="footer-link" target="_blank" rel="noopener noreferrer">Status</a>
+          <a href="https://docs.trackcodex.com/governance/policies/community" className="footer-link" target="_blank" rel="noopener noreferrer">Community</a>
+          <button 
+            type="button" 
+            className="footer-link" 
+            onClick={() => window.dispatchEvent(new CustomEvent('open-cookie-settings'))}
+          >
+            Manage cookies
+          </button>
           <a
             href="https://docs.trackcodex.com"
             target="_blank"
@@ -21,6 +28,14 @@ const Footer: React.FC = () => {
             className="footer-link"
           >
             Docs
+          </a>
+          <a
+            href="https://support.trackcodex.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            Support
           </a>
           <Link to="/contact" className="footer-link">Contact</Link>
           <button className="footer-link footer-cookie-btn">
