@@ -137,9 +137,11 @@ export async function searchRoutes(fastify: FastifyInstance) {
             if (esResults && type) {
                esResults = esResults.filter(r => r.type === type || (type === 'repositories' && r.type === 'repo'));
             }
+          } else {
+            request.log.info("Skipping ElasticSearch (not configured or local tunnel), using Prisma");
           }
         } catch (esError: any) {
-          request.log.warn({ error: esError.message }, "ElasticSearch failed or skipped, using Prisma fallback");
+          request.log.warn({ error: esError.message }, "ElasticSearch fetch failed, falling back to Prisma");
         }
 
         if (esResults && esResults.length > 0) {

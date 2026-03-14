@@ -61,6 +61,18 @@ const SearchResultsPage: React.FC = () => {
     }
   };
 
+  const handleSync = async () => {
+    try {
+      setLoading(true);
+      await api.post("/auth/sync");
+      await performSearch(); // Re-run search after sync
+    } catch (err) {
+      console.error("Manual sync failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderResult = (result: any) => {
     if (result.type === "user") {
       return (
@@ -175,8 +187,17 @@ const SearchResultsPage: React.FC = () => {
             </div>
           ) : results.length === 0 ? (
             <div className="empty-search">
+              <span className="material-symbols-outlined empty-icon">person_search</span>
               <h2>No results found for "{query}"</h2>
               <p>Try different keywords or check your spelling.</p>
+              
+              <div className="empty-actions">
+                <button onClick={handleSync} className="sync-btn-v2">
+                  <span className="material-symbols-outlined">sync</span>
+                  Sync my profile
+                </button>
+                <p className="sync-note">Can't find yourself? Triggering a manual sync might help.</p>
+              </div>
             </div>
           ) : (
             <div className="results-stack">

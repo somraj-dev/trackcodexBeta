@@ -1,4 +1,7 @@
 import { FastifyInstance } from "fastify";
+import { syncUserWithPostgres } from "../../services/auth/sync";
+import { NotificationService } from "../../services/infra/notification";
+import { firebaseAdmin } from "../../services/infra/firebase";
 import { env } from "../../config/env";
 import { emailService } from "../../services/infra/emailService";
 import { prisma } from "../../services/infra/prisma";
@@ -7,12 +10,11 @@ import crypto from "crypto";
 import fs from "fs";
 import { requireAuth, requireCsrf } from "../../middleware/auth";
 import {
-  createSession,
-  getSession,
   revokeSession,
   revokeAllUserSessions,
+  createSession,
+  getSession,
 } from "../../services/auth/session";
-import { firebaseAdmin } from "../../services/infra/firebase";
 import {
   logLoginAttempt,
   checkSuspiciousActivity,
@@ -1189,56 +1191,12 @@ export async function authRoutes(fastify: FastifyInstance) {
       const userAgent = request.headers["user-agent"] || "unknown";
 
       try {
-        let dbUser = await prisma.user.findUnique({
-          where: { id: user.userId }
+        // Use the robust sync service
+        const dbUser = await syncUserWithPostgres({
+          uid: user.userId,
+          email: user.email,
+          displayName: user.name, // Usually comes from Token if present
         });
-
-        // 1. If user doesn't exist, we must fetch their full details from Firebase to seed the DB
-        if (!dbUser) {
-          let email = user.email || "";
-          let name = "TrackCodex User";
-
-          try {
-            // We can fetch the real data from Firebase Admin Since we only have the UID
-            const fbUser = await firebaseAdmin.auth().getUser(user.userId);
-            email = fbUser.email || "";
-            name = fbUser.displayName || name;
-          } catch (e) {
-            request.log.warn({ uid: user.userId }, "Failed to fetch full firebase user profile during sync");
-          }
-
-          const username = email ? email.split("@")[0] : `user_${user.userId.substring(0, 8)}`;
-
-          dbUser = await prisma.user.upsert({
-            where: { id: user.userId },
-            update: {
-              email: email,
-              name: name,
-              username: username,
-            },
-            create: {
-              id: user.userId,
-              email: email,
-              username: username,
-              name: name,
-              password: "", // Handled by Firebase
-              role: user.role || "user",
-            }
-          });
-
-          await prisma.outboxEvent.create({
-            data: {
-              topic: "user",
-              payload: {
-                id: user.userId,
-                email: email,
-                username: username,
-                name: name,
-                role: dbUser.role,
-              }
-            }
-          });
-        }
 
         // 2. Create the Backend Session identical to Login flow
         const sessionId = crypto.randomUUID();
