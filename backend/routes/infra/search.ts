@@ -390,6 +390,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
             select: {
               id: true, name: true, username: true, avatar: true,
               profile: { select: { bio: true, location: true, followersCount: true } },
+              _count: { select: { followers: true } },
             },
             skip,
             take: limit,
@@ -397,6 +398,20 @@ export async function searchRoutes(fastify: FastifyInstance) {
           }),
           prisma.user.count({ where }),
         ]);
+
+        // If the current user is logged in, batch-check which result users they follow
+        const currentUser = (request as any).user;
+        let followingSet: Set<string> = new Set();
+        if (currentUser?.userId && users.length > 0) {
+          const follows = await prisma.follow.findMany({
+            where: {
+              followerId: currentUser.userId,
+              followingId: { in: users.map((u) => u.id) },
+            },
+            select: { followingId: true },
+          });
+          followingSet = new Set(follows.map((f) => f.followingId));
+        }
 
         return {
           users: users.map((u) => ({
@@ -406,7 +421,9 @@ export async function searchRoutes(fastify: FastifyInstance) {
             avatar: u.avatar,
             bio: u.profile?.bio,
             location: u.profile?.location,
-            followersCount: u.profile?.followersCount || 0,
+            // Use live count from Follow table (more accurate than cached profile counter)
+            followersCount: (u as any)._count?.followers ?? u.profile?.followersCount ?? 0,
+            isFollowing: followingSet.has(u.id),
             url: `/profile/${u.username}`,
           })),
           total,

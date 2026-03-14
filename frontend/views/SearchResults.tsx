@@ -18,6 +18,7 @@ interface UserResult {
   bio?: string;
   location?: string;
   followersCount?: number;
+  isFollowing?: boolean;
   url: string;
 }
 
@@ -78,8 +79,17 @@ const SearchResultsPage: React.FC = () => {
       const data = await api.get<any>(
         `/search/users?q=${encodeURIComponent(query)}&limit=30`
       );
-      setUserResults(data.users || []);
+      const users: UserResult[] = data.users || [];
+      setUserResults(users);
       setUserTotal(data.total || 0);
+      // Initialise follow state from backend data
+      const initialFollowMap: Record<string, boolean> = {};
+      users.forEach((u) => {
+        if (u.isFollowing !== undefined) {
+          initialFollowMap[u.id] = u.isFollowing;
+        }
+      });
+      setFollowingMap(initialFollowMap);
     } catch (error) {
       console.error("User search error:", error);
       // Fall back to generic search endpoint
@@ -113,7 +123,18 @@ const SearchResultsPage: React.FC = () => {
   const handleFollow = useCallback(
     async (userId: string) => {
       const isNowFollowing = !followingMap[userId];
+      // Optimistic UI: toggle follow + update follower count immediately
       setFollowingMap((prev) => ({ ...prev, [userId]: isNowFollowing }));
+      setUserResults((prev) =>
+        prev.map((u) =>
+          u.id === userId
+            ? {
+                ...u,
+                followersCount: Math.max(0, (u.followersCount || 0) + (isNowFollowing ? 1 : -1)),
+              }
+            : u
+        )
+      );
       try {
         if (isNowFollowing) {
           await profileService.followUser(userId);
@@ -121,8 +142,18 @@ const SearchResultsPage: React.FC = () => {
           await profileService.unfollowUser(userId);
         }
       } catch (error) {
-        // Revert on error
+        // Revert both on error
         setFollowingMap((prev) => ({ ...prev, [userId]: !isNowFollowing }));
+        setUserResults((prev) =>
+          prev.map((u) =>
+            u.id === userId
+              ? {
+                  ...u,
+                  followersCount: Math.max(0, (u.followersCount || 0) + (isNowFollowing ? -1 : 1)),
+                }
+              : u
+          )
+        );
         console.error("Follow/unfollow error:", error);
       }
     },

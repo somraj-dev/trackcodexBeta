@@ -15,17 +15,18 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
     propProfile || profileService.getProfile(),
   );
 
-  // Update local state if prop changes
+  // Update local state if prop changes (also re-sync isFollowing)
   useEffect(() => {
     if (propProfile && propProfile.username !== profile.username) {
       setProfile(propProfile);
+      setIsFollowing(!!propProfile.isFollowing);
     }
   }, [propProfile, profile.username]);
 
   const { user: currentUser } = useAuth();
   const isSelf = currentUser?.username === profile.username || currentUser?.id === profile.id;
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(!!propProfile?.isFollowing);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [isProofProfileOpen, setIsProofProfileOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
@@ -43,13 +44,33 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
     }
   }, [propProfile]);
 
-  const handleFollow = () => {
-    if (isFollowing) {
-      profileService.simulateUnfollow();
-    } else {
-      profileService.simulateNewFollower();
+  const handleFollow = async () => {
+    const targetId = profile.id;
+    if (!targetId) return;
+
+    // Optimistic update
+    const nowFollowing = !isFollowing;
+    setIsFollowing(nowFollowing);
+    setProfile((prev) => ({
+      ...prev,
+      followers: Math.max(0, (prev.followers || 0) + (nowFollowing ? 1 : -1)),
+    }));
+
+    try {
+      if (nowFollowing) {
+        await profileService.followUser(targetId);
+      } else {
+        await profileService.unfollowUser(targetId);
+      }
+    } catch (error) {
+      // Revert on error
+      setIsFollowing(!nowFollowing);
+      setProfile((prev) => ({
+        ...prev,
+        followers: Math.max(0, (prev.followers || 0) + (nowFollowing ? -1 : 1)),
+      }));
+      console.error("Follow error:", error);
     }
-    setIsFollowing((prev) => !prev);
   };
 
   const handleOffer = () => {

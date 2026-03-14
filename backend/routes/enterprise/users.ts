@@ -335,18 +335,16 @@ export async function userRoutes(fastify: FastifyInstance) {
             followingId: targetUserId,
           },
         }),
-        // Emit events for async counter updates
-        prisma.outboxEvent.create({
-          data: {
-            topic: "UPDATE_USER_COUNTERS",
-            payload: { userId: targetUserId, followersChange: 1 },
-          },
+        // Directly increment counters (no outbox — ensures immediate persistence)
+        prisma.profile.upsert({
+          where: { userId: targetUserId },
+          create: { userId: targetUserId, followersCount: 1, followingCount: 0 },
+          update: { followersCount: { increment: 1 } },
         }),
-        prisma.outboxEvent.create({
-          data: {
-            topic: "UPDATE_USER_COUNTERS",
-            payload: { userId: currentUser.userId, followingChange: 1 },
-          },
+        prisma.profile.upsert({
+          where: { userId: currentUser.userId },
+          create: { userId: currentUser.userId, followersCount: 0, followingCount: 1 },
+          update: { followingCount: { increment: 1 } },
         }),
       ]);
 
@@ -391,7 +389,7 @@ export async function userRoutes(fastify: FastifyInstance) {
         return reply.code(404).send({ message: "Not following this user" });
       }
 
-      // Delete the follow and emit counter update events in a transaction
+      // Delete the follow and update counters directly
       await prisma.$transaction([
         prisma.follow.delete({
           where: {
@@ -401,17 +399,13 @@ export async function userRoutes(fastify: FastifyInstance) {
             },
           },
         }),
-        prisma.outboxEvent.create({
-          data: {
-            topic: "UPDATE_USER_COUNTERS",
-            payload: { userId: targetUserId, followersChange: -1 },
-          },
+        prisma.profile.updateMany({
+          where: { userId: targetUserId },
+          data: { followersCount: { decrement: 1 } },
         }),
-        prisma.outboxEvent.create({
-          data: {
-            topic: "UPDATE_USER_COUNTERS",
-            payload: { userId: currentUser.userId, followingChange: -1 },
-          },
+        prisma.profile.updateMany({
+          where: { userId: currentUser.userId },
+          data: { followingCount: { decrement: 1 } },
         }),
       ]);
 
