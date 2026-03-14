@@ -65,7 +65,10 @@ const LandingPage = () => {
               <div className="text-[#666] text-xs font-medium tracking-wide">
                 main.tf
               </div>
-              <div className="text-[#666] text-xs font-mono hover:text-white cursor-pointer transition-colors">
+              <div 
+                onClick={() => navigate("/team")}
+                className="text-[#666] text-xs font-mono hover:text-white cursor-pointer transition-colors"
+              >
                 more
               </div>
             </div>

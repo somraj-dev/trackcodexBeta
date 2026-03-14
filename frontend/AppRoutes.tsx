@@ -22,6 +22,7 @@ const ResolveConflict = React.lazy(() => import("./views/auth/ResolveConflict"))
 const SignOut = React.lazy(() => import("./views/auth/SignOut"));
 const VerifyEmail = React.lazy(() => import("./views/auth/VerifyEmail"));
 const LandingPage = React.lazy(() => import("./views/LandingPage"));
+const TeamPage = React.lazy(() => import("./views/about/TeamPage"));
 
 // Core
 const RepositoriesView = React.lazy(() => import("./views/repo/Repositories"));
@@ -165,6 +166,7 @@ const AppRoutes = () => {
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/auth/resolve-conflict" element={<ResolveConflict />} />
             <Route path="/" element={<LandingPage />} />
+            <Route path="/team" element={<TeamPage />} />
             <Route path="*" element={<RedirectToLogin />} />
           </>
         )}

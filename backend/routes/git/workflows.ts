@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { prisma } from "../infra/prisma";
+import { prisma } from "../../services/infra/prisma";
 import { requireAuth } from "../../middleware/auth";
 import { GitHubService } from "../../services/git/github";
 
