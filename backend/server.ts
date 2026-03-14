@@ -14,7 +14,7 @@ import Fastify, { FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
 import helmet from "@fastify/helmet";
-// import rateLimit from "@fastify/rate-limit";
+import rateLimit from "@fastify/rate-limit";
 import socketio from "fastify-socket.io";
 import websocket from "@fastify/websocket";
 import path from "path";
@@ -28,6 +28,7 @@ import { routes } from "./routes/index";
 // Removed unused imports and variables for clean startup
 
 // import { csrfProtection } from "./middleware/csrf";
+import { rateLimitKeyGenerator } from "./middleware/rateLimit";
 import { RealtimeService } from "./services/infra/realtime";
 import { AppError } from "./utils/AppError";
 import { prisma } from "./services/infra/prisma";
@@ -165,14 +166,18 @@ async function bootstrap() {
     ];
 
     await server.register(cors, {
-        origin: (origin, cb) => {
+        origin: (origin: string | undefined, cb: (err: Error | null, allow: boolean) => void) => {
             if (!origin || localOrigins.includes(origin) || trackcodexRegex.test(origin) || vercelRegex.test(origin)) {
                 cb(null, true);
                 return;
             }
-            // fallback for debugging
-            console.warn(`[CORS] Rejected origin: ${origin}`);
-            cb(null, true); // Still allow in dev/hotfix mode to unblock user
+            if (isProduction) {
+                console.error(`[CORS] BLOCKED: Unrecognized origin: ${origin}`);
+                cb(new Error("Not allowed by CORS"), false);
+            } else {
+                console.warn(`[CORS] ALLOWED (Dev Mode): ${origin}`);
+                cb(null, true);
+            }
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -230,12 +235,11 @@ async function bootstrap() {
     });
 
 
-    /* DISABLED FOR DEBUGGING 429 ISSUES
     // 4. Rate Limiting - DDoS protection
     await server.register(rateLimit, {
-      max: 10000, // Extremely permissive for development
+      max: isProduction ? 500 : 5000,
       timeWindow: "1 minute",
-      keyGenerator: rateLimitKeyGenerator, // Custom key generator using IP + UserID
+      keyGenerator: rateLimitKeyGenerator,
       errorResponseBuilder: (req, context) => {
         console.warn(
           `[GlobalRateLimit] BLOCKED: ip=${req.ip}, max=${context.max}`,
@@ -243,12 +247,11 @@ async function bootstrap() {
         return {
           statusCode: 429,
           error: "Too Many Requests",
-          message: "Global rate limit exceeded. REDUCED FOR DEV.",
+          message: "Global rate limit exceeded.",
           retryAfter: context.ttl,
         };
       },
     });
-    */
 
     // 5. CSRF Protection - Global middleware
     // Run on preHandler to ensure cookies are parsed
