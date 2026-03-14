@@ -479,9 +479,7 @@ export class GitHubService {
       body,
       labels,
     });
-    return data;
   }
-}
 }
 
 
