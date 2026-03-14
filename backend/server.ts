@@ -391,6 +391,15 @@ async function bootstrap() {
         return reply.redirect("/api/health");
     });
 
+    // Handle legacy or non-prefixed auth routes
+    server.get("/auth/orcid", async (request, reply) => {
+        return reply.redirect("/api/v1/auth/orcid");
+    });
+
+    server.get("/auth/orcid/callback", async (request, reply) => {
+        return reply.redirect(`/api/v1/auth/orcid/callback?${request.query}`);
+    });
+
     // Register API Routes
     await server.register(routes, { prefix: "/api/v1" });
 

@@ -62,7 +62,7 @@ export async function requireAuth(
 
     if (firebaseUid) {
       // Find user in our database to get full profile
-      const dbUser = await prisma.user.findUnique({
+      let dbUser = await prisma.user.findUnique({
         where: { id: firebaseUid },
         select: {
           id: true,
@@ -72,6 +72,42 @@ export async function requireAuth(
         },
       });
 
+      if (!dbUser) {
+        // AUTO-SYNC: User is valid in Firebase but doesn't exist in DB yet.
+        // We need to fetch full details from Firebase and seed our database
+        // to prevent downstream failures like "User record not found".
+        try {
+          const fbUser = await firebaseAdmin.auth().getUser(firebaseUid);
+          const email = fbUser.email || "";
+          const name = fbUser.displayName || "TrackCodex User";
+          const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
+
+          // Create the user in Postgres
+          dbUser = await prisma.user.create({
+            data: {
+              id: firebaseUid,
+              email: email,
+              username: username,
+              name: name,
+              password: "", // Handled by Firebase
+              role: "user",
+              emailVerified: fbUser.emailVerified || false,
+            },
+            select: {
+              id: true,
+              email: true,
+              role: true,
+              tokenVersion: true,
+            }
+          });
+          console.log(`[AUTH-SYNC] Successfully auto-created user record for ${firebaseUid}`);
+        } catch (syncErr) {
+          console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`, syncErr);
+          // Fallback: allow request to proceed if it's for /auth/sync, 
+          // but for other routes, this will likely fail later.
+        }
+      }
+
       if (dbUser) {
         (request as any).user = {
           userId: dbUser.id,
@@ -80,11 +116,10 @@ export async function requireAuth(
         };
         return; // Success with Firebase JWT
       } else {
-        // User is valid in Firebase but doesn't exist in DB yet. 
-        // Allow request to proceed so `/auth/sync` can create them.
+        // Last resort fallback
         (request as any).user = {
           userId: firebaseUid,
-          email: "", // Will be fetched/synced in `/auth/sync`
+          email: "",
           role: "user",
           isNewFirebaseUser: true
         };

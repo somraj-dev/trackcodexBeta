@@ -1207,31 +1207,37 @@ export async function authRoutes(fastify: FastifyInstance) {
             request.log.warn({ uid: user.userId }, "Failed to fetch full firebase user profile during sync");
           }
 
-          const [newUser] = await prisma.$transaction([
-            prisma.user.create({
-              data: {
+          const username = email ? email.split("@")[0] : `user_${user.userId.substring(0, 8)}`;
+
+          dbUser = await prisma.user.upsert({
+            where: { id: user.userId },
+            update: {
+              email: email,
+              name: name,
+              username: username,
+            },
+            create: {
+              id: user.userId,
+              email: email,
+              username: username,
+              name: name,
+              password: "", // Handled by Firebase
+              role: user.role || "user",
+            }
+          });
+
+          await prisma.outboxEvent.create({
+            data: {
+              topic: "user",
+              payload: {
                 id: user.userId,
                 email: email,
-                username: `user_${user.userId.substring(0, 8)}`,
+                username: username,
                 name: name,
-                password: "", // Handled by Firebase
-                role: user.role || "user",
+                role: dbUser.role,
               }
-            }),
-            prisma.outboxEvent.create({
-              data: {
-                topic: "user",
-                payload: {
-                  id: user.userId,
-                  email: email,
-                  username: `user_${user.userId.substring(0, 8)}`,
-                  name: name,
-                  role: user.role || "user",
-                }
-              }
-            })
-          ]);
-          dbUser = newUser;
+            }
+          });
         }
 
         // 2. Create the Backend Session identical to Login flow
@@ -1300,18 +1306,16 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // --- ORCID OAuth (Mocked for Demo - DISABLED in production) ---
-  if (process.env.NODE_ENV === "development") {
-    fastify.get("/auth/orcid", async (request, reply) => {
-      const mockCode = "mock_auth_code_123";
-      return reply.redirect(`/api/v1/auth/orcid/callback?code=${mockCode}`);
-    });
+  // --- ORCID OAuth (Mocked for Demo) ---
+  fastify.get("/auth/orcid", async (request, reply) => {
+    const mockCode = "mock_auth_code_123";
+    return reply.redirect(`${env.BACKEND_URL || ""}/api/v1/auth/orcid/callback?code=${mockCode}`);
+  });
 
-    fastify.get("/auth/orcid/callback", async (request, reply) => {
-      const mockOrcidId = "0000-0002-1825-0097";
-      return reply.redirect(`${process.env.FRONTEND_URL || "https://trackcodex.com"}/settings/profile?orcid_id=${mockOrcidId}`);
-    });
-  }
+  fastify.get("/auth/orcid/callback", async (request, reply) => {
+    const mockOrcidId = "0000-0002-1825-0097";
+    return reply.redirect(`${env.FRONTEND_URL || "https://trackcodex.com"}/settings/profile?orcid_id=${mockOrcidId}`);
+  });
 }
 
 
