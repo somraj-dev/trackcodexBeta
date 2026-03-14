@@ -13,7 +13,7 @@ async function reindexAll() {
             name: "users",
             model: prisma.user,
             index: "trackcodex.users",
-            fields: { id: true, email: true, username: true, name: true, bio: true }
+            fields: { id: true, email: true, username: true, name: true, bio: true, avatar: true, location: true }
         },
         {
             name: "repositories",

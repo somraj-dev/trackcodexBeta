@@ -30,6 +30,7 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
   const [isProofProfileOpen, setIsProofProfileOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [isEditStatusOpen, setIsEditStatusOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const [followModalType, setFollowModalType] = useState<
     "followers" | "following"
   >("followers");
@@ -68,6 +69,27 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
   const openFollowModal = (type: "followers" | "following") => {
     setFollowModalType(type);
     setIsFollowModalOpen(true);
+  };
+
+  const handleShareProfile = () => {
+    const username = profile.username.startsWith('@')
+      ? profile.username.substring(1)
+      : profile.username;
+    const url = `${window.location.origin}/profile/${username}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }).catch(() => {
+      // Fallback for environments without clipboard API
+      const el = document.createElement('input');
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
   };
 
   return (
@@ -121,6 +143,17 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
         <p className="text-[20px] text-gh-text-secondary font-light">
           {profile.username.startsWith('@') ? profile.username.substring(1) : profile.username}
         </p>
+        {/* Share Profile Button */}
+        <button
+          onClick={handleShareProfile}
+          title="Copy profile link"
+          className="mt-2 flex items-center gap-1.5 text-xs text-gh-text-secondary hover:text-primary transition-colors"
+        >
+          <span className="material-symbols-outlined !text-[14px]">
+            {shareCopied ? 'check_circle' : 'share'}
+          </span>
+          {shareCopied ? 'Copied!' : 'Share profile'}
+        </button>
       </div>
 
       {profile.bio && (

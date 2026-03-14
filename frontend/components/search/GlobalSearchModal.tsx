@@ -10,6 +10,13 @@ interface SearchResult {
   icon: string;
   group: string;
   url: string;
+  metadata?: {
+    avatar?: string;
+    bio?: string;
+    location?: string;
+    followersCount?: number;
+    username?: string;
+  };
 }
 
 interface RecentRepo {
@@ -221,9 +228,33 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onClick={() => jumpTo(result.url)}
                       onMouseEnter={() => setSelectedIndex(idx)}
                     >
-                      <span className="material-icons result-icon">
-                        {result.icon}
-                      </span>
+                      {/* Show avatar for user results, icon for everything else */}
+                      {result.type === "user" && (
+                        <img
+                          src={
+                            result.metadata?.avatar ||
+                            `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(result.label)}`
+                          }
+                          alt={result.label}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src =
+                              `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(result.label)}`;
+                          }}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "1px solid #30363d",
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
+                      {result.type !== "user" && (
+                        <span className="material-icons result-icon">
+                          {result.icon}
+                        </span>
+                      )}
                       <div className="result-content">
                         <div className="result-label">{result.label}</div>
                         {result.subLabel && (

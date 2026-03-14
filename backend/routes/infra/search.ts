@@ -67,6 +67,13 @@ async function tryElasticSearch(query: string): Promise<any[]> {
           icon: "person",
           group: "People",
           url: `/profile/${source.username}`,
+          metadata: {
+            avatar: source.avatar,
+            bio: source.bio,
+            location: source.location,
+            followersCount: source.followersCount || 0,
+            username: source.username,
+          },
         });
       } else if (indexName.includes("repositories")) {
         results.push({
@@ -277,6 +284,151 @@ export async function searchRoutes(fastify: FastifyInstance) {
         return reply.code(500).send({ error: "Search failed" });
       }
     },
+  );
+
+  // ── Dedicated User Search with Elasticsearch + Prisma fallback ──
+  // GET /api/v1/search/users?q=query&page=1&limit=20
+  fastify.get(
+    "/search/users",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const { q, page: pageStr, limit: limitStr } = request.query as {
+        q: string;
+        page?: string;
+        limit?: string;
+      };
+
+      if (!q || q.length < 1) {
+        return { users: [], total: 0 };
+      }
+
+      const page = Math.max(1, parseInt(pageStr || "1", 10));
+      const limit = Math.min(50, parseInt(limitStr || "20", 10));
+      const skip = (page - 1) * limit;
+
+      try {
+        // 1. Try Elasticsearch first
+        if (ELASTICSEARCH_URL && ELASTICSEARCH_URL.includes("http") && !ELASTICSEARCH_URL.includes("loca.lt")) {
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            const esRes = await fetch(
+              `${ELASTICSEARCH_URL}/trackcodex.users/_search`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  "Bypass-Tunnel-Reminder": "true",
+                  "User-Agent": "trackcodex-backend",
+                },
+                signal: controller.signal,
+                body: JSON.stringify({
+                  from: skip,
+                  size: limit,
+                  query: {
+                    multi_match: {
+                      query: q,
+                      fields: [
+                        "payload.name^3",
+                        "payload.username^2",
+                        "payload.bio",
+                        "payload.location",
+                      ],
+                      fuzziness: "AUTO",
+                    },
+                  },
+                }),
+              }
+            );
+            clearTimeout(timeout);
+
+            if (esRes.ok) {
+              const result = await esRes.json();
+              const hits = result.hits?.hits || [];
+              const total = result.hits?.total?.value ?? hits.length;
+
+              if (hits.length > 0) {
+                const users = hits.map((hit: any) => {
+                  const src = hit._source?.payload || hit._source;
+                  return {
+                    id: src.id,
+                    name: src.name || src.username || "User",
+                    username: src.username,
+                    avatar: src.avatar,
+                    bio: src.bio,
+                    location: src.location,
+                    followersCount: src.followersCount || 0,
+                    url: `/profile/${src.username}`,
+                  };
+                });
+                return { users, total, source: "elasticsearch" };
+              }
+            }
+          } catch (esErr: any) {
+            request.log.warn({ error: esErr.message }, "[search/users] Elasticsearch failed, using Prisma fallback");
+          }
+        }
+
+        // 2. Prisma fallback
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q);
+        const [users, total] = await Promise.all([
+          prisma.user.findMany({
+            where: {
+              AND: [
+                { deletedAt: null },
+                { accountLocked: false },
+                { isPrivate: false },
+                { username: { not: null } },
+              ],
+              OR: [
+                { name: { contains: q, mode: "insensitive" } },
+                { username: { contains: q, mode: "insensitive" } },
+                { email: { contains: q, mode: "insensitive" } },
+                ...(isUuid ? [{ id: q }] : []),
+              ],
+            },
+            include: { profile: { select: { bio: true, location: true, followersCount: true } } },
+            skip,
+            take: limit,
+            orderBy: { name: "asc" },
+          }),
+          prisma.user.count({
+            where: {
+              AND: [
+                { deletedAt: null },
+                { accountLocked: false },
+                { isPrivate: false },
+                { username: { not: null } },
+              ],
+              OR: [
+                { name: { contains: q, mode: "insensitive" } },
+                { username: { contains: q, mode: "insensitive" } },
+                { email: { contains: q, mode: "insensitive" } },
+              ],
+            },
+          }),
+        ]);
+
+        return {
+          users: users.map((u) => ({
+            id: u.id,
+            name: u.name || u.username || "User",
+            username: u.username,
+            avatar: u.avatar,
+            bio: u.profile?.bio,
+            location: u.profile?.location,
+            followersCount: u.profile?.followersCount || 0,
+            url: `/profile/${u.username}`,
+          })),
+          total,
+          source: "prisma",
+        };
+      } catch (error) {
+        request.log.error(error);
+        return reply.code(500).send({ error: "User search failed" });
+      }
+    }
   );
 
   // Code Search (Raven Engine)
