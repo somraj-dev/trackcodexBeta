@@ -214,27 +214,29 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
                     throw new Error("No access token received from GitHub");
                 }
 
-                // 2. Fetch GitHub user info to get username
+                // 2. Fetch GitHub user info to get stable ID and username
                 const githubUser = await OAuthService.getGithubUserInfo(accessToken);
+                const providerGitHubId = githubUser.id;
                 const providerUsername = githubUser.username;
 
-                // 3. Encrypt and save token (reusing logic from /integrations/connect)
+                // 3. Encrypt and save token
                 const encryptedToken = encrypt(accessToken);
 
                 await prisma.oAuthAccount.upsert({
                     where: {
                         provider_providerAccountId: {
                             provider: "github",
-                            providerAccountId: providerUsername || userId,
+                            providerAccountId: providerGitHubId,
                         },
                     },
                     update: {
                         accessToken: encryptedToken,
                         scope: "repo,read:user,read:org",
+                        userId, // Ensure it's linked to current user
                     },
                     create: {
                         provider: "github",
-                        providerAccountId: providerUsername || userId,
+                        providerAccountId: providerGitHubId,
                         accessToken: encryptedToken,
                         tokenType: "bearer",
                         scope: "repo,read:user,read:org",

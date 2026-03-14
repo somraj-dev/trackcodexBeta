@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { auth } from "../../lib/firebase";
 import { getRedirectResult } from "firebase/auth";
+import { api } from "../../services/infra/api";
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: "google" | "github" | "gitlab" }>();
@@ -18,6 +19,23 @@ const OAuthCallback: React.FC = () => {
 
     const handleCallback = async () => {
       try {
+        // Check for manual code in URL (direct redirect flow)
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        if (provider === "github" && code) {
+          const response = await api.integrations.githubCallback(code);
+          if (response.success) {
+            const redirectPath =
+              localStorage.getItem("integration_return_path") ||
+              "/settings/integrations";
+            localStorage.removeItem("integration_return_path");
+            localStorage.removeItem("integration_pending_provider");
+            navigate(redirectPath, { replace: true });
+            return;
+          }
+        }
+
         // Firebase handles OAuth redirect internally
         // getRedirectResult picks up the result after redirect
         const result = await getRedirectResult(auth);

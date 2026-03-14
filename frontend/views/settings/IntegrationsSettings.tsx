@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { auth } from "../../lib/firebase";
 import { api } from "../../services/infra/api";
 import IntegrationPermissionModal from "../../components/settings/IntegrationPermissionModal";
 
@@ -149,6 +148,7 @@ const IntegrationsSettings = () => {
       }
     };
     loadStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleConnection = useCallback((id: string) => {
@@ -182,13 +182,15 @@ const IntegrationsSettings = () => {
   const [pendingIntegration, setPendingIntegration] = useState<Integration | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Handle GitHub OAuth Callback (Direct Redirect)
+  // Handle GitHub OAuth Callback (Legacy cleanup - effectively handled in OAuthCallback now)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
-    const state = params.get("state");
 
     if (code && !isVerifying) {
+      // Small delay to ensure state is ready if needed, 
+      // but primarily OAuthCallback handles the redirect now.
+      // We keep this as a secondary safety if the redirect is to this page.
       const handleGithubCode = async () => {
         try {
           setIsVerifying(true);
@@ -213,18 +215,8 @@ const IntegrationsSettings = () => {
           }
         } catch (error) {
           console.error("GitHub integration failed:", error);
-          window.dispatchEvent(
-            new CustomEvent("trackcodex-notification", {
-              detail: {
-                title: "Integration Failed",
-                message: "Failed to connect GitHub. Please try again.",
-                type: "error",
-              },
-            }),
-          );
         } finally {
           setIsVerifying(false);
-          // Clean URL
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       };
@@ -236,9 +228,11 @@ const IntegrationsSettings = () => {
     if (integration.connected) {
       // Disconnect via backend
       toggleConnection(integration.id);
-      try {
-        api.integrations.disconnect(integration.id);
-      } catch { }
+        try {
+          api.integrations.disconnect(integration.id);
+        } catch (err) {
+          console.error("Disconnect failed:", err);
+        }
     } else {
       // Open Permission Modal first
       setPendingIntegration(integration);
@@ -254,18 +248,20 @@ const IntegrationsSettings = () => {
       try {
         setIsVerifying(true);
         
-        // Direct GitHub OAuth Redirect (Modern Way)
+        // Use standard redirect URI registered in GitHub App
         const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-        const redirectUri = window.location.origin + window.location.pathname;
+        const redirectUri = `${window.location.origin}/auth/callback/github`;
         const scope = "repo,read:user,read:org";
         const state = Math.random().toString(36).substring(7);
         
         const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
         
-        // Save state for verification if needed
+        // Save state and return path
         localStorage.setItem("github_oauth_state", state);
+        localStorage.setItem("integration_return_path", window.location.pathname);
+        localStorage.setItem("integration_pending_provider", "github");
         
-        // Navigate directly to GitHub (this fixes "page does not open" issues)
+        // Navigate directly to GitHub
         window.location.href = githubUrl;
         
       } catch (err: any) {
