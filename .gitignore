@@ -27,6 +27,10 @@ workspaces/
 test-features.ts
 test_output.txt
 backend_register_error.log
+backend_logs.txt
+ecs_logs.json
+ecs_logs.txt
+logs.txt
 
 # AWS Production Secrets (NEVER COMMIT)
 aws/.env.prod
