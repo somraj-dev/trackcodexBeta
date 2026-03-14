@@ -381,15 +381,15 @@ async function bootstrap() {
         };
     });
 
-    // Root Redirect (Dev Only)
-    if (process.env.NODE_ENV !== "production") {
-        server.get("/", async (request, reply) => {
-            if (request.headers["accept"]?.includes("text/html")) {
-                return reply.redirect(process.env.FRONTEND_URL || "https://trackcodex.com");
-            }
-            return reply.redirect("/api/health");
-        });
-    }
+    // Root Redirect: Friendly landing or redirect to docs/health
+    server.get("/", async (request, reply) => {
+        // If it's a browser request, redirect to the main frontend
+        if (request.headers["accept"]?.includes("text/html")) {
+            return reply.redirect(process.env.FRONTEND_URL || "https://trackcodex.com");
+        }
+        // Otherwise redirect to health info
+        return reply.redirect("/api/health");
+    });
 
     // Register API Routes
     await server.register(routes, { prefix: "/api/v1" });
