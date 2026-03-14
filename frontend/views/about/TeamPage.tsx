@@ -17,19 +17,19 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Mayank Singh",
-    role: "COO",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mayank", // Placeholder for Mayank
+    role: "COO & Co-Founder",
+    image: "", // Use fallback or empty to trigger onError
     linkedin: "https://www.linkedin.com/in/mayank-s-55322a261"
   },
   {
     name: "Yash Kushwah",
-    role: "Lead Engineer",
+    role: "Lead Engineer & Co-Founder",
     image: "https://media.licdn.com/dms/image/v2/D5603AQGnYcbGhrG7gA/profile-displayphoto-scale_200_200/B56ZtuUREuJYAc-/0/1767082367864?e=1775088000&v=beta&t=4Y_N6H7F0E4u5v8S9X9G6y9z9w9r9q9v9t9s9p9o9n9m",
     linkedin: "https://www.linkedin.com/in/yash-kushwah-53b173380"
   },
   {
     name: "Vatsal Bhadoriya",
-    role: "CMO",
+    role: "CMO & Co-Founder",
     image: "https://media.licdn.com/dms/image/v2/D4E03AQHaMuxVRsuIsA/profile-displayphoto-scale_200_200/B4EZqD6E4rHEAY-/0/1763149631659?e=1775088000&v=beta&t=xZqoclmUQzteMAjYD8Jn7LfxgBuUY1ZcmB_7-H2pBr8",
     linkedin: "https://www.linkedin.com/in/vatsal-singh-bhadoria-17451035a"
   }
@@ -59,7 +59,7 @@ const TeamPage: React.FC = () => {
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`;
+                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=222222&color=ffffff&size=512&font-size=0.33`;
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
