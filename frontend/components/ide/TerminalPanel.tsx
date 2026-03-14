@@ -41,7 +41,7 @@ const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = []
         fitAddonRef.current = fitAddon;
 
         // Connect to WebSocket
-        const baseUrl = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
+        const baseUrl = API_URL;
         const wsProto = baseUrl.startsWith('https') ? 'wss' : 'ws';
         const wsUrl = `${baseUrl.replace(/^https?/, wsProto)}/api/v1/forge/terminal/${workspaceId}`;
         const ws = new WebSocket(wsUrl);

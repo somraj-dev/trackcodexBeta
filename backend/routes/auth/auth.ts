@@ -1309,7 +1309,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
     fastify.get("/auth/orcid/callback", async (request, reply) => {
       const mockOrcidId = "0000-0002-1825-0097";
-      return reply.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/settings/profile?orcid_id=${mockOrcidId}`);
+      return reply.redirect(`${process.env.FRONTEND_URL || "https://trackcodex.com"}/settings/profile?orcid_id=${mockOrcidId}`);
     });
   }
 }

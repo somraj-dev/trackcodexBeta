@@ -4,6 +4,7 @@ import { profileService, UserProfile } from "../../services/activity/profile";
 import { useAuth } from "../../context/AuthContext";
 import { locationService, LocationError } from "../../services/infra/location";
 import { detectSocialPlatform } from "../../utils/socialMediaDetector";
+import { API_URL } from "../../services/infra/api";
 
 const ProfileSettings = () => {
   const { logout } = useAuth();
@@ -47,7 +48,7 @@ const ProfileSettings = () => {
 
   const handleOrcidConnect = () => {
     // Redirect to backend auth route
-    window.location.href = "http://localhost:5000/auth/orcid";
+    window.location.href = `${API_URL}/auth/orcid`;
   };
 
   const handleOrcidDisconnect = () => {
@@ -388,7 +389,7 @@ const ProfileSettings = () => {
 
           <div className="pt-4 border-t border-[#1E232E]">
             <h3 className="font-semibold text-white mb-2">ORCID ID</h3>
-            <p className="text-xs text-[#8b949e] mb-3">ORCID provides a persistent identifier - an ORCID iD - that distinguishes you from other researchers. Learn more at <a href="#" className="text-blue-400 hover:underline">ORCID.org</a>.</p>
+            <p className="text-xs text-[#8b949e] mb-3">ORCID provides a persistent identifier - an ORCID iD - that distinguishes you from other researchers. Learn more at <a href="https://orcid.org" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">ORCID.org</a>.</p>
 
             {profile.orcidId ? (
               <div className="flex items-center gap-2">

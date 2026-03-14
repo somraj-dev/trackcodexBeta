@@ -28,16 +28,16 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "512"
+  memory                   = "1024"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
       name      = "backend"
       image     = "275142546612.dkr.ecr.ap-south-1.amazonaws.com/trackcodex-backend:latest"
-      cpu       = 256
-      memory    = 512
+      cpu       = 512
+      memory    = 1024
       essential = true
       portMappings = [
         {
@@ -58,6 +58,14 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "JWT_SECRET"
           valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:JWT_SECRET::"
+        },
+        {
+          name      = "ENCRYPTION_KEY"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:ENCRYPTION_KEY::"
+        },
+        {
+          name      = "COOKIE_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:COOKIE_SECRET::"
         }
       ]
       logConfiguration = {

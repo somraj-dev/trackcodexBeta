@@ -33,6 +33,79 @@ import { AppError } from "./utils/AppError";
 import { prisma } from "./services/infra/prisma";
 import { startOutboxWorker } from "./workers/outboxWorker";
 
+// ═══════════════════════════════════════════════════════════════════════════
+// GLOBAL PROCESS GUARDS — Prevent surprise crashes from ever killing the server
+// ═══════════════════════════════════════════════════════════════════════════
+process.on("uncaughtException", (err) => {
+    console.error("🔥 [UNCAUGHT EXCEPTION] Server survived:", err.message);
+    console.error(err.stack);
+    try {
+        fs.appendFileSync("./backend_crash.log", `\n[${new Date().toISOString()}] UNCAUGHT: ${err.message}\n${err.stack}\n`);
+    } catch { /* ignore */ }
+});
+
+process.on("unhandledRejection", (reason) => {
+    console.error("🔥 [UNHANDLED REJECTION] Server survived:", reason);
+    try {
+        fs.appendFileSync("./backend_crash.log", `\n[${new Date().toISOString()}] UNHANDLED_REJECTION: ${String(reason)}\n`);
+    } catch { /* ignore */ }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATABASE STATE TRACKING — Module-level flag for health checks
+// ═══════════════════════════════════════════════════════════════════════════
+let dbConnected = false;
+let dbLastError = "";
+let dbReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+const DB_RECONNECT_INTERVAL_MS = 30_000; // Retry every 30s if disconnected
+
+/** Attempt to connect to the database. Returns true if successful. */
+async function attemptDbConnect(): Promise<boolean> {
+    try {
+        await Promise.race([
+            prisma.$connect(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("DB connection timeout (15s)")), 15000))
+        ]);
+        dbConnected = true;
+        dbLastError = "";
+        return true;
+    } catch (err: unknown) {
+        dbConnected = false;
+        dbLastError = (err as Error).message;
+        return false;
+    }
+}
+
+/** Background reconnection loop — runs only when DB is disconnected */
+function startDbReconnectLoop() {
+    if (dbReconnectTimer) return; // Already running
+
+    console.warn("🔄 [DB] Starting background reconnection loop (every 30s)...");
+    dbReconnectTimer = setInterval(async () => {
+        if (dbConnected) {
+            // Already connected, stop the loop
+            if (dbReconnectTimer) {
+                clearInterval(dbReconnectTimer);
+                dbReconnectTimer = null;
+            }
+            return;
+        }
+
+        console.warn("🔄 [DB] Attempting background reconnection...");
+        const ok = await attemptDbConnect();
+        if (ok) {
+            console.warn("✅ [DB] Background reconnection SUCCEEDED!");
+            if (dbReconnectTimer) {
+                clearInterval(dbReconnectTimer);
+                dbReconnectTimer = null;
+            }
+        } else {
+            console.warn(`❌ [DB] Background reconnection failed: ${dbLastError}`);
+        }
+    }, DB_RECONNECT_INTERVAL_MS);
+}
+
 const server = Fastify({
     logger: true,
     ajv: {
@@ -80,7 +153,9 @@ async function bootstrap() {
     const trackcodexRegex = /^https?:\/\/([^.]+\.)?trackcodex\.com(:[0-9]+)?$/;
     const vercelRegex = /^https?:\/\/.*\.vercel\.app$/;
 
-    const localOrigins = [
+    const isProduction = env.NODE_ENV === "production";
+
+    const localOrigins = isProduction ? [] : [
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
@@ -136,14 +211,17 @@ async function bootstrap() {
                 imgSrc: ["'self'", "data:", "https:"],
                 connectSrc: [
                     "'self'",
-                    "http://localhost:3001",
-                    "ws://localhost:3001",
-                    "ws://localhost:4000",
-                    "http://localhost:4000",
                     "https://*.trackcodex.com",
                     "wss://*.trackcodex.com",
                     env.BACKEND_URL,
                     env.BACKEND_URL.replace(/^http/, 'ws'),
+                    // Allow localhost connections in development only
+                    ...(isProduction ? [] : [
+                        "http://localhost:3001",
+                        "ws://localhost:3001",
+                        "ws://localhost:4000",
+                        "http://localhost:4000",
+                    ]),
                 ],
             },
         },
@@ -219,7 +297,7 @@ async function bootstrap() {
 
     // 9. CI/CD API (Native)
     try {
-        const ciModule = await import("./routes/ci");
+        const ciModule = await import("./routes/infra/ci");
         await server.register(ciModule.default || ciModule, { prefix: "/api/ci" });
     } catch (err: unknown) {
         console.warn("[WARN] CI routes failed to load:", (err as Error).message);
@@ -242,7 +320,7 @@ async function bootstrap() {
 
     // Register Git Routes
     try {
-        const gitModule = await import("./routes/git");
+        const gitModule = await import("./routes/git/git");
         await server.register(gitModule.default || gitModule, { prefix: "/git" });
     } catch (err: unknown) {
         console.warn("[WARN] Git routes failed to load:", (err as Error).message);
@@ -263,20 +341,43 @@ async function bootstrap() {
         });
 
         // Artifact Upload routes (depends on multipart)
-        const artifactsModule = await import("./routes/artifacts");
+        const artifactsModule = await import("./routes/ai/artifacts");
         await server.register(artifactsModule.default || artifactsModule, { prefix: "/api/artifacts" });
     } catch (err: unknown) {
         console.warn("[WARN] Multipart/Artifacts failed to load:", (err as Error).message);
     }
 
-    // Health Check API
+    // ═══════════════════════════════════════════════════════════════════════
+    // HEALTH CHECK ENDPOINTS — Always respond, regardless of DB state
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Liveness probe: always returns 200 if the process is running
     server.get("/api/health", async () => {
         return {
             status: "online",
             message: "TrackCodex Backend Server is running.",
             api_version: "v1",
             security: "enhanced",
-            environment: process.env.NODE_ENV
+            environment: process.env.NODE_ENV,
+            db: dbConnected ? "connected" : "disconnected",
+            uptime: Math.floor(process.uptime()),
+        };
+    });
+
+    // Readiness probe: returns 503 if DB is disconnected (use for strict ALB checks)
+    server.get("/api/health/ready", async (request, reply) => {
+        if (!dbConnected) {
+            return reply.code(503).send({
+                status: "degraded",
+                message: "Database is not connected. Server is alive but not ready.",
+                db: "disconnected",
+                lastError: dbLastError,
+            });
+        }
+        return {
+            status: "ready",
+            message: "TrackCodex Backend is fully operational.",
+            db: "connected",
         };
     });
 
@@ -295,7 +396,7 @@ async function bootstrap() {
 
     // Register CSS (Code Security System) Routes
     try {
-        const cssModule = await import("./routes/css");
+        const cssModule = await import("./routes/infra/css");
         await server.register(cssModule.default || cssModule);
         console.warn("🛡️ [CSS] Code Security System routes registered");
     } catch (err: unknown) {
@@ -329,7 +430,6 @@ async function bootstrap() {
         });
     } else {
         // Fallback or Dev mode 404
-        // Dev mode or default 404
         server.setNotFoundHandler((request, reply) => {
             server.log.warn(`404 Encountered: ${request.method} ${request.url}`);
             reply.status(404).send({
@@ -340,8 +440,6 @@ async function bootstrap() {
         });
     }
 
-    // Global Error Handler
-    // Global Error Handler
     // Global Error Handler
     server.setErrorHandler((error, request, reply) => {
         const isDev = process.env.NODE_ENV !== "production";
@@ -449,49 +547,64 @@ async function bootstrap() {
     });
 
     try {
-        // 12. Bind to Port Early (to satisfy Render's port scan)
+        // ═══════════════════════════════════════════════════════════════════
+        // 12. BIND TO PORT FIRST — Server must be reachable before DB connect
+        // ═══════════════════════════════════════════════════════════════════
         const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
         await server.listen({ port, host: "0.0.0.0" });
         console.warn(`🚀 TrackCodex Backend operational on port ${port} (Secure Mode)`);
 
-        // 13. Database Connection Check (with retries)
+        // ═══════════════════════════════════════════════════════════════════
+        // 13. DATABASE CONNECTION — Retry with exponential backoff
+        //     CRITICAL: Server NEVER crashes on DB failure. It stays alive
+        //     serving health checks and starts a reconnection loop.
+        // ═══════════════════════════════════════════════════════════════════
         if (!process.env.DATABASE_URL) {
             console.error("❌ [FATAL] DATABASE_URL is not set in environment variables!");
-            process.exit(1);
-        }
+            // Still don't crash — let the health check report the issue
+            dbLastError = "DATABASE_URL not set";
+            startDbReconnectLoop();
+        } else {
+            const maskedDbUrl = process.env.DATABASE_URL.replace(/:([^:@]+)@/, ":****@");
+            console.warn(`⏳ Connecting to database: ${maskedDbUrl}`);
 
-        const maskedDbUrl = process.env.DATABASE_URL.replace(/:([^:@]+)@/, ":****@");
-        console.warn(`⏳ Connecting to database in background: ${maskedDbUrl}`);
+            const MAX_RETRIES = 20;
+            let retryCount = 0;
 
-        let connected = false;
-        let retries = 10; // Increase retries for extra stability
-        while (retries > 0 && !connected) {
-            try {
-                await prisma.$connect();
-                connected = true;
-                console.warn("✅ Connected to PostgreSQL database successfully");
-            } catch (err: unknown) {
-                retries--;
-                console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${(err as Error).message}`);
+            while (retryCount < MAX_RETRIES) {
+                retryCount++;
+                const ok = await attemptDbConnect();
 
-                if (process.env.DATABASE_URL?.includes(":5432")) {
-                    console.warn("💡 TIP: Using port 5432. For AWS RDS + connection pooling, ensure your security group allows inbound on 5432 from EC2.");
-                }
-
-                if (retries === 0) {
-                    console.error("❌ [FATAL] Database connection could not be established after all retries.");
-                    console.error("1. Ensure DATABASE_URL points to your AWS RDS endpoint.");
-                    console.error("2. Verify RDS security group allows inbound TCP 5432 from EC2 security group.");
-                    console.error("3. Check that the RDS instance is in the same VPC or is publicly accessible (for dev).");
+                if (ok) {
+                    console.warn("✅ Connected to PostgreSQL database (AWS RDS) successfully.");
                     break;
                 }
-                console.warn("⏳ Waiting 5 seconds before next attempt...");
-                await new Promise(resolve => setTimeout(resolve, 5000));
+
+                console.error(`❌ Connection failed [${retryCount}/${MAX_RETRIES}]: ${dbLastError}`);
+
+                if (dbLastError.includes("timeout") || dbLastError.includes("ETIMEDOUT")) {
+                    console.warn("🛡️  Detecting TIMEOUT: This often indicates a Security Group (SG) block.");
+                    console.warn("👉 Check if your ECS Task SG is allowed in the RDS SG inbound rules on port 5432.");
+                }
+
+                if (retryCount >= MAX_RETRIES) {
+                    console.error("❌ [WARNING] Database connection could not be established after exhaustive retries.");
+                    console.error("🛠️  Server will KEEP RUNNING and retry in background every 30 seconds.");
+                    console.error("👉 Health check at /api/health will report db: 'disconnected'.");
+                    // DO NOT process.exit or break — start background reconnect loop
+                    startDbReconnectLoop();
+                    break;
+                }
+
+                // Exponential backoff
+                const waitTime = Math.min(10000, 2000 + retryCount * 1000);
+                console.warn(`⏳ Waiting ${waitTime / 1000} seconds before next attempt...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
             }
         }
 
         if (!process.env.ENCRYPTION_KEY) {
-            console.warn("⚠️  [WARN] ENCRYPTION_KEY is not set. Security features will be limited.");
+            console.warn("⚠️  [WARN] ENCRYPTION_KEY is not set. Using default. Change this in production!");
         }
 
         if (process.env.NODE_ENV !== "production") {
@@ -516,6 +629,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-
-

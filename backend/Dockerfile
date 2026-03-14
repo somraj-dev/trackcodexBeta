@@ -37,8 +37,8 @@ FROM node:20.20.0-slim
 
 WORKDIR /app
 
-# Install runtime dependencies required by Prisma
-RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+# Install runtime dependencies required by Prisma + curl for health checks
+RUN apt-get update && apt-get install -y openssl ca-certificates curl && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security (Debian style)
 RUN groupadd -r trackcodex && useradd -r -g trackcodex trackcodex
@@ -61,8 +61,8 @@ EXPOSE 4000
 
 ENV NODE_ENV=production
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "fetch('http://localhost:4000/api/health').then(r => r.ok || process.exit(1))" || exit 1
+# Health check: use curl for reliability, generous start-period for cold starts + DB retry
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+  CMD curl -sf http://localhost:4000/api/health || exit 1
 
 CMD ["node", "dist-backend/index.js"]

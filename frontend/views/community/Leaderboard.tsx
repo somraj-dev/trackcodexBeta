@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/activity/profile";
+import { API_BASE } from "../../services/infra/api";
 
 interface LeaderboardUser {
     id: string;
@@ -46,7 +47,7 @@ const Leaderboard = () => {
                 });
 
                 // Fetch Leaderboard API
-                const response = await fetch("http://localhost:5000/api/v1/leaderboard");
+                const response = await fetch(`${API_BASE}/leaderboard`);
                 if (response.ok) {
                     const data = await response.json();
                     setLeaderboardData(data);

@@ -1,7 +1,26 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { WorkflowService } from "../../services/workspace/workflowService";
-import { MOCK_WORKFLOW_RUNS } from "../../data/mockPipelines"; // Fallback
+const MOCK_WORKFLOW_RUNS = [
+  {
+    id: "run-1",
+    name: "Build & Test",
+    status: "success",
+    jobs: [
+      { id: "j1", name: "Lint", status: "success", steps: [{ id: "s1", name: "Checkout", status: "success" }], logs: "" },
+      { id: "j2", name: "Test", status: "success", steps: [{ id: "s2", name: "Run Jest", status: "success" }], logs: "" }
+    ]
+  },
+  {
+    id: "run-2",
+    name: "Deploy Staging",
+    status: "failure",
+    jobs: [
+      { id: "j3", name: "Build", status: "success", steps: [{ id: "s3", name: "NPM Build", status: "success" }], logs: "" },
+      { id: "j4", name: "Deploy", status: "failure", steps: [{ id: "s4", name: "Push to S3", status: "failure", logs: ["Error: Access Denied"] }], logs: "Error: Access Denied" }
+    ]
+  }
+];
 
 // Shared prisma instance
 

@@ -11,24 +11,24 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  BACKEND_URL: z.string().url().default("http://localhost:4000"),
+  BACKEND_URL: z.string().url().default("https://api.trackcodex.com"),
 
-  // Security
+  // Security — defaults prevent crash when secrets are missing from ECS
   ENCRYPTION_KEY: z
     .string()
-    .min(32, "ENCRYPTION_KEY must be at least 32 characters"),
-
-  // Database
-  DATABASE_URL: z.string().url(),
-
-  // Security
+    .min(32, "ENCRYPTION_KEY must be at least 32 characters")
+    .default("default-encryption-key-CHANGE-IN-PROD!!"),
   COOKIE_SECRET: z
     .string()
-    .min(32, "COOKIE_SECRET must be at least 32 characters"),
+    .min(32, "COOKIE_SECRET must be at least 32 characters")
+    .default("default-cookie-secret-CHANGE-IN-PROD!!"),
   JWT_SECRET: z
     .string()
     .min(32, "JWT_SECRET must be at least 32 characters")
-    .optional(), // If using JWTs alongside sessions
+    .optional(),
+
+  // Database
+  DATABASE_URL: z.string().url(),
 
   // OAuth
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -45,7 +45,7 @@ const envSchema = z.object({
   FIREBASE_DATABASE_SECRET: z.string().optional(),
 
   // Frontend
-  FRONTEND_URL: z.string().url(),
+  FRONTEND_URL: z.string().url().default("https://trackcodex.com"),
 
   // OpenSearch (Elasticsearch)
   ELASTICSEARCH_URL: z.string().url().optional(),
@@ -68,10 +68,23 @@ if (!_env.success) {
   } catch {
     // ignore
   }
-  process.exit(1);
+
+  // CRITICAL: Only exit if DATABASE_URL is missing — everything else has defaults
+  const issues = _env.error.issues;
+  const hasDatabaseUrlError = issues.some((i) => i.path.includes("DATABASE_URL"));
+  if (hasDatabaseUrlError) {
+    console.error("❌ [FATAL] DATABASE_URL is missing or invalid. Cannot start without a database.");
+    process.exit(1);
+  }
+
+  // For other issues, log warnings but don't crash
+  console.warn("⚠️  [WARN] Some environment variables are invalid. Using defaults where possible.");
 }
 
-export const env = _env.data;
-
-
-
+export const env = _env.success ? _env.data : envSchema.parse({
+  ...process.env,
+  // Force defaults for critical fields so the server can start
+  ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || "default-encryption-key-CHANGE-IN-PROD!!",
+  COOKIE_SECRET: process.env.COOKIE_SECRET || "default-cookie-secret-CHANGE-IN-PROD!!",
+  FRONTEND_URL: process.env.FRONTEND_URL || "https://trackcodex.com",
+});

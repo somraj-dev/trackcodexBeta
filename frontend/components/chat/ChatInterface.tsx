@@ -129,7 +129,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     useEffect(() => {
         if (!isOpen) return;
 
-        const socketHost = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
+        const socketHost = API_URL;
 
         const newSocket = io(socketHost, {
             query: { userId: currentUser.id },

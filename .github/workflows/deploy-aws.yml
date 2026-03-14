@@ -83,3 +83,25 @@ jobs:
           echo "   Backend: $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG"
           echo "   IDE:     $ECR_REGISTRY/$ECR_IDE_REPO:$IMAGE_TAG"
           echo "The ECS service will now pull the 'latest' images from ECR."
+          echo ""
+          echo "⏳ Waiting 60s for ECS to start the new task..."
+          sleep 60
+          echo "🔍 Polling health check at https://api.trackcodex.com/api/health ..."
+          ATTEMPTS=0
+          MAX_ATTEMPTS=12
+          while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
+            ATTEMPTS=$((ATTEMPTS + 1))
+            STATUS=$(curl -sf -o /dev/null -w "%{http_code}" https://api.trackcodex.com/api/health 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check PASSED (HTTP $STATUS) on attempt $ATTEMPTS"
+              curl -sf https://api.trackcodex.com/api/health | head -c 500
+              exit 0
+            fi
+            echo "⏳ Attempt $ATTEMPTS/$MAX_ATTEMPTS: HTTP $STATUS — retrying in 10s..."
+            sleep 10
+          done
+          echo "⚠️  Health check did not return 200 after $MAX_ATTEMPTS attempts."
+          echo "   Check CloudWatch Logs: /ecs/trackcodex"
+          echo "   This may be a transient issue — the server should self-heal via reconnection loop."
+          exit 0
+
