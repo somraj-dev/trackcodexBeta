@@ -256,6 +256,11 @@ async function bootstrap() {
 
     // 6. Socket.io Support
     await server.register(socketio, {
+        path: "/socket.io/",
+        pingTimeout: 60000,
+        pingInterval: 25000,
+        transports: ["websocket", "polling"],
+        allowUpgrades: true,
         cors: {
             origin: [
                 trackcodexRegex,
@@ -263,6 +268,7 @@ async function bootstrap() {
                 "https://trackcodex.com",
                 "https://api.trackcodex.com",
                 "https://www.trackcodex.com",
+                "https://api.trackcodex.com/socket.io/",
             ],
             methods: ["GET", "POST"],
             credentials: true,
@@ -274,7 +280,7 @@ async function bootstrap() {
     await server.register(websocket);
 
     // Initialize RealtimeService with the IO instance
-    RealtimeService.init((server as unknown as { io: any }).io);
+    RealtimeService.init((server as any).io);
 
     // 8. GraphQL API (Mercurius)
     try {

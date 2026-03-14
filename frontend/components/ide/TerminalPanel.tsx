@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import 'xterm/css/xterm.css';
-import { API_URL } from '../../services/infra/api';
+import 'xterm/css/xterm.css';
 
 const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = [] }: { workspaceId?: string; onClose?: () => void; onMaximize?: () => void; logs?: string[] }) => {
     const terminalRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
-    const socketRef = useRef<WebSocket | null>(null);
 
     // Initialize Terminal
     useEffect(() => {
@@ -40,30 +39,37 @@ const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = []
         xtermRef.current = term;
         fitAddonRef.current = fitAddon;
 
-        // Connect to WebSocket
-        const baseUrl = API_URL;
-        const wsProto = baseUrl.startsWith('https') ? 'wss' : 'ws';
-        const wsUrl = `${baseUrl.replace(/^https?/, wsProto)}/api/v1/forge/terminal/${workspaceId}`;
-        const ws = new WebSocket(wsUrl);
-        socketRef.current = ws;
+        // Connect to Realtime Layer (Socket.io)
+        let unsubscribe: (() => void) | undefined;
+        
+        const initSocket = async () => {
+            const { realtimeService } = await import('../../services/infra/realtime-service');
+            
+            realtimeService.send({ 
+                type: "TERMINAL_JOIN", 
+                workspaceId 
+            });
 
-        ws.onopen = () => {
-            term.write('\r\n\x1b[34m[Client] Connecting to The Forge...\x1b[0m\r\n');
+            unsubscribe = realtimeService.subscribe((event) => {
+                if (event.type === 'TERMINAL_OUTPUT') {
+                    term.write(event.data);
+                }
+                if (event.type === 'CONNECTION_OPEN') {
+                    term.write('\r\n\x1b[34m[Client] Realtime Layer Re-synchronized.\x1b[0m\r\n');
+                }
+            });
+
+            // Terminal -> Realtime
+            term.onData((data) => {
+                realtimeService.send({
+                    type: "TERMINAL_INPUT",
+                    data
+                });
+            });
         };
 
-        ws.onmessage = (event) => {
-            term.write(event.data);
-        };
-
-        ws.onclose = () => {
-            term.write('\r\n\x1b[31m[Client] Disconnected from server.\x1b[0m\r\n');
-        };
-
-        // Terminal -> WebSocket
-        term.onData((data) => {
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(data);
-            }
+        initSocket().catch(err => {
+            term.write(`\r\n\x1b[31m[Client] Socket.io Init Failed: ${err.message}\x1b[0m\r\n`);
         });
 
         // Handle Resize
@@ -73,7 +79,7 @@ const TerminalPanel = ({ workspaceId = 'default', onClose, onMaximize, logs = []
         return () => {
             window.removeEventListener('resize', handleResize);
             term.dispose();
-            ws.close();
+            if (unsubscribe) unsubscribe();
         };
     }, [workspaceId]);
 

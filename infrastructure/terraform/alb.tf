@@ -21,6 +21,12 @@ resource "aws_alb_target_group" "app" {
     unhealthy_threshold = "2"
   }
 
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400
+    enabled         = true
+  }
+
 }
 
 resource "aws_alb_listener" "front_end" {

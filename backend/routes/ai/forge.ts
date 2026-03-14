@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify';
 import { DockerService } from '../../services/infra/docker';
-import { TerminalService } from '../../services/workspace/terminal';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -12,13 +11,6 @@ const __dirname = dirname(__filename);
 
 export async function forgeRoutes(fastify: FastifyInstance) {
 
-    // Terminal WebSocket
-    fastify.get('/forge/terminal/:workspaceId', { websocket: true }, (connection, req) => {
-        const { workspaceId } = (req.params as any);
-        TerminalService.handleConnection(connection as any, workspaceId).catch(err => {
-            fastify.log.error("Terminal WebSocket Error: " + err.message);
-        });
-    });
 
     // Create Workspace (Docker Container + Local Folder)
     fastify.post('/forge/create', async (request, reply) => {
