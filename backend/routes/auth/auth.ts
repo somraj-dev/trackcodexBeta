@@ -799,12 +799,20 @@ export async function authRoutes(fastify: FastifyInstance) {
       if (!email) throw BadRequest("Email required");
 
       try {
-        // Use Firebase Admin to generate password reset link with redirection to our frontend
-        const actionCodeSettings = {
-          url: `${env.FRONTEND_URL}/reset-password`,
-          handleCodeInApp: true,
-        };
-        const resetLink = await firebaseAdmin.auth().generatePasswordResetLink(email, actionCodeSettings);
+        let resetLink: string | undefined;
+        
+        if (isFirebaseConfigured) {
+          // Use Firebase Admin to generate password reset link
+          const actionCodeSettings = {
+            url: `${env.FRONTEND_URL}/reset-password`,
+            handleCodeInApp: true,
+          };
+          resetLink = await firebaseAdmin.auth().generatePasswordResetLink(email, actionCodeSettings);
+        } else {
+          // Fallback: Local reset link (if implemented) or just log
+          console.warn("⚠️ [AUTH] Firebase not configured, skipping Firebase password reset link generation.");
+          resetLink = `${env.FRONTEND_URL}/reset-password?email=${encodeURIComponent(email)}&mock=true`;
+        }
 
         // Fetch user from DB to get username
         const user = await prisma.user.findUnique({
@@ -851,7 +859,9 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
 
       // Update password in Firebase
-      await firebaseAdmin.auth().updateUser(user.id, { password });
+      if (isFirebaseConfigured) {
+        await firebaseAdmin.auth().updateUser(user.id, { password });
+      }
 
       // Update password hash in Prisma
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -1207,13 +1217,15 @@ export async function authRoutes(fastify: FastifyInstance) {
           let email = user.email || "";
           let name = "TrackCodex User";
 
-          try {
-            // We can fetch the real data from Firebase Admin Since we only have the UID
-            const fbUser = await firebaseAdmin.auth().getUser(user.userId);
-            email = fbUser.email || "";
-            name = fbUser.displayName || name;
-          } catch (e) {
-            request.log.warn({ uid: user.userId }, "Failed to fetch full firebase user profile during sync");
+          if (isFirebaseConfigured) {
+            try {
+              // We can fetch the real data from Firebase Admin Since we only have the UID
+              const fbUser = await firebaseAdmin.auth().getUser(user.userId);
+              email = fbUser.email || "";
+              name = fbUser.displayName || name;
+            } catch (e) {
+              request.log.warn({ uid: user.userId }, "Failed to fetch full firebase user profile during sync");
+            }
           }
 
           const username = email ? email.split("@")[0] : `user_${user.userId.substring(0, 8)}`;
@@ -1301,7 +1313,10 @@ export async function authRoutes(fastify: FastifyInstance) {
         const uid = user.userId;
 
         // Generate a Firebase Custom Token
-        const customToken = await firebaseAdmin.auth().createCustomToken(uid);
+        let customToken = "dummy-local-token";
+        if (isFirebaseConfigured) {
+          customToken = await firebaseAdmin.auth().createCustomToken(uid);
+        }
 
         // Redirect the user back to the Desktop App via the custom protocol
         const deepLinkUrl = `trackcodex://auth?token=${customToken}`;

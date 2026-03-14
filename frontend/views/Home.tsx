@@ -143,6 +143,44 @@ const HomeView = () => {
           </div>
         </div>
 
+        {/* Quick Actions Row */}
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+          <button 
+            onClick={() => navigate("/taskvault")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[18px]">task_alt</span>
+            Task
+          </button>
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[18px]">adjust</span>
+            Create issue
+          </button>
+          <button 
+            onClick={() => navigate("/editor")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[18px]">code</span>
+            Write code
+          </button>
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[18px]">call_split</span>
+            Git
+          </button>
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined !text-[18px]">merge_type</span>
+            Pull requests
+          </button>
+        </div>
 
         {/* Dashboard Cards */}
         {(showBusinessBanner || (showRepoBanner && repos.length === 0 && !loadingRepos)) && (

@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getSession } from "../services/auth/session";
 import { prisma } from "../services/infra/prisma";
-import { firebaseAdmin } from "../services/infra/firebase";
+import { firebaseAdmin, isFirebaseConfigured } from "../services/infra/firebase";
 import { logSensitiveOperation } from "../services/activity/auditLogger";
 
 // Shared prisma instance
@@ -47,7 +47,7 @@ export async function requireAuth(
     const authHeader = request.headers.authorization;
     let firebaseUid: string | null = null;
 
-    if (authHeader?.startsWith("Bearer ")) {
+    if (authHeader?.startsWith("Bearer ") && isFirebaseConfigured) {
       const token = authHeader.substring(7);
       // If it looks like a JWT (roughly 3 parts separated by dots)
       if (token.split(".").length === 3) {
@@ -74,42 +74,44 @@ export async function requireAuth(
 
       if (!dbUser) {
         // AUTO-SYNC: User is valid in Firebase but doesn't exist in DB yet.
-        try {
-          const fbUser = await firebaseAdmin.auth().getUser(firebaseUid);
-          const email = fbUser.email || "";
-          const name = fbUser.displayName || "TrackCodex User";
-          const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
+        if (isFirebaseConfigured) {
+          try {
+            const fbUser = await firebaseAdmin.auth().getUser(firebaseUid);
+            const email = fbUser.email || "";
+            const name = fbUser.displayName || "TrackCodex User";
+            const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
 
-          // Create the user in Postgres using upsert to handle race conditions
-          dbUser = await prisma.user.upsert({
-            where: { id: firebaseUid },
-            update: {
-              emailVerified: fbUser.emailVerified || false, // Sync latest status
-            },
-            create: {
-              id: firebaseUid,
-              email: email,
-              username: username,
-              name: name,
-              password: "", // Handled by Firebase
-              role: "user",
-              emailVerified: fbUser.emailVerified || false,
-            },
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              tokenVersion: true,
-            }
-          });
-          console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
-        } catch (syncErr: any) {
-          console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`, syncErr);
-          // If creation fails, we MUST NOT proceed with an unrecorded ID
-          return reply.code(401).send({
-            error: "Unauthorized",
-            message: "User synchronization failed. Please sign in again.",
-          });
+            // Create the user in Postgres using upsert to handle race conditions
+            dbUser = await prisma.user.upsert({
+              where: { id: firebaseUid },
+              update: {
+                emailVerified: fbUser.emailVerified || false, // Sync latest status
+              },
+              create: {
+                id: firebaseUid,
+                email: email,
+                username: username,
+                name: name,
+                password: "", // Handled by Firebase
+                role: "user",
+                emailVerified: fbUser.emailVerified || false,
+              },
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                tokenVersion: true,
+              }
+            });
+            console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
+          } catch (syncErr: any) {
+            console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`, syncErr);
+            // If creation fails, we MUST NOT proceed with an unrecorded ID
+            return reply.code(401).send({
+              error: "Unauthorized",
+              message: "User synchronization failed. Please sign in again.",
+            });
+          }
         }
       }
 
