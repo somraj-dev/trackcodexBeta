@@ -194,6 +194,12 @@ export const api = {
     disconnect: (provider: string) =>
       request<any>({ url: `/integrations/disconnect/${provider}`, method: "DELETE" }),
     syncGithub: () => request<any>({ url: "/integrations/sync/github" }),
+    githubCallback: (code: string) =>
+      request<any>({
+        url: "/integrations/github/callback",
+        method: "POST",
+        data: { code },
+      }),
   },
   workflows: {
     list: (repoId: string) => request<any[]>({ url: `/repositories/${repoId}/workflows` }),

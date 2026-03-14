@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { auth, githubProvider } from "../../lib/firebase";
-import { signInWithRedirect, getRedirectResult, GithubAuthProvider } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import { api } from "../../services/infra/api";
 import IntegrationPermissionModal from "../../components/settings/IntegrationPermissionModal";
 
@@ -181,50 +180,26 @@ const IntegrationsSettings = () => {
 
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [pendingIntegration, setPendingIntegration] = useState<Integration | null>(null);
-
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // OAuth Handler for custom backend-to-frontend redirect (if used)
+  // Handle GitHub OAuth Callback (Direct Redirect)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const service = params.get("service");
-    const token = params.get("token");
-    const username = params.get("username");
+    const code = params.get("code");
+    const state = params.get("state");
 
-    if (service && token) {
-      const submitOAuthToken = async () => {
+    if (code && !isVerifying) {
+      const handleGithubCode = async () => {
         try {
-          await api.integrations.connect(service, token, username || undefined);
-          if (service === "github") {
-            if (username) localStorage.setItem("trackcodex_github_username", username);
-            toggleConnection("github");
-            api.integrations.syncGithub().catch(console.error);
-          }
-        } catch { }
-      };
-      submitOAuthToken();
-
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [toggleConnection]);
-
-  // Handle Firebase Redirect Result
-  useEffect(() => {
-    const checkRedirect = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const credential = GithubAuthProvider.credentialFromResult(result);
-          const accessToken = credential?.accessToken;
-          const githubUser = result.user;
-
-          if (accessToken) {
-            await api.integrations.connect("github", accessToken, githubUser.displayName || githubUser.email || undefined);
-            if (githubUser.displayName) {
-              localStorage.setItem("trackcodex_github_username", githubUser.displayName);
+          setIsVerifying(true);
+          const response = await api.integrations.githubCallback(code);
+          
+          if (response.success) {
+            if (response.username) {
+              localStorage.setItem("trackcodex_github_username", response.username);
             }
-            api.integrations.syncGithub().catch(console.error);
             toggleConnection("github");
+            api.integrations.syncGithub().catch(console.error);
 
             window.dispatchEvent(
               new CustomEvent("trackcodex-notification", {
@@ -236,13 +211,26 @@ const IntegrationsSettings = () => {
               }),
             );
           }
+        } catch (error) {
+          console.error("GitHub integration failed:", error);
+          window.dispatchEvent(
+            new CustomEvent("trackcodex-notification", {
+              detail: {
+                title: "Integration Failed",
+                message: "Failed to connect GitHub. Please try again.",
+                type: "error",
+              },
+            }),
+          );
+        } finally {
+          setIsVerifying(false);
+          // Clean URL
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
-      } catch (error) {
-        console.error("Redirect error:", error);
-      }
-    };
-    checkRedirect();
-  }, [toggleConnection]);
+      };
+      handleGithubCode();
+    }
+  }, [toggleConnection, isVerifying]);
 
   const handleConnectClick = (integration: Integration) => {
     if (integration.connected) {
@@ -265,9 +253,21 @@ const IntegrationsSettings = () => {
     if (pendingIntegration.id === "github") {
       try {
         setIsVerifying(true);
-        // Use Firebase signInWithRedirect for a full-page OAuth flow
-        // The page will redirect to GitHub confirmation page
-        await signInWithRedirect(auth, githubProvider);
+        
+        // Direct GitHub OAuth Redirect (Modern Way)
+        const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+        const redirectUri = window.location.origin + window.location.pathname;
+        const scope = "repo,read:user,read:org";
+        const state = Math.random().toString(36).substring(7);
+        
+        const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}`;
+        
+        // Save state for verification if needed
+        localStorage.setItem("github_oauth_state", state);
+        
+        // Navigate directly to GitHub (this fixes "page does not open" issues)
+        window.location.href = githubUrl;
+        
       } catch (err: any) {
         console.error("GitHub OAuth redirect failed:", err);
         setIsVerifying(false);

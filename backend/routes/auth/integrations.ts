@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { encrypt, decrypt } from "../../services/auth/encryption";
 import { requireAuth } from "../../middleware/auth";
+import { OAuthService } from "../../services/auth/oauth";
 
 export default async function integrationRoutes(fastify: FastifyInstance) {
     // Save or update an OAuth provider token for the current user
@@ -189,6 +190,68 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
                 success: true,
                 message: "Integration sync started in background",
             });
+        }
+    );
+
+    // Exchange GitHub code for access token and connect
+    fastify.post(
+        "/integrations/github/callback",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+            const { code } = request.body as { code: string };
+
+            if (!code) {
+                return reply.status(400).send({ error: "Code is required" });
+            }
+
+            try {
+                // 1. Exchange code for access token
+                const tokenData = await OAuthService.exchangeGithubCode(code);
+                const accessToken = tokenData.access_token;
+
+                if (!accessToken) {
+                    throw new Error("No access token received from GitHub");
+                }
+
+                // 2. Fetch GitHub user info to get username
+                const githubUser = await OAuthService.getGithubUserInfo(accessToken);
+                const providerUsername = githubUser.username;
+
+                // 3. Encrypt and save token (reusing logic from /integrations/connect)
+                const encryptedToken = encrypt(accessToken);
+
+                await prisma.oAuthAccount.upsert({
+                    where: {
+                        provider_providerAccountId: {
+                            provider: "github",
+                            providerAccountId: providerUsername || userId,
+                        },
+                    },
+                    update: {
+                        accessToken: encryptedToken,
+                        scope: "repo,read:user,read:org",
+                    },
+                    create: {
+                        provider: "github",
+                        providerAccountId: providerUsername || userId,
+                        accessToken: encryptedToken,
+                        tokenType: "bearer",
+                        scope: "repo,read:user,read:org",
+                        userId,
+                    },
+                });
+
+                return reply.send({
+                    success: true,
+                    provider: "github",
+                    username: providerUsername,
+                    accessToken: accessToken // Return to frontend for immediate use/sync if needed
+                });
+            } catch (error: any) {
+                console.error("[Integrations] GitHub callback failed:", error);
+                return reply.status(500).send({ error: error.message || "Failed to exchange GitHub code" });
+            }
         }
     );
 }
