@@ -19,7 +19,7 @@ const ForgeAIView = () => {
   // Provider settings
   const [provider, setProvider] = useState<Provider>("google");
   const [deepseekConfig, setDeepseekConfig] = useState<DeepSeekConfig>({
-    serverUrl: "http://localhost:8000",
+    serverUrl: "",
     apiKey: "",
     model: "deepseek-coder",
   });

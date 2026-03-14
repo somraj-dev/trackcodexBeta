@@ -300,7 +300,7 @@ export async function profileRoutes(server: FastifyInstance) {
             hasResume: Boolean(user.profile?.showResume && user.profile?.resumeUrl),
             isPrivate: user.settings?.isPrivate ?? user.isPrivate,
           },
-          profileUrl: `${process.env.FRONTEND_URL || "http://localhost:3001"}/profile/${userId}`,
+          profileUrl: `${process.env.FRONTEND_URL || "https://trackcodex.com"}/profile/${userId}`,
         });
       } catch (error) {
         console.error("Profile card error:", error);

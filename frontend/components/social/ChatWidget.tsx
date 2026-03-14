@@ -12,7 +12,7 @@ const ChatWidget = ({ userId = 'user-1' }) => {
     useEffect(() => {
         if (!isOpen) return;
 
-        const baseUrl = API_URL || (window.location.hostname === "localhost" ? "http://localhost:4000" : window.location.origin);
+        const baseUrl = API_URL;
         const wsProto = baseUrl.startsWith('https') ? 'wss' : 'ws';
         const wsUrl = `${baseUrl.replace(/^https?/, wsProto)}/api/v1/chat?userId=${userId}`;
 

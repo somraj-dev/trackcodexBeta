@@ -5,9 +5,10 @@ resource "aws_secretsmanager_secret" "backend_secrets" {
 resource "aws_secretsmanager_secret_version" "backend_secrets_version" {
   secret_id     = aws_secretsmanager_secret.backend_secrets.id
   secret_string = jsonencode({
-    DATABASE_URL = "postgresql://${aws_db_instance.main.username}:${aws_db_instance.main.password}@${aws_db_instance.main.endpoint}/trackcodex_db"
-    JWT_SECRET   = "super-secret-key-change-this-in-production"
-    # Add other secrets here as needed
+    DATABASE_URL   = "postgresql://${aws_db_instance.main.username}:${aws_db_instance.main.password}@${aws_db_instance.main.endpoint}/trackcodex_db"
+    JWT_SECRET     = "super-secret-key-change-this-in-production"
+    ENCRYPTION_KEY = "e0f54592-d6c4-4b47-8178-5e5898394236"
+    COOKIE_SECRET  = "cookie-secret-change-this-min-32-chars"
   })
 }
 

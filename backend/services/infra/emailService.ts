@@ -66,7 +66,7 @@ export const emailService = {
   ) => {
     try {
       const transport = await getTransporter();
-      const inviteLink = `http://localhost:3000/accept-invite?token=${inviteToken}`;
+      const inviteLink = `${process.env.FRONTEND_URL || "https://trackcodex.com"}/accept-invite?token=${inviteToken}`;
 
       const info = await transport.sendMail({
         from: '"TrackCodex" <onboarding@resend.dev>', // Resend domains must be verified, fallback to onboarding@resend.dev for testing
