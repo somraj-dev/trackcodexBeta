@@ -8,7 +8,8 @@
  * Integrates with TrackCodex AIOrchestrator.
  */
 
-import { AIOrchestrator } from "../aiOrchestrator";
+import { AIOrchestrator } from "../ai/aiOrchestrator";
+import { ArtifactService } from "../infra/artifact";
 
 // --- Types ---
 

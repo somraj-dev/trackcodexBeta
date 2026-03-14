@@ -217,7 +217,7 @@ async function bootstrap() {
 
     // 9. CI/CD API (Native)
     try {
-        const ciModule = await import("./routes/ci");
+        const ciModule = await import("./routes/infra/ci");
         await server.register(ciModule.default || ciModule, { prefix: "/api/ci" });
     } catch (err: unknown) {
         console.warn("[WARN] CI routes failed to load:", (err as Error).message);
@@ -240,7 +240,7 @@ async function bootstrap() {
 
     // Register Git Routes
     try {
-        const gitModule = await import("./routes/git");
+        const gitModule = await import("./routes/git/git");
         await server.register(gitModule.default || gitModule, { prefix: "/git" });
     } catch (err: unknown) {
         console.warn("[WARN] Git routes failed to load:", (err as Error).message);
@@ -261,7 +261,7 @@ async function bootstrap() {
         });
 
         // Artifact Upload routes (depends on multipart)
-        const artifactsModule = await import("./routes/artifacts");
+        const artifactsModule = await import("./routes/ai/artifacts");
         await server.register(artifactsModule.default || artifactsModule, { prefix: "/api/artifacts" });
     } catch (err: unknown) {
         console.warn("[WARN] Multipart/Artifacts failed to load:", (err as Error).message);
@@ -293,7 +293,7 @@ async function bootstrap() {
 
     // Register CSS (Code Security System) Routes
     try {
-        const cssModule = await import("./routes/css");
+        const cssModule = await import("./routes/infra/css");
         await server.register(cssModule.default || cssModule);
         console.warn("🛡️ [CSS] Code Security System routes registered");
     } catch (err: unknown) {
@@ -462,29 +462,42 @@ async function bootstrap() {
         console.warn(`⏳ Connecting to database in background: ${maskedDbUrl}`);
 
         let connected = false;
-        let retries = 10; // Increase retries for extra stability
+        let retries = 20; // Increased for AWS RDS stability
+        const totalRetries = retries;
+
         while (retries > 0 && !connected) {
             try {
-                await prisma.$connect();
+                // Set a specific connection timeout for this attempt
+                await Promise.race([
+                    prisma.$connect(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error("Prizma connection timeout (15s)")), 15000))
+                ]);
                 connected = true;
-                console.warn("✅ Connected to PostgreSQL database successfully");
+                console.warn("✅ Connected to PostgreSQL database (AWS RDS) successfully.");
             } catch (err: unknown) {
                 retries--;
-                console.error(`❌ Connection failed [Retry ${10 - retries}/10]: ${(err as Error).message}`);
+                const errorMsg = (err as Error).message;
+                console.error(`❌ Connection failed [Retry ${totalRetries - retries}/${totalRetries}]: ${errorMsg}`);
 
-                if (process.env.DATABASE_URL?.includes(":5432")) {
-                    console.warn("💡 TIP: Using port 5432. For AWS RDS + connection pooling, ensure your security group allows inbound on 5432 from EC2.");
+                if (errorMsg.includes("timeout") || errorMsg.includes("ETIMEDOUT")) {
+                    console.warn("🛡️  Detecting TIMEOUT: This often indicates a Security Group (SG) block.");
+                    console.warn("👉 Check if your ECS Task SG is allowed in the RDS SG inbound rules on port 5432.");
                 }
 
                 if (retries === 0) {
-                    console.error("❌ [FATAL] Database connection could not be established after all retries.");
-                    console.error("1. Ensure DATABASE_URL points to your AWS RDS endpoint.");
-                    console.error("2. Verify RDS security group allows inbound TCP 5432 from EC2 security group.");
-                    console.error("3. Check that the RDS instance is in the same VPC or is publicly accessible (for dev).");
+                    console.error("❌ [FATAL] Database connection could not be established after exhaustive retries.");
+                    console.error("🛠️  TROUBLESHOOTING STEPS:");
+                    console.error("1. Verify RDS endpoint in Secrets Manager: trackcodex-db.cnie88q6ughh.ap-south-1.rds.amazonaws.com");
+                    console.error("2. Ensure the RDS instance is 'Available' in the AWS Console.");
+                    console.error("3. Validate that DATABASE_URL includes ?sslmode=require if connecting from outside VPC.");
+                    console.error("4. Check VPC Peering or Public Access settings if ECS and RDS are in different VPCs.");
                     break;
                 }
-                console.warn("⏳ Waiting 5 seconds before next attempt...");
-                await new Promise(resolve => setTimeout(resolve, 5000));
+                
+                // Exponential backoff or steady wait
+                const waitTime = Math.min(10000, 2000 + (totalRetries - retries) * 1000);
+                console.warn(`⏳ Waiting ${waitTime/1000} seconds before next attempt...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
             }
         }
 

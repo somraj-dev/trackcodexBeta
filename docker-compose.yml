@@ -30,19 +30,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-
-  postgrest:
-    image: postgrest/postgrest
-    ports:
-      - "3100:3000" # Moved from 3000 to 3100 (Gitea uses 3000)
-    environment:
-      PGRST_DB_URI: postgres://postgres:password@db:5432/trackcodex
-      PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: web_anon
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3100
-    depends_on:
-      - db
-
   # ── OpenVSCode Server: Self-Hosted IDE ──
   openvscode:
     build:

@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { ArtifactService } from "../../services/artifact";
+import { ArtifactService } from "../../services/infra/artifact";
 
 export default async function (server: FastifyInstance) {
   // Upload Artifact
