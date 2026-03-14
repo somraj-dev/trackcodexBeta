@@ -24,8 +24,16 @@ const Login = () => {
   // Safety net: If auth state becomes true, redirect away from login
   useEffect(() => {
     if (isAuthenticated) {
-      const redirectPath = localStorage.getItem("redirect_after_login") || "/";
+      const rawPath = localStorage.getItem("redirect_after_login") || "/";
       localStorage.removeItem("redirect_after_login");
+
+      // Safety check: Avoid redirecting to auth pages
+      const isAuthPath = rawPath.startsWith("/login") ||
+        rawPath.startsWith("/signup") ||
+        rawPath.startsWith("/logout") ||
+        rawPath.startsWith("/auth");
+
+      const redirectPath = isAuthPath ? "/" : rawPath;
       navigate(redirectPath, { replace: true });
     }
   }, [isAuthenticated, navigate]);
@@ -104,8 +112,15 @@ const Login = () => {
       }
 
       // State update is handled by onAuthStateChanged in AuthContext OR by our mock `login()` call above
-      const redirectPath = localStorage.getItem("redirect_after_login") || "/";
+      const rawPath = localStorage.getItem("redirect_after_login") || "/";
       localStorage.removeItem("redirect_after_login");
+
+      const isAuthPath = rawPath.startsWith("/login") ||
+        rawPath.startsWith("/signup") ||
+        rawPath.startsWith("/logout") ||
+        rawPath.startsWith("/auth");
+
+      const redirectPath = isAuthPath ? "/" : rawPath;
       navigate(redirectPath);
     } catch (err: any) {
       if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
@@ -265,12 +280,12 @@ const Login = () => {
 
       <footer className="mt-16 py-8 pb-16 text-center">
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px] text-[#8b949e] px-4 max-w-3xl mx-auto">
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Terms</a>
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Privacy</a>
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Docs</a>
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Contact TrackCodex Support</a>
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Manage cookies</a>
-          <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Do not share my personal information</a>
+          <a href="https://docs.trackcodex.com/governance/policies/terms" className="hover:text-[#2f81f7] hover:underline transition-colors">Terms</a>
+          <a href="https://docs.trackcodex.com/governance/policies/privacy" className="hover:text-[#2f81f7] hover:underline transition-colors">Privacy</a>
+          <a href="https://docs.trackcodex.com" className="hover:text-[#2f81f7] hover:underline transition-colors">Docs</a>
+          <a href="https://support.trackcodex.com" className="hover:text-[#2f81f7] hover:underline transition-colors">Contact TrackCodex Support</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-cookie-settings')); }} className="hover:text-[#2f81f7] hover:underline transition-colors">Manage cookies</a>
+          <a href="https://docs.trackcodex.com/governance/policies/privacy" className="hover:text-[#2f81f7] hover:underline transition-colors">Do not share my personal information</a>
         </div>
       </footer>
     </div>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 import { profileService } from "../services/activity/profile";
 import { auth, isFirebaseConfigured } from "../lib/firebase";
@@ -46,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Sync CSRF token to localStorage for the axios interceptor in api.ts
   useEffect(() => {
@@ -151,10 +153,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(null);
       setCsrfToken(null);
       localStorage.removeItem("trackcodex_github_username");
+      localStorage.removeItem("redirect_after_login");
       profileService.clearProfile();
-      window.location.href = "/";
+      navigate("/", { replace: true }); // Changed from window.location.href to navigate
     }
   };
+
+  // Handle redirect after login
+  useEffect(() => {
+    if (user && !isLoading) {
+      // Read the intended destination or default to home
+      const rawPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+      localStorage.removeItem("redirect_after_login");
+
+      // Safety check: ensure we don't redirect back to auth related pages
+      const isAuthPath = rawPath.startsWith("/login") ||
+        rawPath.startsWith("/signup") ||
+        rawPath.startsWith("/logout") ||
+        rawPath.startsWith("/auth");
+
+      const redirectPath = isAuthPath ? "/dashboard/home" : rawPath;
+
+      // Redirect safely replacing the auth URL in history
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, isLoading, navigate]); // Added user and isLoading to dependencies
 
   return (
     <AuthContext.Provider

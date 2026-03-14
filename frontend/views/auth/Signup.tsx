@@ -454,7 +454,7 @@ const Signup = () => {
                 </div>
 
                 <p className="text-[12px] text-[#57606a] leading-relaxed pt-2">
-                  By signing up, you agree to our <a href="/terms" className="text-blue-600 font-semibold hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 font-semibold hover:underline">Privacy Statement</a>.
+                  By signing up, you agree to our <a href="https://docs.trackcodex.com/governance/policies/terms" className="text-blue-600 font-semibold hover:underline">Terms of Service</a> and <a href="https://docs.trackcodex.com/governance/policies/privacy" className="text-blue-600 font-semibold hover:underline">Privacy Statement</a>.
                 </p>
               </form>
             )}
