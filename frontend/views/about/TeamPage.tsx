@@ -32,6 +32,24 @@ const teamMembers: TeamMember[] = [
     role: "CMO & Co-Founder",
     image: "https://media.licdn.com/dms/image/v2/D4E03AQHaMuxVRsuIsA/profile-displayphoto-scale_200_200/B4EZqD6E4rHEAY-/0/1763149631659?e=1775088000&v=beta&t=xZqoclmUQzteMAjYD8Jn7LfxgBuUY1ZcmB_7-H2pBr8",
     linkedin: "https://www.linkedin.com/in/vatsal-singh-bhadoria-17451035a"
+  },
+  {
+    name: "Yug Mittal",
+    role: "Team Member",
+    image: "",
+    linkedin: "#"
+  },
+  {
+    name: "Abhay Gupta",
+    role: "Team Member",
+    image: "",
+    linkedin: "#"
+  },
+  {
+    name: "Sudhanshu Patel",
+    role: "Team Member",
+    image: "",
+    linkedin: "#"
   }
 ];
 
