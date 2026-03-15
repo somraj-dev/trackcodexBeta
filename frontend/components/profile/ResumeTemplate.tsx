@@ -8,184 +8,250 @@ interface ResumeTemplateProps {
 
 export const ResumeTemplate: React.FC<ResumeTemplateProps> = ({ profile, isEditable = false }) => {
   return (
-    <div className="bg-[#030014] text-white p-12 max-w-[850px] mx-auto shadow-2xl font-display" id="resume-content">
-      {/* Header */}
-      <div className="flex items-center gap-8 mb-12 border-b border-white/10 pb-12">
-        <div className="relative group">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-emerald-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-          <img
-            src={profile.avatar}
-            className="size-32 rounded-full border-2 border-primary/20 object-cover relative z-10"
-            alt={profile.name}
-          />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2 uppercase">{profile.name}</h1>
-          <div className="flex flex-wrap items-center gap-4 text-slate-400 text-sm">
-            <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-[10px]">
-              <span className="material-symbols-outlined !text-[16px]">work</span>
-              {profile.role || profile.systemRole}
-            </span>
-            <span className="opacity-30">|</span>
-            <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-[10px]">
-              <span className="material-symbols-outlined !text-[16px]">location_on</span>
-              {profile.location || "Remote / Earth"}
-            </span>
-            {profile.linkedinUrl && (
-              <>
-                <span className="opacity-30">|</span>
-                <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-[10px]">
-                   LinkedIn: {profile.linkedinUrl}
-                </span>
-              </>
-            )}
+    <div className="bg-[#0A0A0B] text-[#E1E1E1] p-0 max-w-[900px] mx-auto shadow-2xl font-sans" id="resume-content">
+      {/* Header Banner Section */}
+      <div className="relative h-48 w-full overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?q=80&w=1000&auto=format&fit=crop" 
+          className="w-full h-full object-cover brightness-50"
+          alt="Banner"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] to-transparent"></div>
+      </div>
+
+      {/* Profile Bar */}
+      <div className="px-10 -mt-12 relative z-10 flex items-end justify-between mb-8">
+        <div className="flex items-end gap-6">
+          <div className="size-32 rounded-3xl border-4 border-[#0A0A0B] bg-[#1C1C1E] overflow-hidden shadow-2xl">
+            <img src={profile.avatar} className="w-full h-full object-cover" alt={profile.name} />
           </div>
+          <div className="pb-2">
+            <h1 className="text-3xl font-bold text-white mb-1">{profile.name}</h1>
+            <div className="flex items-center gap-2 text-slate-400 text-sm">
+              <span className="font-medium text-blue-400">{profile.role || profile.systemRole}</span>
+              <span>•</span>
+              <span>{profile.location || "Remote / Earth"}</span>
+            </div>
+          </div>
+        </div>
+        <div className="pb-3">
+           <div className="px-6 py-2 bg-blue-600 rounded-xl text-xs font-bold text-white shadow-lg shadow-blue-900/40">Connect +</div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-12">
-        {/* About Me */}
-        <section>
-          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-6 flex items-center gap-3">
-            <span className="size-2 rounded-full bg-primary shadow-[0_0_8px_rgba(139,92,246,0.6)]"></span>
-            About Me
-          </h2>
-          <p className="text-slate-300 leading-relaxed text-sm font-medium">
-            {profile.bio || "A dedicated developer contributing to the TrackCodex ecosystem. Passionate about building robust systems and delivering high-quality code."}
+      {/* Tabs Mockup */}
+      <div className="px-10 mb-8">
+        <div className="flex items-center gap-8 border-b border-white/5 pb-4">
+           {["Feed", "ID", "Projects", "Activity"].map(tab => (
+             <span key={tab} className={`text-xs font-bold uppercase tracking-widest ${tab === "ID" ? "text-white border-b-2 border-white pb-4 -mb-[18px]" : "text-slate-500"}`}>
+               {tab}
+             </span>
+           ))}
+        </div>
+      </div>
+
+      <div className="px-10 pb-12 space-y-6">
+        {/* About Me Section */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-4">About Me</h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-6">
+            {profile.bio || "Full-stack developer with a passion for building high-performance applications and clean user interfaces. Expert in ecosystem architectures and verified TrackCodex contributor."}
           </p>
-        </section>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Tools and Platforms */}
-          <section>
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-emerald-400 mb-6 flex items-center gap-3">
-              <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
-              Tools & Platforms
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { name: "TrackCodex", desc: "Core Intelligence", icon: "hub" },
-                { name: "GitHub", desc: "Version Control", icon: "account_tree" },
-                { name: "GitLab", desc: "CI/CD Pipeline", icon: "integration_instructions" },
-                { name: "Fiverr/Freelance", desc: "External Missions", icon: "work" },
-              ].map((tool) => (
-                <div key={tool.name} className="flex items-start gap-3 p-3 bg-white/5 border border-white/5 rounded-xl">
-                  <span className="material-symbols-outlined !text-[20px] text-slate-400">{tool.icon}</span>
-                  <div>
-                    <div className="text-[12px] font-bold text-white">{tool.name}</div>
-                    <div className="text-[10px] text-slate-500">{tool.desc}</div>
-                  </div>
-                </div>
-              ))}
+          <div className="flex flex-wrap gap-8 pt-6 border-t border-white/5">
+            <div>
+              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-black tracking-tighter mb-1">
+                <span className="material-symbols-outlined !text-sm">military_tech</span>
+                Grade:
+              </div>
+              <div className="text-xs font-bold text-white">Senior Developer +</div>
             </div>
-          </section>
-
-          {/* Performance Grades */}
-          <section>
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-amber-400 mb-6 flex items-center gap-3">
-              <span className="size-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"></span>
-              TrackCodex Performance
-            </h2>
-            <div className="space-y-4">
-              {[
-                { label: "Coding Speed", value: profile.skillScore?.coding ?? 85, color: "bg-primary" },
-                { label: "Security Impact", value: profile.skillScore?.security ?? 92, color: "bg-emerald-500" },
-                { label: "Collaboration", value: profile.skillScore?.collaboration ?? 78, color: "bg-blue-500" },
-                { label: "Architecture", value: profile.skillScore?.architecture ?? 88, color: "bg-amber-500" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                    <span>{stat.label}</span>
-                    <span>{stat.value}%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${stat.color} shadow-sm`} 
-                      style={{ width: `${stat.value}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+            <div>
+              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-black tracking-tighter mb-1">
+                <span className="material-symbols-outlined !text-sm">language</span>
+                Languages:
+              </div>
+              <div className="text-xs font-bold text-white">English: Native, JavaScript: Expert, Python: Fluent</div>
             </div>
-          </section>
+          </div>
         </div>
 
-        {/* Work Experience / Missions */}
-        <section>
-          <h2 className="text-sm font-black uppercase tracking-[0.2em] text-blue-400 mb-6 flex items-center gap-3">
-            <span className="size-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)]"></span>
-            Experience & Missions
-          </h2>
-          <div className="space-y-8">
-            {profile.receivedReviews && profile.receivedReviews.length > 0 ? (
-              profile.receivedReviews.slice(0, 3).map((review) => (
-                <div key={review.id} className="relative pl-6 border-l border-white/10">
-                  <div className="absolute top-0 left-[-4px] size-2 rounded-full bg-blue-400"></div>
-                  <div className="flex justify-between items-start mb-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-                    <span>{review.author}</span>
-                    <span>{review.date}</span>
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2">{review.jobTitle}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed italic">
-                    "{review.comment}"
-                  </p>
+        {/* Tools and Platforms */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-6">Tools and Platforms:</h2>
+          <div className="grid grid-cols-2 gap-6">
+            {[
+              { name: "TrackCodex", desc: "Core Intelligence Service", icon: "hub", color: "text-blue-400" },
+              { name: "GitHub", desc: "Version Control Platform", icon: "account_tree", color: "text-emerald-400" },
+              { name: "GitLab", desc: "Enterprise CI/CD Pipelines", icon: "integration_instructions", color: "text-orange-400" },
+              { name: "Fiverr", desc: "Freelance Services Network", icon: "work", color: "text-green-500" },
+              { name: "Figma", desc: "Interface Design System", icon: "brush", color: "text-purple-400" },
+              { name: "Notion", desc: "Documentation & Knowledge", icon: "menu_book", color: "text-slate-50" },
+            ].map((tool) => (
+              <div key={tool.name} className="flex items-center gap-4">
+                <div className="size-10 rounded-xl bg-black/40 flex items-center justify-center">
+                   <span className={`material-symbols-outlined !text-2xl ${tool.color}`}>{tool.icon}</span>
                 </div>
+                <div>
+                   <div className="text-sm font-bold text-white">{tool.name}</div>
+                   <div className="text-[10px] text-slate-500">{tool.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skills Section */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-6">Skills:</h2>
+          <div className="flex flex-wrap gap-2">
+            {profile.skills && profile.skills.length > 0 ? (
+              profile.skills.map(skill => (
+                <span key={skill.name} className="px-4 py-1.5 bg-white/5 rounded-full text-[11px] font-bold text-slate-400 border border-white/5">
+                  {skill.name}
+                </span>
               ))
             ) : (
-              <div className="p-8 border border-dashed border-white/10 rounded-2xl text-center">
-                <p className="text-slate-500 text-sm">Active participant in the TrackCodex freelance network.</p>
-              </div>
+              ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker", "AWS", "UI/UX Design", "System Architecture"].map(s => (
+                <span key={s} className="px-4 py-1.5 bg-white/5 rounded-full text-[11px] font-bold text-slate-400 border border-white/5">
+                  {s}
+                </span>
+              ))
             )}
           </div>
-        </section>
+        </div>
 
-        {/* Education & Achievements */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-           <section>
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-rose-400 mb-6 flex items-center gap-3">
-              <span className="size-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]"></span>
-              Achievements
-            </h2>
-            <div className="flex flex-wrap gap-4">
-              {profile.achievements && profile.achievements.length > 0 ? (
-                profile.achievements.map((ach) => (
-                  <div key={ach.name} className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl w-full">
-                    <img src={ach.imageUrl} alt={ach.name} className="size-10" />
-                    <div>
-                      <div className="text-[12px] font-bold text-white">{ach.name}</div>
-                      <div className="text-[10px] text-slate-500">Earned x{ach.count} times</div>
-                    </div>
+        {/* Soft Skills Section */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-6">Soft Skills:</h2>
+          <div className="flex flex-wrap gap-2">
+            {["Communication", "Leadership", "Problem Solving", "Team Collaboration", "Global Strategy", "Mission Driven"].map(s => (
+              <span key={s} className="px-4 py-1.5 bg-white/5 rounded-full text-[11px] font-bold text-slate-400 border border-white/5">
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Work Experience */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-8">Work Experience:</h2>
+          <div className="space-y-10">
+            {/* Experience Item 1 */}
+            <div className="flex gap-6">
+              <div className="size-14 rounded-2xl bg-slate-800 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-white">business</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold text-white">TrackCodex Core Team</h3>
+                    <div className="text-xs text-slate-400">Senior Systems Engineer</div>
                   </div>
-                ))
-              ) : (
-                <div className="text-slate-500 text-sm italic">Verified by TrackCodex Network</div>
-              )}
+                  <div className="text-right">
+                    <div className="text-[10px] font-bold text-white uppercase px-2 py-0.5 bg-white/5 rounded">Jan 2024 - Present</div>
+                    <div className="text-[10px] text-slate-500 mt-1">1 year 3 months</div>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-400 space-y-2 list-disc pl-4 leading-relaxed">
+                  <li>Lead development of the decentralized intelligence verification system.</li>
+                  <li>Architected the high-scale real-time mission tracking engine.</li>
+                  <li>Improved system reliability by 45% through advanced diagnostic frameworks.</li>
+                </ul>
+              </div>
             </div>
-          </section>
 
-          <section>
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white mb-6 flex items-center gap-3">
-              <span className="size-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></span>
-              Network Presence
-            </h2>
-            <div className="space-y-4">
-               <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl">
-                 <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Reputation</div>
-                 <div className="text-2xl font-bold text-white">{profile.communityKarma} Karma</div>
-               </div>
-               <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
-                 <div className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">Impact</div>
-                 <div className="text-2xl font-bold text-white">{profile.jobsCompleted} Completed</div>
-               </div>
+            {/* Experience Item 2 */}
+            <div className="flex gap-6">
+              <div className="size-14 rounded-2xl bg-blue-900 border border-blue-500/20 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-blue-400">shield</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold text-white">CyberSecurity Partners</h3>
+                    <div className="text-xs text-slate-400">Security Architect</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] font-bold text-white uppercase px-2 py-0.5 bg-white/5 rounded">May 2022 - Dec 2023</div>
+                    <div className="text-[10px] text-slate-500 mt-1">1 year 8 months</div>
+                  </div>
+                </div>
+                <ul className="text-xs text-slate-400 space-y-2 list-disc pl-4 leading-relaxed">
+                  <li>Implemented end-to-end encrypted communication protocols for enterprise clients.</li>
+                  <li>Conducted weekly security audits and vulnerability research.</li>
+                </ul>
+              </div>
             </div>
-          </section>
+          </div>
+        </div>
+
+        {/* Education Section */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-8">Education:</h2>
+          <div className="space-y-8">
+            <div className="flex gap-6">
+              <div className="size-12 rounded-xl bg-slate-700 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-white">school</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-white">University of Technology</h3>
+                    <div className="text-xs text-slate-400">M.S. in Computer Science & Engineering</div>
+                  </div>
+                   <div className="text-[10px] font-bold text-slate-500 uppercase">2020 - 2022</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-6">
+              <div className="size-12 rounded-xl bg-slate-700 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-white">school</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-white">Institute of Innovation</h3>
+                    <div className="text-xs text-slate-400">B.S. in Software Development</div>
+                  </div>
+                   <div className="text-[10px] font-bold text-slate-500 uppercase">2016 - 2020</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Awards Section */}
+        <div className="bg-[#1C1C1E] rounded-2xl p-8 border border-white/5">
+          <h2 className="text-lg font-bold text-white mb-8">Awards and Achievements:</h2>
+          <div className="space-y-8">
+             <div className="flex gap-6">
+               <div className="size-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-amber-500 text-2xl">emoji_events</span>
+               </div>
+               <div>
+                  <h3 className="font-bold text-white mb-1">Global Innovation Award 2024</h3>
+                  <div className="text-[10px] font-bold text-amber-500 uppercase mb-2">TrackCodex Network</div>
+                  <p className="text-xs text-slate-500 leading-relaxed">Recognized for outstanding contributions to the open-source ecosystem and innovative systems design.</p>
+               </div>
+             </div>
+             <div className="flex gap-6">
+               <div className="size-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                 <span className="material-symbols-outlined text-blue-500 text-2xl">workspace_premium</span>
+               </div>
+               <div>
+                  <h3 className="font-bold text-white mb-1">Expert Systems Certification</h3>
+                  <div className="text-[10px] font-bold text-blue-500 uppercase mb-2">Professional Architects Assoc.</div>
+                  <p className="text-xs text-slate-500 leading-relaxed">Certified in distributed systems and large-scale enterprise architecture.</p>
+               </div>
+             </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer Branding */}
-      <div className="mt-16 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">
-        <div>Generated by TrackCodex Vault</div>
-        <div>Verified Ecosystem Profile</div>
+      {/* Footer Branded Bar */}
+      <div className="bg-[#0A0A0B] px-10 py-6 border-t border-white/5 flex items-center justify-between opacity-40">
+        <div className="text-[9px] uppercase font-black tracking-widest text-slate-500">TrackCodex Verified Vault ID: {profile.id.substring(0, 12)}</div>
+        <div className="text-[9px] uppercase font-black tracking-widest text-slate-500">© 2026 TrackCodex ecosystem</div>
       </div>
     </div>
   );
