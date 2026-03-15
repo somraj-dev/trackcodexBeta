@@ -1,5 +1,5 @@
 import React from 'react';
-import './TeamPage.css';
+
 
 interface TeamMember {
   name: string;
