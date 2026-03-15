@@ -6,6 +6,7 @@ interface ProofProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProceed: () => void;
+  onDownloadResume: () => void;
   profile: UserProfile;
 }
 
@@ -42,6 +43,7 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
   isOpen,
   onClose,
   onProceed,
+  onDownloadResume,
   profile,
 }) => {
   if (!isOpen) return null;
@@ -107,22 +109,9 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
               >
                 View GitHub
               </button>
-              <button
-                onClick={() => {
-                  const blob = new Blob(
-                    [
-                      `Resume for ${profile.name}\n\nExperience:\n- Senior Full-Stack Engineer\n- Distributed Systems Architect\n\nSkills:\n- React, Node.js, Go, Rust, Kubernetes\n\nContact:\n${profile.username}@trackcodex.com`,
-                    ],
-                    { type: "text/plain" },
-                  );
-                  const url = window.URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `${profile.username}_resume.txt`;
-                  a.click();
-                  window.URL.revokeObjectURL(url);
-                }}
-                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all"
+               <button
+                onClick={onDownloadResume}
+                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all border border-purple-400/20"
               >
                 Download Resume
               </button>

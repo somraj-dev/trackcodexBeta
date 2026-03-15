@@ -216,15 +216,6 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
           >
             Message
           </button>
-          <button
-            onClick={() => setIsResumeModalOpen(true)}
-            className="px-4 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md text-sm font-black hover:bg-primary/20 transition-all flex items-center justify-center gap-1"
-            title="Download auto-generated Resume"
-          >
-            <span className="material-symbols-outlined !text-[18px]">
-              description
-            </span>
-          </button>
         </div>
       )}
 
@@ -414,6 +405,7 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
             setIsProofProfileOpen(false);
             setIsOfferModalOpen(true);
           }}
+          onDownloadResume={() => setIsResumeModalOpen(true)}
           profile={profile}
         />
       )}
