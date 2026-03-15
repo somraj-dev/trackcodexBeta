@@ -76,7 +76,7 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="flex-1 bg-[#0d1117] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+        <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                 {/* TrackCodex Logo imitating the GitHub icon placement */}
                 <div className="mx-auto h-12 w-12 bg-white rounded-full flex items-center justify-center filter drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] mb-6">
