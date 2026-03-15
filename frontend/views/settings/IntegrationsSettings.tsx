@@ -269,17 +269,24 @@ const IntegrationsSettings = () => {
         setIsVerifying(false);
       }
     } else if (pendingIntegration.id === "gitlab") {
-      // GitLab can be implemented similarly with an OAuth provider if available
-      // For now, if no GitLab OAuth is set up, we keep it simple or show a message
-      window.dispatchEvent(
-        new CustomEvent("trackcodex-notification", {
-          detail: {
-            title: "GitLab OAuth",
-            message: "GitLab OAuth is currently being configured for this environment.",
-            type: "info",
-          },
-        }),
-      );
+      try {
+        setIsVerifying(true);
+        const clientId = import.meta.env.VITE_GITLAB_CLIENT_ID;
+        const redirectUri = `${window.location.origin}/auth/callback/gitlab`;
+        const scope = "api read_user read_repository";
+        const state = Math.random().toString(36).substring(7);
+
+        const gitlabUrl = `https://gitlab.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}`;
+
+        localStorage.setItem("gitlab_oauth_state", state);
+        localStorage.setItem("integration_return_path", window.location.pathname);
+        localStorage.setItem("integration_pending_provider", "gitlab");
+
+        window.location.href = gitlabUrl;
+      } catch (err: any) {
+        console.error("GitLab OAuth redirect failed:", err);
+        setIsVerifying(false);
+      }
     } else {
       // For non-VCS integrations
       toggleConnection(pendingIntegration.id);

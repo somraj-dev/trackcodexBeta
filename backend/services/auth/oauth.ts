@@ -18,6 +18,12 @@ const getGithubRedirectUri = () =>
   process.env.GITHUB_REDIRECT_URI ||
   `${process.env.FRONTEND_URL || "https://trackcodex.com"}/auth/callback/github`;
 
+const getGitlabClientId = () => process.env.GITLAB_CLIENT_ID || "";
+const getGitlabClientSecret = () => process.env.GITLAB_CLIENT_SECRET || "";
+const getGitlabRedirectUri = () =>
+  process.env.GITLAB_REDIRECT_URI ||
+  `${process.env.FRONTEND_URL || "https://trackcodex.com"}/auth/callback/gitlab`;
+
 console.log("--- OAuth Service Initialization (Lazy) ---");
 // We can't log values here reliably if dotenv loads later, but we can log that we are initialized.
 console.log("OAuthService module loaded.");
@@ -235,6 +241,83 @@ export class OAuthService {
 
     const verified = emails.find((e: any) => e.verified);
     return verified ? verified.email : "";
+  }
+
+  /**
+   * Generate GitLab OAuth authorization URL
+   */
+  static getGitlabAuthUrl(state?: string): string {
+    if (!getGitlabClientId()) {
+      throw new Error("GitLab Client ID is not configured on the server.");
+    }
+    const params = new URLSearchParams({
+      client_id: getGitlabClientId(),
+      redirect_uri: getGitlabRedirectUri(),
+      response_type: "code",
+      scope: "api read_user read_repository",
+      ...(state && { state }),
+    });
+
+    return `https://gitlab.com/oauth/authorize?${params.toString()}`;
+  }
+
+  /**
+   * Exchange GitLab authorization code for access token
+   */
+  static async exchangeGitlabCode(
+    code: string,
+    redirectUri?: string
+  ): Promise<OAuthTokenData> {
+    if (!getGitlabClientId() || !getGitlabClientSecret()) {
+      throw new Error("GitLab credentials are not configured on the server.");
+    }
+
+    const response = await fetch("https://gitlab.com/oauth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: getGitlabClientId(),
+        client_secret: getGitlabClientSecret(),
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: redirectUri || getGitlabRedirectUri(),
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`GitLab token exchange failed: ${error}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Fetch GitLab user profile information
+   */
+  static async getGitlabUserInfo(accessToken: string): Promise<OAuthUserInfo> {
+    const response = await fetch("https://gitlab.com/api/v4/user", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch GitLab user info");
+    }
+
+    const data = await response.json();
+
+    return {
+      id: String(data.id),
+      email: data.email,
+      username: data.username,
+      name: data.name || data.username,
+      avatar: data.avatar_url,
+    };
   }
 }
 

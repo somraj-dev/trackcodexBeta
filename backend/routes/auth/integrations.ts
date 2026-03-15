@@ -256,4 +256,68 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
             }
         }
     );
+
+    // Exchange GitLab code for access token and connect
+    fastify.post(
+        "/integrations/gitlab/callback",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+            const { code } = request.body as { code: string };
+
+            if (!code) {
+                return reply.status(400).send({ error: "Code is required" });
+            }
+
+            try {
+                // 1. Exchange code for access token
+                const tokenData = await OAuthService.exchangeGitlabCode(code);
+                const accessToken = tokenData.access_token;
+
+                if (!accessToken) {
+                    throw new Error("No access token received from GitLab");
+                }
+
+                // 2. Fetch GitLab user info
+                const gitlabUser = await OAuthService.getGitlabUserInfo(accessToken);
+                const providerGitLabId = gitlabUser.id;
+                const providerUsername = gitlabUser.username;
+
+                // 3. Encrypt and save token
+                const encryptedToken = encrypt(accessToken);
+
+                await prisma.oAuthAccount.upsert({
+                    where: {
+                        provider_providerAccountId: {
+                            provider: "gitlab",
+                            providerAccountId: providerGitLabId,
+                        },
+                    },
+                    update: {
+                        accessToken: encryptedToken,
+                        scope: "api read_user read_repository",
+                        userId,
+                    },
+                    create: {
+                        provider: "gitlab",
+                        providerAccountId: providerGitLabId,
+                        accessToken: encryptedToken,
+                        tokenType: "bearer",
+                        scope: "api read_user read_repository",
+                        userId,
+                    },
+                });
+
+                return reply.send({
+                    success: true,
+                    provider: "gitlab",
+                    username: providerUsername,
+                    accessToken: accessToken,
+                });
+            } catch (error: any) {
+                console.error("[Integrations] GitLab callback failed:", error);
+                return reply.status(500).send({ error: error.message || "Failed to exchange GitLab code" });
+            }
+        }
+    );
 }

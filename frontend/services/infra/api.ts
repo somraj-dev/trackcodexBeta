@@ -200,6 +200,12 @@ export const api = {
         method: "POST",
         data: { code },
       }),
+    gitlabCallback: (code: string) =>
+      request<any>({
+        url: "/integrations/gitlab/callback",
+        method: "POST",
+        data: { code },
+      }),
   },
   workflows: {
     list: (repoId: string) => request<any[]>({ url: `/repositories/${repoId}/workflows` }),

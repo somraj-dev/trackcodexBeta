@@ -36,6 +36,19 @@ const OAuthCallback: React.FC = () => {
           }
         }
 
+        if (provider === "gitlab" && code) {
+          const response = await api.integrations.gitlabCallback(code);
+          if (response.success) {
+            const redirectPath =
+              localStorage.getItem("integration_return_path") ||
+              "/settings/integrations";
+            localStorage.removeItem("integration_return_path");
+            localStorage.removeItem("integration_pending_provider");
+            navigate(redirectPath, { replace: true });
+            return;
+          }
+        }
+
         // Firebase handles OAuth redirect internally
         // getRedirectResult picks up the result after redirect
         const result = await getRedirectResult(auth);
