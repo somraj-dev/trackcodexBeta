@@ -45,22 +45,13 @@ export class GitHubService {
 
     const syncedRepos = [];
 
-    // 5. Upsert into Database
+    // 5. Upsert into Database using githubId as the unique key
     for (const repo of repos) {
-      if (repo.archived) continue; // Optional: skip archived
-
-      const existingRepo = await prisma.repository.findFirst({
-        where: {
-          OR: [
-            { githubId: repo.id.toString() },
-            { name: repo.name, orgId: null },
-          ],
-        },
-      });
+      if (repo.archived) continue;
 
       const upserted = await prisma.repository.upsert({
         where: {
-          id: existingRepo?.id || "new-id-placeholder",
+          githubId: repo.id.toString(),
         },
         create: {
           name: repo.name,
@@ -76,6 +67,7 @@ export class GitHubService {
           updatedAt: new Date(repo.updated_at || Date.now()),
         },
         update: {
+          name: repo.name,
           description: repo.description,
           isPublic: !repo.private,
           stars: repo.stargazers_count,

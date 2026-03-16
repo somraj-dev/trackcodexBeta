@@ -294,6 +294,47 @@ const IntegrationsSettings = () => {
     setPendingIntegration(null);
   };
 
+  // Handle GitLab OAuth Callback fallback (similar to github above)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const provider = localStorage.getItem("integration_pending_provider");
+
+    if (code && provider === "gitlab" && !isVerifying) {
+      const handleGitlabCode = async () => {
+        try {
+          setIsVerifying(true);
+          const response = await api.integrations.gitlabCallback(code);
+          
+          if (response.success) {
+            if (response.username) {
+              localStorage.setItem("trackcodex_gitlab_username", response.username);
+            }
+            toggleConnection("gitlab");
+            api.integrations.syncGitlab().catch(console.error);
+
+            window.dispatchEvent(
+              new CustomEvent("trackcodex-notification", {
+                detail: {
+                  title: "GitLab Connected",
+                  message: "Successfully integrated with GitLab. Syncing data...",
+                  type: "success",
+                },
+              }),
+            );
+          }
+        } catch (error) {
+          console.error("GitLab integration failed:", error);
+        } finally {
+          setIsVerifying(false);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          localStorage.removeItem("integration_pending_provider");
+        }
+      };
+      handleGitlabCode();
+    }
+  }, [toggleConnection, isVerifying]);
+
   return (
     <div className="space-y-10 relative">
       {/* Permission Modal */}

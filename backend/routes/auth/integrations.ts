@@ -182,13 +182,34 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
             // Trigger sync in the background
             import("../../services/git/github").then(({ GitHubService }) => {
                 GitHubService.syncAllData(userId).catch(err => {
-                    console.error(`[Integrations] Background sync failed for user ${userId}:`, err);
+                    console.error(`[Integrations] Background GitHub sync failed for user ${userId}:`, err);
                 });
             });
 
             return reply.send({
                 success: true,
-                message: "Integration sync started in background",
+                message: "GitHub integration sync started in background",
+            });
+        }
+    );
+
+    // Trigger full sync for GitLab
+    fastify.get(
+        "/integrations/sync/gitlab",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+
+            // Trigger sync in the background
+            import("../../services/git/gitlab").then(({ GitLabService }) => {
+                GitLabService.syncAllData(userId).catch(err => {
+                    console.error(`[Integrations] Background GitLab sync failed for user ${userId}:`, err);
+                });
+            });
+
+            return reply.send({
+                success: true,
+                message: "GitLab integration sync started in background",
             });
         }
     );

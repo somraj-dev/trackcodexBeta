@@ -194,6 +194,7 @@ export const api = {
     disconnect: (provider: string) =>
       request<any>({ url: `/integrations/disconnect/${provider}`, method: "DELETE" }),
     syncGithub: () => request<any>({ url: "integrations/sync/github" }),
+    syncGitlab: () => request<any>({ url: "integrations/sync/gitlab" }),
     githubCallback: (code: string) =>
       request<any>({
         url: "integrations/github/callback",
