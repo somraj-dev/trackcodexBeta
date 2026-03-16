@@ -186,9 +186,19 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // User Activity Feed — real per-user event log
   fastify.get("/users/:userId/activity", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
     const { limit } = request.query as { limit?: string };
     const take = limit ? Math.min(parseInt(limit), 50) : 10;
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
+
     try {
       const logs = await prisma.activityLog.findMany({
         where: { userId },
@@ -214,7 +224,17 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // User Contribution Heatmap — groups ActivityLog by date for the past 365 days
   fastify.get("/users/:userId/contributions", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
+
     try {
       const since = new Date();
       since.setFullYear(since.getFullYear() - 1);

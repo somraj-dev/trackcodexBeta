@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiInstance } from "../../services/infra/api";
 import "../styles/GlobalSearchModal.css";
 
 interface SearchResult {
@@ -66,10 +67,9 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const loadRecentRepos = async () => {
     try {
-      const res = await fetch("/api/v1/search/recent", { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setRecentRepos(data.recent || []);
+      const response = await apiInstance.get("/search/recent");
+      if (response.data) {
+        setRecentRepos(response.data.recent || []);
       }
     } catch (error) {
       console.error("Error loading recent repos:", error);
@@ -105,13 +105,12 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         // 2. Fetch remote matches (with timeout)
         let dynamicMatches: SearchResult[] = [];
         try {
-          const res = await fetch(
-            `/api/v1/search?q=${encodeURIComponent(query)}`,
-            { credentials: 'include', signal: controller.signal },
-          );
-          if (res.ok) {
-            const data = await res.json();
-            dynamicMatches = data.results || [];
+          const response = await apiInstance.get("/search", {
+            params: { q: query },
+            signal: controller.signal,
+          });
+          if (response.data) {
+            dynamicMatches = response.data.results || [];
           }
         } catch {
           // Backend unreachable - shortcuts still show, just no dynamic results
@@ -190,15 +189,10 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const submitFeedback = async (message: string) => {
     try {
-      await fetch("/api/v1/search/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify({
-          message,
-          category: "search",
-          url: window.location.href,
-        }),
+      await apiInstance.post("/search/feedback", {
+        message,
+        category: "search",
+        url: window.location.href,
       });
       setShowFeedback(false);
       alert("Thank you for your feedback!");

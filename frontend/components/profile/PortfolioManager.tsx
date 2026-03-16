@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { apiInstance } from "../../services/infra/api";
 
 interface PortfolioItem {
   id: string;
@@ -44,12 +45,12 @@ export const PortfolioManager: React.FC = () => {
 
   const fetchVisibilitySettings = async () => {
     try {
-      const response = await fetch(`/api/v1/users/${user?.id}`);
-      const data = await response.json();
-      if (data.user) {
-        setShowPortfolio(data.user.showPortfolio ?? true);
-        setShowRepositories(data.user.showRepositories ?? true);
-        setShowContributions(data.user.showContributions ?? true);
+      const response = await apiInstance.get(`/users/${user?.id}`);
+      const data = response.data;
+      if (data) {
+        setShowPortfolio(data.showPortfolio ?? true);
+        setShowRepositories(data.showRepositories ?? true);
+        setShowContributions(data.showContributions ?? true);
       }
     } catch (error) {
       console.error("Failed to fetch visibility settings:", error);
@@ -58,8 +59,8 @@ export const PortfolioManager: React.FC = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch(`/api/v1/portfolio/${user?.id}`);
-      const data = await response.json();
+      const response = await apiInstance.get(`/portfolio/${user?.id}`);
+      const data = response.data;
       if (data.success) {
         setItems(data.items);
       }
@@ -87,18 +88,17 @@ export const PortfolioManager: React.FC = () => {
 
     try {
       const url = editingId
-        ? `/api/v1/portfolio/${editingId}`
-        : "/api/v1/portfolio";
-      const method = editingId ? "PUT" : "POST";
+        ? `/portfolio/${editingId}`
+        : "/portfolio";
+      const method = editingId ? "put" : "post";
 
-      const response = await fetch(url, {
+      const response = await apiInstance({
+        url,
         method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
+        data: payload,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         await fetchItems();
@@ -131,12 +131,9 @@ export const PortfolioManager: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`/api/v1/portfolio/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await apiInstance.delete(`/portfolio/${id}`);
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         await fetchItems();
@@ -151,14 +148,11 @@ export const PortfolioManager: React.FC = () => {
 
   const toggleFeatured = async (id: string, featured: boolean) => {
     try {
-      const response = await fetch(`/api/v1/portfolio/${id}/feature`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ featured: !featured }),
+      const response = await apiInstance.patch(`/portfolio/${id}/feature`, {
+        featured: !featured,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         await fetchItems();
@@ -186,14 +180,11 @@ export const PortfolioManager: React.FC = () => {
 
   const updateVisibility = async (field: string, value: boolean) => {
     try {
-      const response = await fetch(`/api/v1/portfolio/${user?.id}/visibility`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ [field]: value }),
+      const response = await apiInstance.patch(`/portfolio/${user?.id}/visibility`, {
+        [field]: value,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.success) {
         // Update local state

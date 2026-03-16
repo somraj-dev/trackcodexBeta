@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { apiInstance } from "../services/infra/api";
 
 type Provider = "google" | "deepseek";
 
@@ -39,22 +40,14 @@ const ForgeAIView = () => {
     setIsAnalyzing(true);
 
     try {
-      const response = await fetch("/api/v1/forgeai/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt,
-          provider,
-          model: provider === "google" ? "gemini-1.5-flash" : deepseekConfig.model,
-          workspaceId: localStorage.getItem("current_workspace_id"),
-        }),
+      const response = await apiInstance.post("/forgeai/complete", {
+        prompt,
+        provider,
+        model: provider === "google" ? "gemini-1.5-flash" : deepseekConfig.model,
+        workspaceId: localStorage.getItem("current_workspace_id"),
       });
 
-      if (!response.ok) {
-        throw new Error(`AI Orchestrator error: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       setResults((prev) => [{ type: "AI", content: data.content }, ...prev]);
       setPrompt("");
     } catch (error) {
