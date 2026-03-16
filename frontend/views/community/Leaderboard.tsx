@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/activity/profile";
-import { API_BASE } from "../../services/infra/api";
+import { apiInstance } from "../../services/infra/api";
 
 interface LeaderboardUser {
     id: string;
@@ -47,10 +47,9 @@ const Leaderboard = () => {
                 });
 
                 // Fetch Leaderboard API
-                const response = await fetch(`${API_BASE}/leaderboard`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setLeaderboardData(data);
+                const response = await apiInstance.get("/leaderboard");
+                if (response.data) {
+                    setLeaderboardData(response.data);
 
                     // Find current user in leaderboard to update their specific stats
                     // In a real app we'd use the real user ID from auth context
@@ -69,7 +68,7 @@ const Leaderboard = () => {
     }, []);
 
     const handleUserClick = (userId: string) => {
-        navigate(`/portfolio/${userId}`);
+        navigate(`/profile/${userId}`);
     };
 
     // Split data for UI (Top 3 vs Rest)
