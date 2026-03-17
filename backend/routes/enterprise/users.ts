@@ -86,7 +86,6 @@ export async function userRoutes(fastify: FastifyInstance) {
           id: true,
           username: true,
           name: true,
-          email: false, // Don't expose email
           avatar: true,
           role: true,
           createdAt: true,
@@ -98,6 +97,51 @@ export async function userRoutes(fastify: FastifyInstance) {
               company: true,
               followersCount: true,
               followingCount: true,
+            },
+          },
+          freelancerProfile: {
+            select: {
+              jobsCompleted: true,
+              rating: true,
+              isPublic: true,
+              reviews: {
+                select: {
+                  rating: true,
+                  comment: true,
+                  createdAt: true,
+                },
+                take: 5,
+                orderBy: { createdAt: "desc" },
+              },
+            },
+          },
+          skillScore: {
+            select: {
+              coding: true,
+              quality: true,
+              bugDetection: true,
+              security: true,
+              collaboration: true,
+              architecture: true,
+              consistency: true,
+              communityImpact: true,
+              lastCalculatedAt: true,
+            },
+          },
+          skillMetrics: {
+            select: {
+              commitsPushed: true,
+              prCreated: true,
+              prMerged: true,
+              linesChanged: true,
+              bugsFixed: true,
+              bugsReported: true,
+              vulnerabilitiesFixed: true,
+              securityIssuesReported: true,
+              prReviewsGiven: true,
+              currentStreak: true,
+              starsReceived: true,
+              followers: true,
             },
           },
         },
@@ -114,7 +158,7 @@ export async function userRoutes(fastify: FastifyInstance) {
           where: {
             followerId_followingId: {
               followerId: currentUser.userId,
-              followingId: userId,
+              followingId: user.id,
             },
           },
         });
@@ -130,6 +174,9 @@ export async function userRoutes(fastify: FastifyInstance) {
         website: (user as any).profile?.website || "",
         company: (user as any).profile?.company || "",
         isFollowing,
+        freelancerProfile: (user as any).freelancerProfile || null,
+        skillScore: (user as any).skillScore || null,
+        skillMetrics: (user as any).skillMetrics || null,
       };
     } catch (error) {
       console.error("Get user profile error:", error);
@@ -137,7 +184,73 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Follow a user
+  // User Activity Feed — real per-user event log
+  fastify.get("/users/:userId/activity", async (request, reply) => {
+    const { userId } = request.params as { userId: string };
+    const { limit } = request.query as { limit?: string };
+    const take = limit ? Math.min(parseInt(limit), 50) : 10;
+    try {
+      const logs = await prisma.activityLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take,
+        include: {
+          repo: { select: { id: true, name: true } },
+        },
+      });
+      return logs.map((log: any) => ({
+        id: log.id,
+        action: log.action,
+        details: log.details,
+        repoName: log.repo?.name ?? null,
+        repoId: log.repo?.id ?? null,
+        createdAt: log.createdAt,
+      }));
+    } catch (error) {
+      console.error("User activity fetch error:", error);
+      return reply.code(500).send({ message: "Failed to fetch user activity" });
+    }
+  });
+
+  // User Contribution Heatmap — groups ActivityLog by date for the past 365 days
+  fastify.get("/users/:userId/contributions", async (request, reply) => {
+    const { userId } = request.params as { userId: string };
+    try {
+      const since = new Date();
+      since.setFullYear(since.getFullYear() - 1);
+
+      const logs = await prisma.activityLog.findMany({
+        where: { userId, createdAt: { gte: since } },
+        select: { createdAt: true },
+        orderBy: { createdAt: "asc" },
+      });
+
+      // Count per date
+      const countMap: Record<string, number> = {};
+      logs.forEach((log: any) => {
+        const date = log.createdAt.toISOString().split("T")[0];
+        countMap[date] = (countMap[date] || 0) + 1;
+      });
+
+      // Build full 365-day array
+      const result = [];
+      for (let i = 364; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split("T")[0];
+        const count = countMap[dateStr] || 0;
+        const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 8 ? 3 : 4;
+        result.push({ date: dateStr, count, level });
+      }
+      const total = Object.values(countMap).reduce((a: number, b: number) => a + b, 0);
+      return { contributions: result, total };
+    } catch (error) {
+      console.error("Contributions fetch error:", error);
+      return reply.code(500).send({ message: "Failed to fetch contributions" });
+    }
+  });
+
+
   fastify.post("/users/:userId/follow", async (request, reply) => {
     const { userId: targetUserId } = request.params as { userId: string };
     const currentUser = (request as any).user;
@@ -486,6 +599,12 @@ export async function userRoutes(fastify: FastifyInstance) {
     try {
       const users = await prisma.user.findMany({
         where: {
+          AND: [
+            { deletedAt: null },
+            { accountLocked: false },
+            { isPrivate: false },
+            { username: { not: null } }
+          ],
           OR: [
             { username: { contains: q, mode: "insensitive" } },
             { name: { contains: q, mode: "insensitive" } },
@@ -509,6 +628,14 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.get("/users/trending", async (request, reply) => {
     try {
       const users = await prisma.user.findMany({
+        where: {
+          AND: [
+            { deletedAt: null },
+            { accountLocked: false },
+            { isPrivate: false },
+            { username: { not: null } }
+          ],
+        },
         include: { profile: true },
         orderBy: {
           profile: {
@@ -547,9 +674,13 @@ export async function userRoutes(fastify: FastifyInstance) {
 
       const users = await prisma.user.findMany({
         where: {
-          id: {
-            notIn: currentUser ? [...followingIds, currentUser.userId] : [],
-          },
+          AND: [
+            { id: { notIn: currentUser ? [...followingIds, currentUser.userId] : [] } },
+            { deletedAt: null },
+            { accountLocked: false },
+            { isPrivate: false },
+            { username: { not: null } }
+          ],
         },
         include: { profile: true },
         take: 5,

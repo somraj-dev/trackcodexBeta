@@ -82,6 +82,43 @@ export interface UserProfile {
   showRepositories?: boolean;
   showContributions?: boolean;
   pinnedItems?: string[];
+
+  // Unique per-user metrics from backend
+  freelancerProfile?: {
+    jobsCompleted: number;
+    rating: number;
+    isPublic: boolean;
+    reviews?: {
+      rating: number;
+      comment?: string;
+      createdAt: string;
+    }[];
+  } | null;
+  skillScore?: {
+    coding: number;
+    quality: number;
+    bugDetection: number;
+    security: number;
+    collaboration: number;
+    architecture: number;
+    consistency: number;
+    communityImpact: number;
+    lastCalculatedAt: string;
+  } | null;
+  skillMetrics?: {
+    commitsPushed: number;
+    prCreated: number;
+    prMerged: number;
+    linesChanged: number;
+    bugsFixed: number;
+    bugsReported: number;
+    vulnerabilitiesFixed: number;
+    securityIssuesReported: number;
+    prReviewsGiven: number;
+    currentStreak: number;
+    starsReceived: number;
+    followers: number;
+  } | null;
 }
 
 // Blank default — no personal details. Will be hydrated by initFromAuth() on login.

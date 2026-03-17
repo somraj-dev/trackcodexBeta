@@ -9,7 +9,7 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         "/integrations/connect",
         { preHandler: requireAuth },
         async (request: any, reply) => {
-            const userId = request.userId;
+            const userId = request.user.userId;
             const { provider, accessToken, providerUsername } = request.body as {
                 provider: string;
                 accessToken: string;
@@ -78,7 +78,7 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         "/integrations/token/:provider",
         { preHandler: requireAuth },
         async (request: any, reply) => {
-            const userId = request.userId;
+            const userId = request.user.userId;
             const { provider } = request.params as { provider: string };
 
             if (!["github", "gitlab", "google"].includes(provider)) {
@@ -117,7 +117,7 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         "/integrations/status",
         { preHandler: requireAuth },
         async (request: any, reply) => {
-            const userId = request.userId;
+            const userId = request.user.userId;
 
             try {
                 const accounts = await prisma.oAuthAccount.findMany({
@@ -152,7 +152,7 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         "/integrations/disconnect/:provider",
         { preHandler: requireAuth },
         async (request: any, reply) => {
-            const userId = request.userId;
+            const userId = request.user.userId;
             const { provider } = request.params as { provider: string };
 
             try {
@@ -171,7 +171,3 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
         }
     );
 }
-
-
-
-

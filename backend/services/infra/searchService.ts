@@ -55,6 +55,12 @@ export const searchService = {
     // Search users/organizations
     const owners = await prisma.user.findMany({
       where: {
+        AND: [
+          { deletedAt: null },
+          { accountLocked: false },
+          { isPrivate: false },
+          { username: { not: null } }
+        ],
         OR: [
           { username: { contains: trimmedQuery, mode: "insensitive" } },
           { name: { contains: trimmedQuery, mode: "insensitive" } },

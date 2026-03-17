@@ -174,6 +174,7 @@ const ProfileView = () => {
         const me = await api.auth.getMe() as any;
         const backendProfile = me?.user;
         if (backendProfile) {
+          // Step 1: Update basic identity fields
           profileService.updateProfile({
             id: backendProfile.id,
             name: backendProfile.name || backendProfile.username,
@@ -181,6 +182,27 @@ const ProfileView = () => {
             avatar: backendProfile.avatar,
             role: backendProfile.role,
           });
+
+          // Step 2: Fetch enriched profile with unique metrics (skillMetrics, skillScore, freelancerProfile)
+          try {
+            const enriched = await profileService.getProfileByIdOrUsername(backendProfile.id);
+            if (enriched) {
+              profileService.updateProfile({
+                skillMetrics: enriched.skillMetrics,
+                skillScore: enriched.skillScore,
+                freelancerProfile: enriched.freelancerProfile,
+              });
+              // Also update local state directly so cards re-render immediately
+              setProfile((prev) => ({
+                ...prev,
+                skillMetrics: enriched.skillMetrics,
+                skillScore: enriched.skillScore,
+                freelancerProfile: enriched.freelancerProfile,
+              }));
+            }
+          } catch (metricsErr) {
+            console.warn("Could not fetch enriched profile metrics", metricsErr);
+          }
         }
       } catch (err) {
         console.error("Profile sync failed", err);
@@ -264,20 +286,23 @@ const ProfileView = () => {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             {activeTab === "Overview" && (
               <div className="space-y-12">
-                <Highlights />
+                <Highlights profile={profile} />
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  <CodingSnapshot />
-                  <SecurityImpact />
-                  <ForgeAIUsage />
-                  <FreelanceCard />
+
+                  <CodingSnapshot profile={profile} />
+                  <SecurityImpact profile={profile} />
+                  <ForgeAIUsage profile={profile} />
+                  <FreelanceCard profile={profile} />
                 </div>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
                   <div className="xl:col-span-2 space-y-12">
                     <PinnedRepos />
-                    <ContributionHeatmap />
+                    <ContributionHeatmap userId={profile.id} />
+
                   </div>
                   <div className="space-y-12">
-                    <ActivityFeed />
+                    <ActivityFeed profile={profile} />
+
                     <div className="p-6 bg-gh-bg-secondary border border-gh-border rounded-xl relative overflow-hidden group">
                       <div className="flex items-center gap-2 mb-4 text-primary">
                         <span className="material-symbols-outlined filled !text-xl">

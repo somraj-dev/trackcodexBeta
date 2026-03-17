@@ -156,6 +156,12 @@ export async function searchRoutes(fastify: FastifyInstance) {
           const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(q);
           const users = await prisma.user.findMany({
             where: {
+              AND: [
+                { deletedAt: null },
+                { accountLocked: false },
+                { isPrivate: false },
+                { username: { not: null } }
+              ],
               OR: [
                 { username: { contains: query, mode: "insensitive" } },
                 { name: { contains: query, mode: "insensitive" } },

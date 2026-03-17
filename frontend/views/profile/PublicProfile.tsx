@@ -17,17 +17,18 @@ import UserJobsTab from "../../components/profile/UserJobsTab";
 import UserLibraryTab from "../../components/profile/UserLibraryTab";
 
 export const PublicProfile: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { userId, username } = useParams<{ userId?: string; username?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Overview");
 
   useEffect(() => {
-    if (userId) {
-      loadProfile(userId);
+    const idOrUsername = userId || username;
+    if (idOrUsername) {
+      loadProfile(idOrUsername);
     }
-  }, [userId]);
+  }, [userId, username]);
 
   const loadProfile = async (id: string) => {
     setLoading(true);
@@ -125,21 +126,26 @@ export const PublicProfile: React.FC = () => {
             {/* Tab Content */}
             {activeTab === "Overview" && (
               <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <Highlights />
+                <Highlights profile={profile} />
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <CodingSnapshot />
-                  <SecurityImpact />
+                  <CodingSnapshot profile={profile} />
+                  <SecurityImpact profile={profile} />
                 </div>
+
 
                 <div className="grid grid-cols-1 xl:grid-cols-[1fr_350px] gap-8">
                   <div className="space-y-8">
                     <PinnedRepos />
-                    <ContributionHeatmap />
+                    <ContributionHeatmap userId={profile.id} />
+
                   </div>
                   <div className="space-y-8">
-                    <ForgeAIUsage />
-                    <ActivityFeed />
+                    <ForgeAIUsage profile={profile} />
+
+                    <ActivityFeed profile={profile} />
+
                   </div>
                 </div>
               </div>

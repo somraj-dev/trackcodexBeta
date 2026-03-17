@@ -159,13 +159,16 @@ const MainLayout: React.FC = () => {
                 <button onClick={() => navigate("/dashboard/home")} aria-label="Home"><TrackCodexLogo size="sm" collapsed={true} clickable={false} /></button>
               </div>
               <div className="flex-1 flex justify-center max-w-[720px] mx-auto">
-                <div onClick={() => setIsCommandPaletteOpen(true)} className="flex items-center gap-2 px-3 py-1 bg-[#0A0D14] border border-[#1E232E] rounded-md w-full max-w-[272px] cursor-pointer hover:border-[#58a6ff]/50 transition-colors group">
+                <div 
+                  onClick={() => setIsCommandPaletteOpen(true)} 
+                  className="flex items-center gap-2 px-3 py-1 bg-[#0A0D14] border border-[#1E232E] rounded-md w-full max-w-[272px] cursor-pointer hover:border-[#58a6ff]/50 transition-colors group"
+                >
                   <span className="material-symbols-outlined !text-[14px] text-gh-text-secondary">search</span>
                   <input
                     type="text"
                     placeholder="Search TrackCodex..."
-                    className="flex-1 bg-transparent border-none text-[13px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none h-6"
-                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 bg-transparent border-none text-[13px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none h-6 cursor-pointer"
+                    onFocus={() => setIsCommandPaletteOpen(true)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         const q = (e.target as HTMLInputElement).value;

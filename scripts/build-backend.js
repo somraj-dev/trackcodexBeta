@@ -15,6 +15,7 @@ esbuild
     target: "node18",
     outfile: path.join(__dirname, "../dist-backend/index.js"),
     // Exclude all node_modules from the bundle (keep them as external dependencies)
+    // We will rely on a complete node_modules environment in the container.
     packages: "external",
     sourcemap: true,
     format: "esm",
