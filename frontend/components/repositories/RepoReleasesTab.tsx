@@ -357,6 +357,17 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
                 </label>
               </div>
 
+              <div className="space-y-4">
+                <label className="text-xs font-black uppercase text-gh-text-secondary">Attach binaries by dropping them here or selecting them</label>
+                <div className="border-2 border-dashed border-gh-border rounded-lg p-8 flex flex-col items-center justify-center bg-gh-bg-tertiary/10 hover:bg-gh-bg-tertiary/20 transition-all cursor-pointer group">
+                  <span className="material-symbols-outlined !text-[32px] text-gh-text-tertiary group-hover:text-primary transition-colors mb-2">cloud_upload</span>
+                  <p className="text-sm text-gh-text-secondary">
+                    <span className="text-primary font-bold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-[10px] text-gh-text-tertiary mt-1">ZIP, TAR.GZ, EXE, DMG (max 2GB)</p>
+                </div>
+              </div>
+
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex gap-3 text-xs text-gh-text-secondary leading-relaxed">
                 <span className="material-symbols-outlined text-primary !text-[18px] shrink-0">info</span>
                 <p>

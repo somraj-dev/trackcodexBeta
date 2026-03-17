@@ -9,6 +9,7 @@ import CodespaceSettings from "./CodespaceSettings";
 import PagesSettings from "./PagesSettings";
 import SecuritySettings from "./SecuritySettings";
 import SecretSettings from "./SecretSettings";
+import RepoNotificationSettings from "./RepoNotificationSettings";
 
 interface RepoSettingsTabProps {
   repo: any;
@@ -100,12 +101,109 @@ const CheckboxRow = ({
   </div>
 );
 
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText,
+  requireRepoName,
+  repoName,
+  isDanger,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  requireRepoName?: boolean;
+  repoName?: string;
+  isDanger?: boolean;
+}) => {
+  const [input, setInput] = useState("");
+  if (!isOpen) return null;
+
+  const isConfirmed = requireRepoName ? input === repoName : true;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+      <div className="bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
+          <h3 className="font-bold text-gh-text flex items-center gap-2 text-sm uppercase tracking-widest">
+            {isDanger && <span className="material-symbols-outlined text-red-500 !text-[18px]">warning</span>}
+            {title}
+          </h3>
+          <button onClick={onClose} className="text-gh-text-secondary hover:text-gh-text transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-gh-text-secondary leading-relaxed">
+            {description}
+          </p>
+          {requireRepoName && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-gh-text">
+                Please type <span className="font-mono text-primary">{repoName}</span> to confirm.
+              </p>
+              <input
+                type="text"
+                className="w-full bg-gh-bg border border-gh-border rounded-lg px-4 py-2 text-sm text-gh-text focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={repoName}
+                autoFocus
+              />
+            </div>
+          )}
+        </div>
+        <div className="px-6 py-4 bg-gh-bg border-t border-gh-border flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 text-sm font-bold text-gh-text-secondary hover:bg-gh-bg-tertiary rounded-lg transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!isConfirmed}
+            onClick={() => {
+              onConfirm();
+              onClose();
+              setInput("");
+            }}
+            className={`flex-1 px-4 py-2 text-sm font-bold text-white rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100 ${isDanger ? "bg-red-600 hover:bg-red-500 shadow-red-600/20" : "bg-primary hover:bg-opacity-90 shadow-primary/20"}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
   const [settings, setSettings] = useState<FullRepoSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("General");
   const [renameValue, setRenameValue] = useState(repo.name);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmText: string;
+    onConfirm: () => void;
+    requireRepoName?: boolean;
+    isDanger?: boolean;
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    confirmText: "",
+    onConfirm: () => {},
+  });
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -215,6 +313,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           { id: "Environments", icon: "cloud", label: "Environments" },
           { id: "Codespaces", icon: "terminal", label: "Codespaces" },
           { id: "Pages", icon: "browser_updated", label: "Pages" },
+          { id: "Notifications", icon: "notifications", label: "Notifications" },
         ].map((item) => (
           <button
             key={item.id}
@@ -637,27 +736,53 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     label: "Change repository visibility",
                     desc: "This repository is currently public. Anyone on the internet can see it.",
                     btn: "Make Private",
-                  },
-                  {
-                    label: "Disable branch protection",
-                    desc: "Remove safeguards preventing direct pushes and forced deletion.",
-                    btn: "Disable Rules",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Change visibility",
+                      description: "Making this repository private will hide it from the public. Some features might be restricted.",
+                      confirmText: "Make private",
+                      onConfirm: () => console.log("Visibility changed")
+                    })
                   },
                   {
                     label: "Transfer ownership",
-                    desc: "Move this repository to another account or organization.",
+                    desc: "Move this repository to another account or organization. This action can be irreversible.",
                     btn: "Transfer",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Transfer repository",
+                      description: "Enter the username or organization name of the new owner.",
+                      confirmText: "Transfer repository",
+                      onConfirm: () => console.log("Transfer initialized")
+                    })
                   },
                   {
                     label: "Archive this repository",
-                    desc: "Mark as read-only and close all active development.",
+                    desc: "Mark this repository as read-only and close all active development. You can unarchive it later.",
                     btn: "Archive",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Archive repository",
+                      description: "Archiving this repository will make it read-only. Issues and pull requests will be closed.",
+                      confirmText: "Archive this repository",
+                      isDanger: true,
+                      onConfirm: () => console.log("Archived")
+                    })
                   },
                   {
                     label: "Delete this repository",
                     desc: "Permanently remove this repository and all its history. There is no undo.",
                     btn: "Delete repository",
                     danger: true,
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Delete repository",
+                      description: "This action cannot be undone. This will permanently delete the repository, its wiki, issues, and comments.",
+                      confirmText: "I understand the consequences, delete this repository",
+                      requireRepoName: true,
+                      isDanger: true,
+                      onConfirm: () => console.log("Deleted")
+                    })
                   },
                 ].map((item, idx) => (
                   <div
@@ -673,6 +798,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       </p>
                     </div>
                     <button
+                      onClick={item.action}
                       className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border whitespace-nowrap active:brightness-90 ${item.danger ? "bg-red-600 text-white border-red-600 hover:bg-red-500 shadow-xl shadow-red-600/20" : "bg-gh-bg border-gh-border text-red-500/80 hover:border-red-500 hover:text-red-500 hover:shadow-lg"}`}
                     >
                       {item.btn}
@@ -681,6 +807,12 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                 ))}
               </div>
             </Section>
+            
+            <ConfirmationModal
+              {...modalConfig}
+              repoName={repo.name}
+              onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+            />
           </div>
         )}
 
@@ -738,6 +870,12 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           </div>
         )}
 
+        {activeSubTab === "Notifications" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <RepoNotificationSettings repoId={repo.id} />
+          </div>
+        )}
+
         {activeSubTab !== "General" &&
           activeSubTab !== "Access" &&
           activeSubTab !== "Webhooks" &&
@@ -747,6 +885,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           activeSubTab !== "Codespaces" &&
           activeSubTab !== "Pages" &&
           activeSubTab !== "Security" &&
+          activeSubTab !== "Notifications" &&
           activeSubTab !== "Secrets" && (
             <div className="flex flex-col items-center justify-center py-40 text-gh-text-secondary opacity-50 h-full animate-in zoom-in-95 duration-700">
               <div className="size-20 rounded-full bg-gh-border/10 flex items-center justify-center mb-6">

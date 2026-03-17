@@ -20,6 +20,7 @@ import RepoReleasesTab from "../../components/repositories/RepoReleasesTab";
 import RepoTagsTab from "../../components/repositories/RepoTagsTab";
 import RepoBranchesTab from "../../components/repositories/RepoBranchesTab";
 import RepoContributorsTab from "../../components/repositories/RepoContributorsTab";
+import RepoCommitsTab from "../../components/repositories/RepoCommitsTab";
 import ActivityFeed from "../../components/shared/ActivityFeed";
 
 const RepoDetailView = () => {
@@ -39,6 +40,23 @@ const RepoDetailView = () => {
   const [isPinning, setIsPinning] = useState(false);
   const [isWatching, setIsWatching] = useState(false);
   const [ciStatus, setCiStatus] = useState<{ status: string; conclusion: string } | null>(null);
+  const [extraCounts, setExtraCounts] = useState<{
+    discussions: number;
+    actions: number;
+    releases: number;
+    tags: number;
+    contributors: number;
+    branches: number;
+    wiki: number;
+  }>({
+    discussions: 0,
+    actions: 0,
+    releases: 0,
+    tags: 0,
+    contributors: 0,
+    branches: 0,
+    wiki: 0,
+  });
 
   // Deep linking for Code Viewer
   useEffect(() => {
@@ -187,6 +205,30 @@ const RepoDetailView = () => {
         } catch (ciErr) {
           console.warn("Failed to fetch CI status", ciErr);
         }
+
+        // Fetch Extra Counts for badges
+        try {
+          const [branches, tags, releases, contributors, workflows, wiki] = await Promise.all([
+            api.repositories.getBranches(data.id).catch(() => []),
+            api.repositories.getTags(data.id).catch(() => []),
+            api.repositories.getReleases(data.id).catch(() => []),
+            api.repositories.getContributors(data.id).catch(() => []),
+            api.workflows.list(data.id).catch(() => []),
+            api.repositories.getWikiPages(data.id).catch(() => []),
+          ]);
+
+          setExtraCounts({
+            branches: branches.length,
+            tags: tags.length,
+            releases: releases.length,
+            contributors: contributors.length,
+            actions: workflows.length,
+            wiki: Array.isArray(wiki) ? wiki.length : 0,
+            discussions: 0, // Placeholder if no API yet
+          });
+        } catch (countErr) {
+          console.warn("Failed to fetch extra counts", countErr);
+        }
       } catch (err) {
         console.error("Failed to fetch repo detail", err);
         // We could still fallback to mock here if we want, but the goal is production-ready
@@ -255,6 +297,8 @@ const RepoDetailView = () => {
     switch (activeTab) {
       case "Code":
         return <RepoCodeTab repo={repo} />;
+      case "Commits":
+        return <RepoCommitsTab repo={repo} />;
       case "Issues":
         return <RepoIssuesTab repo={repo} />;
       case "Pull Requests":
@@ -322,6 +366,12 @@ const RepoDetailView = () => {
                 <span className="px-2 py-0.5 rounded-full border border-gh-border text-[12px] font-medium text-gh-text-secondary capitalize bg-transparent ml-2">
                   {repo.visibility?.toLowerCase() || "public"}
                 </span>
+
+                {repo.parent && (
+                  <div className="text-xs text-gh-text-secondary mt-1 ml-1">
+                    forked from <span className="text-primary hover:underline cursor-pointer" onClick={() => navigate(`/repo/${repo.parent.id}`)}>{repo.parent.full_name || `${repo.parent.owner.username}/${repo.parent.name}`}</span>
+                  </div>
+                )}
 
                 <button
                   onClick={handleTogglePin}
@@ -456,6 +506,8 @@ const RepoDetailView = () => {
               "Code",
               "Issues",
               "Pull Requests",
+              "Commits",
+              "Discussions",
               "Actions",
               "Projects",
               "Wiki",
@@ -476,7 +528,9 @@ const RepoDetailView = () => {
                 <span className="material-symbols-outlined !text-[18px]">
                   {tab === "Code"
                     ? "code"
-                    : tab === "Issues"
+                    : tab === "Commits"
+                      ? "history"
+                      : tab === "Issues"
                       ? "adjust"
                       : tab === "Pull Requests"
                         ? "schema"
@@ -505,14 +559,44 @@ const RepoDetailView = () => {
                                                 : "insights"}
                 </span>
                 {tab}
-                {tab === "Issues" && (
-                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary rounded-full text-xs ml-1">
-                    {repo.open_issues || 0}
+                {tab === "Issues" && repo.open_issues_count !== undefined && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {repo.open_issues_count}
                   </span>
                 )}
-                {tab === "Pull Requests" && (
-                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary rounded-full text-xs ml-1">
-                    0
+                {tab === "Pull Requests" && repo.open_pull_requests_count !== undefined && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {repo.open_pull_requests_count}
+                  </span>
+                )}
+                {tab === "Actions" && extraCounts.actions > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.actions}
+                  </span>
+                )}
+                {tab === "Releases" && extraCounts.releases > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.releases}
+                  </span>
+                )}
+                {tab === "Tags" && extraCounts.tags > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.tags}
+                  </span>
+                )}
+                {tab === "Branches" && extraCounts.branches > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.branches}
+                  </span>
+                )}
+                {tab === "Contributors" && extraCounts.contributors > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.contributors}
+                  </span>
+                )}
+                {tab === "Wiki" && extraCounts.wiki > 0 && (
+                  <span className="px-1.5 py-0.5 bg-gh-bg-secondary border border-gh-border rounded-full text-[10px] ml-1 opacity-70">
+                    {extraCounts.wiki}
                   </span>
                 )}
               </button>

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import yamlLang from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
+import { githubGist } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import PipelineVisualizer from "./PipelineVisualizer";
+import { api } from "../../services/infra/api";
+
+SyntaxHighlighter.registerLanguage("yaml", yamlLang);
 
 // Types matching API response
 interface WorkflowRun {
@@ -26,13 +32,16 @@ interface Workflow {
 const RepoActionsTab = () => {
   const { id: repoId } = useParams();
   const [currentView, setCurrentView] = useState<
-    "overview" | "workflows" | "detail"
+    "overview" | "workflows" | "detail" | "workflow_detail"
   >("overview");
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRun, setSelectedRun] = useState<any | null>(null);
   const [loadingRun, setLoadingRun] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
+  const [workflowYaml, setWorkflowYaml] = useState<string | null>(null);
+  const [loadingYaml, setLoadingYaml] = useState(false);
 
   useEffect(() => {
     if (repoId) {
@@ -63,14 +72,38 @@ const RepoActionsTab = () => {
     }
   };
 
+  const handleWorkflowClick = async (workflow: Workflow) => {
+    setSelectedWorkflow(workflow);
+    setCurrentView("workflow_detail");
+    setLoadingYaml(true);
+    try {
+      // Use existing getContents or a specific workflow endpoint
+      // For GitHub parity, we usually fetch the file path
+      const content = await api.repositories.getContent(
+        repoId!,
+        workflow.path,
+        "main" // Should use default branch or current branch context
+      );
+      if (typeof content === "string") {
+        setWorkflowYaml(content);
+      } else if (content && (content as any).content) {
+        // Handle base64 encoded content if necessary
+        setWorkflowYaml(atob((content as any).content));
+      }
+    } catch (e) {
+      console.error("Failed to load workflow YAML", e);
+      setWorkflowYaml("# Failed to load workflow content.");
+    } finally {
+      setLoadingYaml(false);
+    }
+  };
+
   const handleRunClick = async (run: WorkflowRun) => {
     setLoadingRun(true);
     try {
       const res = await fetch(`/api/ci/runs/${run.id}`);
       if (res.ok) {
         const fullRun = await res.json();
-        // Transform for visualizer if needed, or pass full object
-        // Assuming Visualizer can handle the API shape or we map it here
         setSelectedRun(fullRun);
         setCurrentView("detail");
       }
@@ -124,10 +157,11 @@ const RepoActionsTab = () => {
           Workflows
         </h3>
         <div className="space-y-1">
-          {workflows.map((w) => (
+          {workflows.map((w: Workflow) => (
             <button
               key={w.id}
-              className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-[#c9d1d9] hover:bg-[#11141A] truncate flex items-center gap-2"
+              onClick={() => handleWorkflowClick(w)}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors truncate flex items-center gap-2 ${selectedWorkflow?.id === w.id && currentView === "workflow_detail" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-[#11141A]"}`}
             >
               <span
                 className={`size-2 rounded-full ${w.state === "ACTIVE" ? "bg-green-500" : "bg-gray-500"}`}
@@ -202,7 +236,7 @@ const RepoActionsTab = () => {
                 <div className="text-3xl font-black text-[#3fb950] mt-1">
                   {runs.length > 0
                     ? Math.round(
-                        (runs.filter((r) => r.conclusion === "SUCCESS").length /
+                        (runs.filter((r: WorkflowRun) => r.conclusion === "SUCCESS").length /
                           runs.length) *
                           100,
                       )
@@ -222,7 +256,7 @@ const RepoActionsTab = () => {
                     No workflow runs yet. Push code to start CI.
                   </div>
                 ) : (
-                  runs.map((run) => (
+                  runs.map((run: WorkflowRun) => (
                     <div
                       key={run.id}
                       onClick={() => handleRunClick(run)}
@@ -270,27 +304,82 @@ const RepoActionsTab = () => {
           </div>
         )}
 
-        {currentView === "workflows" && (
-          /* Keep workflow placeholder or list real workflows */
-          <div>
-            <h2 className="text-xl font-bold text-white mb-6">
-              Workflow Manager
-            </h2>
-            <div className="space-y-4">
-              {workflows.map((w) => (
-                <div
-                  key={w.id}
-                  className="p-4 border border-[#1E232E] rounded-md bg-[#0A0D14] flex justify-between items-center"
+        {currentView === "workflow_detail" && selectedWorkflow && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 h-full flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <nav className="flex items-center gap-2 text-sm text-[#8b949e] mb-1">
+                  <button 
+                    onClick={() => setCurrentView("overview")}
+                    className="hover:text-[#58a6ff]"
+                  >
+                    Actions
+                  </button>
+                  <span>/</span>
+                  <span className="text-white font-bold">{selectedWorkflow.name}</span>
+                </nav>
+                <h2 className="text-xl font-bold text-white">
+                  {selectedWorkflow.path.split('/').pop()}
+                </h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleWorkflowClick(selectedWorkflow)}
+                  className="px-3 py-1.5 bg-[#11141A] border border-[#1E232E] text-[#c9d1d9] text-xs font-bold rounded-md hover:border-[#8b949e] transition-colors flex items-center gap-2"
                 >
-                  <div>
-                    <h3 className="font-bold text-[#c9d1d9]">{w.name}</h3>
-                    <p className="text-xs text-[#8b949e] font-mono">{w.path}</p>
+                  <span className="material-symbols-outlined !text-[16px]">refresh</span>
+                  Refresh
+                </button>
+                <button
+                  onClick={async () => {
+                    setLoadingRun(true);
+                    try {
+                      await api.workflows.dispatch(repoId!, selectedWorkflow.id, "main");
+                      setTimeout(fetchData, 1000);
+                      setCurrentView("overview");
+                    } catch (e) {
+                      console.error("Failed to dispatch");
+                    } finally {
+                      setLoadingRun(false);
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-[#238636] text-white text-xs font-bold rounded-md hover:bg-[#2ea043] transition-colors flex items-center gap-2"
+                >
+                  <span className="material-symbols-outlined !text-[16px]">play_arrow</span>
+                  Run workflow
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg overflow-hidden flex flex-col min-h-0">
+              <div className="bg-[#161b22] px-4 py-2 border-b border-[#30363d] flex justify-between items-center">
+                <span className="text-xs text-[#8b949e] font-mono">{selectedWorkflow.path}</span>
+                <span className="text-[10px] text-[#8b949e] uppercase font-bold tracking-wider">YAML</span>
+              </div>
+              <div className="flex-1 overflow-auto p-4 custom-scrollbar">
+                {loadingYaml ? (
+                  <div className="flex items-center justify-center h-full text-[#8b949e] gap-3">
+                    <div className="size-4 border-2 border-[#58a6ff] border-t-transparent rounded-full animate-spin"></div>
+                    Loading YAML...
                   </div>
-                  <div className="px-2 py-1 rounded bg-[#1f6feb]/20 text-[#58a6ff] text-xs">
-                    {w.state}
-                  </div>
-                </div>
-              ))}
+                ) : (
+                  <SyntaxHighlighter
+                    language="yaml"
+                    style={githubGist}
+                    customStyle={{
+                      backgroundColor: "transparent",
+                      padding: 0,
+                      margin: 0,
+                      fontSize: "12px",
+                      lineHeight: "1.5",
+                    }}
+                    showLineNumbers={true}
+                    lineNumberStyle={{ minWidth: "3em", paddingRight: "1em", color: "#484f58", textAlign: "right" }}
+                  >
+                    {workflowYaml || "# No content found."}
+                  </SyntaxHighlighter>
+                )}
+              </div>
             </div>
           </div>
         )}

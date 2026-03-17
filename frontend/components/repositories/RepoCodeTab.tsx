@@ -6,6 +6,8 @@ import { githubService } from "../../services/git/github";
 import UniversalFileList from "../common/UniversalFileList";
 import RepoCodeViewer from "./RepoCodeViewer";
 import RepoAboutSidebar from "./RepoAboutSidebar";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { FileItem } from "../common/UniversalFileList";
 
@@ -27,6 +29,13 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [isCreatingFile, setIsCreatingFile] = useState(false);
   const [newFileName, setNewFileName] = useState("");
+  const [readmeContent, setReadmeContent] = useState<string | null>(null);
+  const [latestRepoCommit, setLatestRepoCommit] = useState<any>(null);
+  const [showGoToFile, setShowGoToFile] = useState(false);
+  const [allFiles, setAllFiles] = useState<FileItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [fetchingAllFiles, setFetchingAllFiles] = useState(false);
+  const [cloneMethod, setCloneMethod] = useState<"HTTPS" | "SSH">("HTTPS");
 
   useEffect(() => {
     const fetchRepoData = async () => {
@@ -76,6 +85,54 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
     fetchContents();
   }, [repo.id, repo.name, currentPath, currentBranch]);
 
+  useEffect(() => {
+    const fetchReadme = async () => {
+      if (!repo.id || currentPath !== "") {
+        setReadmeContent(null);
+        return;
+      }
+      try {
+        const readmeFile = files.find(f => 
+          f.name.toLowerCase() === "readme.md" || 
+          f.name.toLowerCase() === "readme"
+        );
+        if (readmeFile) {
+          const content = await api.repositories.getContent(repo.id, readmeFile.path, currentBranch);
+          if (typeof content === "string") {
+            setReadmeContent(content);
+          } else if (content && content.content) {
+            // Handle base64 or raw content if API returns an object
+             setReadmeContent(content.encoding === 'base64' ? atob(content.content) : content.content);
+          }
+        } else {
+          setReadmeContent(null);
+        }
+      } catch (err) {
+        console.error("Failed to fetch README", err);
+        setReadmeContent(null);
+      }
+    };
+
+    if (files.length > 0) {
+      fetchReadme();
+    }
+  }, [repo.id, currentPath, currentBranch, files]);
+
+  useEffect(() => {
+    const fetchLatestCommit = async () => {
+      if (!repo.id) return;
+      try {
+        const commits = await api.repositories.getCommits(repo.id, currentBranch, "", 1);
+        if (commits && commits.length > 0) {
+          setLatestRepoCommit(commits[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch latest commit", err);
+      }
+    };
+    fetchLatestCommit();
+  }, [repo.id, currentBranch]);
+
   const handleFileClick = (file: FileItem) => {
     if (file.type === "dir") {
       setCurrentPath(file.path);
@@ -83,6 +140,49 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
       setSelectedFile({ path: file.path });
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "t" && !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) {
+        e.preventDefault();
+        openGoToFile();
+      }
+      if (e.key === "Escape") {
+        setShowGoToFile(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [repo.id, currentBranch]);
+
+  const openGoToFile = async () => {
+    setShowGoToFile(true);
+    setSearchQuery("");
+    if (allFiles.length === 0) {
+      setFetchingAllFiles(true);
+      try {
+        const treeData = await api.repositories.getTree(repo.id, currentBranch);
+        const mapped: FileItem[] = (treeData || [])
+          .filter((item: any) => item.type === "blob" || item.type === "file")
+          .map((item: any) => ({
+            name: item.path.split("/").pop() || item.path,
+            type: "file",
+            path: item.path,
+            commitVal: "",
+            time: ""
+          }));
+        setAllFiles(mapped);
+      } catch (err) {
+        console.error("Failed to fetch tree", err);
+      } finally {
+        setFetchingAllFiles(false);
+      }
+    }
+  };
+
+  const filteredFiles = allFiles.filter(f => 
+    f.path.toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 50);
 
   return (
     <div className="flex flex-col gap-4">
@@ -101,7 +201,7 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
             <span className="material-symbols-outlined !text-[14px]">
               adjust
             </span>
-            {repo.open_issues || 0} issues
+            {repo.open_issues_count || 0} issues
           </div>
         </div>
 
@@ -152,6 +252,14 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
               </div>
             )}
           </div>
+
+          <button
+            onClick={openGoToFile}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-xs font-bold text-gh-text hover:bg-gh-bg-tertiary transition-all"
+            title="Press 't' to search files"
+          >
+            Go to file
+          </button>
 
           {/* Add File Dropdown */}
           <div className="relative">
@@ -353,23 +461,63 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                 <h4 className="font-bold text-sm">Clone</h4>
               </div>
 
-              <div className="text-xs text-gh-text-secondary mb-2">HTTPS</div>
+              <div className="flex items-center gap-1 mb-3">
+                <button
+                  onClick={() => setCloneMethod("HTTPS")}
+                  className={`text-[11px] font-bold px-3 py-1 rounded-full transition-all ${
+                    cloneMethod === "HTTPS"
+                      ? "bg-primary text-white"
+                      : "text-gh-text-secondary hover:text-gh-text"
+                  }`}
+                >
+                  HTTPS
+                </button>
+                <button
+                  onClick={() => setCloneMethod("SSH")}
+                  className={`text-[11px] font-bold px-3 py-1 rounded-full transition-all ${
+                    cloneMethod === "SSH"
+                      ? "bg-primary text-white"
+                      : "text-gh-text-secondary hover:text-gh-text"
+                  }`}
+                >
+                  SSH
+                </button>
+              </div>
+
               <div className="flex items-center gap-0 border border-gh-border rounded-md overflow-hidden bg-gh-bg">
                 <input
                   readOnly
                   aria-label="Clone URL"
                   title="Repository Clone URL"
                   value={(() => {
-                    const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
-                    return repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
+                    const ownerUsername =
+                      typeof repo.owner === "object"
+                        ? (repo.owner as any).username
+                        : repo.owner || "me";
+                    const host = window.location.host;
+                    if (cloneMethod === "SSH") {
+                      return `git@${host}:${ownerUsername}/${repo.name}.git`;
+                    }
+                    return (
+                      repo.cloneUrl ||
+                      `${window.location.protocol}//${host}/git/${ownerUsername}/${repo.name}.git`
+                    );
                   })()}
                   className="flex-1 bg-transparent px-2 py-1.5 text-xs font-mono outline-none text-gh-text select-all"
                 />
                 <button
                   onClick={() => {
-                    const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
-                    const cloneUrl = repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
-                    navigator.clipboard.writeText(cloneUrl);
+                    const ownerUsername =
+                      typeof repo.owner === "object"
+                        ? (repo.owner as any).username
+                        : repo.owner || "me";
+                    const host = window.location.host;
+                    const url =
+                      cloneMethod === "SSH"
+                        ? `git@${host}:${ownerUsername}/${repo.name}.git`
+                        : repo.cloneUrl ||
+                          `${window.location.protocol}//${host}/git/${ownerUsername}/${repo.name}.git`;
+                    navigator.clipboard.writeText(url);
                   }}
                   className="px-2 py-1.5 hover:bg-gh-bg-tertiary border-l border-gh-border"
                   title="Copy to clipboard"
@@ -379,6 +527,12 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                   </span>
                 </button>
               </div>
+
+              <p className="text-[10px] text-gh-text-secondary mt-2 mb-4 leading-relaxed">
+                {cloneMethod === "HTTPS" 
+                  ? "Use Git or checkout with SVN using the web URL."
+                  : "Use a password-protected SSH key."}
+              </p>
 
               <button
                 onClick={async () => {
@@ -392,7 +546,7 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                     alert("Provisioning failed.");
                   }
                 }}
-                className="w-full mt-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined !text-[16px]">
                   add_box
@@ -400,20 +554,40 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                 Create codespace on main
               </button>
 
-              <button
-                onClick={() => {
-                  const ownerUsername = typeof repo.owner === 'object' ? (repo.owner as any).username : repo.owner || "me";
-                  const cloneUrl = repo.cloneUrl || `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
-                  const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(cloneUrl)}`;
-                  window.location.href = vscodeUri;
-                }}
-                className="w-full mt-2 py-2 bg-[#2d2d2d] hover:bg-[#3d3d3d] text-[#cccccc] rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-gh-border"
-              >
-                <span className="material-symbols-outlined !text-[16px]">
-                  open_in_new
-                </span>
-                Open with VS Code Desktop
-              </button>
+              <div className="mt-3 grid grid-cols-1 gap-2 border-t border-gh-border pt-3">
+                <button
+                  onClick={() => {
+                    const ownerUsername =
+                      typeof repo.owner === "object"
+                        ? (repo.owner as any).username
+                        : repo.owner || "me";
+                    const cloneUrl =
+                      repo.cloneUrl ||
+                      `${window.location.protocol}//${window.location.host}/git/${ownerUsername}/${repo.name}.git`;
+                    const vscodeUri = `vscode://vscode.git/clone?url=${encodeURIComponent(
+                      cloneUrl,
+                    )}`;
+                    window.location.href = vscodeUri;
+                  }}
+                  className="w-full py-2 bg-gh-bg text-gh-text rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-gh-border hover:bg-gh-bg-tertiary"
+                >
+                  <span className="material-symbols-outlined !text-[16px]">
+                    open_in_new
+                  </span>
+                  Open with VS Code Desktop
+                </button>
+
+                <a
+                  href={`${api.baseUrl}/repositories/${repo.id}/zipball?branch=${currentBranch}`}
+                  download
+                  className="w-full py-2 bg-gh-bg text-gh-text rounded-md text-xs font-bold transition-colors flex items-center justify-center gap-2 border border-gh-border hover:bg-gh-bg-tertiary"
+                >
+                  <span className="material-symbols-outlined !text-[16px]">
+                    download
+                  </span>
+                  Download ZIP
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -439,7 +613,13 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
             <UniversalFileList
               files={files}
               onFileClick={handleFileClick}
-              latestCommit={{
+              latestCommit={latestRepoCommit ? {
+                message: latestRepoCommit.message,
+                author: latestRepoCommit.author?.username || latestRepoCommit.author?.name || "unknown",
+                time: latestRepoCommit.createdAt ? new Date(latestRepoCommit.createdAt).toLocaleDateString() : "recently",
+                avatar: latestRepoCommit.author?.avatarUrl || "https://github.com/github.png",
+                count: String(repo.commits_count || ""),
+              } : {
                 message: "Project files synchronized with GitHub Hardware",
                 author: (repo.owner as any)?.username || (repo.owner as any)?.name || (typeof repo.owner === 'string' ? repo.owner : "trackcodex"),
                 time: "Live",
@@ -456,14 +636,20 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                 README.md
               </div>
             </div>
-            <div className="p-8 prose prose-invert max-w-none text-gh-text">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html:
-                    repo.description ||
-                    "No description provided for this repository.",
-                }}
-              ></div>
+            <div className="p-8 prose prose-invert max-w-none text-gh-text selection:bg-primary/30">
+              {readmeContent ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {readmeContent}
+                </ReactMarkdown>
+              ) : (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      repo.description ||
+                      "No description provided for this repository.",
+                  }}
+                ></div>
+              )}
             </div>
           </div>
         </div>
@@ -572,6 +758,81 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
               >
                 Create File
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Go to File Modal */}
+      {showGoToFile && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-[100] pt-[10vh] px-4">
+          <div className="bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200">
+            <div className="p-4 border-b border-gh-border">
+              <div className="flex items-center gap-3 bg-gh-bg border border-gh-border rounded-lg px-3 py-2 focus-within:border-primary transition-all">
+                <span className="material-symbols-outlined text-gh-text-secondary">search</span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search files..."
+                  className="flex-1 bg-transparent text-sm text-gh-text outline-none"
+                  autoFocus
+                />
+                <span className="text-[10px] font-bold text-gh-text-secondary bg-gh-bg-tertiary px-1.5 py-0.5 rounded border border-gh-border">ESC</span>
+              </div>
+            </div>
+            
+            <div className="max-h-[60vh] overflow-y-auto">
+              {fetchingAllFiles ? (
+                <div className="p-8 flex flex-col items-center gap-3">
+                  <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-xs text-gh-text-secondary">Indexing files...</p>
+                </div>
+              ) : filteredFiles.length > 0 ? (
+                <div className="divide-y divide-gh-border/50">
+                  {filteredFiles.map((file) => (
+                    <button
+                      key={file.path}
+                      onClick={() => {
+                        setSelectedFile({ path: file.path });
+                        setShowGoToFile(false);
+                      }}
+                      className="w-full text-left px-4 py-3 hover:bg-primary/10 group transition-colors flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined !text-[18px] text-gh-text-secondary group-hover:text-primary">description</span>
+                        <div>
+                          <p className="text-sm font-medium text-gh-text group-hover:text-primary">{file.name}</p>
+                          <p className="text-[10px] text-gh-text-secondary font-mono">{file.path}</p>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined !text-[16px] text-gh-text-secondary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-12 text-center">
+                  <span className="material-symbols-outlined !text-[48px] opacity-20 mb-2">search_off</span>
+                  <p className="text-sm text-gh-text-secondary">No files matched your search</p>
+                </div>
+              )}
+            </div>
+
+            <div className="px-4 py-2 border-t border-gh-border bg-gh-bg-tertiary flex items-center justify-between">
+              <p className="text-[10px] text-gh-text-secondary">
+                Showing {filteredFiles.length} of {allFiles.length} files
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-gh-text-secondary flex items-center gap-1">
+                  <span className="material-symbols-outlined !text-[12px]">keyboard_arrow_up</span>
+                  <span className="material-symbols-outlined !text-[12px]">keyboard_arrow_down</span>
+                  to navigate
+                </span>
+                <span className="text-[10px] text-gh-text-secondary flex items-center gap-1">
+                  <span className="material-symbols-outlined !text-[12px]">keyboard_return</span>
+                  to select
+                </span>
+              </div>
             </div>
           </div>
         </div>

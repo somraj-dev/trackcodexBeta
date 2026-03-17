@@ -149,6 +149,8 @@ export const api = {
       request<Repository>({ url: "/repositories", method: "POST", data }),
     star: (id: string) => request<any>({ url: `/repositories/${id}/star`, method: "POST" }),
     unstar: (id: string) => request<any>({ url: `/repositories/${id}/star`, method: "DELETE" }),
+    update: (id: string, data: Partial<Repository>) =>
+      request<Repository>({ url: `/repositories/${id}`, method: "PATCH", data }),
     pin: (id: string) => request<any>({ url: `/repositories/${id}/pin`, method: "POST" }),
     unpin: (id: string) => request<any>({ url: `/repositories/${id}/pin`, method: "DELETE" }),
     watch: (id: string, level: string) => request<any>({ url: `/repositories/${id}/watch`, method: "POST", data: { level } }),
@@ -162,18 +164,33 @@ export const api = {
       }),
     getBranches: (id: string) => request<string[]>({ url: `/repositories/${id}/branches` }),
     getCommitDiff: (id: string, sha: string) => request<{ diff: string }>({ url: `/repositories/${id}/commits/${sha}/diff` }),
-    getIssues: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/issues`, params: { status: filter } }),
-    createIssue: (id: string, data: { title: string; body: string; labelIds?: string[]; assigneeIds?: string[]; milestoneId?: string; }) =>
-      request<any>({ url: `/repositories/${id}/issues`, method: "POST", data }),
+    getIssue: (id: string, number: string | number) => request<any>({ url: `/repositories/${id}/issues/${number}` }),
+    updateIssue: (id: string, number: string | number, data: any) =>
+      request<any>({ url: `/repositories/${id}/issues/${number}`, method: "PATCH", data }),
+    addIssueComment: (id: string, number: string | number, data: { body: string }) =>
+      request<any>({ url: `/repositories/${id}/issues/${number}/comments`, method: "POST", data }),
+    toggleIssueState: (id: string, number: string | number, action: "close" | "reopen", stateReason?: string) =>
+      request<any>({ url: `/repositories/${id}/issues/${number}/${action}`, method: "POST", data: { stateReason } }),
     getLabels: (id: string) => request<any[]>({ url: `/repositories/${id}/labels` }),
     getMilestones: (id: string) => request<any[]>({ url: `/repositories/${id}/milestones` }),
     getAssignees: (id: string) => request<any[]>({ url: `/repositories/${id}/assignees` }),
+    addIssueAssignee: (id: string, number: string | number, userId: string) =>
+      request<any>({ url: `/repositories/${id}/issues/${number}/assignees`, method: "POST", data: { userId } }),
+    removeIssueAssignee: (id: string, number: string | number, userId: string) =>
+      request<any>({ url: `/repositories/${id}/issues/${number}/assignees/${userId}`, method: "DELETE" }),
     getPulls: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/pulls`, params: { status: filter } }),
+    getPull: (id: string, number: string | number) => request<any>({ url: `/repositories/${id}/pulls/${number}` }),
+    getPullDiff: (id: string, number: string | number) => request<{ diff: string }>({ url: `/repositories/${id}/pulls/${number}/diff` }),
+    mergePull: (id: string, number: string | number, method: "merge" | "squash" | "rebase") =>
+      request<any>({ url: `/repositories/${id}/pulls/${number}/merge`, method: "POST", data: { method } }),
     createPull: (id: string, data: any) => request<any>({ url: `/repositories/${id}/pulls`, method: "POST", data }),
     getPullComments: (id: string, number: string | number) => request<any[]>({ url: `/repositories/${id}/pulls/${number}/comments` }),
     createPullComment: (id: string, number: string | number, data: { body: string }) => request<any>({ url: `/repositories/${id}/pulls/${number}/comments`, method: "POST", data }),
+    getCIStatus: (id: string, ref: string) => request<any[]>({ url: `/repositories/${id}/ci-runs`, params: { ref } }),
     getContents: (id: string, path: string = "", ref: string = "HEAD") =>
       request<any[]>({ url: `/repositories/${id}/contents`, params: { path, ref } }),
+    getTree: (id: string, ref: string = "HEAD", recursive: boolean = true) =>
+      request<any[]>({ url: `/repositories/${id}/tree`, params: { ref, recursive } }),
     getContent: (id: string, path: string, ref: string = "HEAD") =>
       request<any>({ url: `/repositories/${id}/content`, params: { path, ref } }),
     createFile: (id: string, data: any) =>
@@ -182,6 +199,9 @@ export const api = {
     getLanguages: (id: string) => request<any>({ url: `/repositories/${id}/languages` }),
     getTags: (id: string) => request<string[]>({ url: `/repositories/${id}/tags` }),
     getReleases: (id: string) => request<any[]>({ url: `/repositories/${id}/releases` }),
+    getWikiPages: (id: string) => request<any[]>({ url: `/repositories/${id}/wiki/pages` }),
+    getWikiPage: (id: string, slug: string) => request<any>({ url: `/repositories/${id}/wiki/pages/${slug}` }),
+    updateWikiPage: (id: string, slug: string, data: { content: string }) => request<any>({ url: `/repositories/${id}/wiki/pages/${slug}`, method: "PUT", data }),
     createRelease: (id: string, data: any) => request<any>({ url: `/repositories/${id}/releases`, method: "POST", data }),
     importRepo: (data: any) =>
       request<Repository>({ url: "/repositories/import", method: "POST", data }),
@@ -246,6 +266,7 @@ export const api = {
   put: <T>(url: string, data?: any) => request<T>({ url, method: "PUT", data }),
   patch: <T>(url: string, data?: any) => request<T>({ url, method: "PATCH", data }),
   delete: <T>(url: string) => request<T>({ url, method: "DELETE" }),
+  baseUrl: API_BASE,
 };
 
 

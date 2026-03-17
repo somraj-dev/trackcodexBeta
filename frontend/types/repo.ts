@@ -16,6 +16,7 @@ export interface Repository {
   createdAt: string;
   isPublic: boolean;
   description: string;
+  website?: string;
   techStack: string;
   techColor: string;
   language?: string;
@@ -59,6 +60,9 @@ export interface Repository {
   watchLevel?: string | null;
   isPinned?: boolean;
   isStarred?: boolean;
+  open_issues_count?: number;
+  open_pull_requests_count?: number;
+  commits_count?: number;
 }
 
 export interface PinnedRepo {
