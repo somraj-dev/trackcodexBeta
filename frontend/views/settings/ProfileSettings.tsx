@@ -1,73 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { profileService, UserProfile } from "../../services/activity/profile";
-import { useAuth } from "../../context/AuthContext";
-import { locationService, LocationError } from "../../services/infra/location";
+import { locationService } from "../../services/infra/location";
 import { detectSocialPlatform } from "../../utils/socialMediaDetector";
-import { API_URL } from "../../services/infra/api";
 
 const ProfileSettings = () => {
-  const { logout } = useAuth();
   const location = useLocation();
   const [profile, setProfile] = useState<UserProfile>(() =>
     profileService.getProfile(),
   );
 
-  // ... existing state ...
-
   useEffect(() => {
-    // Check for ORCID callback param
+    // Clean URL if there was an ORCID callback (optional cleanup)
     const params = new URLSearchParams(location.search);
-    const orcidId = params.get("orcid_id");
-
-    if (orcidId) {
-      // Update profile with new ID
-      setProfile(prev => ({ ...prev, orcidId }));
-      profileService.updateProfile({ orcidId });
-
-      // Notify user
-      window.dispatchEvent(
-        new CustomEvent("trackcodex-realtime-notification", {
-          detail: {
-            id: `orcid-connect-${Date.now()}`,
-            title: "ORCID Connected",
-            message: `Successfully linked ORCID iD: ${orcidId}`,
-            type: "success",
-            createdAt: new Date().toISOString(),
-            read: false,
-          },
-        }),
-      );
-
-      // Clean URL
+    if (params.get("orcid_id")) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location]);
-
-  // ... existing useEffects ...
-
-  const handleOrcidConnect = () => {
-    // Redirect to backend auth route
-    window.location.href = `${API_URL}/auth/orcid`;
-  };
-
-  const handleOrcidDisconnect = () => {
-    setProfile(prev => ({ ...prev, orcidId: undefined }));
-    profileService.updateProfile({ orcidId: undefined });
-
-    window.dispatchEvent(
-      new CustomEvent("trackcodex-realtime-notification", {
-        detail: {
-          id: `orcid-disconnect-${Date.now()}`,
-          title: "ORCID Disconnected",
-          message: "Unlinked your ORCID iD.",
-          type: "info",
-          createdAt: new Date().toISOString(),
-          read: false,
-        },
-      }),
-    );
-  };
 
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
@@ -112,7 +61,7 @@ const ProfileSettings = () => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      let updates: any = { [name]: checked };
+      const updates: any = { [name]: checked };
 
       // If enabling local time, auto-detect timezone if missing
       if (name === "displayLocalTime" && checked && !profile.timezone) {
@@ -385,49 +334,6 @@ const ProfileSettings = () => {
               </label>
               <p className="text-xs text-[#8b949e]">Other users will see the time difference from their local time.</p>
             </div>
-          </div>
-
-          <div className="pt-4 border-t border-[#1E232E]">
-            <h3 className="font-semibold text-white mb-2">ORCID ID</h3>
-            <p className="text-xs text-[#8b949e] mb-3">ORCID provides a persistent identifier - an ORCID iD - that distinguishes you from other researchers. Learn more at <a href="https://orcid.org" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">ORCID.org</a>.</p>
-
-            {profile.orcidId ? (
-              <div className="flex items-center gap-2">
-                <div className="relative flex-grow">
-                  <div className="absolute left-3 top-2 text-[#a6ce39]">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.306v7.444h2.297c3.325 0 3.325-5.044 0-5.044h-2.297z" /></svg>
-                  </div>
-                  <input
-                    type="text"
-                    value={profile.orcidId}
-                    readOnly
-                    className={`${inputStyle} pl-9 pr-20`}
-                  />
-                  <div className="absolute right-3 top-2 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span className="text-xs text-[#8b949e]">Verified</span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleOrcidDisconnect}
-                  className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] hover:text-red-400 border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors"
-                >
-                  Disconnect
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleOrcidConnect}
-                  className="flex-grow flex items-center justify-center gap-2 px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors"
-                >
-                  <span className="text-[#a6ce39]">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.306v7.444h2.297c3.325 0 3.325-5.044 0-5.044h-2.297z" /></svg>
-                  </span>
-                  Connect your ORCID iD
-                </button>
-              </div>
-            )}
           </div>
 
           <div className="pt-6">

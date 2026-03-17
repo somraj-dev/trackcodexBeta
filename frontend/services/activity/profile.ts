@@ -60,7 +60,6 @@ export interface UserProfile {
   displayLocalTime?: boolean;
   timezone?: string; // IANA timezone string (e.g. "Asia/Kolkata")
   socialLinks?: string[]; // Generic list of 4 social links
-  orcidId?: string; // Verified ORCID iD
   // GPS Location fields
   useGPSLocation?: boolean; // Whether to use GPS for location
   gpsLocation?: string; // GPS-derived location string
