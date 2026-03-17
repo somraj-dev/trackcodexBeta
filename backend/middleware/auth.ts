@@ -110,11 +110,26 @@ export async function requireAuth(
             });
             console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
           } catch (syncErr: any) {
-            console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`, syncErr);
-            // If creation fails, we MUST NOT proceed with an unrecorded ID
-            return reply.code(401).send({
-              error: "Unauthorized",
-              message: "User synchronization failed. Please sign in again.",
+            const isConnectionError = syncErr?.message?.includes("Can't reach database") ||
+              syncErr?.message?.includes("connect") ||
+              syncErr?.message?.includes("ECONNREFUSED") ||
+              syncErr?.message?.includes("timeout") ||
+              syncErr?.code === "P1001" || syncErr?.code === "P1002";
+
+            console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`);
+            console.error(`[AUTH-SYNC]   Error name: ${syncErr?.name}`);
+            console.error(`[AUTH-SYNC]   Error code: ${syncErr?.code}`);
+            console.error(`[AUTH-SYNC]   Error message: ${syncErr?.message}`);
+            console.error(`[AUTH-SYNC]   Is connection error: ${isConnectionError}`);
+            console.error(`[AUTH-SYNC]   DATABASE_URL target: ${(process.env.DATABASE_URL || "").replace(/:([^:@]+)@/, ":****@")}`);
+
+            const userMessage = isConnectionError
+              ? "Database is temporarily unavailable. Please try again in a moment."
+              : "User synchronization failed. Please sign in again.";
+
+            return reply.code(isConnectionError ? 503 : 401).send({
+              error: isConnectionError ? "Service Unavailable" : "Unauthorized",
+              message: userMessage,
             });
           }
         }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 const SettingsSidebarItem = ({
@@ -35,13 +35,14 @@ const ExpandableMenuItem = ({
   label: string;
   children: React.ReactNode;
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocation();
 
   // Check if any child route is active
   const isChildActive = React.Children.toArray(children).some((child: any) => {
     return location.pathname.includes(child.props.to);
   });
+
+  const [isExpanded, setIsExpanded] = useState(isChildActive);
 
   return (
     <div>
