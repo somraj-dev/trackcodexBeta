@@ -16,6 +16,10 @@ import RepoProjectsTab from "../../components/repositories/RepoProjectsTab";
 import RepoSecurityTab from "../../components/repositories/RepoSecurityTab";
 import RepoInsightsTab from "../../components/repositories/RepoInsightsTab";
 import RepoSettingsTab from "../../components/repositories/RepoSettingsTab";
+import RepoReleasesTab from "../../components/repositories/RepoReleasesTab";
+import RepoTagsTab from "../../components/repositories/RepoTagsTab";
+import RepoBranchesTab from "../../components/repositories/RepoBranchesTab";
+import RepoContributorsTab from "../../components/repositories/RepoContributorsTab";
 import ActivityFeed from "../../components/shared/ActivityFeed";
 
 const RepoDetailView = () => {
@@ -31,6 +35,9 @@ const RepoDetailView = () => {
   const [isForking, setIsForking] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLaunchingWorkspace, setIsLaunchingWorkspace] = useState(false);
+  const [isStarring, setIsStarring] = useState(false);
+  const [isPinning, setIsPinning] = useState(false);
+  const [isWatching, setIsWatching] = useState(false);
   const [ciStatus, setCiStatus] = useState<{ status: string; conclusion: string } | null>(null);
 
   // Deep linking for Code Viewer
@@ -97,6 +104,63 @@ const RepoDetailView = () => {
       alert("Failed to generate from template.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleToggleStar = async () => {
+    if (isStarring || !repo) return;
+    setIsStarring(true);
+    try {
+      if (repo.isStarred) {
+        await api.repositories.unstar(repo.id);
+        setRepo({ ...repo, isStarred: false, stars: Math.max(0, (repo.stars || 0) - 1) });
+      } else {
+        await api.repositories.star(repo.id);
+        setRepo({ ...repo, isStarred: true, stars: (repo.stars || 0) + 1 });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to toggle star.");
+    } finally {
+      setIsStarring(false);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (isPinning || !repo) return;
+    setIsPinning(true);
+    try {
+      if (repo.isPinned) {
+        await api.repositories.unpin(repo.id);
+        setRepo({ ...repo, isPinned: false });
+      } else {
+        await api.repositories.pin(repo.id);
+        setRepo({ ...repo, isPinned: true });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to toggle pin.");
+    } finally {
+      setIsPinning(false);
+    }
+  };
+
+  const handleWatchDrop = async (level: string) => {
+    if (isWatching || !repo) return;
+    setIsWatching(true);
+    try {
+      if (level === "IGNORE") {
+        await api.repositories.unwatch(repo.id);
+        setRepo({ ...repo, watchLevel: null });
+      } else {
+        await api.repositories.watch(repo.id, level);
+        setRepo({ ...repo, watchLevel: level });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update watch status.");
+    } finally {
+      setIsWatching(false);
     }
   };
 
@@ -207,6 +271,14 @@ const RepoDetailView = () => {
         return <RepoSecurityTab />;
       case "Insights":
         return <RepoInsightsTab repo={repo} />;
+      case "Releases":
+        return <RepoReleasesTab repo={repo} />;
+      case "Tags":
+        return <RepoTagsTab repo={repo} />;
+      case "Branches":
+        return <RepoBranchesTab repo={repo} />;
+      case "Contributors":
+        return <RepoContributorsTab repo={repo} />;
       case "Settings":
         return <RepoSettingsTab repo={repo} />;
       case "Activity":
@@ -250,6 +322,21 @@ const RepoDetailView = () => {
                 <span className="px-2 py-0.5 rounded-full border border-gh-border text-[12px] font-medium text-gh-text-secondary capitalize bg-transparent ml-2">
                   {repo.visibility?.toLowerCase() || "public"}
                 </span>
+
+                <button
+                  onClick={handleTogglePin}
+                  disabled={isPinning}
+                  className={`ml-2 flex items-center justify-center p-1 rounded-full transition-colors ${
+                    repo.isPinned 
+                      ? "text-primary bg-primary/10" 
+                      : "text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary"
+                  } disabled:opacity-50`}
+                  title={repo.isPinned ? "Unpin repository" : "Pin repository"}
+                >
+                  <span className="material-symbols-outlined !text-[16px]">
+                    {repo.isPinned ? "keep_public" : "keep"}
+                  </span>
+                </button>
 
                 {ciStatus && (
                   <div
@@ -312,12 +399,26 @@ const RepoDetailView = () => {
                   </span>
                   {isLaunchingWorkspace ? "Launching..." : "Launch in Workspace"}
                 </button>
-                <button className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors">
-                  <span className="material-symbols-outlined !text-[16px]">
-                    notifications
-                  </span>
-                  Notifications
-                </button>
+                <div className="relative group/watch">
+                  <button className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50" disabled={isWatching}>
+                    <span className="material-symbols-outlined !text-[16px]">
+                      {repo.watchLevel ? "visibility" : "visibility_off"}
+                    </span>
+                    {isWatching ? "..." : (repo.watchLevel === "ALL" ? "Watching" : repo.watchLevel === "PARTICIPATING" ? "Participating" : "Watch")}
+                    <span className="material-symbols-outlined !text-[16px] opacity-70">arrow_drop_down</span>
+                  </button>
+                  <div className="absolute right-0 mt-1 w-48 bg-gh-bg-secondary border border-gh-border rounded-md shadow-lg hidden group-hover/watch:block z-50 py-1">
+                    <button onClick={() => handleWatchDrop("ALL")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                      All Activity
+                    </button>
+                    <button onClick={() => handleWatchDrop("PARTICIPATING")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                      Participating
+                    </button>
+                    <button onClick={() => handleWatchDrop("IGNORE")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                      Ignore
+                    </button>
+                  </div>
+                </div>
                 <button
                   onClick={handleFork}
                   disabled={isForking}
@@ -333,13 +434,17 @@ const RepoDetailView = () => {
                     {repo.forks}
                   </span>
                 </button>
-                <button className="px-3 py-1 text-gh-text font-medium hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors">
-                  <span className="material-symbols-outlined !text-[16px]">
+                <button 
+                  onClick={handleToggleStar}
+                  disabled={isStarring}
+                  className={`px-3 py-1 ${repo.isStarred ? 'text-yellow-400' : 'text-gh-text'} font-medium hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50`}
+                >
+                  <span className={`material-symbols-outlined !text-[16px] ${repo.isStarred ? 'fill-current text-yellow-500' : ''}`}>
                     star
                   </span>
-                  Star{" "}
-                  <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs">
-                    {repo.stars}
+                  {isStarring ? "..." : (repo.isStarred ? "Starred" : "Star")}
+                  <span className="bg-gh-bg-tertiary px-1.5 border border-gh-border rounded-full text-xs ml-1 text-gh-text">
+                    {repo.stars || 0}
                   </span>
                 </button>
               </div>
@@ -356,6 +461,10 @@ const RepoDetailView = () => {
               "Wiki",
               "Security",
               "Insights",
+              "Releases",
+              "Tags",
+              "Branches",
+              "Contributors",
               "Settings",
             ].map((tab) => (
               <button
@@ -383,9 +492,17 @@ const RepoDetailView = () => {
                                   ? "menu_book"
                                   : tab === "Security"
                                     ? "security"
-                                    : tab === "Settings"
-                                      ? "settings"
-                                      : "insights"}
+                                      : tab === "Settings"
+                                        ? "settings"
+                                        : tab === "Releases"
+                                          ? "sell"
+                                          : tab === "Tags"
+                                            ? "label"
+                                            : tab === "Branches"
+                                              ? "account_tree"
+                                              : tab === "Contributors"
+                                                ? "groups"
+                                                : "insights"}
                 </span>
                 {tab}
                 {tab === "Issues" && (

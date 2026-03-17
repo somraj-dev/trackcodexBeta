@@ -8,6 +8,8 @@ const IssueDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
   const [reopening, setReopening] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
 
   useEffect(() => {
     fetchIssue();
@@ -67,6 +69,29 @@ const IssueDetail: React.FC = () => {
       alert("Failed to reopen issue");
     } finally {
       setReopening(false);
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!newComment.trim() || postingComment) return;
+    setPostingComment(true);
+    try {
+      const res = await fetch(
+        `/api/v1/repositories/${repoId}/issues/${number}/comments`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body: newComment }),
+        },
+      );
+      if (!res.ok) throw new Error("Failed to post comment");
+      setNewComment("");
+      await fetchIssue();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to post comment");
+    } finally {
+      setPostingComment(false);
     }
   };
 
@@ -253,6 +278,50 @@ const IssueDetail: React.FC = () => {
                     <p className="text-sm text-gh-text">{comment.body}</p>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Post Comment Form */}
+            {issue.status === "OPEN" && (
+              <div className="bg-gh-bg-secondary border border-gh-border rounded-xl flex overflow-hidden">
+                <div className="hidden sm:block p-4 border-r border-gh-border bg-gh-bg">
+                  <div className="size-10 rounded-full bg-gh-bg-tertiary flex items-center justify-center overflow-hidden">
+                    <span className="material-symbols-outlined text-gh-text-secondary">
+                      person
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 p-4 flex flex-col">
+                  <div className="flex items-center gap-2 mb-2">
+                    <button className="text-sm font-medium border-b-2 border-primary text-gh-text pb-1">
+                      Write
+                    </button>
+                    <button className="text-sm font-medium border-b-2 border-transparent text-gh-text-secondary hover:text-gh-text pb-1 transition-colors">
+                      Preview
+                    </button>
+                  </div>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Leave a comment"
+                    className="w-full bg-gh-bg border border-gh-border rounded-md p-3 text-gh-text focus:border-primary outline-none focus:ring-1 focus:ring-primary min-h-[120px] resize-y font-mono text-sm mb-3"
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gh-text-secondary flex items-center gap-1">
+                      <span className="material-symbols-outlined !text-[14px]">
+                        markdown
+                      </span>
+                      Markdown is supported
+                    </p>
+                    <button
+                      onClick={handlePostComment}
+                      disabled={!newComment.trim() || postingComment}
+                      className="px-4 py-1.5 bg-[#238636] border border-[#2ea043] text-white rounded-md font-bold hover:bg-[#2ea043] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    >
+                      {postingComment ? "Commenting..." : "Comment"}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -5,6 +5,7 @@ import { api } from "../../services/infra/api";
 import { githubService } from "../../services/git/github";
 import UniversalFileList from "../common/UniversalFileList";
 import RepoCodeViewer from "./RepoCodeViewer";
+import RepoAboutSidebar from "./RepoAboutSidebar";
 
 import { FileItem } from "../common/UniversalFileList";
 
@@ -418,50 +419,61 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
         </div>
       </div>
 
-      {loading ? (
-        <div className="py-20 flex flex-col items-center justify-center text-gh-text-secondary">
-          <div className="size-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-sm font-bold">Synchronizing File Tree...</p>
-        </div>
-      ) : selectedFile ? (
-        <div className="h-[600px] mb-6">
-          <RepoCodeViewer
-            repoId={repo.id}
-            path={selectedFile.path}
-            initialLine={selectedFile.line}
-            onClose={() => setSelectedFile(null)}
-          />
-        </div>
-      ) : (
-        <UniversalFileList
-          files={files}
-          onFileClick={handleFileClick}
-          latestCommit={{
-            message: "Project files synchronized with GitHub Hardware",
-            author: (repo.owner as any)?.username || (repo.owner as any)?.name || (typeof repo.owner === 'string' ? repo.owner : "trackcodex"),
-            time: "Live",
-            avatar: "https://github.com/github.png",
-          }}
-        />
-      )}
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex-1 min-w-0">
+          {loading ? (
+            <div className="py-20 flex flex-col items-center justify-center text-gh-text-secondary">
+              <div className="size-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-sm font-bold">Synchronizing File Tree...</p>
+            </div>
+          ) : selectedFile ? (
+            <div className="h-[600px] mb-6">
+              <RepoCodeViewer
+                repoId={repo.id}
+                path={selectedFile.path}
+                initialLine={selectedFile.line}
+                onClose={() => setSelectedFile(null)}
+              />
+            </div>
+          ) : (
+            <UniversalFileList
+              files={files}
+              onFileClick={handleFileClick}
+              latestCommit={{
+                message: "Project files synchronized with GitHub Hardware",
+                author: (repo.owner as any)?.username || (repo.owner as any)?.name || (typeof repo.owner === 'string' ? repo.owner : "trackcodex"),
+                time: "Live",
+                avatar: "https://github.com/github.png",
+              }}
+            />
+          )}
 
-      {/* Readme Section */}
-      <div className="mt-6 border border-gh-border rounded-md overflow-hidden bg-gh-bg">
-        <div className="border-b border-gh-border px-4 py-2 flex items-center justify-between sticky top-0 bg-gh-bg z-10">
-          <div className="flex items-center gap-2 text-sm font-bold text-gh-text">
-            <span className="material-symbols-outlined !text-[18px]">list</span>
-            README.md
+          {/* Readme Section */}
+          <div className="mt-6 border border-gh-border rounded-md overflow-hidden bg-gh-bg">
+            <div className="border-b border-gh-border px-4 py-2 flex items-center justify-between sticky top-0 bg-gh-bg z-10">
+              <div className="flex items-center gap-2 text-sm font-bold text-gh-text">
+                <span className="material-symbols-outlined !text-[18px]">list</span>
+                README.md
+              </div>
+            </div>
+            <div className="p-8 prose prose-invert max-w-none text-gh-text">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html:
+                    repo.description ||
+                    "No description provided for this repository.",
+                }}
+              ></div>
+            </div>
           </div>
         </div>
-        <div className="p-8 prose prose-invert max-w-none text-gh-text">
-          <div
-            dangerouslySetInnerHTML={{
-              __html:
-                repo.description ||
-                "No description provided for this repository.",
-            }}
-          ></div>
-        </div>
+
+        {/* Sidebar */}
+        {!selectedFile && (
+          <div className="w-full md:w-[300px] shrink-0">
+            <RepoAboutSidebar repo={repo} />
+          </div>
+        )}
       </div>
 
       {/* New File Modal */}

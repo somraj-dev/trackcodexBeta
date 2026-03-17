@@ -274,3 +274,20 @@ html.anim-fast * {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   background: linear-gradient(to bottom right, var(--gh-bg-secondary), #151515);
 }
+
+/* ===== Data-Driven Dynamic Utilities ===== */
+.dynamic-width {
+  width: var(--dynamic-width, 0%);
+}
+
+.dynamic-height {
+  height: var(--dynamic-height, 0%);
+}
+
+.dynamic-bg {
+  background-color: var(--dynamic-bg, transparent);
+}
+
+.dynamic-gradient {
+  background: var(--dynamic-gradient);
+}

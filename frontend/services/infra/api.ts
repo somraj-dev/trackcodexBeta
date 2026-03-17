@@ -147,6 +147,12 @@ export const api = {
       request<Repository>({ url: `/repositories/by-name/${owner}/${name}` }),
     create: (data: Partial<Repository>) =>
       request<Repository>({ url: "/repositories", method: "POST", data }),
+    star: (id: string) => request<any>({ url: `/repositories/${id}/star`, method: "POST" }),
+    unstar: (id: string) => request<any>({ url: `/repositories/${id}/star`, method: "DELETE" }),
+    pin: (id: string) => request<any>({ url: `/repositories/${id}/pin`, method: "POST" }),
+    unpin: (id: string) => request<any>({ url: `/repositories/${id}/pin`, method: "DELETE" }),
+    watch: (id: string, level: string) => request<any>({ url: `/repositories/${id}/watch`, method: "POST", data: { level } }),
+    unwatch: (id: string) => request<any>({ url: `/repositories/${id}/watch`, method: "DELETE" }),
     sync: () =>
       request<{ message: string; repositories: Repository[] }>({ url: "/repositories/sync", method: "POST" }),
     getCommits: (id: string, ref?: string, path?: string, depth?: number) =>
@@ -157,18 +163,35 @@ export const api = {
     getBranches: (id: string) => request<string[]>({ url: `/repositories/${id}/branches` }),
     getCommitDiff: (id: string, sha: string) => request<{ diff: string }>({ url: `/repositories/${id}/commits/${sha}/diff` }),
     getIssues: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/issues`, params: { status: filter } }),
-    createIssue: (id: string, data: { title: string; body: string }) =>
+    createIssue: (id: string, data: { title: string; body: string; labelIds?: string[]; assigneeIds?: string[]; milestoneId?: string; }) =>
       request<any>({ url: `/repositories/${id}/issues`, method: "POST", data }),
+    getLabels: (id: string) => request<any[]>({ url: `/repositories/${id}/labels` }),
+    getMilestones: (id: string) => request<any[]>({ url: `/repositories/${id}/milestones` }),
+    getAssignees: (id: string) => request<any[]>({ url: `/repositories/${id}/assignees` }),
     getPulls: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/pulls`, params: { status: filter } }),
     createPull: (id: string, data: any) => request<any>({ url: `/repositories/${id}/pulls`, method: "POST", data }),
+    getPullComments: (id: string, number: string | number) => request<any[]>({ url: `/repositories/${id}/pulls/${number}/comments` }),
+    createPullComment: (id: string, number: string | number, data: { body: string }) => request<any>({ url: `/repositories/${id}/pulls/${number}/comments`, method: "POST", data }),
     getContents: (id: string, path: string = "", ref: string = "HEAD") =>
       request<any[]>({ url: `/repositories/${id}/contents`, params: { path, ref } }),
     getContent: (id: string, path: string, ref: string = "HEAD") =>
       request<any>({ url: `/repositories/${id}/content`, params: { path, ref } }),
     createFile: (id: string, data: any) =>
       request<any>({ url: `/repositories/${id}/contents`, method: "POST", data }),
+    getContributors: (id: string) => request<any[]>({ url: `/repositories/${id}/contributors` }),
+    getLanguages: (id: string) => request<any>({ url: `/repositories/${id}/languages` }),
+    getTags: (id: string) => request<string[]>({ url: `/repositories/${id}/tags` }),
+    getReleases: (id: string) => request<any[]>({ url: `/repositories/${id}/releases` }),
+    createRelease: (id: string, data: any) => request<any>({ url: `/repositories/${id}/releases`, method: "POST", data }),
     importRepo: (data: any) =>
       request<Repository>({ url: "/repositories/import", method: "POST", data }),
+    insights: {
+      pulse: (id: string, period: string = "week") => request<any>({ url: `/repositories/${id}/insights/pulse`, params: { period } }),
+      contributors: (id: string) => request<any[]>({ url: `/repositories/${id}/insights/contributors` }),
+      commits: (id: string) => request<any[]>({ url: `/repositories/${id}/insights/commits` }),
+      codeFrequency: (id: string) => request<any[]>({ url: `/repositories/${id}/insights/code-frequency` }),
+      forks: (id: string) => request<any[]>({ url: `/repositories/${id}/insights/forks` }),
+    },
   },
   profile: {
     get: (username: string) => request<ProfileData>({ url: `/profiles/${username}` }),

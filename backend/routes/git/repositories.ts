@@ -8,6 +8,7 @@ import { requireAuth } from "../../middleware/auth";
 import { RepoLevel } from "../../services/auth/iamService";
 import { GovernanceService } from "../../services/git/governanceService";
 import { AuditService } from "../../services/activity/audit";
+import { GitServer } from "../../services/git/gitServer";
 import {
   InternalError,
   Unauthorized,
@@ -591,7 +592,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         if (!repo) throw NotFound("Repository not found");
 
         if (repo.githubId && repo.owner?.username) {
-          const { GitHubService } = await import("../../services/github");
+          const { GitHubService } = await import("../../services/git/github");
           const branches = await GitHubService.getBranches(
             request.user!.userId,
             repo.owner.username,
@@ -607,6 +608,109 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       } catch (e: any) {
         request.log.error(e);
         return ["main", "master"]; // Fallback
+      }
+    }
+  );
+
+  // List Tags
+  fastify.get(
+    "/repositories/:id/tags",
+    { preHandler: requireRepoPermission(RepoLevel.READ) },
+    async (request, reply) => {
+      const { id } = request.params as { id: string };
+
+      try {
+        const repo = await prisma.repository.findUnique({
+          where: { id },
+          include: { owner: true }
+        });
+
+        if (!repo) throw NotFound("Repository not found");
+
+        if (repo.githubId && repo.owner?.username) {
+          const { GitHubService } = await import("../../services/git/github");
+          const tags = await GitHubService.getTags(
+            request.user!.userId,
+            repo.owner.username,
+            repo.name
+          );
+          return tags;
+        }
+
+        const { GitServer } = await import("../../services/git/gitServer");
+        const gitServer = new GitServer();
+        const tags = await gitServer.listTags(id);
+        return tags;
+      } catch (e: any) {
+        request.log.error(e);
+        return [];
+      }
+    }
+  );
+
+  // List Releases
+  fastify.get(
+    "/repositories/:id/releases",
+    { preHandler: requireRepoPermission(RepoLevel.READ) },
+    async (request, reply) => {
+      const { id: repoId } = request.params as { id: string };
+
+      try {
+        const releases = await prisma.release.findMany({
+          where: { repoId },
+          include: {
+            author: { select: { id: true, username: true, avatar: true } }
+          },
+          orderBy: { createdAt: "desc" }
+        });
+        return releases;
+      } catch (e: any) {
+        request.log.error(e);
+        throw InternalError("Failed to fetch releases");
+      }
+    }
+  );
+
+  // Create Release
+  fastify.post(
+    "/repositories/:id/releases",
+    { preHandler: requireRepoPermission(RepoLevel.WRITE) },
+    async (request, reply) => {
+      const { id: repoId } = request.params as { id: string };
+      const { tagName, name, body, draft, prerelease, assets } = request.body as any;
+
+      if (!tagName || !name) {
+        throw BadRequest("Tag name and release name are required");
+      }
+
+      try {
+        const release = await prisma.release.create({
+          data: {
+            tagName,
+            name,
+            body,
+            draft: draft || false,
+            prerelease: prerelease || false,
+            assets: assets || [],
+            repoId,
+            authorId: request.user!.userId,
+          }
+        });
+
+        // Audit Log
+        const { AuditService } = await import("../../services/activity/audit");
+        await AuditService.log({
+          actorId: request.user!.userId,
+          action: "RELEASE_CREATE",
+          resource: `repo:${repoId}:release:${release.id}`,
+          details: { tagName, name },
+          ipAddress: request.ip,
+        });
+
+        return release;
+      } catch (e: any) {
+        request.log.error(e);
+        throw InternalError("Failed to create release");
       }
     }
   );

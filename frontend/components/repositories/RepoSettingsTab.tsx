@@ -3,6 +3,12 @@ import { repoService, FullRepoSettings } from "../../services/git/repoService";
 import ManageAccess from "./ManageAccess";
 import RepoWebhookSettings from "./RepoWebhookSettings";
 import EnvironmentSettings from "./EnvironmentSettings";
+import BranchProtectionSettings from "./BranchProtectionSettings";
+import ActionSettings from "./ActionSettings";
+import CodespaceSettings from "./CodespaceSettings";
+import PagesSettings from "./PagesSettings";
+import SecuritySettings from "./SecuritySettings";
+import SecretSettings from "./SecretSettings";
 
 interface RepoSettingsTabProps {
   repo: any;
@@ -696,10 +702,52 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           </div>
         )}
 
+        {activeSubTab === "Branches" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <BranchProtectionSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Actions" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <ActionSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Codespaces" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <CodespaceSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Pages" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <PagesSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Security" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <SecuritySettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Secrets" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <SecretSettings repoId={repo.id} />
+          </div>
+        )}
+
         {activeSubTab !== "General" &&
           activeSubTab !== "Access" &&
           activeSubTab !== "Webhooks" &&
-          activeSubTab !== "Environments" && (
+          activeSubTab !== "Environments" &&
+          activeSubTab !== "Branches" &&
+          activeSubTab !== "Actions" &&
+          activeSubTab !== "Codespaces" &&
+          activeSubTab !== "Pages" &&
+          activeSubTab !== "Security" &&
+          activeSubTab !== "Secrets" && (
             <div className="flex flex-col items-center justify-center py-40 text-gh-text-secondary opacity-50 h-full animate-in zoom-in-95 duration-700">
               <div className="size-20 rounded-full bg-gh-border/10 flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined !text-[48px]">
