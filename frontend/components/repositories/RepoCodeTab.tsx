@@ -52,8 +52,10 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
           currentBranch,
         );
 
+        const safeData = Array.isArray(data) ? data : [];
+
         // Map internal API to FileItem type
-        const mappedFiles: FileItem[] = data.map((item: any) => ({
+        const mappedFiles: FileItem[] = safeData.map((item: any) => ({
           name: item.name,
           type: item.type === "tree" || item.type === "dir" ? "dir" : "file",
           commitVal: "Updated just now",
@@ -212,8 +214,9 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
                           currentPath,
                           currentBranch,
                         );
+                        const safeData = Array.isArray(data) ? data : [];
                         setFiles(
-                          data.map((item: any) => ({
+                          safeData.map((item: any) => ({
                             name: item.name,
                             type:
                               item.type === "tree" || item.type === "dir"

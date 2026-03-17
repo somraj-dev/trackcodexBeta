@@ -99,7 +99,11 @@ async function processOutboxEvents() {
             // Mark as error so we can debug it later, but don't stop processing other events
             await prisma.outboxEvent.update({
                 where: { id: event.id },
-                data: { error: err.message || 'Unknown error during Kafka publish' }
+                data: { 
+                    error: err.message || 'Unknown error during ES publish',
+                    // Set processed to true so we don't infinitely block the queue on one poisoned event
+                    processed: true 
+                }
             });
         }
     }

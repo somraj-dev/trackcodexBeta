@@ -37,7 +37,7 @@ const DesktopBridge = () => {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
+      <div className="flex-1 w-full bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
         <TrackCodexLogo size="lg" collapsed={false} clickable={false} />
         <p className="mt-8 text-[#8b949e]">Checking secure session...</p>
       </div>
@@ -46,7 +46,7 @@ const DesktopBridge = () => {
 
   if (status === "error") {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
+      <div className="flex-1 w-full bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
         <TrackCodexLogo size="lg" collapsed={false} clickable={false} />
         <div className="mt-12 flex flex-col items-center">
           <span className="text-red-500 text-4xl mb-4">⚠</span>
@@ -64,7 +64,7 @@ const DesktopBridge = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
+    <div className="flex-1 w-full bg-[#0d1117] flex flex-col justify-center items-center font-sans tracking-tight">
       <div className="relative flex flex-col items-center">
         {/* Glowing logo effect */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#2f81f7] opacity-20 blur-3xl rounded-full mix-blend-screen animate-pulse duration-[3000ms]"></div>

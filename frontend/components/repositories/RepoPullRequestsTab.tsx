@@ -21,7 +21,7 @@ const RepoPullRequestsTab: React.FC<RepoPullRequestsTabProps> = ({ repo }) => {
     setLoading(true);
     try {
       const data = await api.repositories.getPulls(repo.id, filter);
-      setPrs(data);
+      setPrs(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch PRs", err);
     } finally {

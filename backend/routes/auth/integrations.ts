@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { encrypt, decrypt } from "../../services/auth/encryption";
 import { requireAuth } from "../../middleware/auth";
+import { OAuthService } from "../../services/auth/oauth";
 
 export default async function integrationRoutes(fastify: FastifyInstance) {
     // Save or update an OAuth provider token for the current user
@@ -167,6 +168,177 @@ export default async function integrationRoutes(fastify: FastifyInstance) {
             } catch (error: any) {
                 console.error(`[Integrations] Failed to disconnect ${provider}:`, error);
                 return reply.status(500).send({ error: "Failed to disconnect" });
+            }
+        }
+    );
+
+    // Trigger full sync for GitHub
+    fastify.get(
+        "/integrations/sync/github",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+
+            // Trigger sync in the background
+            import("../../services/git/github").then(({ GitHubService }) => {
+                GitHubService.syncAllData(userId).catch(err => {
+                    console.error(`[Integrations] Background GitHub sync failed for user ${userId}:`, err);
+                });
+            });
+
+            return reply.send({
+                success: true,
+                message: "GitHub integration sync started in background",
+            });
+        }
+    );
+
+    // Trigger full sync for GitLab
+    fastify.get(
+        "/integrations/sync/gitlab",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+
+            // Trigger sync in the background
+            import("../../services/git/gitlab").then(({ GitLabService }) => {
+                GitLabService.syncAllData(userId).catch(err => {
+                    console.error(`[Integrations] Background GitLab sync failed for user ${userId}:`, err);
+                });
+            });
+
+            return reply.send({
+                success: true,
+                message: "GitLab integration sync started in background",
+            });
+        }
+    );
+
+    // Exchange GitHub code for access token and connect
+    fastify.post(
+        "/integrations/github/callback",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            console.log("📥 [Integrations] GitHub Callback triggered", { body: request.body });
+            const userId = request.user.userId;
+            const { code } = request.body as { code: string };
+
+            if (!code) {
+                return reply.status(400).send({ error: "Code is required" });
+            }
+
+            try {
+                // 1. Exchange code for access token (Using the NEW integration credentials)
+                const tokenData = await OAuthService.exchangeIntegrationGithubCode(code);
+                const accessToken = tokenData.access_token;
+
+                if (!accessToken) {
+                    throw new Error("No access token received from GitHub");
+                }
+
+                // 2. Fetch GitHub user info to get stable ID and username
+                const githubUser = await OAuthService.getGithubUserInfo(accessToken);
+                const providerGitHubId = githubUser.id;
+                const providerUsername = githubUser.username;
+
+                // 3. Encrypt and save token
+                const encryptedToken = encrypt(accessToken);
+
+                await prisma.oAuthAccount.upsert({
+                    where: {
+                        provider_providerAccountId: {
+                            provider: "github",
+                            providerAccountId: providerGitHubId,
+                        },
+                    },
+                    update: {
+                        accessToken: encryptedToken,
+                        scope: "repo,read:user,read:org",
+                        userId, // Ensure it's linked to current user
+                    },
+                    create: {
+                        provider: "github",
+                        providerAccountId: providerGitHubId,
+                        accessToken: encryptedToken,
+                        tokenType: "bearer",
+                        scope: "repo,read:user,read:org",
+                        userId,
+                    },
+                });
+
+                return reply.send({
+                    success: true,
+                    provider: "github",
+                    username: providerUsername,
+                    accessToken: accessToken // Return to frontend for immediate use/sync if needed
+                });
+            } catch (error: any) {
+                console.error("[Integrations] GitHub callback failed:", error);
+                return reply.status(500).send({ error: error.message || "Failed to exchange GitHub code" });
+            }
+        }
+    );
+
+    // Exchange GitLab code for access token and connect
+    fastify.post(
+        "/integrations/gitlab/callback",
+        { preHandler: requireAuth },
+        async (request: any, reply) => {
+            const userId = request.user.userId;
+            const { code } = request.body as { code: string };
+
+            if (!code) {
+                return reply.status(400).send({ error: "Code is required" });
+            }
+
+            try {
+                // 1. Exchange code for access token
+                const tokenData = await OAuthService.exchangeGitlabCode(code);
+                const accessToken = tokenData.access_token;
+
+                if (!accessToken) {
+                    throw new Error("No access token received from GitLab");
+                }
+
+                // 2. Fetch GitLab user info
+                const gitlabUser = await OAuthService.getGitlabUserInfo(accessToken);
+                const providerGitLabId = gitlabUser.id;
+                const providerUsername = gitlabUser.username;
+
+                // 3. Encrypt and save token
+                const encryptedToken = encrypt(accessToken);
+
+                await prisma.oAuthAccount.upsert({
+                    where: {
+                        provider_providerAccountId: {
+                            provider: "gitlab",
+                            providerAccountId: providerGitLabId,
+                        },
+                    },
+                    update: {
+                        accessToken: encryptedToken,
+                        scope: "api read_user read_repository",
+                        userId,
+                    },
+                    create: {
+                        provider: "gitlab",
+                        providerAccountId: providerGitLabId,
+                        accessToken: encryptedToken,
+                        tokenType: "bearer",
+                        scope: "api read_user read_repository",
+                        userId,
+                    },
+                });
+
+                return reply.send({
+                    success: true,
+                    provider: "gitlab",
+                    username: providerUsername,
+                    accessToken: accessToken,
+                });
+            } catch (error: any) {
+                console.error("[Integrations] GitLab callback failed:", error);
+                return reply.status(500).send({ error: error.message || "Failed to exchange GitLab code" });
             }
         }
     );

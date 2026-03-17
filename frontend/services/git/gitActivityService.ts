@@ -1,4 +1,5 @@
 // services/git/gitActivityService.ts
+import { apiInstance } from "../infra/api";
 
 export interface Activity {
   date: string;
@@ -56,9 +57,8 @@ class GitActivityService {
     }
 
     try {
-      const res = await fetch(`/api/users/${userId}/contributions`);
-      if (!res.ok) throw new Error("Failed to fetch contributions");
-      const data = await res.json();
+      const response = await apiInstance.get(`/stats/contributions/${userId}`);
+      const data = response.data;
       const activities: Activity[] = data.contributions ?? this.buildEmptyYear();
       const total: number = data.total ?? 0;
       this.cache.set(key, { activities, total, fetchedAt: Date.now() });

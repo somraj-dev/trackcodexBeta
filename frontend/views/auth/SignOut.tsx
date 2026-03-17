@@ -21,7 +21,7 @@ const SignOut: React.FC = () => {
     const displayAvatar = user?.avatar || profile.avatar;
 
     return (
-        <div className="min-h-screen bg-[#0A0D14] flex flex-col items-center justify-center font-display text-white selection:bg-[#1f6feb] selection:text-white">
+        <div className="flex-1 w-full bg-[#0A0D14] flex flex-col items-center justify-center font-display text-white selection:bg-[#1f6feb] selection:text-white">
             {/* Main Container */}
             <div className="w-full max-w-[340px] flex flex-col gap-4 z-10">
 
@@ -67,17 +67,6 @@ const SignOut: React.FC = () => {
 
             </div>
 
-            {/* Subtle Footer (Fixed to bottom, typical for auth flow pages) */}
-            <div className="fixed bottom-0 w-full py-6 flex justify-center bg-[#0A0D14]">
-                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[12px] text-[#8b949e]">
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Terms</a>
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Privacy</a>
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Docs</a>
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Contact TrackCodex Support</a>
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Manage cookies</a>
-                    <a href="#" className="hover:text-[#58a6ff] hover:underline">Do not share my personal information</a>
-                </div>
-            </div>
 
         </div>
     );

@@ -8,6 +8,7 @@ import MessagingPanel from "../messaging/MessagingPanel";
 import CommandPalette from "./CommandPalette";
 import ChatWidget from "../social/ChatWidget";
 import UserProfileDropdown from "../profile/UserProfileDropdown";
+import ResumePreviewModal from "../profile/ResumePreviewModal";
 import TrackCodexLogo from "../branding/TrackCodexLogo";
 
 // Contexts & Services
@@ -41,6 +42,7 @@ const MainLayout: React.FC = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const lastScrollTopRef = useRef(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -53,6 +55,12 @@ const MainLayout: React.FC = () => {
 
   useEffect(() => {
     return profileService.subscribe(setProfile);
+  }, []);
+
+  useEffect(() => {
+    const handleOpenResume = () => setIsResumeModalOpen(true);
+    window.addEventListener("open-resume-modal", handleOpenResume);
+    return () => window.removeEventListener("open-resume-modal", handleOpenResume);
   }, []);
 
   // Use simple boolean for focus mode for now
@@ -257,6 +265,11 @@ const MainLayout: React.FC = () => {
       {!isFocusMode && <MessagingPanel />}
       <ChatWidget />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
+      <ResumePreviewModal 
+        isOpen={isResumeModalOpen} 
+        onClose={() => setIsResumeModalOpen(false)} 
+        profile={profile} 
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { syncUserWithPostgres } from "../../services/auth/sync";
 import { NotificationService } from "../../services/infra/notification";
-import { firebaseAdmin } from "../../services/infra/firebase";
+import { firebaseAdmin, isFirebaseConfigured } from "../../services/infra/firebase";
 import { env } from "../../config/env";
 import { emailService } from "../../services/infra/emailService";
 import { prisma } from "../../services/infra/prisma";
@@ -76,22 +76,30 @@ export async function authRoutes(fastify: FastifyInstance) {
           throw BadRequest("Password must be at least 8 characters");
         }
 
-        // 2. Register user with Firebase
-        let firebaseUser;
-        try {
-          firebaseUser = await firebaseAdmin.auth().createUser({
-            email,
-            password,
-            displayName: name,
-          });
-        } catch (fbErr: any) {
-          if (fbErr.code === "auth/email-already-exists") {
-            throw Conflict("Email already registered");
+        // 2. Register user with Firebase (Optional & Resilient)
+        let firebaseUid: string | undefined;
+
+        if (isFirebaseConfigured) {
+          try {
+            const firebaseUser = await firebaseAdmin.auth().createUser({
+              email,
+              password,
+              displayName: name,
+            });
+            firebaseUid = firebaseUser.uid;
+            console.log(`✅ [AUTH] Firebase user created: ${firebaseUid}`);
+          } catch (fbErr: any) {
+            // Log as warning, don't throw unless it's a specific user-error like email taken
+            if (fbErr.code === "auth/email-already-exists") {
+              throw Conflict("Email already registered");
+            }
+            console.warn("⚠️ [AUTH] Firebase registration failed (falling back to local):", fbErr.message);
           }
-          throw BadRequest(fbErr.message || "Failed to create user");
+        } else {
+          console.log("ℹ️ [AUTH] Firebase not configured, skipping cloud sync.");
         }
 
-        const firebaseUid = firebaseUser.uid;
+        const userId = firebaseUid || crypto.randomUUID();
 
         // 3. Create user in our database (with Saga Pattern)
         const hashedPassword = await bcrypt.hash(password, 12);
@@ -101,7 +109,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           const result = await prisma.$transaction([
             prisma.user.create({
               data: {
-                id: firebaseUid,
+                id: userId,
                 email,
                 username,
                 name: name || username,
@@ -129,7 +137,7 @@ export async function authRoutes(fastify: FastifyInstance) {
               data: {
                 topic: "user",
                 payload: {
-                  id: firebaseUid,
+                  id: userId,
                   email,
                   username,
                   name: name || username,
@@ -143,20 +151,49 @@ export async function authRoutes(fastify: FastifyInstance) {
           newUser = result[0];
         } catch (dbError: any) {
           // Compensating Transaction (Saga): Rollback Firebase user if DB insert fails
-          console.error("Database registration failed (Prisma Transaction), rolling back Firebase user:", dbError);
-          await firebaseAdmin.auth().deleteUser(firebaseUid).catch(console.error);
+          console.error("Database registration failed (Prisma Transaction), rolling back if needed:", dbError);
+          if (userId && isFirebaseConfigured) {
+            await firebaseAdmin.auth().deleteUser(userId).catch(console.error);
+          }
           throw BadRequest("Database error during user creation. Please try again or choose a different username.");
         }
 
-        // 3.5 Send verification email via Resend
+        // 3.5 Send verification email via Resend (Primary/Fallback)
         try {
-          const verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
-          await emailService.sendVerificationEmail(email, verificationLink);
+          let verificationLink = "";
+          const token = crypto.randomBytes(32).toString("hex");
+          
+          // Try to get link from Firebase if available
+          if (isFirebaseConfigured && firebaseUid) {
+            try {
+              verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
+            } catch (fbLinkErr) {
+              console.warn("⚠️ [AUTH] Failed to get Firebase verification link, using local fallback");
+            }
+          }
+
+          // Fallback to local verification link if Firebase failed or wasn't configured
+          if (!verificationLink) {
+            // Update the verification record we created earlier in transaction
+            await prisma.userVerification.update({
+              where: { userId },
+              data: {
+                otpCode: token,
+                otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24h
+              }
+            });
+            const frontendUrl = process.env.FRONTEND_URL || "https://trackcodex.com";
+            verificationLink = `${frontendUrl}/verify-email?token=${token}&userId=${userId}`;
+          }
+
+          // ALWAYS send via Resend if configured
+          const sent = await emailService.sendVerificationEmail(email, verificationLink);
+          if (!sent) {
+            console.warn("⚠️ [AUTH] Resend failed to send verification email");
+          }
         } catch (emailErr: any) {
-          console.error("Failed to send verification email (but user was created):", emailErr);
-          // Don't throw a full error, allow creation to proceed and return a specific message
-          request.log.error({ msg: "Email Verification Dispatch Failed", detail: emailErr.message });
-          // We will inject a warning into the success response later
+          console.error("❌ [AUTH] CRITICAL: Verification email dispatch failed:", emailErr.message);
+          // We don't throw here to avoid blocking a successful DB registration
         }
 
         // 4. Create Session
@@ -164,7 +201,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         const { csrfToken } = await createSession(
           sessionId,
           {
-            userId: firebaseUid,
+            userId: userId,
             email: email,
             username: username,
             name: name || username,
@@ -202,7 +239,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           message: "Registration successful",
           csrfToken,
           user: {
-            id: firebaseUid,
+            id: userId,
             email,
             username,
             name: name || username,
@@ -727,17 +764,43 @@ export async function authRoutes(fastify: FastifyInstance) {
       config: { rateLimit: rateLimitConfig.verifyEmail },
     },
     async (request: any) => {
-      const user = request.user;
+      const user = (request as any).user;
+      const email = user.email;
+      const userId = user.userId;
 
       try {
-        // Generate email verification link via Firebase Admin
-        const verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(user.email);
+        let verificationLink = "";
+        const token = crypto.randomBytes(32).toString("hex");
+
+        if (isFirebaseConfigured) {
+          try {
+            verificationLink = await firebaseAdmin.auth().generateEmailVerificationLink(email);
+          } catch (fbErr) {
+            console.warn("⚠️ [AUTH] Failed to generate Firebase verification link, using local fallback");
+          }
+        }
+
+        if (!verificationLink) {
+          await prisma.userVerification.upsert({
+            where: { userId },
+            create: {
+              userId,
+              otpCode: token,
+              otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            },
+            update: {
+              otpCode: token,
+              otpExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+            }
+          });
+          const frontendUrl = process.env.FRONTEND_URL || "https://trackcodex.com";
+          verificationLink = `${frontendUrl}/verify-email?token=${token}&userId=${userId}`;
+        }
 
         // Send verification email via Resend
-        await emailService.sendVerificationEmail(user.email, verificationLink);
+        await emailService.sendVerificationEmail(email, verificationLink);
 
-        request.log.info(`Verification email sent to ${user.email} via Resend`);
-
+        request.log.info(`Verification email sent to ${email} via Resend`);
         return { message: "Verification email sent" };
       } catch (error: any) {
         request.log.error(error);
@@ -747,24 +810,49 @@ export async function authRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post("/auth/verify-email/confirm", async (request, reply) => {
-    const { token, email } = request.body as { token: string; email: string };
+    const { token, userId } = request.body as { token: string; userId: string };
 
-    if (!token || !email) {
-      throw BadRequest("Token and email required");
+    if (!token || !userId) {
+      throw BadRequest("Token and userId required");
     }
 
     try {
       // With Firebase, email verification is handled by Firebase's email link.
-      // This endpoint can be used to manually mark a user as verified.
-      const user = await prisma.user.findFirst({
-        where: { email },
+      // This endpoint supports BOTH Firebase-verified users (manually) AND local tokens.
+      
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { verification: true }
       });
 
       if (!user) {
         throw BadRequest("User not found");
       }
 
-      // Mark verified in our database
+      // Check for local token if provided
+      if (token && token.length > 32) { // Local tokens are longer hex strings in this impl
+        const verification = user.verification;
+        if (!verification || verification.otpCode !== token) {
+           throw BadRequest("Invalid or expired verification token");
+        }
+        
+        if (verification.otpExpiresAt && verification.otpExpiresAt < new Date()) {
+           throw BadRequest("Verification token has expired");
+        }
+
+        // Token matches! Clear it.
+        await prisma.userVerification.update({
+          where: { userId: user.id },
+          data: {
+            otpCode: null,
+            otpExpiresAt: null,
+            emailVerified: true,
+            emailVerifiedAt: new Date()
+          }
+        });
+      }
+
+      // Mark verified in core user table
       await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -792,12 +880,20 @@ export async function authRoutes(fastify: FastifyInstance) {
       if (!email) throw BadRequest("Email required");
 
       try {
-        // Use Firebase Admin to generate password reset link with redirection to our frontend
-        const actionCodeSettings = {
-          url: `${env.FRONTEND_URL}/reset-password`,
-          handleCodeInApp: true,
-        };
-        const resetLink = await firebaseAdmin.auth().generatePasswordResetLink(email, actionCodeSettings);
+        let resetLink: string | undefined;
+        
+        if (isFirebaseConfigured) {
+          // Use Firebase Admin to generate password reset link
+          const actionCodeSettings = {
+            url: `${env.FRONTEND_URL}/reset-password`,
+            handleCodeInApp: true,
+          };
+          resetLink = await firebaseAdmin.auth().generatePasswordResetLink(email, actionCodeSettings);
+        } else {
+          // Fallback: Local reset link (if implemented) or just log
+          console.warn("⚠️ [AUTH] Firebase not configured, skipping Firebase password reset link generation.");
+          resetLink = `${env.FRONTEND_URL}/reset-password?email=${encodeURIComponent(email)}&mock=true`;
+        }
 
         // Fetch user from DB to get username
         const user = await prisma.user.findUnique({
@@ -844,7 +940,9 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
 
       // Update password in Firebase
-      await firebaseAdmin.auth().updateUser(user.id, { password });
+      if (isFirebaseConfigured) {
+        await firebaseAdmin.auth().updateUser(user.id, { password });
+      }
 
       // Update password hash in Prisma
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -1250,7 +1348,10 @@ export async function authRoutes(fastify: FastifyInstance) {
         const uid = user.userId;
 
         // Generate a Firebase Custom Token
-        const customToken = await firebaseAdmin.auth().createCustomToken(uid);
+        let customToken = "dummy-local-token";
+        if (isFirebaseConfigured) {
+          customToken = await firebaseAdmin.auth().createCustomToken(uid);
+        }
 
         // Redirect the user back to the Desktop App via the custom protocol
         const deepLinkUrl = `trackcodex://auth?token=${customToken}`;

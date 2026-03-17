@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserProfile } from "../../services/activity/profile";
+import { apiInstance } from "../../services/infra/api";
 
 interface ActivityEvent {
   id: string;
@@ -58,11 +59,14 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
     const fetchActivity = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/users/${profile.id}/activity?limit=6`);
-        if (res.ok) {
-          const data = await res.json();
-          setEvents(Array.isArray(data) ? data : []);
-        }
+        const response = await apiInstance.get(`/users/${profile.id}/activity`, {
+          params: { limit: 6 }
+        });
+        const data = response.data;
+        // The backend returns { activities: [], total } or just [] depending on which route is hit
+        // Let's be safe and check for both
+        const eventsList = Array.isArray(data) ? data : (data.activities || []);
+        setEvents(eventsList);
       } catch (err) {
         console.warn("Could not load activity feed", err);
       } finally {

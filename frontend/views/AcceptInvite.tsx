@@ -46,7 +46,7 @@ const AcceptInvite: React.FC = () => {
   }, [token, navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gh-bg text-gh-text p-4">
+    <div className="flex-1 w-full flex flex-col items-center justify-center bg-gh-bg text-gh-text p-4">
       <div className="w-full max-w-md bg-gh-bg-secondary border border-gh-border rounded-xl p-8 text-center shadow-xl">
         {status === "loading" && (
           <div className="flex flex-col items-center">

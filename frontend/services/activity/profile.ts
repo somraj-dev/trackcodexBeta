@@ -400,12 +400,17 @@ export const profileService = {
 
       // 4. Generate a fallback profile for any ID to prevent "Not Found" screens
       // This ensures a premium experience even if data is missing
+      const fallbackName = idOrUsername
+        .split(/[-_]/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
       return {
         ...DEFAULT_PROFILE,
         id: idOrUsername,
-        name: idOrUsername.split("-")[0] || idOrUsername,
+        name: fallbackName || idOrUsername,
         username: query,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(idOrUsername)}&background=random&size=128`,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName || idOrUsername)}&background=random&size=128`,
         bio: "A talented developer in the TrackCodex community.",
         location: "Planet Earth",
       };

@@ -72,7 +72,16 @@ export default async function (server: FastifyInstance) {
       req: FastifyRequest<{ Params: { userId: string } }>,
       reply: FastifyReply,
     ) => {
-      const { userId } = req.params;
+      let { userId } = req.params;
+
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+      if (!isUuid) {
+        const user = await prisma.user.findFirst({
+          where: { username: { equals: userId, mode: "insensitive" } },
+          select: { id: true }
+        });
+        if (user) userId = user.id;
+      }
 
       try {
         const result = await PortfolioService.getUserPortfolioItems(userId);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DeleteAccountModal } from "../../components/settings/DeleteAccountModal";
+import { apiInstance } from "../../services/infra/api";
 
 const AccountSettings = () => {
   const [isExporting, setIsExporting] = useState(false);
@@ -21,13 +22,11 @@ const AccountSettings = () => {
     );
 
     try {
-      const response = await fetch("/api/v1/users/me/export", {
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const response = await apiInstance.get("/users/me/export", {
+        responseType: 'blob'
       });
-      if (!response.ok) throw new Error("Export failed");
-
-      const blob = await response.blob();
+      
+      const blob = response.data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

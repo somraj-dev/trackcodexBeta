@@ -142,9 +142,9 @@ const IssueDetail: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gh-bg">
+    <div className="flex-1 w-full flex flex-col bg-gh-bg">
       {/* Header */}
-      <div className="border-b border-gh-border bg-gh-bg-secondary">
+      <div className="border-b border-gh-border bg-gh-bg-secondary w-full">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <button
             onClick={() => navigate(`/repo/${repoId}`)}

@@ -51,7 +51,7 @@ const Onboarding = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="flex-1 w-full bg-[#0d1117] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-8">
                 <div className="mx-auto h-12 w-12 bg-white rounded-full flex items-center justify-center filter drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] mb-6">
                     <svg className="w-8 h-8 text-[#0d1117]" fill="currentColor" viewBox="0 0 24 24">

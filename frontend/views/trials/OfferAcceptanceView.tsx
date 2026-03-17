@@ -58,7 +58,7 @@ const OfferAcceptanceView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0D14] text-slate-300 font-display p-8">
+        <div className="flex-1 w-full bg-[#0A0D14] text-slate-300 font-display p-8">
             <div className="max-w-7xl mx-auto">
                 <header className="flex items-start justify-between mb-8">
                     <div>

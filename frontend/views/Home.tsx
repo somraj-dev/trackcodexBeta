@@ -145,23 +145,38 @@ const HomeView = () => {
 
         {/* Quick Actions Row */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2">
+          <button 
+            onClick={() => navigate("/taskvault")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
             <span className="material-symbols-outlined !text-[18px]">task_alt</span>
             Task
           </button>
-          <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2">
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
             <span className="material-symbols-outlined !text-[18px]">adjust</span>
             Create issue
           </button>
-          <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2">
+          <button 
+            onClick={() => navigate("/editor")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
             <span className="material-symbols-outlined !text-[18px]">code</span>
             Write code
           </button>
-          <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2">
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
             <span className="material-symbols-outlined !text-[18px]">call_split</span>
             Git
           </button>
-          <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2">
+          <button 
+            onClick={() => navigate("/repositories")}
+            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+          >
             <span className="material-symbols-outlined !text-[18px]">merge_type</span>
             Pull requests
           </button>

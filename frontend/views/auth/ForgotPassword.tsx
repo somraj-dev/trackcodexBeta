@@ -47,7 +47,7 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d1117] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+        <div className="flex-1 bg-[#0d1117] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
             <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
                 {/* TrackCodex Logo imitating the GitHub icon placement */}
                 <div className="mx-auto h-12 w-12 bg-white rounded-full flex items-center justify-center filter drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] mb-6">
@@ -183,16 +183,6 @@ const ForgotPassword = () => {
                 </form>
             </div>
 
-            <footer className="mt-16 py-8 pb-16 text-center">
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px] text-[#8b949e] px-4 max-w-3xl mx-auto">
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Terms</a>
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Privacy</a>
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Docs</a>
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Contact GitHub Support</a>
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Manage cookies</a>
-                    <a href="#" className="hover:text-[#2f81f7] hover:underline transition-colors">Do not share my personal information</a>
-                </div>
-            </footer>
         </div>
     );
 };

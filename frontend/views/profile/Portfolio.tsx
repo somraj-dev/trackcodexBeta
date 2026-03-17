@@ -36,11 +36,20 @@ const Portfolio = () => {
     ]);
 
     return (
-        <div className="min-h-screen bg-gh-bg text-gh-text p-8">
+        <div className="flex-1 w-full bg-gh-bg text-gh-text p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-12">
-                    <h1 className="text-5xl font-bold mb-6">Portfolio</h1>
+                <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <h1 className="text-5xl font-bold">Portfolio</h1>
+                    <button 
+                        onClick={() => window.dispatchEvent(new CustomEvent("open-resume-modal"))}
+                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(139,92,246,0.3)] w-fit"
+                    >
+                        <span className="material-symbols-outlined !text-[20px]">description</span>
+                        Download Resume
+                    </button>
+                </div>
 
                     <div className="flex items-start gap-8">
                         <div className="flex-1">

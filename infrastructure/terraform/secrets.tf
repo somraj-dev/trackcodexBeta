@@ -9,6 +9,18 @@ resource "aws_secretsmanager_secret_version" "backend_secrets_version" {
     JWT_SECRET     = "super-secret-key-change-this-in-production"
     ENCRYPTION_KEY = "e0f54592-d6c4-4b47-8178-5e5898394236"
     COOKIE_SECRET  = "cookie-secret-change-this-min-32-chars"
+    
+    # GitHub Auth (Old)
+    GITHUB_CLIENT_ID     = "Ov23licToDxyo4YGzpOj"
+    GITHUB_CLIENT_SECRET = "5a277a02609fffc44463d04c549bfd0bd8920834"
+
+    # GitHub Integration (New)
+    INTEGRATION_GITHUB_CLIENT_ID     = "Ov23liO3PrmxXbPvp4rJ"
+    INTEGRATION_GITHUB_CLIENT_SECRET = "d080f9b2a162a8008de984c08db55fe8da4c1ed6"
+
+    # GitLab Integration
+    GITLAB_CLIENT_ID     = "your-gitlab-client-id"
+    GITLAB_CLIENT_SECRET = "your-gitlab-client-secret"
   })
 }
 

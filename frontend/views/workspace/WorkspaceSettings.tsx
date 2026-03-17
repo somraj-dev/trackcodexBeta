@@ -106,7 +106,7 @@ const WorkspaceSettings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gh-bg">
+      <div className="flex-1 w-full flex items-center justify-center bg-gh-bg">
         <Spinner size="lg" />
       </div>
     );
@@ -114,7 +114,7 @@ const WorkspaceSettings: React.FC = () => {
 
   if (!workspace) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gh-bg text-gh-text-secondary">
+      <div className="flex-1 w-full flex flex-col items-center justify-center bg-gh-bg text-gh-text-secondary">
         <p>Workspace not found</p>
         <button
           onClick={() => navigate("/")}
@@ -131,7 +131,7 @@ const WorkspaceSettings: React.FC = () => {
   const isOwner = currentUserRole === "OWNER";
 
   return (
-    <div className="min-h-screen bg-gh-bg text-gh-text flex flex-col">
+    <div className="flex-1 w-full bg-gh-bg text-gh-text flex flex-col">
       {/* Header */}
       <div className="border-b border-gh-border bg-gh-bg-secondary px-8 py-4 flex items-center gap-4">
         <button

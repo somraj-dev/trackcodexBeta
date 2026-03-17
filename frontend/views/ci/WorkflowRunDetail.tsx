@@ -170,7 +170,7 @@ const WorkflowRunDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gh-bg">
+    <div className="flex-1 w-full flex flex-col bg-gh-bg">
       {/* Header */}
       <div className="border-b border-gh-border bg-gh-bg-secondary">
         <div className="max-w-full px-6 py-4">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiInstance } from "../../services/infra/api";
 import "../styles/GlobalSearchModal.css";
 
 interface SearchResult {
@@ -10,6 +11,13 @@ interface SearchResult {
   icon: string;
   group: string;
   url: string;
+  metadata?: {
+    avatar?: string;
+    bio?: string;
+    location?: string;
+    followersCount?: number;
+    username?: string;
+  };
 }
 
 interface RecentRepo {
@@ -59,10 +67,9 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const loadRecentRepos = async () => {
     try {
-      const res = await fetch("/api/v1/search/recent", { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setRecentRepos(data.recent || []);
+      const response = await apiInstance.get("/search/recent");
+      if (response.data) {
+        setRecentRepos(response.data.recent || []);
       }
     } catch (error) {
       console.error("Error loading recent repos:", error);
@@ -76,37 +83,54 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       return;
     }
 
+    // Show shortcuts immediately (no waiting for backend)
+    setLoading(true);
+    let cancelled = false;
+
     const timer = setTimeout(async () => {
-      setLoading(true);
+      if (cancelled) return;
+
+      // Abort fetch after 3s if backend is unreachable
+      const controller = new AbortController();
+      const fetchTimeout = setTimeout(() => controller.abort(), 3000);
+
       try {
-        // 1. Filter local static pages based on search text
+        // 1. Filter local static pages
         const lowerQuery = query.toLowerCase();
         const staticMatches = STATIC_PAGES.filter(p =>
           p.label.toLowerCase().includes(lowerQuery) ||
           (p.subLabel && p.subLabel.toLowerCase().includes(lowerQuery))
         );
 
-        // 2. Fetch remote ElasticSearch matches (dynamic users, repos, jobs)
+        // 2. Fetch remote matches (with timeout)
         let dynamicMatches: SearchResult[] = [];
-        const res = await fetch(
-          `/api/v1/search?q=${encodeURIComponent(query)}`,
-          { credentials: 'include' },
-        );
-        if (res.ok) {
-          const data = await res.json();
-          dynamicMatches = data.results || [];
+        try {
+          const response = await apiInstance.get("/search", {
+            params: { q: query },
+            signal: controller.signal,
+          });
+          if (response.data) {
+            dynamicMatches = response.data.results || [];
+          }
+        } catch {
+          // Backend unreachable - shortcuts still show, just no dynamic results
         }
 
-        // 3. Combine both lists (Static first, then dynamic)
-        setResults([...staticMatches, ...dynamicMatches]);
+        if (!cancelled) {
+          setResults([...staticMatches, ...dynamicMatches]);
+        }
       } catch (error) {
         console.error("Search error:", error);
       } finally {
-        setLoading(false);
+        clearTimeout(fetchTimeout);
+        if (!cancelled) setLoading(false);
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query]);
 
   const jumpTo = useCallback((url: string) => {
@@ -129,6 +153,9 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
     if (items[selectedIndex]) {
       jumpTo(items[selectedIndex].url);
+    } else if (query.trim()) {
+      // Fallback: navigate to full search results
+      jumpTo(`/search?q=${encodeURIComponent(query.trim())}&type=users`);
     }
   }, [query, results, recentRepos, selectedIndex, jumpTo]);
 
@@ -162,15 +189,10 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
   const submitFeedback = async (message: string) => {
     try {
-      await fetch("/api/v1/search/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify({
-          message,
-          category: "search",
-          url: window.location.href,
-        }),
+      await apiInstance.post("/search/feedback", {
+        message,
+        category: "search",
+        url: window.location.href,
       });
       setShowFeedback(false);
       alert("Thank you for your feedback!");
@@ -209,9 +231,38 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
         <div className="search-body">
           {query.trim() ? (
-            // Search results
-            Object.keys(groupedResults).length > 0 ? (
-              Object.entries(groupedResults).map(([group, items]) => (
+            <>
+              {/* Always-visible shortcuts */}
+              <div className="search-section">
+                <div className="search-section-header">Search</div>
+                <div
+                  className="search-result-item"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => jumpTo(`/search?q=${encodeURIComponent(query.trim())}&type=users`)}
+                >
+                  <span className="material-icons result-icon">person_search</span>
+                  <div className="result-content">
+                    <div className="result-label">Search users for "{query}"</div>
+                    <div className="result-sublabel">Find people by name or username</div>
+                  </div>
+                  <button className="jump-to-btn">View all →</button>
+                </div>
+                <div
+                  className="search-result-item"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => jumpTo(`/search?q=${encodeURIComponent(query.trim())}&type=repositories`)}
+                >
+                  <span className="material-icons result-icon">search</span>
+                  <div className="result-content">
+                    <div className="result-label">Search all of TrackCodex for "{query}"</div>
+                    <div className="result-sublabel">Repos, code, users, and more</div>
+                  </div>
+                  <button className="jump-to-btn">Go →</button>
+                </div>
+              </div>
+              {/* Dynamic API results */}
+              {Object.keys(groupedResults).length > 0 ? (
+            Object.entries(groupedResults).map(([group, items]) => (
                 <div key={group} className="search-section">
                   <div className="search-section-header">{group}</div>
                   {items.map((result, idx) => (
@@ -221,9 +272,33 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       onClick={() => jumpTo(result.url)}
                       onMouseEnter={() => setSelectedIndex(idx)}
                     >
-                      <span className="material-icons result-icon">
-                        {result.icon}
-                      </span>
+                      {/* Show avatar for user results, icon for everything else */}
+                      {result.type === "user" && (
+                        <img
+                          src={
+                            result.metadata?.avatar ||
+                            `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(result.label)}`
+                          }
+                          alt={result.label}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src =
+                              `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(result.label)}`;
+                          }}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "1px solid #30363d",
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
+                      {result.type !== "user" && (
+                        <span className="material-icons result-icon">
+                          {result.icon}
+                        </span>
+                      )}
                       <div className="result-content">
                         <div className="result-label">{result.label}</div>
                         {result.subLabel && (
@@ -235,15 +310,37 @@ const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                       <button className="jump-to-btn">Jump to →</button>
                     </div>
                   ))}
+                  {/* View all link for each group */}
+                  {group === "People" && (
+                    <div
+                      className="search-result-item"
+                      style={{ borderTop: "1px solid #21262d", opacity: 0.8 }}
+                      onClick={() => jumpTo(`/search?q=${encodeURIComponent(query)}&type=users`)}
+                    >
+                      <span className="material-icons result-icon">person_search</span>
+                      <div className="result-content">
+                        <div className="result-label">View all users matching "{query}"</div>
+                      </div>
+                      <button className="jump-to-btn">View all →</button>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <span className="material-symbols-outlined !text-4xl text-[#8b949e] mb-2">search</span>
-                <h3 className="text-[#c9d1d9] text-sm font-semibold mb-1">No results matched your search.</h3>
-                <p className="text-[#8b949e] text-xs">Try different keywords or filters.</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <span className="material-symbols-outlined !text-4xl text-[#8b949e] mb-2">person_search</span>
+                <h3 className="text-[#c9d1d9] text-sm font-semibold mb-1">No results found for "{query}"</h3>
+                <p className="text-[#8b949e] text-xs mb-4">Try different keywords, or search all users below.</p>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-[#161b22] border border-[#30363d] rounded-lg text-sm text-[#c9d1d9] hover:border-[#58a6ff] hover:text-[#58a6ff] transition-all"
+                  onClick={() => jumpTo(`/search?q=${encodeURIComponent(query)}&type=users`)}
+                >
+                  <span className="material-icons" style={{ fontSize: 16 }}>person</span>
+                  Search "{query}" in Users
+                </button>
               </div>
-            )
+            )}
+            </>
           ) : (
             // Recent repositories
             <>

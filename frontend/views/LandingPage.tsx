@@ -13,7 +13,7 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="landing-container min-h-screen w-full flex bg-[#f5f5f7] relative font-sans">
+    <div className="landing-container flex-1 w-full flex flex-col bg-[#f5f5f7] relative font-sans">
 
       {/* Background Subtle Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-[#f5f5f7] pointer-events-none" />
@@ -65,7 +65,10 @@ const LandingPage = () => {
               <div className="text-[#666] text-xs font-medium tracking-wide">
                 main.tf
               </div>
-              <div className="text-[#666] text-xs font-mono hover:text-white cursor-pointer transition-colors">
+              <div 
+                onClick={() => navigate("/team")}
+                className="text-[#666] text-xs font-mono hover:text-white cursor-pointer transition-colors"
+              >
                 more
               </div>
             </div>

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { auth } from "../../lib/firebase";
 import { getRedirectResult } from "firebase/auth";
+import { api } from "../../services/infra/api";
 
 const OAuthCallback: React.FC = () => {
   const { provider } = useParams<{ provider: "google" | "github" | "gitlab" }>();
@@ -18,6 +19,36 @@ const OAuthCallback: React.FC = () => {
 
     const handleCallback = async () => {
       try {
+        // Check for manual code in URL (direct redirect flow)
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        if (provider === "github" && code) {
+          const response = await api.integrations.githubCallback(code);
+          if (response.success) {
+            const redirectPath =
+              localStorage.getItem("integration_return_path") ||
+              "/settings/integrations";
+            localStorage.removeItem("integration_return_path");
+            localStorage.removeItem("integration_pending_provider");
+            navigate(redirectPath, { replace: true });
+            return;
+          }
+        }
+
+        if (provider === "gitlab" && code) {
+          const response = await api.integrations.gitlabCallback(code);
+          if (response.success) {
+            const redirectPath =
+              localStorage.getItem("integration_return_path") ||
+              "/settings/integrations";
+            localStorage.removeItem("integration_return_path");
+            localStorage.removeItem("integration_pending_provider");
+            navigate(redirectPath, { replace: true });
+            return;
+          }
+        }
+
         // Firebase handles OAuth redirect internally
         // getRedirectResult picks up the result after redirect
         const result = await getRedirectResult(auth);
@@ -58,7 +89,7 @@ const OAuthCallback: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gh-bg text-gh-text-secondary">
+      <div className="flex-1 w-full flex flex-col items-center justify-center bg-gh-bg text-gh-text-secondary">
         <div className="bg-gh-bg-secondary border border-red-500 rounded-lg p-8 max-w-md text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
           <h1 className="text-xl font-bold mb-2 text-red-400">
@@ -72,7 +103,7 @@ const OAuthCallback: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gh-bg text-gh-text-secondary">
+    <div className="flex-1 w-full flex flex-col items-center justify-center bg-gh-bg text-gh-text-secondary">
       <div className="bg-gh-bg-secondary border border-gh-border rounded-lg p-8 max-w-md text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-500 mx-auto mb-4"></div>
         <h1 className="text-xl font-bold mb-2">Completing Sign In</h1>

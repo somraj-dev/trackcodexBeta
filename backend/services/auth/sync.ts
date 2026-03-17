@@ -6,6 +6,7 @@ export interface SyncUserData {
   email?: string;
   displayName?: string;
   avatarUrl?: string;
+  emailVerified?: boolean;
 }
 
 /**
@@ -23,6 +24,15 @@ export async function syncUserWithPostgres(userData: SyncUserData) {
     });
 
     if (user) {
+      // Update emailVerified if provided and different
+      if (userData.emailVerified !== undefined && user.emailVerified !== userData.emailVerified) {
+        await prisma.user.update({
+          where: { id: uid },
+          data: { emailVerified: userData.emailVerified }
+        });
+        user.emailVerified = userData.emailVerified;
+      }
+
       // User exists, just ensure profile exists
       if (!user.profile) {
         await prisma.profile.create({
@@ -57,6 +67,7 @@ export async function syncUserWithPostgres(userData: SyncUserData) {
           avatar: avatarUrl,
           password: "", // Managed by Firebase
           role: "user",
+          emailVerified: userData.emailVerified || false,
           profile: {
             create: {} // Create empty profile
           }

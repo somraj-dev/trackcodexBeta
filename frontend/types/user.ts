@@ -73,3 +73,16 @@ export interface Candidate {
   }[];
 }
 
+export interface ProfileData {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  company: string | null;
+  socialLinks: { platform: string; url: string }[];
+  followersCount: number;
+  followingCount: number;
+}

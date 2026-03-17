@@ -45,22 +45,13 @@ export class GitHubService {
 
     const syncedRepos = [];
 
-    // 5. Upsert into Database
+    // 5. Upsert into Database using githubId as the unique key
     for (const repo of repos) {
-      if (repo.archived) continue; // Optional: skip archived
-
-      const existingRepo = await prisma.repository.findFirst({
-        where: {
-          OR: [
-            { githubId: repo.id.toString() },
-            { name: repo.name, orgId: null },
-          ],
-        },
-      });
+      if (repo.archived) continue;
 
       const upserted = await prisma.repository.upsert({
         where: {
-          id: existingRepo?.id || "new-id-placeholder",
+          githubId: repo.id.toString(),
         },
         create: {
           name: repo.name,
@@ -76,6 +67,7 @@ export class GitHubService {
           updatedAt: new Date(repo.updated_at || Date.now()),
         },
         update: {
+          name: repo.name,
           description: repo.description,
           isPublic: !repo.private,
           stars: repo.stargazers_count,
@@ -95,6 +87,164 @@ export class GitHubService {
     // So we can use upsert using githubId.
 
     return syncedRepos;
+  }
+
+  /**
+   * Sync ALL data for a given user from GitHub to local DB
+   * This includes Repositories, Issues, Pull Requests, and CI Workflows.
+   */
+  static async syncAllData(userId: string): Promise<void> {
+    console.log(`[GitHubService] Starting FULL sync for user ${userId}`);
+    const octokit = await this.getOctokit(userId);
+
+    // 1. Sync Repositories first
+    const repos = await this.syncRepositories(userId);
+
+    for (const repo of repos) {
+      if (!repo.githubId) continue;
+      const [owner, name] = repo.htmlUrl.split("/").slice(-2);
+
+      try {
+        // 2. Sync Issues
+        const issues = await this.listIssues(userId, owner, name, "all");
+        for (const issueData of issues) {
+          await prisma.issue.upsert({
+            where: {
+              repoId_number: {
+                repoId: repo.id,
+                number: issueData.number,
+              },
+            },
+            create: {
+              repoId: repo.id,
+              number: issueData.number,
+              title: issueData.title,
+              body: issueData.body,
+              status: issueData.state.toUpperCase(),
+              authorId: userId, // Mapping simplified
+              createdAt: new Date(issueData.created_at),
+              updatedAt: new Date(issueData.updated_at),
+            },
+            update: {
+              title: issueData.title,
+              body: issueData.body,
+              status: issueData.state.toUpperCase(),
+              updatedAt: new Date(issueData.updated_at),
+            },
+          });
+        }
+
+        // 3. Sync Pull Requests
+        const prs = await this.listPullRequests(userId, owner, name, "all");
+        for (const prData of prs) {
+          await prisma.pullRequest.upsert({
+            where: {
+              repoId_number: {
+                repoId: repo.id,
+                number: prData.number,
+              },
+            },
+            create: {
+              repoId: repo.id,
+              number: prData.number,
+              title: prData.title,
+              body: prData.body,
+              status: prData.state.toUpperCase(),
+              base: prData.base.ref,
+              head: prData.head.ref,
+              authorId: userId,
+              createdAt: new Date(prData.created_at),
+              updatedAt: new Date(prData.updated_at),
+            },
+            update: {
+              title: prData.title,
+              body: prData.body,
+              status: prData.state.toUpperCase(),
+              updatedAt: new Date(prData.updated_at),
+            },
+          });
+        }
+
+        // 4. Sync Workflows & Runs
+        const { data: workflowsData } = await octokit.actions.listRepoWorkflows({
+          owner,
+          repo: name,
+        });
+
+        for (const wf of workflowsData.workflows) {
+          const workflow = await prisma.workflow.upsert({
+            where: {
+              repoId_path: {
+                repoId: repo.id,
+                path: wf.path,
+              },
+            },
+            create: {
+              repoId: repo.id,
+              name: wf.name,
+              path: wf.path,
+              state: wf.state === "active" ? "ACTIVE" : "DISABLED",
+            },
+            update: {
+              name: wf.name,
+              state: wf.state === "active" ? "ACTIVE" : "DISABLED",
+            },
+          });
+
+          // Sync Runs for this workflow
+          const { data: runsData } = await octokit.actions.listWorkflowRuns({
+            owner,
+            repo: name,
+            workflow_id: wf.id,
+            per_page: 5,
+          });
+
+          for (const run of runsData.workflow_runs) {
+            await prisma.workflowRun.upsert({
+              where: { id: run.id.toString() },
+              create: {
+                id: run.id.toString(),
+                repoId: repo.id,
+                workflowId: workflow.id,
+                workflowName: wf.name,
+                commitSha: run.head_sha,
+                event: run.event,
+                status: run.status?.toUpperCase() || "QUEUED",
+                conclusion: run.conclusion?.toUpperCase(),
+                createdAt: new Date(run.created_at),
+                updatedAt: new Date(run.updated_at),
+              },
+              update: {
+                status: run.status?.toUpperCase() || "QUEUED",
+                conclusion: run.conclusion?.toUpperCase(),
+                updatedAt: new Date(run.updated_at),
+              },
+            });
+          }
+        }
+      } catch (err) {
+        console.error(`[GitHubService] Failed to sync data for repo ${repo.name}:`, err);
+      }
+    }
+  }
+
+  /**
+   * Dispatch a workflow
+   */
+  static async dispatchWorkflow(
+    userId: string,
+    owner: string,
+    repo: string,
+    workflowId: string | number,
+    ref: string = "main"
+  ): Promise<void> {
+    const octokit = await this.getOctokit(userId);
+    await octokit.actions.createWorkflowDispatch({
+      owner,
+      repo,
+      workflow_id: workflowId,
+      ref,
+    });
   }
 
   /**
@@ -321,7 +471,6 @@ export class GitHubService {
       body,
       labels,
     });
-    return data;
   }
 }
 

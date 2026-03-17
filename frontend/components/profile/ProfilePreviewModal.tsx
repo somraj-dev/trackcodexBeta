@@ -1,7 +1,8 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { UserProfile } from "../../services/activity/profileService";
+import { UserProfile } from "../../services/activity/profile";
+import { api, apiInstance } from "../../services/infra/api";
 import PortfolioDisplay from "./PortfolioDisplay";
 import RepositoryShowcase from "./RepositoryShowcase";
 import PinnedItemsGrid from "./PinnedItemsGrid";
@@ -27,10 +28,9 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
   const loadPortfolio = React.useCallback(async () => {
     if (!profile.id) return;
     try {
-      const response = await fetch(`/api/v1/portfolio/${profile.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setPortfolioItems(data.items || []);
+      const response = await apiInstance.get(`/portfolio/${profile.id}`);
+      if (response.data?.items) {
+        setPortfolioItems(response.data.items);
       }
     } catch (error) {
       console.error("Error loading portfolio:", error);
@@ -40,13 +40,8 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
   const loadRepositories = React.useCallback(async () => {
     if (!profile.id) return;
     try {
-      const response = await fetch(
-        `/api/v1/repositories?userId=${profile.id}&limit=6`,
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setRepositories(data.repositories || []);
-      }
+      const repos = await api.repositories.list({ userId: profile.id });
+      setRepositories(repos.slice(0, 6));
     } catch (error) {
       console.error("Error loading repositories:", error);
     }

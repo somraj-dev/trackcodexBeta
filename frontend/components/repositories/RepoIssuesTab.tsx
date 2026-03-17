@@ -44,7 +44,7 @@ const RepoIssuesTab: React.FC<RepoIssuesTabProps> = ({ repo }) => {
     setLoading(true);
     try {
       const data = await api.repositories.getIssues(repo.id, filter);
-      setIssues(data);
+      setIssues(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch issues", err);
     } finally {

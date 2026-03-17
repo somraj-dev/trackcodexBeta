@@ -5,6 +5,9 @@ import PublicLayout from "./components/layout/PublicLayout";
 import RedirectToLogin from "./components/auth/RedirectToLogin";
 import RedirectAfterAuth from "./components/auth/RedirectAfterAuth";
 import SettingsLayout from "./components/settings/SettingsLayout";
+import { useAuth } from "./context/AuthContext";
+
+const ComingSoon = React.lazy(() => import("./views/ComingSoon"));
 
 // Lazy imports (extracted from App.tsx)
 // Auth
@@ -17,7 +20,9 @@ const ResetPassword = React.lazy(() => import("./views/auth/ResetPassword"));
 const Onboarding = React.lazy(() => import("./views/auth/Onboarding"));
 const ResolveConflict = React.lazy(() => import("./views/auth/ResolveConflict"));
 const SignOut = React.lazy(() => import("./views/auth/SignOut"));
+const VerifyEmail = React.lazy(() => import("./views/auth/VerifyEmail"));
 const LandingPage = React.lazy(() => import("./views/LandingPage"));
+const TeamPage = React.lazy(() => import("./views/about/TeamPage"));
 
 // Core
 const RepositoriesView = React.lazy(() => import("./views/repo/Repositories"));
@@ -136,7 +141,9 @@ const AuditLogs = React.lazy(() => import("./components/admin/AuditLogs"));
 
 import { RoleGuard } from "./components/auth";
 
-const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+const AppRoutes = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Routes>
       {/* Public Pages */}
@@ -156,9 +163,10 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/auth/resolve-conflict" element={<ResolveConflict />} />
-            <Route path="/logout" element={<Navigate to="/login" replace />} />
             <Route path="/" element={<LandingPage />} />
+            <Route path="/team" element={<TeamPage />} />
             <Route path="*" element={<RedirectToLogin />} />
           </>
         )}
@@ -173,44 +181,46 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
           <Route path="/signup" element={<RedirectAfterAuth />} />
           <Route path="/forgot-password" element={<RedirectAfterAuth />} />
           <Route path="/reset-password" element={<RedirectAfterAuth />} />
-          <Route path="/*" element={<MainLayout />}>
-            <Route path="taskvault" element={<TaskVault />} />
-            <Route path="" element={<HomeView />} />
-            <Route path="dashboard/home" element={<HomeView />} />
-            <Route path="onboarding/welcome" element={<WelcomeView />} />
-            <Route path="accept-invite" element={<AcceptInvite />} />
-            <Route path="explore" element={<ExploreView />} />
-            <Route path="search" element={<SearchResults />} />
-            <Route path="platform-matrix" element={<PlatformMatrix />} />
-            <Route path="overview" element={<Overview />} />
-            <Route path="workspaces" element={<WorkspacesView />} />
-            <Route path="community" element={<CommunityView />} />
-            <Route path="community/*" element={<CommunityView />} />
-            <Route path="trackcoin" element={<TrackCoinView />} />
-            <Route path="workspace/new" element={<CreateWorkspaceView />} />
-            <Route path="workspace/:id" element={<VSCodeWorkspaceView />} />
-            <Route path="workspace/:id/ide" element={<VSCodeWorkspaceView />} />
-            <Route path="repositories" element={<RepositoriesView />} />
-            <Route path="repositories/new" element={<CreateRepoView />} />
-            <Route path="repositories/import" element={<ImportRepoView />} />
-            <Route path="repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
-            <Route path="repo/:id/pulls/:number" element={<ReviewMode />} />
-            <Route path="repo/:id/discussions/:number" element={<DiscussionDetail />} />
-            <Route path="repo/:id/issues/:number" element={<IssueDetail />} />
-            <Route path="repo/:id/*" element={<RepoDetailView />} />
-            <Route path="dashboard/library" element={<LibraryView />} />
-            <Route path="editor" element={<EditorView />} />
-            <Route path="profile" element={<ProfileView />} />
-            <Route path="profile/:userId" element={<PublicProfile />} />
-            <Route path="portfolio" element={<Portfolio />} />
-            <Route path="leaderboard" element={<Leaderboard />} />
-            <Route path="notifications" element={<NotificationsView />} />
-            <Route path="messages" element={<MessagesView />} />
+          
+          <Route element={<MainLayout />}>
+            <Route path="/taskvault" element={<TaskVault />} />
+            <Route path="/" element={<HomeView />} />
+            <Route path="/dashboard/home" element={<HomeView />} />
+            <Route path="/onboarding/welcome" element={<WelcomeView />} />
+            <Route path="/accept-invite" element={<AcceptInvite />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/explore" element={<ExploreView />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/platform-matrix" element={<PlatformMatrix />} />
+            <Route path="/overview" element={<Overview />} />
+            <Route path="/workspaces" element={<WorkspacesView />} />
+            <Route path="/community" element={<CommunityView />} />
+            <Route path="/community/*" element={<CommunityView />} />
+            <Route path="/trackcoin" element={<TrackCoinView />} />
+            <Route path="/workspace/new" element={<CreateWorkspaceView />} />
+            <Route path="/workspace/:id" element={<VSCodeWorkspaceView />} />
+            <Route path="/workspace/:id/ide" element={<VSCodeWorkspaceView />} />
+            <Route path="/repositories" element={<RepositoriesView />} />
+            <Route path="/repositories/new" element={<CreateRepoView />} />
+            <Route path="/repositories/import" element={<ImportRepoView />} />
+            <Route path="/repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
+            <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
+            <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
+            <Route path="/repo/:id/issues/:number" element={<IssueDetail />} />
+            <Route path="/repo/:id/*" element={<RepoDetailView />} />
+            <Route path="/dashboard/library" element={<LibraryView />} />
+            <Route path="/editor" element={<EditorView />} />
+            <Route path="/profile" element={<ProfileView />} />
+            <Route path="/profile/:userId" element={<PublicProfile />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/notifications" element={<NotificationsView />} />
+            <Route path="/messages" element={<MessagesView />} />
 
             {/* Strata */}
-            <Route path="strata" element={<StrataIndexView />} />
-            <Route path="strata/new" element={<CreateStrataView />} />
-            <Route path="strata/:strataId" element={<StrataDetailView />}>
+            <Route path="/strata" element={<StrataIndexView />} />
+            <Route path="/strata/new" element={<CreateStrataView />} />
+            <Route path="/strata/:strataId" element={<StrataDetailView />}>
               <Route index element={<StrataOverview />} />
               <Route path="repositories" element={<StrataRepositories />} />
               <Route path="people" element={<StrataPeople />} />
@@ -226,7 +236,7 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             </Route>
 
             {/* Marketplace */}
-            <Route path="marketplace" element={<MarketplaceLayout />}>
+            <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
               <Route path="missions" element={<MissionsView />} />
               <Route path="missions/:id" element={<MissionDetailView />} />
@@ -240,10 +250,10 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
                 <Route path="compare" element={<CandidateComparisonView />} />
                 <Route path="offer/:id" element={<OfferEditorView />} />
                 <Route path="schedule/:id" element={<SessionSchedulerView />} />
-                <Route path="feedback/:id" element={<InterviewerFeedbackView />} />
+                <Route path="feedback/:id" element={<ComingSoon />} />
                 <Route path="jobs" element={<HiringJobsView />} />
-                <Route path="analytics" element={<HiringAnalyticsView />} />
-                <Route path="assessments" element={<AssessmentsView />} />
+                <Route path="analytics" element={<ComingSoon />} />
+                <Route path="assessments" element={<ComingSoon />} />
               </Route>
               <Route path="growth" element={<GrowthLayout />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -253,7 +263,7 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             </Route>
 
             {/* Settings */}
-            <Route path="settings" element={<SettingsLayout />}>
+            <Route path="/settings" element={<SettingsLayout />}>
               <Route index element={<Navigate to="profile" replace />} />
               <Route path="profile" element={<ProfileSettings />} />
               <Route path="account" element={<AccountSettings />} />
@@ -269,8 +279,8 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
               <Route path="integrations" element={<IntegrationsSettings />} />
               <Route path="sessions" element={<SessionsSettings />} />
               <Route path="ssh-keys" element={<SSHKeysSettings />} />
-              <Route path="ahi-cs" element={<AhiCsSettings />} />
-              <Route path="privacy" element={<PrivacySettings />} />
+              <Route path="ahi-cs" element={<ComingSoon />} />
+              <Route path="privacy" element={<ComingSoon />} />
               <Route path="billing/usage" element={<BillingUsage />} />
               <Route path="billing/analytics" element={<BillingAnalytics />} />
               <Route path="billing/budgets" element={<BillingBudgets />} />
@@ -280,11 +290,11 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
               <Route path="billing/additional" element={<BillingAdditional />} />
             </Route>
 
-            <Route path="forge-ai" element={<ForgeAIView />} />
-            <Route path="finance" element={<WalletDashboard />} />
+            <Route path="/forge-ai" element={<ForgeAIView />} />
+            <Route path="/finance" element={<WalletDashboard />} />
 
             {/* Admin */}
-            <Route path="admin" element={<RoleGuard><AdminRoomView /></RoleGuard>}>
+            <Route path="/admin" element={<RoleGuard><AdminRoomView /></RoleGuard>}>
               <Route index element={<AdminOverview />} />
               <Route path="users" element={<UserManager />} />
               <Route path="teams" element={<TeamManager />} />
@@ -297,9 +307,9 @@ const AppRoutes = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             </Route>
 
             {/* Catch-alls */}
-            <Route path=":owner/:repo/*" element={<RepoDetailView />} />
-            <Route path=":username" element={<PublicProfile />} />
-            <Route path="*" element={<Navigate to="/dashboard/home" />} />
+            <Route path="/:owner/:repo/*" element={<RepoDetailView />} />
+            <Route path="/:username" element={<PublicProfile />} />
+            <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
           </Route>
         </>
       )}

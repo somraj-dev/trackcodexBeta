@@ -83,8 +83,8 @@ const ImportRepo: React.FC = () => {
   };
 
   return (
-    <div className="bg-gh-bg min-h-screen font-sans selection:bg-primary/30">
-      <div className="max-w-[768px] mx-auto py-12 px-6 animate-in fade-in duration-500">
+    <div className="bg-gh-bg flex-1 w-full flex flex-col font-sans selection:bg-primary/30">
+      <div className="max-w-[768px] mx-auto py-12 px-6 animate-in fade-in duration-500 w-full">
         <header className="mb-8 border-b border-gh-border pb-6">
           <h1 className="text-2xl font-semibold text-gh-text mb-2 tracking-tight">
             Import your project to TrackCodex
@@ -330,21 +330,6 @@ const ImportRepo: React.FC = () => {
         </form>
 
         {/* GitHub-style Page Footer */}
-        <footer className="mt-20 pt-10 border-t border-gh-border flex flex-col md:flex-row items-center justify-between gap-6 text-[12px] text-gh-text-secondary animate-in fade-in duration-700 delay-500 pb-10">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined !text-[18px]">account_tree</span>
-            <span>© 2026 TrackCodex, Inc.</span>
-          </div>
-          <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2">
-            <button type="button" className="hover:text-primary hover:underline">Terms</button>
-            <button type="button" className="hover:text-primary hover:underline">Privacy</button>
-            <button type="button" className="hover:text-primary hover:underline">Security</button>
-            <button type="button" className="hover:text-primary hover:underline">Status</button>
-            <button type="button" className="hover:text-primary hover:underline">Docs</button>
-            <button type="button" className="hover:text-primary hover:underline">Contact</button>
-            <button type="button" className="hover:text-primary hover:underline">Manage cookies</button>
-          </nav>
-        </footer>
       </div>
     </div>
   );

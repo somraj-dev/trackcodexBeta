@@ -1,0 +1,100 @@
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 2 and 41 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+	modified:   .github/workflows/deploy-aws.yml
+	modified:   backend/routes/activity/portfolio.ts
+	modified:   backend/routes/activity/stats.ts
+	modified:   backend/routes/auth/integrations.ts
+	modified:   backend/routes/enterprise/users.ts
+	modified:   backend/routes/index.ts
+	modified:   backend/scripts/reindex.ts
+	modified:   backend/services/auth/oauth.ts
+	modified:   backend/services/git/github.ts
+	new file:   backend/services/git/gitlab.ts
+	modified:   backend/services/infra/firebase.ts
+	modified:   backend/workers/outboxWorker.ts
+	modified:   frontend/App.tsx
+	modified:   frontend/AppRoutes.tsx
+	modified:   frontend/components/auth/RedirectAfterAuth.tsx
+	modified:   frontend/components/layout/Footer.tsx
+	modified:   frontend/components/layout/MainLayout.tsx
+	modified:   frontend/components/profile/ActivityFeed.tsx
+	modified:   frontend/components/profile/ContributionGraph.tsx
+	modified:   frontend/components/profile/PortfolioManager.tsx
+	modified:   frontend/components/profile/ProfileCard.tsx
+	modified:   frontend/components/profile/ProfilePreviewModal.tsx
+	modified:   frontend/components/profile/ProofProfileModal.tsx
+	new file:   frontend/components/profile/ResumePreviewModal.tsx
+	new file:   frontend/components/profile/ResumeTemplate.tsx
+	modified:   frontend/components/profile/UserProfileDropdown.tsx
+	modified:   frontend/components/repositories/RepoCodeTab.tsx
+	modified:   frontend/components/repositories/RepoIssuesTab.tsx
+	modified:   frontend/components/repositories/RepoPullRequestsTab.tsx
+	modified:   frontend/components/search/GlobalSearchModal.tsx
+	modified:   frontend/context/AuthContext.tsx
+	modified:   frontend/services/activity/profile.ts
+	modified:   frontend/services/git/gitActivityService.ts
+	modified:   frontend/services/infra/api.ts
+	modified:   frontend/styles/SearchResults.css
+	modified:   frontend/types/repo.ts
+	modified:   frontend/types/user.ts
+	modified:   frontend/views/AcceptInvite.tsx
+	new file:   frontend/views/ComingSoon.tsx
+	modified:   frontend/views/ForgeAI.tsx
+	modified:   frontend/views/Home.tsx
+	modified:   frontend/views/LandingPage.tsx
+	modified:   frontend/views/ProjectBoardKanban.tsx
+	new file:   frontend/views/about/TeamPage.tsx
+	modified:   frontend/views/auth/DesktopBridge.tsx
+	modified:   frontend/views/auth/ForgotPassword.tsx
+	modified:   frontend/views/auth/Login.tsx
+	modified:   frontend/views/auth/OAuthCallback.tsx
+	modified:   frontend/views/auth/Onboarding.tsx
+	modified:   frontend/views/auth/ResetPassword.tsx
+	modified:   frontend/views/auth/ResolveConflict.tsx
+	modified:   frontend/views/auth/SignOut.tsx
+	modified:   frontend/views/auth/Signup.tsx
+	new file:   frontend/views/auth/VerifyEmail.tsx
+	modified:   frontend/views/ci/WorkflowRunDetail.tsx
+	modified:   frontend/views/community/Leaderboard.tsx
+	modified:   frontend/views/onboarding/ProfileCompletion.tsx
+	modified:   frontend/views/profile/Portfolio.tsx
+	modified:   frontend/views/repo/CreateRepo.tsx
+	modified:   frontend/views/repo/ImportRepo.tsx
+	modified:   frontend/views/repo/IssueDetail.tsx
+	modified:   frontend/views/repo/PullRequestDetail.tsx
+	modified:   frontend/views/repo/RepoDetail.tsx
+	modified:   frontend/views/repo/Repositories.tsx
+	modified:   frontend/views/settings/AccountSettings.tsx
+	modified:   frontend/views/settings/IntegrationsSettings.tsx
+	modified:   frontend/views/trials/OfferAcceptanceView.tsx
+	modified:   frontend/views/workspace/WorkspaceSettings.tsx
+	modified:   infrastructure/terraform/ecs.tf
+	modified:   infrastructure/terraform/secrets.tf
+	modified:   package-lock.json
+	modified:   package.json
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+	both modified:   backend/middleware/auth.ts
+	both modified:   backend/routes/auth/auth.ts
+	both modified:   backend/routes/infra/search.ts
+	both modified:   frontend/views/SearchResults.tsx
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   backend/services/auth/sync.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	git_status.txt
+	git_status_2.txt
+

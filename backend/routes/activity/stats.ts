@@ -1,11 +1,21 @@
 import { FastifyInstance } from "fastify";
 import { contributionStatsService } from "../../services/activity/contributionStatsService";
+import { prisma } from "../../services/infra/prisma";
 
 export default async function statsRoutes(fastify: FastifyInstance) {
   // Get contribution graph for a year
   fastify.get("/contributions/:userId", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
     const { year } = request.query as { year?: string };
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
 
     const yearNum = year ? parseInt(year) : new Date().getFullYear();
 
@@ -26,7 +36,16 @@ export default async function statsRoutes(fastify: FastifyInstance) {
 
   // Get commit streak
   fastify.get("/streak/:userId", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
 
     try {
       const streak = await contributionStatsService.getStreak(userId);
@@ -42,8 +61,17 @@ export default async function statsRoutes(fastify: FastifyInstance) {
 
   // Get total contributions for a year
   fastify.get("/total/:userId", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
     const { year } = request.query as { year?: string };
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
 
     const yearNum = year ? parseInt(year) : new Date().getFullYear();
 

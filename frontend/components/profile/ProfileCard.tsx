@@ -8,6 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 
 import ProofProfileModal from "./ProofProfileModal";
 import EditStatusModal from "./EditStatusModal";
+import ResumePreviewModal from "./ResumePreviewModal";
 
 const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
   const navigate = useNavigate();
@@ -15,21 +16,24 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
     propProfile || profileService.getProfile(),
   );
 
-  // Update local state if prop changes
+  // Update local state if prop changes (also re-sync isFollowing)
   useEffect(() => {
     if (propProfile && propProfile.username !== profile.username) {
       setProfile(propProfile);
+      setIsFollowing(!!propProfile.isFollowing);
     }
   }, [propProfile, profile.username]);
 
   const { user: currentUser } = useAuth();
   const isSelf = currentUser?.username === profile.username || currentUser?.id === profile.id;
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(!!propProfile?.isFollowing);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [isProofProfileOpen, setIsProofProfileOpen] = useState(false);
   const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
   const [isEditStatusOpen, setIsEditStatusOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const [followModalType, setFollowModalType] = useState<
     "followers" | "following"
   >("followers");
@@ -42,13 +46,33 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
     }
   }, [propProfile]);
 
-  const handleFollow = () => {
-    if (isFollowing) {
-      profileService.simulateUnfollow();
-    } else {
-      profileService.simulateNewFollower();
+  const handleFollow = async () => {
+    const targetId = profile.id;
+    if (!targetId) return;
+
+    // Optimistic update
+    const nowFollowing = !isFollowing;
+    setIsFollowing(nowFollowing);
+    setProfile((prev) => ({
+      ...prev,
+      followers: Math.max(0, (prev.followers || 0) + (nowFollowing ? 1 : -1)),
+    }));
+
+    try {
+      if (nowFollowing) {
+        await profileService.followUser(targetId);
+      } else {
+        await profileService.unfollowUser(targetId);
+      }
+    } catch (error) {
+      // Revert on error
+      setIsFollowing(!nowFollowing);
+      setProfile((prev) => ({
+        ...prev,
+        followers: Math.max(0, (prev.followers || 0) + (nowFollowing ? -1 : 1)),
+      }));
+      console.error("Follow error:", error);
     }
-    setIsFollowing((prev) => !prev);
   };
 
   const handleOffer = () => {
@@ -68,6 +92,27 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
   const openFollowModal = (type: "followers" | "following") => {
     setFollowModalType(type);
     setIsFollowModalOpen(true);
+  };
+
+  const handleShareProfile = () => {
+    const username = profile.username.startsWith('@')
+      ? profile.username.substring(1)
+      : profile.username;
+    const url = `${window.location.origin}/profile/${username}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }).catch(() => {
+      // Fallback for environments without clipboard API
+      const el = document.createElement('input');
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
   };
 
   return (
@@ -121,6 +166,17 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
         <p className="text-[20px] text-gh-text-secondary font-light">
           {profile.username.startsWith('@') ? profile.username.substring(1) : profile.username}
         </p>
+        {/* Share Profile Button */}
+        <button
+          onClick={handleShareProfile}
+          title="Copy profile link"
+          className="mt-2 flex items-center gap-1.5 text-xs text-gh-text-secondary hover:text-primary transition-colors"
+        >
+          <span className="material-symbols-outlined !text-[14px]">
+            {shareCopied ? 'check_circle' : 'share'}
+          </span>
+          {shareCopied ? 'Copied!' : 'Share profile'}
+        </button>
       </div>
 
       {profile.bio && (
@@ -349,6 +405,7 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
             setIsProofProfileOpen(false);
             setIsOfferModalOpen(true);
           }}
+          onDownloadResume={() => setIsResumeModalOpen(true)}
           profile={profile}
         />
       )}
@@ -376,6 +433,11 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
           onClose={() => setIsEditStatusOpen(false)}
         />
       )}
+      <ResumePreviewModal
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        profile={profile}
+      />
     </div>
   );
 };

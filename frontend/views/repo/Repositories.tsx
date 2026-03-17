@@ -175,7 +175,7 @@ const Repositories = () => {
 
   if (loading) {
     return (
-      <div className="bg-gh-bg min-h-screen p-8 max-w-[900px] mx-auto">
+      <div className="bg-gh-bg flex-1 w-full p-8 max-w-[900px] mx-auto">
         <div className="space-y-4 mt-8">
           {[1, 2, 3, 4].map((i) => (
             <div
@@ -195,7 +195,7 @@ const Repositories = () => {
   );
 
   return (
-    <div className="bg-gh-bg min-h-screen flex flex-col">
+    <div className="bg-gh-bg flex-1 w-full flex flex-col">
       <div className="flex-1 p-8 max-w-[900px] w-full mx-auto">
         {/* Toolbar: Search + Filters + New */}
         <div className="flex items-center gap-3 pb-5 border-b border-gh-border">

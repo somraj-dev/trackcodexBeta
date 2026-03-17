@@ -37,6 +37,7 @@ import { ideConfigRoutes } from "./workspace/ideconfig";
 import { galleryRoutes } from "./infra/gallery";
 import integrationRoutes from "./auth/integrations";
 import { applicationRoutes } from "./hiring/applications";
+import workflowRoutes from "./infra/ci";
 
 export async function routes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", async (request) => {
@@ -95,6 +96,7 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(deploymentRoutes);
   await fastify.register(integrationRoutes);
   await fastify.register(applicationRoutes);
+  await fastify.register(workflowRoutes);
 }
 
 

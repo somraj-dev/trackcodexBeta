@@ -55,7 +55,7 @@ const AppContent = () => {
   return (
     <ChunkErrorBoundary>
       <React.Suspense fallback={<SplashScreen />}>
-        <AppRoutes isAuthenticated={isAuthenticated} />
+        <AppRoutes />
         <CookieConsent />
       </React.Suspense>
     </ChunkErrorBoundary>

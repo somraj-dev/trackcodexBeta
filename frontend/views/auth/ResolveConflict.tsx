@@ -48,7 +48,7 @@ const ResolveConflict = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d1117] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 w-full flex flex-col items-center justify-center bg-[#0d1117] py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-[#161b22] p-10 rounded-2xl border border-[#30363d] shadow-2xl relative overflow-hidden">
                 {/* Visual Accent */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#2f81f7] to-[#238636]"></div>

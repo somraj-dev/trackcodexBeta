@@ -192,11 +192,6 @@ const ResetPassword = () => {
                     </form>
                 </div>
 
-                <footer className="mt-8 text-center px-4">
-                    <p className="text-[12px] text-[#8b949e]">
-                        By changing your password, you agree to TrackCodex's <a href="#" className="text-[#2f81f7] hover:underline">Terms of Service</a> and <a href="#" className="text-[#2f81f7] hover:underline">Privacy Policy</a>.
-                    </p>
-                </footer>
             </div>
         </div>
     );

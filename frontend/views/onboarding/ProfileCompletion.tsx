@@ -50,7 +50,7 @@ const ProfileCompletion: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gh-bg text-gh-text flex flex-col items-center justify-center p-4">
+    <div className="flex-1 w-full bg-gh-bg text-gh-text flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-gh-bg-secondary border border-gh-border rounded-lg p-8 shadow-xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gh-text mb-2">

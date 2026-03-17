@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { auth } from "../../lib/firebase";
 import { Repository, Workspace, Job, ProfileData, SSHKey, Notification, PullRequest } from "../../types";
-import { UserProfile } from "./components/profile";
+import { UserProfile } from "../activity/profile";
 
 // Extended Window interface for Electron Bridge
 declare global {
@@ -180,7 +180,44 @@ export const api = {
     markRead: (id: string) => request<any>({ url: `/notifications/${id}/read`, method: "POST" }),
     markAllRead: (userId: string) => request<any>({ url: `/notifications/read-all`, method: "POST" }),
   },
-  // ... other services can be added here following the same pattern
+  ciRuns: {
+    list: (repoId: string) => request<any[]>({ url: `/repositories/${repoId}/ci-runs` }),
+  },
+  integrations: {
+    status: () => request<any>({ url: "/integrations/status" }),
+    connect: (provider: string, accessToken: string, providerUsername?: string) =>
+      request<any>({
+        url: "/integrations/connect",
+        method: "POST",
+        data: { provider, accessToken, providerUsername },
+      }),
+    disconnect: (provider: string) =>
+      request<any>({ url: `/integrations/disconnect/${provider}`, method: "DELETE" }),
+    syncGithub: () => request<any>({ url: "integrations/sync/github" }),
+    syncGitlab: () => request<any>({ url: "integrations/sync/gitlab" }),
+    githubCallback: (code: string) =>
+      request<any>({
+        url: "integrations/github/callback",
+        method: "POST",
+        data: { code },
+      }),
+    gitlabCallback: (code: string) =>
+      request<any>({
+        url: "integrations/gitlab/callback",
+        method: "POST",
+        data: { code },
+      }),
+  },
+  workflows: {
+    list: (repoId: string) => request<any[]>({ url: `/repositories/${repoId}/workflows` }),
+    listRuns: (repoId: string) => request<any[]>({ url: `/repositories/${repoId}/workflow-runs` }),
+    dispatch: (repoId: string, workflowId: string, ref?: string) =>
+      request<any>({
+        url: `/repositories/${repoId}/workflows/${workflowId}/dispatch`,
+        method: "POST",
+        data: { ref },
+      }),
+  },
   get: <T>(url: string, params?: any) => request<T>({ url, params }),
   post: <T>(url: string, data?: any) => request<T>({ url, method: "POST", data }),
   put: <T>(url: string, data?: any) => request<T>({ url, method: "PUT", data }),

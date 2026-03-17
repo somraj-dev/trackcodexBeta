@@ -46,7 +46,6 @@ interface UserProfileDropdownProps {
 const UserProfileDropdown = ({
   profile,
   onClose,
-  logout,
 }: UserProfileDropdownProps) => {
   const navigate = useNavigate();
   const [stratas, setStratas] = React.useState<Strata[]>([]);

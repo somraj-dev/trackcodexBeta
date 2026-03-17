@@ -271,7 +271,7 @@ const RepoDetailView = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {presence.length > 1 && (
+              {presence && Array.isArray(presence) && presence.length > 0 && (
                 <div className="flex -space-x-2 mr-2">
                   {presence.map((uid) => (
                     <div

@@ -135,11 +135,11 @@ const BoardColumn: React.FC<{
       </div>
 
       <SortableContext
-        items={cards.map((c) => c.id)}
+        items={(cards || []).map((c) => c.id)}
         strategy={verticalListSortingStrategy}
       >
         <div className="flex-1 overflow-y-auto max-h-[600px]">
-          {cards.length === 0 ? (
+          {!cards || cards.length === 0 ? (
             <div className="text-center py-8 text-gh-text-secondary text-sm">
               No cards
             </div>
@@ -281,9 +281,9 @@ const ProjectBoardKanban: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gh-bg">
+    <div className="flex-1 w-full flex flex-col bg-gh-bg overflow-hidden">
       {/* Header */}
-      <div className="border-b border-gh-border bg-gh-bg-secondary">
+      <div className="border-b border-gh-border bg-gh-bg-secondary w-full">
         <div className="max-w-full px-6 py-4">
           <button
             onClick={() => navigate(`/repo/${board.repoId}`)}

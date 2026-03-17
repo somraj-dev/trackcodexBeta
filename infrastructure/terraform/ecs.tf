@@ -66,6 +66,30 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "COOKIE_SECRET"
           valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:COOKIE_SECRET::"
+        },
+        {
+          name      = "GITHUB_CLIENT_ID"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:GITHUB_CLIENT_ID::"
+        },
+        {
+          name      = "GITHUB_CLIENT_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:GITHUB_CLIENT_SECRET::"
+        },
+        {
+          name      = "INTEGRATION_GITHUB_CLIENT_ID"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:INTEGRATION_GITHUB_CLIENT_ID::"
+        },
+        {
+          name      = "INTEGRATION_GITHUB_CLIENT_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:INTEGRATION_GITHUB_CLIENT_SECRET::"
+        },
+        {
+          name      = "GITLAB_CLIENT_ID"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:GITLAB_CLIENT_ID::"
+        },
+        {
+          name      = "GITLAB_CLIENT_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:GITLAB_CLIENT_SECRET::"
         }
       ]
       logConfiguration = {

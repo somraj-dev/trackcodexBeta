@@ -51,3 +51,16 @@ export interface PinnedRepo {
   isPublic: boolean;
 }
 
+export interface PullRequest {
+  id: string;
+  number: number;
+  title: string;
+  body: string | null;
+  status: string;
+  base: string;
+  head: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

@@ -33,9 +33,6 @@ const Footer: React.FC = () => {
             Support
           </a>
           <a href="https://support.trackcodex.com" className="footer-link">Contact</a>
-          <button className="footer-link footer-cookie-btn">
-            Manage cookies
-          </button>
         </nav>
       </div>
     </footer>

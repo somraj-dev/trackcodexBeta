@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../../styles/PublicProfile.css";
 import styles from "./ContributionGraph.module.css";
+import { apiInstance } from "../../services/infra/api";
 
 interface ContributionDay {
   date: string;
@@ -38,24 +39,21 @@ const ContributionGraph: React.FC<ContributionGraphProps> = ({
     setLoading(true);
     try {
       const [contribRes, streakRes, totalRes] = await Promise.all([
-        fetch(`/api/v1/stats/contributions/${userId}?year=${year}`),
-        fetch(`/api/v1/stats/streak/${userId}`),
-        fetch(`/api/v1/stats/total/${userId}?year=${year}`),
+        apiInstance.get(`/stats/contributions/${userId}?year=${year}`),
+        apiInstance.get(`/stats/streak/${userId}`),
+        apiInstance.get(`/stats/total/${userId}?year=${year}`),
       ]);
 
-      if (contribRes.ok) {
-        const data = await contribRes.json();
-        setContributions(data.contributions || []);
+      if (contribRes.data) {
+        setContributions(contribRes.data.contributions || []);
       }
 
-      if (streakRes.ok) {
-        const data = await streakRes.json();
-        setStreak(data.streak);
+      if (streakRes.data) {
+        setStreak(streakRes.data.streak);
       }
 
-      if (totalRes.ok) {
-        const data = await totalRes.json();
-        setTotalContributions(data.total || 0);
+      if (totalRes.data) {
+        setTotalContributions(totalRes.data.total || 0);
       }
     } catch (error) {
       console.error("Error loading contributions:", error);
