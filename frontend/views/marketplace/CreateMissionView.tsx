@@ -6,7 +6,7 @@ const CreateMissionView = () => {
   const navigate = useNavigate();
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     title: '',
     organization: '',
     type: 'General & Case Competitions',
@@ -22,6 +22,17 @@ const CreateMissionView = () => {
     allowedRegister: 'Everyone can apply',
     collegeFilter: 'Default : Everyone can apply',
     genderFilter: 'Default : Everyone can apply',
+    startDate: '',
+    endDate: '',
+    registrationLimit: '',
+    formFields: [
+      { label: 'Full Name', required: true, id: 'name' },
+      { label: 'Email Address', required: true, id: 'email' },
+      { label: 'Mobile Number', required: true, id: 'phone' },
+      { label: 'College/Organization', required: false, id: 'college' },
+      { label: 'Year of Graduation', required: false, id: 'gradYear' },
+      { label: 'City', required: false, id: 'city' },
+    ],
   });
 
   const [activeStep, setActiveStep] = useState(1);
@@ -34,6 +45,15 @@ const CreateMissionView = () => {
   const handleModeChange = (mode: string) => setFormData({ ...formData, mode });
   const handleParticipationChange = (type: string) => setFormData({ ...formData, participationType: type });
   const handleWhoCanRegister = (type: string) => setFormData({ ...formData, allowedRegister: type });
+  
+  const toggleFormField = (id: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      formFields: prev.formFields.map((f: any) => 
+        f.id === id ? { ...f, required: !f.required } : f
+      )
+    }));
+  };
 
   const handleSaveAndNext = async () => {
     if (activeStep === 1) {
@@ -44,15 +64,24 @@ const CreateMissionView = () => {
     // Submit the form
     setIsSubmitting(true);
     try {
-      // Map to Job model and metadata
       const payload = {
         title: formData.title,
         description: formData.description,
-        type: 'Gig', // mapping arbitrary type
-        techStack: formData.skills ? formData.skills.split(',').map(s => s.trim()) : [],
+        type: 'Gig',
+        techStack: formData.skills ? formData.skills.split(',').map((s: string) => s.trim()) : [],
         budget: '$0',
-        repoId: '', // None yet
+        repoId: '',
         status: 'Open',
+        metadata: {
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          registrationLimit: formData.registrationLimit,
+          participationType: formData.participationType,
+          organization: formData.organization,
+          website: formData.website,
+          allowedRegister: formData.allowedRegister,
+          formFields: formData.formFields.filter((f: any) => f.required),
+        }
       };
 
       await api.post('/jobs', payload);
@@ -433,17 +462,102 @@ const CreateMissionView = () => {
 
             </div>
           ) : (
-            <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8 min-h-[400px] flex flex-col items-center justify-center animate-in fade-in duration-300">
-              <span className="material-symbols-outlined text-6xl text-gh-text-secondary mb-4 opacity-30">description</span>
-              <h2 className="text-2xl font-bold text-gh-text mb-2">Registration Form Details</h2>
-              <p className="text-sm text-gh-text-secondary text-center max-w-sm">Build your custom registration form fields here in the next update.</p>
-              
-              <div className="mt-8 flex gap-4">
+            <div className="space-y-8 animate-in fade-in duration-300">
+              {/* Registration Schedule */}
+              <div>
+                <h3 className="text-lg font-bold text-gh-text mb-4 px-1">Registration Schedule</h3>
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8">
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <label className="block text-sm font-semibold text-gh-text mb-2">
+                        Registration Start Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleChange}
+                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gh-text mb-2">
+                        Registration End Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        name="endDate"
+                        value={formData.endDate}
+                        onChange={handleChange}
+                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-8">
+                    <label className="block text-sm font-semibold text-gh-text mb-2">
+                      Max No. of Registrations <span className="text-gh-text-secondary font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="registrationLimit"
+                      value={formData.registrationLimit}
+                      onChange={handleChange}
+                      placeholder="e.g. 500"
+                      className="w-full max-w-xs bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                    />
+                    <p className="text-xs text-gh-text-secondary mt-2">Leave blank for unlimited registrations.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Registration Form Builder */}
+              <div>
+                <h3 className="text-lg font-bold text-gh-text mb-4 px-1">Registration Form Fields</h3>
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8">
+                  <p className="text-sm text-gh-text-secondary mb-6 leading-relaxed">
+                    Select the information you want to collect from participants. Required fields are pre-filled based on TrackCodex core requirements.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {formData.formFields.map((field) => (
+                      <div 
+                        key={field.id}
+                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                          field.required ? 'border-blue-500/50 bg-blue-500/5' : 'border-gh-border hover:border-gh-text-secondary'
+                        }`}
+                        onClick={() => !['name', 'email', 'phone'].includes(field.id) && toggleFormField(field.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`material-symbols-outlined text-[20px] ${field.required ? 'text-blue-500' : 'text-gh-text-secondary opacity-50'}`}>
+                            {field.required ? 'check_box' : 'check_box_outline_blank'}
+                          </span>
+                          <span className={`text-sm font-semibold ${field.required ? 'text-gh-text' : 'text-gh-text-secondary'}`}>
+                            {field.label}
+                          </span>
+                        </div>
+                        {['name', 'email', 'phone'].includes(field.id) && (
+                          <span className="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase">Mandatory</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-8 pt-8 border-t border-gh-border">
+                    <button className="flex items-center gap-2 text-blue-500 font-bold text-sm hover:underline">
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                      Add Custom Question
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-center pt-4">
                 <button 
                   onClick={() => setActiveStep(1)}
-                  className="px-6 py-2.5 rounded-xl border border-gh-border text-gh-text font-semibold text-sm hover:bg-gh-bg-tertiary transition-colors"
+                  className="flex items-center gap-2 text-gh-text-secondary text-sm font-semibold hover:text-gh-text transition-colors"
                 >
-                  Back to Step 1
+                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                  Go back to edit Opportunity Details
                 </button>
               </div>
             </div>
