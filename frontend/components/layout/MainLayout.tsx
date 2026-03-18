@@ -223,6 +223,7 @@ const MainLayout: React.FC = () => {
                       {[
                         { icon: "terminal", label: "New Workspace", to: "/workspace/new" },
                         { icon: "account_tree", label: "New Repository", to: "/repositories/new" },
+                        { icon: "work", label: "New Mission", to: "/marketplace/missions/new" },
                         { icon: "add_box", label: "New Post", to: "/community?action=create-post" },
                         { icon: "upload", label: "Import Repository", to: "/repositories/import" },
                       ].map((item) => (
