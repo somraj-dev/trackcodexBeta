@@ -80,8 +80,10 @@ export async function requireAuth(
       if (!dbUser) {
         // AUTO-SYNC: User is valid in Firebase but doesn't exist in DB yet.
         if (isFirebaseConfigured) {
+          let fbEmail: string | undefined; // Hoisted so catch block can access it
           try {
             const fbUser = await firebaseAdmin.auth().getUser(firebaseUid);
+            fbEmail = fbUser.email || undefined;
             const email = fbUser.email || "";
             const name = fbUser.displayName || "TrackCodex User";
             const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
@@ -116,21 +118,49 @@ export async function requireAuth(
               syncErr?.message?.includes("timeout") ||
               syncErr?.code === "P1001" || syncErr?.code === "P1002";
 
+            const isUniqueConstraint = syncErr?.code === "P2002";
+
             console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`);
             console.error(`[AUTH-SYNC]   Error name: ${syncErr?.name}`);
             console.error(`[AUTH-SYNC]   Error code: ${syncErr?.code}`);
             console.error(`[AUTH-SYNC]   Error message: ${syncErr?.message}`);
             console.error(`[AUTH-SYNC]   Is connection error: ${isConnectionError}`);
-            console.error(`[AUTH-SYNC]   DATABASE_URL target: ${(process.env.DATABASE_URL || "").replace(/:([^:@]+)@/, ":****@")}`);
+            console.error(`[AUTH-SYNC]   Is unique constraint: ${isUniqueConstraint}`);
 
-            const userMessage = isConnectionError
-              ? "Database is temporarily unavailable. Please try again in a moment."
-              : "User synchronization failed. Please sign in again.";
+            // If the upsert failed due to a unique constraint (e.g. email/username already taken by another row),
+            // try to find the existing user by email and link them instead of rejecting.
+            if (isUniqueConstraint && fbEmail) {
+              try {
+                const existingUser = await prisma.user.findFirst({
+                  where: {
+                    OR: [
+                      { email: fbEmail },
+                      { id: firebaseUid },
+                    ],
+                  },
+                  select: { id: true, email: true, role: true, tokenVersion: true },
+                });
 
-            return reply.code(isConnectionError ? 503 : 401).send({
-              error: isConnectionError ? "Service Unavailable" : "Unauthorized",
-              message: userMessage,
-            });
+                if (existingUser) {
+                  console.log(`[AUTH-SYNC] Found existing user by email fallback: ${existingUser.id}`);
+                  dbUser = existingUser;
+                }
+              } catch (fallbackErr) {
+                console.error(`[AUTH-SYNC] Fallback lookup also failed:`, fallbackErr);
+              }
+            }
+
+            // If we still don't have a user, return appropriate error
+            if (!dbUser) {
+              const userMessage = isConnectionError
+                ? "Database is temporarily unavailable. Please try again in a moment."
+                : "User synchronization failed. Please sign in again.";
+
+              return reply.code(isConnectionError ? 503 : 401).send({
+                error: isConnectionError ? "Service Unavailable" : "Unauthorized",
+                message: userMessage,
+              });
+            }
           }
         }
       }
