@@ -468,12 +468,9 @@ const EditorView = ({ isFocusMode = false }: { isFocusMode?: boolean }) => {
             <div className="p-4 text-xs text-slate-500">Loading workspace...</div>
           ) : (
             <FileExplorer
-              fileSystem={fileSystem}
+              files={fileSystem}
               onFileClick={handleFileClick}
-              openFiles={openFiles}
               activeFileId={activeFileId}
-              onCloseFile={handleCloseFile}
-              onAddFile={handleAddFile}
             />
           )}
         </div>

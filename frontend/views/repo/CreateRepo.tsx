@@ -52,7 +52,7 @@ const CreateRepo: React.FC = () => {
         }),
       );
 
-      navigate(`/repo/${created.id}`);
+      navigate(`/github/${created.id}`);
     } catch (err: any) {
       console.error(`Failed to create repository. Target: ${(import.meta as any).env?.VITE_API_URL || "Local/Proxy"}/api/v1/repositories`, err);
       const errorMessage = err?.response?.data?.message || err?.message || "Failed to create repository";

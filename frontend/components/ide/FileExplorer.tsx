@@ -73,7 +73,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       <div className="p-3 text-xs font-bold tracking-wider text-[#bbbbbb] uppercase sticky top-0 bg-[#181818]">
         Explorer
       </div>
-      {files.map((node) => (
+      {(files || []).map((node) => (
         <FileItem
           key={node.id}
           node={node}

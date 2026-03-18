@@ -184,43 +184,7 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // User Activity Feed — real per-user event log
-  fastify.get("/users/:userId/activity", async (request, reply) => {
-    let { userId } = request.params as { userId: string };
-    const { limit } = request.query as { limit?: string };
-    const take = limit ? Math.min(parseInt(limit), 50) : 10;
 
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
-    if (!isUuid) {
-      const user = await prisma.user.findFirst({
-        where: { username: { equals: userId, mode: "insensitive" } },
-        select: { id: true }
-      });
-      if (user) userId = user.id;
-    }
-
-    try {
-      const logs = await prisma.activityLog.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take,
-        include: {
-          repo: { select: { id: true, name: true } },
-        },
-      });
-      return logs.map((log: any) => ({
-        id: log.id,
-        action: log.action,
-        details: log.details,
-        repoName: log.repo?.name ?? null,
-        repoId: log.repo?.id ?? null,
-        createdAt: log.createdAt,
-      }));
-    } catch (error) {
-      console.error("User activity fetch error:", error);
-      return reply.code(500).send({ message: "Failed to fetch user activity" });
-    }
-  });
 
   // User Contribution Heatmap — groups ActivityLog by date for the past 365 days
   fastify.get("/users/:userId/contributions", async (request, reply) => {
@@ -719,12 +683,21 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // Get User Activity
   fastify.get("/users/:userId/activity", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    let { userId } = request.params as { userId: string };
     const { page, limit } = request.query as { page?: string; limit?: string };
 
     const pageNum = Math.max(1, parseInt(page || "1"));
     const limitNum = Math.min(50, parseInt(limit || "20"));
     const skip = (pageNum - 1) * limitNum;
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isUuid) {
+      const user = await prisma.user.findFirst({
+        where: { username: { equals: userId, mode: "insensitive" } },
+        select: { id: true }
+      });
+      if (user) userId = user.id;
+    }
 
     try {
       const [activities, total] = await Promise.all([
@@ -733,6 +706,9 @@ export async function userRoutes(fastify: FastifyInstance) {
           orderBy: { createdAt: "desc" },
           take: limitNum,
           skip,
+          include: {
+            repo: { select: { id: true, name: true } }
+          }
         }),
         prisma.activityLog.count({ where: { userId } }),
       ]);
@@ -743,7 +719,10 @@ export async function userRoutes(fastify: FastifyInstance) {
         id: a.id,
         userId: a.userId,
         action: a.action,
+        details: a.details,
         metadata: a.details,
+        repoName: a.repo?.name ?? null,
+        repoId: a.repo?.id ?? null,
         createdAt: a.createdAt,
       }));
 

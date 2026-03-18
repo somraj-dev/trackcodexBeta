@@ -38,6 +38,7 @@ import { galleryRoutes } from "./infra/gallery";
 import integrationRoutes from "./auth/integrations";
 import { applicationRoutes } from "./hiring/applications";
 import workflowRoutes from "./infra/ci";
+import { githubishRoutes } from "./githubish";
 
 export async function routes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", async (request) => {
@@ -97,6 +98,7 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(integrationRoutes);
   await fastify.register(applicationRoutes);
   await fastify.register(workflowRoutes);
+  await fastify.register(githubishRoutes, { prefix: "/github" });
 }
 
 

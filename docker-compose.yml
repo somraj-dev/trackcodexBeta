@@ -13,11 +13,14 @@ services:
       - COOKIE_SECRET=cookie-secret-change-this-min-32-chars
       - FRONTEND_URL=https://trackcodex.com
       - OPENVSCODE_URL=https://ide.trackcodex.com
+      - GIT_ROOT=/app/data/git
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - git-data:/app/data/git
     user: "0:0"
     depends_on:
       - db
+
 
   db:
     image: postgres:15-alpine
@@ -45,7 +48,7 @@ services:
 
 volumes:
   pgdata:
-
+  git-data:
 networks:
   default:
     driver: bridge

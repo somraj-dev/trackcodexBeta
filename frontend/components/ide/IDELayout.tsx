@@ -126,12 +126,9 @@ const IDELayout = () => {
         switch (activeView) {
             case 'explorer': return (
                 <FileExplorer
-                    fileSystem={fileSystem}
+                    files={fileSystem}
                     onFileClick={handleFileClick}
-                    openFiles={openFiles}
                     activeFileId={activeFileId}
-                    onCloseFile={handleCloseFile}
-                    onAddFile={handleAddFile}
                 />
             );
             case 'search': return <SearchPanel />;
