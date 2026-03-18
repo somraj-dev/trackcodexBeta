@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import RedirectToLogin from "./components/auth/RedirectToLogin";
@@ -97,8 +97,7 @@ const PersonalAccessTokensSettings = React.lazy(() => import("./views/settings/P
 const IntegrationsSettings = React.lazy(() => import("./views/settings/IntegrationsSettings"));
 const SessionsSettings = React.lazy(() => import("./views/settings/SessionsSettings"));
 const SSHKeysSettings = React.lazy(() => import("./views/settings/SSHKeysSettings"));
-const AhiCsSettings = React.lazy(() => import("./views/settings/AhiCsSettings"));
-const PrivacySettings = React.lazy(() => import("./views/settings/PrivacySettings"));
+
 const BillingUsage = React.lazy(() => import("./views/settings/billing/BillingUsage"));
 const BillingAnalytics = React.lazy(() => import("./views/settings/billing/BillingAnalytics"));
 const BillingBudgets = React.lazy(() => import("./views/settings/billing/BillingBudgets"));
@@ -117,13 +116,10 @@ const TrialRepositoriesView = React.lazy(() => import("./views/marketplace/Trial
 const HiringLayout = React.lazy(() => import("./views/hiring/HiringLayout"));
 const CandidateDiscoveryView = React.lazy(() => import("./views/hiring/CandidateDiscoveryView"));
 const HiringJobsView = React.lazy(() => import("./views/hiring/HiringJobsView"));
-const HiringAnalyticsView = React.lazy(() => import("./views/hiring/HiringAnalyticsView"));
 const CandidateScorecardView = React.lazy(() => import("./views/hiring/CandidateScorecardView"));
 const CandidateComparisonView = React.lazy(() => import("./views/hiring/CandidateComparisonView"));
 const OfferEditorView = React.lazy(() => import("./views/hiring/OfferEditorView"));
 const SessionSchedulerView = React.lazy(() => import("./views/hiring/SessionSchedulerView"));
-const InterviewerFeedbackView = React.lazy(() => import("./views/hiring/InterviewerFeedbackView"));
-const AssessmentsView = React.lazy(() => import("./views/hiring/AssessmentsView"));
 
 // Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));

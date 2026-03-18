@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { MOCK_REPOS } from "../../constants";
-import PostJobModal from "../../components/jobs/PostJobModal";
+
 import { api } from "../../services/infra/api";
 import { useRealtime } from "../../contexts/RealtimeContext";
 
@@ -32,7 +32,7 @@ const RepoDetailView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("Code");
-  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+
   const [isForking, setIsForking] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLaunchingWorkspace, setIsLaunchingWorkspace] = useState(false);
@@ -609,15 +609,7 @@ const RepoDetailView = () => {
         {renderTabContent()}
       </div>
 
-      <PostJobModal
-        isOpen={isJobModalOpen}
-        onClose={() => setIsJobModalOpen(false)}
-        onSubmit={() => { }}
-        initialData={{
-          repoId: repo.id,
-          description: `Hiring an expert for ${repo.name} repository tasks.`,
-        }}
-      />
+
     </div>
   );
 };

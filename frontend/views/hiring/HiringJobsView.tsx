@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import PostJobModal from "../../components/jobs/PostJobModal";
+import { useNavigate } from "react-router-dom";
 
 const HiringJobsView = () => {
-    const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <div className="p-8 text-gh-text max-w-[1200px] mx-auto">
@@ -14,7 +13,7 @@ const HiringJobsView = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => setIsPostJobModalOpen(true)}
+                    onClick={() => navigate("/marketplace/missions/new")}
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
                 >
                     <span className="material-symbols-outlined !text-sm">add</span>
@@ -30,16 +29,6 @@ const HiringJobsView = () => {
                 </p>
             </div>
 
-            {isPostJobModalOpen && (
-                <PostJobModal
-                    isOpen={isPostJobModalOpen}
-                    onClose={() => setIsPostJobModalOpen(false)}
-                    onSubmit={(jobData) => {
-                        console.log("Job submitted:", jobData);
-                        setIsPostJobModalOpen(false);
-                    }}
-                />
-            )}
         </div>
     );
 };

@@ -52,8 +52,7 @@ const CreateMissionView = () => {
         techStack: formData.skills ? formData.skills.split(',').map(s => s.trim()) : [],
         budget: '$0',
         repoId: '', // None yet
-        status: 'OPEN',
-        metadata: { ...formData }
+        status: 'Open',
       };
 
       await api.post('/jobs', payload);
@@ -168,6 +167,7 @@ const CreateMissionView = () => {
                       </label>
                       <select
                         name="type"
+                        title="Opportunity Type"
                         value={formData.type}
                         onChange={handleChange}
                         className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm text-slate-800 outline-none appearance-none shadow-sm"
@@ -183,6 +183,7 @@ const CreateMissionView = () => {
                       </label>
                       <select
                         name="subType"
+                        title="Opportunity Sub-type"
                         value={formData.subType}
                         onChange={handleChange}
                         className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl px-4 py-3 text-sm text-slate-800 outline-none appearance-none shadow-sm"
@@ -317,6 +318,7 @@ const CreateMissionView = () => {
                       <div className="flex items-center gap-4 max-w-sm">
                         <select
                           name="minTeamSize"
+                          title="Minimum Team Size"
                           value={formData.minTeamSize}
                           onChange={handleChange}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none"
@@ -327,6 +329,7 @@ const CreateMissionView = () => {
                         </select>
                         <select
                           name="maxTeamSize"
+                          title="Maximum Team Size"
                           value={formData.maxTeamSize}
                           onChange={handleChange}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none"
