@@ -88,29 +88,48 @@ export async function requireAuth(
             const name = fbUser.displayName || "TrackCodex User";
             const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
 
-            // Create the user in Postgres using upsert to handle race conditions
-            dbUser = await prisma.user.upsert({
-              where: { id: firebaseUid },
-              update: {
-                emailVerified: fbUser.emailVerified || false, // Sync latest status
-              },
-              create: {
-                id: firebaseUid,
-                email: email,
-                username: username,
-                name: name,
-                password: "", // Handled by Firebase
-                role: "user",
-                emailVerified: fbUser.emailVerified || false,
-              },
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                tokenVersion: true,
-              }
-            });
-            console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
+            // STEP 1: Try to find the user by email first (handles cases where
+            // user was created via a different auth method with the same email)
+            const existingByEmail = email
+              ? await prisma.user.findFirst({
+                  where: {
+                    OR: [
+                      { email: { equals: email, mode: "insensitive" } },
+                      { id: firebaseUid },
+                    ],
+                  },
+                  select: { id: true, email: true, role: true, tokenVersion: true },
+                })
+              : null;
+
+            if (existingByEmail) {
+              console.log(`[AUTH-SYNC] Found existing user by email/id lookup: ${existingByEmail.id}`);
+              dbUser = existingByEmail;
+            } else {
+              // STEP 2: Create a brand-new user via upsert
+              dbUser = await prisma.user.upsert({
+                where: { id: firebaseUid },
+                update: {
+                  emailVerified: fbUser.emailVerified || false,
+                },
+                create: {
+                  id: firebaseUid,
+                  email: email,
+                  username: username,
+                  name: name,
+                  password: "", // Handled by Firebase
+                  role: "user",
+                  emailVerified: fbUser.emailVerified || false,
+                },
+                select: {
+                  id: true,
+                  email: true,
+                  role: true,
+                  tokenVersion: true,
+                }
+              });
+              console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
+            }
           } catch (syncErr: any) {
             const isConnectionError = syncErr?.message?.includes("Can't reach database") ||
               syncErr?.message?.includes("connect") ||
@@ -118,39 +137,32 @@ export async function requireAuth(
               syncErr?.message?.includes("timeout") ||
               syncErr?.code === "P1001" || syncErr?.code === "P1002";
 
-            const isUniqueConstraint = syncErr?.code === "P2002";
-
             console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`);
-            console.error(`[AUTH-SYNC]   Error name: ${syncErr?.name}`);
-            console.error(`[AUTH-SYNC]   Error code: ${syncErr?.code}`);
-            console.error(`[AUTH-SYNC]   Error message: ${syncErr?.message}`);
-            console.error(`[AUTH-SYNC]   Is connection error: ${isConnectionError}`);
-            console.error(`[AUTH-SYNC]   Is unique constraint: ${isUniqueConstraint}`);
+            console.error(`[AUTH-SYNC]   Error: ${syncErr?.code} - ${syncErr?.message}`);
 
-            // If the upsert failed due to a unique constraint (e.g. email/username already taken by another row),
-            // try to find the existing user by email and link them instead of rejecting.
-            if (isUniqueConstraint && fbEmail) {
+            // STEP 3: Last-resort fallback — try to find the user by ANY means
+            if (!isConnectionError) {
               try {
-                const existingUser = await prisma.user.findFirst({
+                const fallbackUser = await prisma.user.findFirst({
                   where: {
                     OR: [
-                      { email: fbEmail },
+                      ...(fbEmail ? [{ email: fbEmail }] : []),
                       { id: firebaseUid },
                     ],
                   },
                   select: { id: true, email: true, role: true, tokenVersion: true },
                 });
 
-                if (existingUser) {
-                  console.log(`[AUTH-SYNC] Found existing user by email fallback: ${existingUser.id}`);
-                  dbUser = existingUser;
+                if (fallbackUser) {
+                  console.log(`[AUTH-SYNC] Fallback lookup succeeded: ${fallbackUser.id}`);
+                  dbUser = fallbackUser;
                 }
               } catch (fallbackErr) {
                 console.error(`[AUTH-SYNC] Fallback lookup also failed:`, fallbackErr);
               }
             }
 
-            // If we still don't have a user, return appropriate error
+            // If we STILL don't have a user, return appropriate error
             if (!dbUser) {
               const userMessage = isConnectionError
                 ? "Database is temporarily unavailable. Please try again in a moment."

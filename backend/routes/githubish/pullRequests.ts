@@ -118,16 +118,20 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
 
 async function triggerWebhooks(repoId: string, event: string, payload: any) {
     const webhooks = await prisma.webhook.findMany({ where: { repoId, active: true } });
-    const fetch = require('node-fetch');
+    const crypto = await import('crypto');
     for (const hook of webhooks) {
         if (!hook.events.includes("*") && !hook.events.includes(event)) continue;
         
+        const signature = hook.secret 
+            ? crypto.createHmac('sha256', hook.secret).update(JSON.stringify(payload)).digest('hex') 
+            : '';
+
         fetch(hook.url, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json', 
                 'X-TrackCodex-Event': event,
-                'X-TrackCodex-Signature': hook.secret ? require('crypto').createHmac('sha256', hook.secret).update(JSON.stringify(payload)).digest('hex') : ''
+                'X-TrackCodex-Signature': signature
             },
             body: JSON.stringify({ event, payload })
         }).catch((err: any) => console.error('Webhook payload failed:', err.message));
