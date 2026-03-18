@@ -8,34 +8,25 @@ const CreateMissionView = () => {
   // Form State
   const [formData, setFormData] = useState<any>({
     title: '',
-    organization: '',
-    type: 'General & Case Competitions',
-    subType: 'General Competition',
-    link: '',
-    website: '',
-    description: '',
-    skills: '',
-    participationType: 'Team Participation',
-    minTeamSize: '1',
-    maxTeamSize: '2',
-    mode: 'Online',
-    allowedRegister: 'Everyone can apply',
-    collegeFilter: 'Default : Everyone can apply',
     genderFilter: 'Default : Everyone can apply',
-    startDate: '',
-    endDate: '',
+    startDate: '2026-03-18T00:00',
+    endDate: '2026-04-01T00:00',
     registrationLimit: '',
     formFields: [
-      { label: 'Full Name', required: true, id: 'name' },
-      { label: 'Email Address', required: true, id: 'email' },
-      { label: 'Mobile Number', required: true, id: 'phone' },
-      { label: 'College/Organization', required: false, id: 'college' },
-      { label: 'Year of Graduation', required: false, id: 'gradYear' },
-      { label: 'City', required: false, id: 'city' },
+      { label: 'Name', required: true, id: 'name', status: 'Required', locked: true, icon: 'person' },
+      { label: 'Email', required: true, id: 'email', status: 'Required', locked: true, icon: 'mail' },
+      { label: 'Mobile number', required: true, id: 'phone', status: 'Required', icon: 'call' },
+      { label: 'CV/Resume', required: false, id: 'cv', status: 'Off', icon: 'description' },
+      { label: 'Gender', required: true, id: 'gender', status: 'Required', icon: 'group' },
+      { label: 'Current College/Organization', required: true, id: 'college', status: 'Required', icon: 'corporate_fare' },
+      { label: 'User Type', required: true, id: 'userType', status: 'Required', icon: 'person_search' },
+      { label: 'Applicant\'s location', required: true, id: 'location', status: 'Required', icon: 'location_on' },
+      { label: 'Differently abled', required: true, id: 'differentlyAbled', status: 'Required', icon: 'accessibility' },
     ],
   });
 
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(2);
+  const [showAllFields, setShowAllFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -105,25 +96,25 @@ const CreateMissionView = () => {
           <div className="border border-gh-border rounded-2xl bg-gh-bg-secondary overflow-hidden shadow-sm">
             <button 
               onClick={() => setActiveStep(1)}
-              className={`w-full flex items-center gap-4 p-4 text-left transition-colors ${activeStep === 1 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
+              className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${activeStep === 1 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${activeStep === 1 ? 'bg-blue-600 text-white' : 'bg-gh-bg-tertiary text-gh-text-secondary'}`}>1</div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${activeStep === 1 ? 'bg-blue-600 text-white' : 'bg-emerald-500 text-white'}`}>
+                {activeStep > 1 ? <span className="material-symbols-outlined text-sm">check</span> : '1'}
+              </div>
               <div>
-                <div className="text-xs text-gh-text-secondary font-medium">Step 1</div>
-                <div className={`font-semibold ${activeStep === 1 ? 'text-blue-500' : 'text-gh-text-secondary'}`}>Opportunity details</div>
+                <div className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-wider mb-0.5">Step 1</div>
+                <div className={`text-sm font-semibold ${activeStep === 1 ? 'text-blue-500' : 'text-gh-text'}`}>Opportunity details</div>
               </div>
             </button>
             
-            <div className="h-px bg-gh-border mx-4" />
-            
             <button 
               onClick={() => setActiveStep(2)}
-              className={`w-full flex items-center gap-4 p-4 text-left transition-colors ${activeStep === 2 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
+              className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${activeStep === 2 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${activeStep === 2 ? 'bg-blue-600 text-white' : 'bg-gh-bg-tertiary text-gh-text-secondary'}`}>2</div>
               <div>
-                <div className="text-xs text-gh-text-secondary font-medium">Step 2</div>
-                <div className={`font-semibold ${activeStep === 2 ? 'text-blue-500' : 'text-gh-text-secondary'}`}>Registration Form</div>
+                <div className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-wider mb-0.5">Step 2</div>
+                <div className={`text-sm font-semibold ${activeStep === 2 ? 'text-blue-500' : 'text-gh-text'}`}>Registration Form</div>
               </div>
             </button>
           </div>
@@ -131,15 +122,15 @@ const CreateMissionView = () => {
           <div className="border border-gh-border rounded-2xl bg-gh-bg-secondary p-5 shadow-sm">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 rounded-full bg-gh-bg-tertiary flex items-center justify-center">
-                <span className="material-symbols-outlined text-gh-text-secondary text-sm">support_agent</span>
+                <img src="https://unstop.com/assets/images/support-icon.png" alt="Support" className="w-4 h-4 opacity-50 contrast-0" />
               </div>
-              <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded">Support</span>
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded uppercase tracking-wider">Support</span>
             </div>
-            <p className="text-xs text-gh-text-secondary leading-relaxed">
+            <p className="text-[11px] text-gh-text-secondary leading-relaxed">
               Facing any issues or need any help? <br/>
-              Reach us at <a href="mailto:support@trackcodex.com" className="text-blue-600 font-semibold">support@trackcodex.com</a>
+              Reach us at <a href="mailto:support@unstop.com" className="text-blue-600 font-semibold">support@unstop.com</a>
             </p>
-            <button className="text-xs text-blue-600 font-semibold underline mt-2">Get in touch with us here</button>
+            <button className="text-[11px] text-blue-600 font-bold underline mt-2 block">Get in touch with us here</button>
           </div>
         </div>
 
@@ -462,124 +453,157 @@ const CreateMissionView = () => {
 
             </div>
           ) : (
-            <div className="space-y-8 animate-in fade-in duration-300">
-              {/* Registration Schedule */}
-              <div>
-                <h3 className="text-lg font-bold text-gh-text mb-4 px-1">Registration Schedule</h3>
-                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8">
-                  <div className="grid grid-cols-2 gap-8">
-                    <div>
-                      <label className="block text-sm font-semibold text-gh-text mb-2">
-                        Registration Start Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleChange}
-                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
-                      />
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              
+              <div className="px-1">
+                <h2 className="text-2xl font-bold text-gh-text">Registration Form</h2>
+                <p className="text-[13px] text-gh-text-secondary mt-1">Customize the form candidates fill out when applying for this role.</p>
+              </div>
+
+              {/* Basic Details Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-gh-text px-1">Basic Details (Filled by all team members)</h3>
+                <div className="space-y-3">
+                  {formData.formFields.slice(0, showAllFields ? formData.formFields.length : 3).map((field: any) => (
+                    <div 
+                      key={field.id}
+                      className="bg-gh-bg-secondary border border-gh-border rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="material-symbols-outlined text-gh-text-secondary text-[20px] group-hover:text-blue-500 transition-colors">{field.icon}</span>
+                        <span className="text-[15px] font-semibold text-gh-text">{field.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[12px] font-medium px-3 py-1 rounded-full ${field.status === 'Required' ? 'text-gh-text-secondary' : 'text-orange-500 bg-orange-500/5'}`}>
+                          {field.status}
+                        </span>
+                        {field.locked ? (
+                          <span className="material-symbols-outlined text-gh-text-secondary text-[18px] opacity-40">lock</span>
+                        ) : (
+                          <span className="material-symbols-outlined text-gh-text-secondary text-[20px] cursor-pointer hover:text-gh-text">unfold_more</span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gh-text mb-2">
-                        Registration End Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="datetime-local"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleChange}
-                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-8">
-                    <label className="block text-sm font-semibold text-gh-text mb-2">
-                      Max No. of Registrations <span className="text-gh-text-secondary font-normal">(Optional)</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="registrationLimit"
-                      value={formData.registrationLimit}
-                      onChange={handleChange}
-                      placeholder="e.g. 500"
-                      className="w-full max-w-xs bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
-                    />
-                    <p className="text-xs text-gh-text-secondary mt-2">Leave blank for unlimited registrations.</p>
-                  </div>
+                  ))}
+                  
+                  <button 
+                    onClick={() => setShowAllFields(!showAllFields)}
+                    className="w-full py-4 text-sm font-bold text-gh-text-secondary hover:text-gh-text transition-colors flex items-center justify-center gap-2"
+                  >
+                    {showAllFields ? 'Show less' : 'Show more'} 
+                    <span className={`material-symbols-outlined transition-transform duration-300 ${showAllFields ? 'rotate-180' : ''}`}>expand_more</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Registration Form Builder */}
-              <div>
-                <h3 className="text-lg font-bold text-gh-text mb-4 px-1">Registration Form Fields</h3>
-                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8">
-                  <p className="text-sm text-gh-text-secondary mb-6 leading-relaxed">
-                    Select the information you want to collect from participants. Required fields are pre-filled based on TrackCodex core requirements.
-                  </p>
+              {/* Screening Questions Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gh-text">Screening Questions/Additional Info (Filled by team leader only)</h3>
+                    <p className="text-[12px] text-gh-text-secondary mt-1">Add custom questions in registration form and use responses to shortlist candidates</p>
+                  </div>
+                  <button className="w-10 h-10 rounded-full border border-gh-border flex items-center justify-center hover:bg-gh-bg-tertiary transition-colors shadow-sm">
+                    <span className="material-symbols-outlined text-gh-text-secondary">add</span>
+                  </button>
+                </div>
+
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4 cursor-pointer text-gh-text hover:text-blue-500 transition-colors">
+                    <span className="material-symbols-outlined text-sm">expand_more</span>
+                    <span className="text-[13px] font-bold">Suggested screening question(s)</span>
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {formData.formFields.map((field) => (
-                      <div 
-                        key={field.id}
-                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                          field.required ? 'border-blue-500/50 bg-blue-500/5' : 'border-gh-border hover:border-gh-text-secondary'
-                        }`}
-                        onClick={() => !['name', 'email', 'phone'].includes(field.id) && toggleFormField(field.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`material-symbols-outlined text-[20px] ${field.required ? 'text-blue-500' : 'text-gh-text-secondary opacity-50'}`}>
-                            {field.required ? 'check_box' : 'check_box_outline_blank'}
-                          </span>
-                          <span className={`text-sm font-semibold ${field.required ? 'text-gh-text' : 'text-gh-text-secondary'}`}>
-                            {field.label}
-                          </span>
-                        </div>
-                        {['name', 'email', 'phone'].includes(field.id) && (
-                          <span className="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase">Mandatory</span>
-                        )}
-                      </div>
+                  <div className="flex flex-wrap gap-2">
+                    {['+ Cover Letter', '+ Highest Qualification', '+ Portfolio/Work Samples'].map(p => (
+                      <button key={p} className="px-4 py-2 border border-gh-border rounded-full text-[13px] font-semibold text-gh-text hover:border-blue-500 hover:text-blue-500 transition-all">
+                        {p}
+                      </button>
                     ))}
                   </div>
 
-                  <div className="mt-8 pt-8 border-t border-gh-border">
-                    <button className="flex items-center gap-2 text-blue-500 font-bold text-sm hover:underline">
-                      <span className="material-symbols-outlined text-[18px]">add</span>
-                      Add Custom Question
-                    </button>
+                  <div className="mt-8 pt-8 border-t border-gh-border flex items-center justify-between">
+                    <div className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-gh-text-secondary mt-1">filter_alt</span>
+                      <div>
+                        <h4 className="text-[14px] font-bold text-gh-text leading-tight">Make additional questions eliminatory</h4>
+                        <p className="text-[12px] text-gh-text-secondary mt-1 max-w-sm font-medium">These "Additional Questions" will determine whether candidate(s) move forward in the opportunity.</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" />
+                      <div className="w-11 h-6 bg-gh-bg-tertiary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="mt-6 bg-blue-500/5 border border-blue-500/10 rounded-xl p-4 flex items-start gap-3">
+                    <span className="material-symbols-outlined text-blue-500 text-[20px]">info</span>
+                    <p className="text-[12px] text-gh-text-secondary font-medium leading-relaxed">
+                      When eliminatory screening is enabled, you can mark additional questions as mandatory and set auto-shortlisting criteria. Candidate(s) who meet the criteria(s) will be automatically shortlisted
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-center pt-4">
-                <button 
-                  onClick={() => setActiveStep(1)}
-                  className="flex items-center gap-2 text-gh-text-secondary text-sm font-semibold hover:text-gh-text transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                  Go back to edit Opportunity Details
-                </button>
+              {/* Registration Platform & Timeline Section */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-bold text-gh-text leading-tight">Registration Platform & Timeline</h3>
+                  <p className="text-[12px] text-gh-text-secondary mt-1">Specify the registration platform and registration window for this Opportunity</p>
+                </div>
+
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm space-y-8">
+                  <div className="space-y-2">
+                    <h4 className="text-[14px] font-bold text-gh-text">Registration Timeline</h4>
+                    <p className="text-[13px] text-gh-text-secondary font-medium">
+                      Registrations will be open from <span className="text-gh-text font-bold">18 Mar 26, 12:00 AM</span> to <span className="text-gh-text font-bold">01 Apr 26, 12:00 AM</span>
+                      <button className="text-blue-500 font-bold ml-2 inline-flex items-center gap-1 hover:underline">
+                        <span className="material-symbols-outlined text-[14px]">edit</span> Change
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-[14px] font-bold text-gh-text tracking-wide">Platform</h4>
+                    <p className="text-[13px] text-gh-text-secondary font-medium flex items-center gap-2">
+                      This Opportunity is set to receive applications on 
+                      <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-[11px] font-black uppercase flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">verified</span> TrackCodex
+                      </span>
+                      <button className="text-blue-500 font-bold ml-1 inline-flex items-center gap-1 hover:underline">
+                        <span className="material-symbols-outlined text-[14px]">edit</span> Change
+                      </button>
+                    </p>
+                  </div>
+                </div>
               </div>
+
             </div>
           )}
         </div>
       </div>
 
       {/* Sticky Bottom Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg-secondary border-t border-gh-border shadow-[0_-4px_20px_rgba(0,0,0,0.02)] z-50">
-        <div className="max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-end gap-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg px-12 py-4 border-t border-gh-border flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.05)]">
+        <button 
+          onClick={() => activeStep > 1 && setActiveStep(1)}
+          className="text-gh-text-secondary font-bold text-[14px] hover:text-gh-text transition-colors"
+        >
+          Back
+        </button>
+        <div className="flex items-center gap-4">
           <button 
             type="button" 
-            className="px-6 py-2.5 rounded-xl border border-gh-border text-gh-text font-semibold text-sm hover:bg-gh-bg-tertiary transition-colors"
+            className="px-8 py-2.5 rounded-full border border-gh-border text-gh-text font-bold text-[14px] hover:bg-gh-bg-secondary transition-all"
           >
             Save as Draft
           </button>
           <button 
             onClick={handleSaveAndNext}
             disabled={isSubmitting}
-            className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="px-10 py-2.5 bg-blue-600 text-white rounded-full font-bold text-[14px] shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
           >
-            {isSubmitting ? 'Saving...' : (activeStep === 1 ? 'Save and next' : 'Publish Opportunity')}
+            {isSubmitting ? 'Saving...' : (activeStep === 1 ? 'Save and next' : 'Publish')}
           </button>
         </div>
       </div>
