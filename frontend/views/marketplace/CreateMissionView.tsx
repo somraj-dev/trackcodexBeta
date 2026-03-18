@@ -1,6 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/infra/api';
+
+const ORG_LIST = [
+  "Madhav Institute of Technology and Science (MITS), Gwalior",
+  "Amrita Sai Institute of Science and Technology",
+  "Anil Neerukonda Institute of Technology and Sciences",
+  "Godavari Institute of Engineering and Technology, AP",
+  "Hyderabad Institute of Technology and Management (HITM), Hyderabad",
+  "Sreenidhi Institute of Science and Technology (SNIST)",
+  "Acropolis Institute of Technology and Research, Indore",
+  "Balaji Institute of Technology and Science, Warangal"
+];
+
+const FESTIVAL_LIST = [
+  "Unstop Awards 2024",
+  "Flipkart GRiD 6.0",
+  "Tata Imagination Challenge",
+  "Google Solution Challenge",
+  "Amazon ML Summer School"
+];
 
 const CreateMissionView = () => {
   const navigate = useNavigate();
@@ -9,9 +28,14 @@ const CreateMissionView = () => {
   const [formData, setFormData] = useState<any>({
     title: '',
     genderFilter: 'Default : Everyone can apply',
-    startDate: '2026-03-18T00:00',
-    endDate: '2026-04-01T00:00',
-    registrationLimit: '',
+    registrationPlatform: 'Unstop',
+    allowedRegister: ['Everyone can apply'],
+    allowedClasses: ['All'],
+    educationalYears: ['Allow All'],
+    educationalDegrees: [],
+    passoutYears: ['Allow All'],
+    experienceMode: 'Allow all',
+    experienceYears: 0,
     formFields: [
       { label: 'Name', required: true, id: 'name', status: 'Required', locked: true, icon: 'person' },
       { label: 'Email', required: true, id: 'email', status: 'Required', locked: true, icon: 'mail' },
@@ -28,6 +52,19 @@ const CreateMissionView = () => {
   const [activeStep, setActiveStep] = useState(2);
   const [showAllFields, setShowAllFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showGenderConfig, setShowGenderConfig] = useState(false);
+  const [showCollegeConfig, setShowCollegeConfig] = useState(false);
+  const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
+  const [activeFieldMenu, setActiveFieldMenu] = useState<string | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState<'startDate' | 'endDate' | null>(null);
+  const [tempDate, setTempDate] = useState<Date>(new Date());
+
+  const [orgSuggestions, setOrgSuggestions] = useState<string[]>([]);
+  const [showOrgSuggestions, setShowOrgSuggestions] = useState(false);
+  const [festivalSuggestions, setFestivalSuggestions] = useState<string[]>([]);
+  const [showFestivalSuggestions, setShowFestivalSuggestions] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,8 +72,191 @@ const CreateMissionView = () => {
 
   const handleModeChange = (mode: string) => setFormData({ ...formData, mode });
   const handleParticipationChange = (type: string) => setFormData({ ...formData, participationType: type });
-  const handleWhoCanRegister = (type: string) => setFormData({ ...formData, allowedRegister: type });
   
+  const handleWhoCanRegister = (type: string) => {
+    setFormData((prev: any) => {
+      let current = prev.allowedRegister || ['Everyone can apply'];
+      if (type === 'Everyone can apply') {
+        current = ['Everyone can apply'];
+      } else {
+        current = current.filter((t: string) => t !== 'Everyone can apply');
+        if (current.includes(type)) {
+          current = current.filter((t: string) => t !== type);
+          if (current.length === 0) current = ['Everyone can apply'];
+        } else {
+          current = [...current, type];
+        }
+      }
+      return { ...prev, allowedRegister: current };
+    });
+  };
+
+  const handleClassSelect = (cls: string) => {
+    setFormData((prev: any) => {
+      let current = prev.allowedClasses || ['All'];
+      if (cls === 'All') {
+        current = ['All'];
+      } else {
+        current = current.filter((c: string) => c !== 'All');
+        if (current.includes(cls)) {
+          current = current.filter((c: string) => c !== cls);
+          if (current.length === 0) current = ['All'];
+        } else {
+          current = [...current, cls];
+        }
+      }
+      return { ...prev, allowedClasses: current };
+    });
+  };
+
+  const handleEduYearSelect = (year: string) => {
+    setFormData((prev: any) => {
+      let current = prev.educationalYears || ['Allow All'];
+      if (year === 'Allow All') {
+        current = ['Allow All'];
+      } else {
+        current = current.filter((y: string) => y !== 'Allow All');
+        if (current.includes(year)) {
+          current = current.filter((y: string) => y !== year);
+          if (current.length === 0) current = ['Allow All'];
+        } else {
+          current = [...current, year];
+        }
+      }
+      return { ...prev, educationalYears: current };
+    });
+  };
+
+  const handleDegreeToggle = (degree: string) => {
+    setFormData((prev: any) => {
+      const current = prev.educationalDegrees || [];
+      if (current.includes(degree)) {
+        return { ...prev, educationalDegrees: current.filter((d: string) => d !== degree) };
+      }
+      return { ...prev, educationalDegrees: [...current, degree] };
+    });
+  };
+
+  const handlePassoutYearSelect = (year: string) => {
+    setFormData((prev: any) => {
+      let current = prev.passoutYears || ['Allow All'];
+      if (year === 'Allow All') {
+        current = ['Allow All'];
+      } else {
+        current = current.filter((y: string) => y !== 'Allow All');
+        if (current.includes(year)) {
+          current = current.filter((y: string) => y !== year);
+          if (current.length === 0) current = ['Allow All'];
+        } else {
+          current = [...current, year];
+        }
+      }
+      return { ...prev, passoutYears: current };
+    });
+  };
+
+  const handleFieldStatusUpdate = (fieldId: string, status: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      formFields: prev.formFields.map((f: any) => 
+        f.id === fieldId ? { ...f, status, required: status === 'Required' } : f
+      )
+    }));
+    setActiveFieldMenu(null);
+  };
+
+  const calculateDays = (start: string, end: string) => {
+    const s = new Date(start);
+    const e = new Date(end);
+    const diffTime = Math.abs(e.getTime() - s.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const handleDateSave = (field: 'startDate' | 'endDate', date: Date) => {
+    // Format to YYYY-MM-DDTHH:mm
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const formatted = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    setFormData({ ...formData, [field]: formatted });
+    setShowDatePicker(null);
+  };
+
+  const handleOrgSearch = (val: string) => {
+    setFormData({ ...formData, organization: val });
+    if (val.trim().length > 0) {
+      const matches = ORG_LIST.filter(org => org.toLowerCase().includes(val.toLowerCase()));
+      setOrgSuggestions(matches);
+      setShowOrgSuggestions(true);
+    } else {
+      setShowOrgSuggestions(false);
+    }
+  };
+
+  const handleFestivalSearch = (val: string) => {
+    setFormData({ ...formData, link: val });
+    if (val.trim().length > 0) {
+      const matches = FESTIVAL_LIST.filter(fest => fest.toLowerCase().includes(val.toLowerCase()));
+      setFestivalSuggestions(matches);
+      setShowFestivalSuggestions(true);
+    } else {
+      setShowFestivalSuggestions(false);
+    }
+  };
+  const handleGenderSelect = (gender: string) => {
+    setFormData((prev: any) => {
+      let newGenders = prev.allowedGenders || ['Allow All'];
+      if (gender === 'Allow All') {
+        newGenders = ['Allow All'];
+      } else {
+        newGenders = newGenders.filter((g: string) => g !== 'Allow All');
+        if (newGenders.includes(gender)) {
+          newGenders = newGenders.filter((g: string) => g !== gender);
+          if (newGenders.length === 0) newGenders = ['Allow All'];
+        } else {
+          newGenders = [...newGenders, gender];
+        }
+      }
+      return { ...prev, allowedGenders: newGenders };
+    });
+  };
+
+  const handleCollegeSelect = (college: string) => {
+    setFormData((prev: any) => {
+      let newColleges = prev.eligibleColleges || ['Allow All'];
+      if (college === 'Allow All') {
+        newColleges = ['Allow All'];
+      } else {
+        newColleges = newColleges.filter((c: string) => c !== 'Allow All');
+        if (newColleges.includes(college)) {
+          newColleges = newColleges.filter((c: string) => c !== college);
+          if (newColleges.length === 0) newColleges = ['Allow All'];
+        } else {
+          newColleges = [...newColleges, college];
+        }
+      }
+      return { ...prev, eligibleColleges: newColleges };
+    });
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1024 * 1024) {
+        alert("File size should be less than 1MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setLogoPreview(result);
+        setFormData({ ...formData, logo: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerLogoUpload = () => fileInputRef.current?.click();
+
   const toggleFormField = (id: string) => {
     setFormData((prev: any) => ({
       ...prev,
@@ -86,7 +306,7 @@ const CreateMissionView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gh-bg font-sans pb-24 text-gh-text">
+    <div className="min-h-screen bg-gh-bg font-sans pb-32 text-gh-text">
       <div className="max-w-[1280px] mx-auto px-6 py-8 flex flex-col md:flex-row gap-8">
         
         {/* Left Sidebar */}
@@ -141,23 +361,47 @@ const CreateMissionView = () => {
               
               {/* Opportunity Details Block */}
               <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8">
-                <div className="flex items-start gap-6 border border-dashed border-blue-500/30 bg-blue-500/5 rounded-xl p-6 mb-8 cursor-pointer hover:bg-blue-500/10 transition-colors">
-                  <div className="w-16 h-16 bg-gh-bg border border-gh-border rounded-xl flex flex-col items-center justify-center shadow-sm text-blue-500">
-                    <span className="material-symbols-outlined text-2xl">cloud_upload</span>
-                    <span className="text-[10px] font-bold mt-1">Add Logo</span>
+                <input 
+                  type="file" 
+                  ref={fileInputRef}
+                  onChange={handleLogoChange}
+                  accept="image/jpeg,image/png,image/jpg"
+                  className="hidden"
+                  title="Upload Logo"
+                />
+                <div 
+                  onClick={triggerLogoUpload}
+                  className={`flex items-start gap-6 border-2 border-dashed rounded-xl p-6 mb-8 cursor-pointer transition-all ${logoPreview ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10'}`}
+                >
+                  <div className="w-16 h-16 bg-gh-bg border border-gh-border rounded-xl flex flex-col items-center justify-center shadow-sm overflow-hidden text-blue-500">
+                    {logoPreview ? (
+                      <img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-2xl">cloud_upload</span>
+                        <span className="text-[10px] font-bold mt-1">Add Logo</span>
+                      </>
+                    )}
                   </div>
                   <div>
                     <h4 className="text-sm font-semibold text-gh-text">Supported logo image: JPG, JPEG, or PNG. Max 1 MB.</h4>
-                    <p className="text-xs text-red-500 font-medium mt-1">Logo required</p>
+                    {logoPreview ? (
+                      <p className="text-xs text-emerald-500 font-medium mt-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">check_circle</span> Logo uploaded successfully
+                      </p>
+                    ) : (
+                      <p className="text-xs text-red-500 font-medium mt-1">Logo required</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gh-text mb-2">
+                    <label htmlFor="title" className="block text-sm font-semibold text-gh-text mb-2">
                       Opportunity Title <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="title"
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
@@ -167,17 +411,56 @@ const CreateMissionView = () => {
                     <p className="text-xs text-gh-text-secondary mt-2">Max 100 characters</p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gh-text mb-2">
-                      Organization Name <span className="text-red-500">*</span>
+                  <div className="relative">
+                    <label htmlFor="organization" className="block text-sm font-semibold text-gh-text mb-2">
+                      Organisation Name <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      name="organization"
-                      value={formData.organization}
-                      onChange={handleChange}
-                      placeholder="e.g. Madhav Institute of Technology and Science (MITS), Gwalior"
-                      className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
-                    />
+                    <div className="relative">
+                      <input
+                        id="organization"
+                        name="organization"
+                        value={formData.organization}
+                        onChange={(e) => handleOrgSearch(e.target.value)}
+                        onFocus={() => formData.organization?.trim().length > 0 && setShowOrgSuggestions(true)}
+                        placeholder="e.g. Madhav Institute of Technology and Science (MITS), Gwalior"
+                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                      />
+                      <button 
+                        onClick={() => setShowOrgSuggestions(false)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500/10 text-blue-500 text-[11px] font-bold rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all"
+                      >
+                        Create New
+                      </button>
+                    </div>
+
+                    {showOrgSuggestions && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-gh-bg border border-gh-border rounded-xl shadow-2xl z-[100] max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                        {orgSuggestions.length > 0 ? (
+                          orgSuggestions.map((org) => (
+                            <button
+                              key={org}
+                              onClick={() => {
+                                setFormData({ ...formData, organization: org });
+                                setShowOrgSuggestions(false);
+                              }}
+                              className="w-full text-left px-4 py-3 text-[13px] border-b border-gh-border last:border-0 hover:bg-gh-bg-tertiary transition-colors text-gh-text font-medium"
+                            >
+                              {org}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="p-4 text-[13px] text-gh-text-secondary bg-gh-bg-secondary rounded-xl">
+                            Cannot Find <span className="font-bold text-gh-text">{formData.organization}</span>, 
+                            <button 
+                              onClick={() => setShowOrgSuggestions(false)}
+                              className="text-blue-500 font-bold ml-1 hover:underline text-[13px]"
+                            >
+                              Create New
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -193,15 +476,20 @@ const CreateMissionView = () => {
                         className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none appearance-none shadow-sm"
                       >
                         <option>General & Case Competitions</option>
-                        <option>Hackathons</option>
-                        <option>Hiring Challenges</option>
+                        <option>Quizzes</option>
+                        <option>Hackathons & Coding Challenges</option>
+                        <option>Scholarships</option>
+                        <option>Workshops & Webinar</option>
+                        <option>Conferences</option>
+                        <option>Creative & Cultural Events</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-gh-text mb-2">
+                      <label htmlFor="subType" className="block text-sm font-semibold text-gh-text mb-2">
                         Opportunity Sub-type <span className="text-red-500">*</span>
                       </label>
                       <select
+                        id="subType"
                         name="subType"
                         title="Opportunity Sub-type"
                         value={formData.subType}
@@ -214,17 +502,47 @@ const CreateMissionView = () => {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-semibold text-gh-text mb-2">
                       Link Festival/Campaign <span className="text-gh-text-secondary font-normal">(Optional)</span>
                     </label>
                     <input
                       name="link"
                       value={formData.link}
-                      onChange={handleChange}
+                      onChange={(e) => handleFestivalSearch(e.target.value)}
+                      onFocus={() => formData.link?.trim().length > 0 && setShowFestivalSuggestions(true)}
                       placeholder="Enter Festival/Campaign name"
                       className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
                     />
+                    
+                    {showFestivalSuggestions && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-gh-bg border border-gh-border rounded-xl shadow-2xl z-[100] max-h-48 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                        {festivalSuggestions.length > 0 ? (
+                          festivalSuggestions.map((fest) => (
+                            <button
+                              key={fest}
+                              onClick={() => {
+                                setFormData({ ...formData, link: fest });
+                                setShowFestivalSuggestions(false);
+                              }}
+                              className="w-full text-left px-4 py-3 text-[13px] border-b border-gh-border last:border-0 hover:bg-gh-bg-tertiary transition-colors text-gh-text font-medium"
+                            >
+                              {fest}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="p-4 text-[13px] text-gh-text-secondary bg-gh-bg-secondary rounded-xl">
+                            Cannot Find <span className="font-bold text-gh-text">{formData.link}</span>, 
+                            <button 
+                              onClick={() => setShowFestivalSuggestions(false)}
+                              className="text-blue-500 font-bold ml-1 hover:underline text-[13px]"
+                            >
+                              Create One
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -402,11 +720,17 @@ const CreateMissionView = () => {
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-sm p-8 space-y-6">
                   
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <label className="block text-sm font-semibold text-gh-text">
-                        Who can register? <span className="text-red-500">*</span>
-                        <p className="text-xs text-gh-text-secondary font-normal mt-0.5">Select the candidate type(s) eligible to register.</p>
-                      </label>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="text-sm font-semibold text-gh-text">Who can register? <span className="text-red-500">*</span></h4>
+                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Select the candidate type(s) eligible to register</p>
+                      </div>
+                      <button 
+                        onClick={() => handleWhoCanRegister('Everyone can apply')}
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-gh-bg-tertiary hover:bg-gh-bg transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">refresh</span>
+                      </button>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                       {['Everyone can apply', 'College Students', 'Freshers', 'Professionals', 'School Students'].map((type) => (
@@ -414,10 +738,10 @@ const CreateMissionView = () => {
                           key={type}
                           onClick={() => handleWhoCanRegister(type)}
                           type="button"
-                          className={`px-5 py-2.5 rounded-full border border-dashed transition-all text-sm font-medium ${
-                            formData.allowedRegister === type 
+                          className={`px-5 py-2.5 rounded-full border text-[13px] font-medium transition-all ${
+                            (formData.allowedRegister || ['Everyone can apply']).includes(type) 
                               ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm' 
-                              : 'border-gh-border text-gh-text-secondary hover:border-gh-text-secondary'
+                              : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
                           }`}
                         >
                           {type}
@@ -426,26 +750,359 @@ const CreateMissionView = () => {
                     </div>
                   </div>
 
-                  <div className="border border-gh-border rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gh-text mb-1">College/Organization</h4>
-                      <p className="text-xs text-gh-text-secondary">Default : Everyone can apply</p>
-                      <p className="text-[11px] text-gh-text-secondary mt-0.5 opacity-70">Restrict applicants based on their College/Organization</p>
+                  {/* Dynamic Section: Class/Grade for School Students */}
+                  {(formData.allowedRegister || []).includes('School Students') && (
+                    <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h4 className="text-[15px] font-bold text-gh-text">Class/Grade</h4>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Restrict applicants based on class/grade.</p>
+                        </div>
+                        <button 
+                          onClick={() => handleClassSelect('All')}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gh-bg-tertiary hover:bg-gh-bg transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">refresh</span>
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {['All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'].map((cls) => (
+                          <button
+                            key={cls}
+                            onClick={() => handleClassSelect(cls)}
+                            className={`px-4 py-2 rounded-full border text-[12px] font-medium transition-all ${
+                              (formData.allowedClasses || ['All']).includes(cls)
+                                ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm'
+                                : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                            }`}
+                          >
+                            {cls}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <button className="flex items-center gap-1.5 text-blue-500 text-sm font-semibold px-4 py-2 border border-blue-500/20 rounded-lg hover:bg-blue-500/10 transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">edit</span> Change
-                    </button>
+                  )}
+
+                  {/* Dynamic Section: Experience for Professionals */}
+                  {(formData.allowedRegister || []).includes('Professionals') && (
+                    <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h4 className="text-[15px] font-bold text-gh-text">Experience Required</h4>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Set the required prior work experience (in years) for applicants.</p>
+                        </div>
+                        <button 
+                          onClick={() => setFormData({ ...formData, experienceMode: 'Allow all', experienceYears: 0 })}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gh-bg-tertiary hover:bg-gh-bg transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">refresh</span>
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <button
+                          onClick={() => setFormData({ ...formData, experienceMode: 'Allow all' })}
+                          className={`px-4 py-2 rounded-full border text-[12px] font-medium transition-all ${
+                            formData.experienceMode === 'Allow all'
+                              ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm'
+                              : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                          }`}
+                        >
+                          Allow all
+                        </button>
+                        <button
+                          onClick={() => setFormData({ ...formData, experienceMode: 'Specify' })}
+                          className={`px-4 py-2 rounded-full border text-[12px] font-medium transition-all ${
+                            formData.experienceMode === 'Specify'
+                              ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm'
+                              : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                          }`}
+                        >
+                          Specify working experience
+                        </button>
+                      </div>
+                      
+                      {formData.experienceMode === 'Specify' && (
+                        <div className="mb-4 animate-in fade-in zoom-in-95 duration-200">
+                          <input 
+                            type="number"
+                            value={formData.experienceYears}
+                            onChange={(e) => setFormData({ ...formData, experienceYears: e.target.value })}
+                            placeholder="Enter years of experience..."
+                            className="w-full bg-gh-bg-tertiary border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text outline-none focus:border-blue-500"
+                          />
+                        </div>
+                      )}
+
+                      <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 flex gap-3">
+                        <span className="material-symbols-outlined text-amber-500 text-[20px]">warning</span>
+                        <p className="text-[11px] text-gh-text-secondary leading-relaxed">
+                          By default, candidates of all experience level can register. To include those with 0 years of experience, select 'Freshers' under 'Who can register'
+                        </p>
+                      </div>
+                      <button className="mt-4 flex items-center gap-2 text-blue-500 text-[13px] font-bold hover:underline transition-all">
+                        <span className="material-symbols-outlined text-[18px]">add</span> Add Educational Criteria for Professionals
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Dynamic Section: Educational Background for College/Freshers/Professionals */}
+                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers', 'Professionals'].includes(t))) && (
+                    <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h4 className="text-[15px] font-bold text-gh-text">Educational Background</h4>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Specify the required academic background for this Opportunity.</p>
+                        </div>
+                        <button 
+                          onClick={() => setFormData({ ...formData, educationalYears: ['Allow All'], educationalDegrees: [] })}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gh-bg-tertiary hover:bg-gh-bg transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">refresh</span>
+                        </button>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <h5 className="text-[13px] font-bold text-gh-text mb-3">Specify passing/graduating year</h5>
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            {['Allow All', '2026', '2027', '2028', '2029', '2030', '2031'].map((year) => (
+                              <button
+                                key={year}
+                                onClick={() => handleEduYearSelect(year)}
+                                className={`px-4 py-2 rounded-full border text-[12px] font-medium transition-all ${
+                                  (formData.educationalYears || ['Allow All']).includes(year)
+                                    ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm'
+                                    : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                                }`}
+                              >
+                                {year}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h5 className="text-[13px] font-bold text-gh-text mb-3">Specify degree(s), course(s), or specialization if required</h5>
+                          <div className="flex flex-wrap items-center gap-2.5">
+                            {['Management', 'Engineering', 'Arts & Science', 'Medicine', 'Law'].map((degree) => (
+                              <button
+                                key={degree}
+                                onClick={() => handleDegreeToggle(degree)}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-[13px] font-medium transition-all ${
+                                  (formData.educationalDegrees || []).includes(degree)
+                                    ? 'border-blue-500 bg-blue-500 text-white shadow-md'
+                                    : 'border-gh-border text-gh-text hover:border-gh-text-secondary'
+                                }`}
+                              >
+                                {degree} <span className="material-symbols-outlined text-[16px]">{(formData.educationalDegrees || []).includes(degree) ? 'close' : 'add'}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dynamic Section: Passout Year for College/Freshers */}
+                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers'].includes(t))) && (
+                    <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h4 className="text-[15px] font-bold text-gh-text">Passout Year</h4>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Select the passout year range for candidates eligible to apply for this Opportunity.</p>
+                        </div>
+                        <button 
+                          onClick={() => handlePassoutYearSelect('Allow All')}
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-gh-bg-tertiary hover:bg-gh-bg transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">refresh</span>
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        {['Allow All', '2021', '2022', '2023', '2024', '2025'].map((year) => (
+                          <button
+                            key={year}
+                            onClick={() => handlePassoutYearSelect(year)}
+                            className={`px-4 py-2 rounded-full border text-[12px] font-medium transition-all ${
+                              (formData.passoutYears || ['Allow All']).includes(year)
+                                ? 'border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm'
+                                : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                            }`}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* College/Organization Section */}
+                  <div className={`border border-gh-border rounded-xl transition-all ${showCollegeConfig ? 'p-0 overflow-hidden' : 'p-4'}`}>
+                    {!showCollegeConfig ? (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gh-text mb-1">College/Organization</h4>
+                          <p className="text-xs text-gh-text-secondary">Default : {(formData.eligibleColleges || ['Allow All']).join(', ')}</p>
+                          <p className="text-[11px] text-gh-text-secondary mt-0.5 opacity-70">Restrict applicants based on their College/Organization</p>
+                        </div>
+                        <button 
+                          onClick={() => setShowCollegeConfig(true)}
+                          className="flex items-center gap-1.5 text-blue-500 text-sm font-semibold px-4 py-2 border border-blue-500/20 rounded-lg hover:bg-blue-500/10 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span> Change
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-gh-bg-secondary p-6 space-y-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-[16px] font-bold text-gh-text">College/Organization</h4>
+                            <p className="text-[13px] text-gh-text-secondary">Restrict applicants by college/organization</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => handleCollegeSelect('Allow All')}
+                              className="w-9 h-9 flex items-center justify-center rounded-full bg-gh-bg border border-gh-border hover:bg-gh-bg-tertiary transition-colors"
+                              title="Reset"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">refresh</span>
+                            </button>
+                            <button 
+                              onClick={() => setShowCollegeConfig(false)}
+                              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/5 text-red-500 border border-red-500/20 text-sm font-semibold hover:bg-red-500/10 transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">close</span> Cancel
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            onClick={() => handleCollegeSelect('Allow All')}
+                            className={`px-5 py-2 rounded-full border text-[13px] font-medium transition-all ${
+                              (formData.eligibleColleges || []).includes('Allow All')
+                                ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                            }`}
+                          >
+                            Allow All
+                          </button>
+                          <button
+                            onClick={() => {
+                              const current = formData.eligibleColleges || ['Allow All'];
+                              if (current.includes('Allow All')) {
+                                setFormData({ ...formData, eligibleColleges: [] });
+                              }
+                            }}
+                            className={`px-5 py-2 rounded-full border border-dashed text-[13px] font-medium transition-all ${(formData.eligibleColleges || []).length > 0 && !formData.eligibleColleges.includes('Allow All') ? 'border-blue-500 bg-blue-500/10 text-blue-500' : 'border-gh-border text-gh-text-secondary hover:border-gh-text-secondary'}`}
+                          >
+                            Eligible College/Organization(s)
+                          </button>
+                        </div>
+
+                        {(formData.eligibleColleges || []).length > 0 && !formData.eligibleColleges.includes('Allow All') && (
+                          <div className="animate-in fade-in zoom-in-95 duration-200">
+                            <input
+                              type="text"
+                              placeholder="Type college/organization name and press Enter..."
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const val = e.currentTarget.value.trim();
+                                  if (val && !formData.eligibleColleges.includes(val)) {
+                                    setFormData({ ...formData, eligibleColleges: [...formData.eligibleColleges, val] });
+                                    e.currentTarget.value = '';
+                                  }
+                                }
+                              }}
+                              className="w-full bg-gh-bg-tertiary border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text outline-none focus:border-blue-500"
+                            />
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {formData.eligibleColleges.map((c: string) => (
+                                <span key={c} className="flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-full text-xs font-medium">
+                                  {c}
+                                  <button onClick={() => setFormData({ ...formData, eligibleColleges: formData.eligibleColleges.filter((item: string) => item !== c) })}>
+                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="pt-4 border-t border-gh-border">
+                          <h5 className="text-[14px] font-bold text-gh-text mb-3">Team composition by organization</h5>
+                          <label className="flex items-center gap-3 cursor-pointer group">
+                            <input 
+                              type="checkbox" 
+                              checked={formData.teamSameOrg}
+                              onChange={(e) => setFormData({ ...formData, teamSameOrg: e.target.checked })}
+                              className="w-5 h-5 rounded border-gh-border bg-gh-bg-tertiary text-blue-500 focus:ring-blue-500"
+                            />
+                            <span className="text-[13px] text-gh-text group-hover:text-blue-500 transition-colors">Member of a team should be from same organizations.</span>
+                          </label>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="border border-gh-border rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gh-text mb-1">Gender</h4>
-                      <p className="text-xs text-gh-text-secondary">Default : Everyone can apply</p>
-                      <p className="text-[11px] text-gh-text-secondary mt-0.5 opacity-70">Restrict applicants based on their Gender</p>
-                    </div>
-                    <button className="flex items-center gap-1.5 text-blue-500 text-sm font-semibold px-4 py-2 border border-blue-500/20 rounded-lg hover:bg-blue-500/10 transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">edit</span> Change
-                    </button>
+                  {/* Gender Section */}
+                  <div className={`border border-gh-border rounded-xl transition-all ${showGenderConfig ? 'p-0 overflow-hidden' : 'p-4'}`}>
+                    {!showGenderConfig ? (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gh-text mb-1">Gender</h4>
+                          <p className="text-xs text-gh-text-secondary">Default : {(formData.allowedGenders || ['Allow All']).join(', ')}</p>
+                          <p className="text-[11px] text-gh-text-secondary mt-0.5 opacity-70">Restrict applicants based on their Gender</p>
+                        </div>
+                        <button 
+                          onClick={() => setShowGenderConfig(true)}
+                          className="flex items-center gap-1.5 text-blue-500 text-sm font-semibold px-4 py-2 border border-blue-500/20 rounded-lg hover:bg-blue-500/10 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span> Change
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="bg-gh-bg-secondary p-6 space-y-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-[16px] font-bold text-gh-text">Gender</h4>
+                            <p className="text-[13px] text-gh-text-secondary">Restrict applicants based on their gender</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => handleGenderSelect('Allow All')}
+                              className="w-9 h-9 flex items-center justify-center rounded-full bg-gh-bg border border-gh-border hover:bg-gh-bg-tertiary transition-colors"
+                              title="Reset"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">refresh</span>
+                            </button>
+                            <button 
+                              onClick={() => setShowGenderConfig(false)}
+                              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/5 text-red-500 border border-red-500/20 text-sm font-semibold hover:bg-red-500/10 transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">close</span> Cancel
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3">
+                          {['Allow All', 'Female', 'Male', 'Transgender', 'Intersex', 'Non-binary', 'Prefer not to say', 'Others'].map((gender) => (
+                            <button
+                              key={gender}
+                              onClick={() => handleGenderSelect(gender)}
+                              className={`px-5 py-2 rounded-full border text-[13px] font-medium transition-all ${
+                                (formData.allowedGenders || ['Allow All']).includes(gender)
+                                  ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                  : 'border-gh-border border-dashed text-gh-text-secondary hover:border-gh-text-secondary'
+                              }`}
+                            >
+                              {gender}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -467,20 +1124,48 @@ const CreateMissionView = () => {
                   {formData.formFields.slice(0, showAllFields ? formData.formFields.length : 3).map((field: any) => (
                     <div 
                       key={field.id}
-                      className="bg-gh-bg-secondary border border-gh-border rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all group"
+                      className="bg-gh-bg-secondary border border-gh-border rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all group relative"
                     >
                       <div className="flex items-center gap-4">
                         <span className="material-symbols-outlined text-gh-text-secondary text-[20px] group-hover:text-blue-500 transition-colors">{field.icon}</span>
                         <span className="text-[15px] font-semibold text-gh-text">{field.label}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-[12px] font-medium px-3 py-1 rounded-full ${field.status === 'Required' ? 'text-gh-text-secondary' : 'text-orange-500 bg-orange-500/5'}`}>
-                          {field.status}
-                        </span>
-                        {field.locked ? (
+                        <div className="relative">
+                          {!field.locked ? (
+                            <button
+                              onClick={() => setActiveFieldMenu(activeFieldMenu === field.id ? null : field.id)}
+                              className={`flex items-center gap-2 px-3 py-1 rounded-lg border transition-all text-[12px] font-bold ${
+                                field.status === 'Required' 
+                                  ? 'text-gh-text-secondary hover:bg-gh-bg-tertiary border-gh-border' 
+                                  : 'text-orange-500 bg-orange-500/5 border-orange-500/10 hover:bg-orange-500/10'
+                              }`}
+                            >
+                              {field.status}
+                              <span className="material-symbols-outlined text-[16px]">unfold_more</span>
+                            </button>
+                          ) : (
+                            <span className="text-[12px] font-bold text-gh-text-secondary px-3 py-1">
+                              {field.status}
+                            </span>
+                          )}
+
+                          {activeFieldMenu === field.id && (
+                            <div className="absolute right-0 top-full mt-2 w-32 bg-gh-bg border border-gh-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                              {['Required', 'Off'].map((s) => (
+                                <button
+                                  key={s}
+                                  onClick={() => handleFieldStatusUpdate(field.id, s)}
+                                  className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-gh-bg-tertiary transition-colors ${field.status === s ? 'text-blue-500' : 'text-gh-text-secondary'}`}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {field.locked && (
                           <span className="material-symbols-outlined text-gh-text-secondary text-[18px] opacity-40">lock</span>
-                        ) : (
-                          <span className="material-symbols-outlined text-gh-text-secondary text-[20px] cursor-pointer hover:text-gh-text">unfold_more</span>
                         )}
                       </div>
                     </div>
@@ -503,7 +1188,10 @@ const CreateMissionView = () => {
                     <h3 className="text-lg font-bold text-gh-text">Screening Questions/Additional Info (Filled by team leader only)</h3>
                     <p className="text-[12px] text-gh-text-secondary mt-1">Add custom questions in registration form and use responses to shortlist candidates</p>
                   </div>
-                  <button className="w-10 h-10 rounded-full border border-gh-border flex items-center justify-center hover:bg-gh-bg-tertiary transition-colors shadow-sm">
+                  <button 
+                    onClick={() => setShowAddQuestionModal(true)}
+                    className="w-10 h-10 rounded-full border border-gh-border flex items-center justify-center hover:bg-gh-bg-tertiary transition-colors shadow-sm"
+                  >
                     <span className="material-symbols-outlined text-gh-text-secondary">add</span>
                   </button>
                 </div>
@@ -531,7 +1219,7 @@ const CreateMissionView = () => {
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" />
+                      <input type="checkbox" className="sr-only peer" title="Eliminatory Questions" />
                       <div className="w-11 h-6 bg-gh-bg-tertiary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
@@ -546,34 +1234,115 @@ const CreateMissionView = () => {
               </div>
 
               {/* Registration Platform & Timeline Section */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gh-text leading-tight">Registration Platform & Timeline</h3>
-                  <p className="text-[12px] text-gh-text-secondary mt-1">Specify the registration platform and registration window for this Opportunity</p>
-                </div>
-
-                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm space-y-8">
-                  <div className="space-y-2">
-                    <h4 className="text-[14px] font-bold text-gh-text">Registration Timeline</h4>
-                    <p className="text-[13px] text-gh-text-secondary font-medium">
-                      Registrations will be open from <span className="text-gh-text font-bold">18 Mar 26, 12:00 AM</span> to <span className="text-gh-text font-bold">01 Apr 26, 12:00 AM</span>
-                      <button className="text-blue-500 font-bold ml-2 inline-flex items-center gap-1 hover:underline">
-                        <span className="material-symbols-outlined text-[14px]">edit</span> Change
-                      </button>
-                    </p>
+              <div className="space-y-6">
+                {/* Platform Section */}
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm">
+                  <div className="flex items-center justify-between mb-6 cursor-pointer group">
+                    <h3 className="text-[15px] font-bold text-blue-500 flex items-center gap-2 group-hover:underline">
+                      Platform <span className="material-symbols-outlined text-[18px]">expand_less</span>
+                    </h3>
                   </div>
 
-                  <div className="space-y-2">
-                    <h4 className="text-[14px] font-bold text-gh-text tracking-wide">Platform</h4>
-                    <p className="text-[13px] text-gh-text-secondary font-medium flex items-center gap-2">
-                      This Opportunity is set to receive applications on 
-                      <span className="bg-blue-600 text-white px-2 py-0.5 rounded text-[11px] font-black uppercase flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[12px]">verified</span> TrackCodex
-                      </span>
-                      <button className="text-blue-500 font-bold ml-1 inline-flex items-center gap-1 hover:underline">
-                        <span className="material-symbols-outlined text-[14px]">edit</span> Change
-                      </button>
-                    </p>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <button 
+                      onClick={() => setFormData({ ...formData, registrationPlatform: 'Unstop' })}
+                      className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'Unstop' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
+                    >
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-white font-black text-[12px]">un</span>
+                      </div>
+                      <div>
+                        <h4 className="text-[14px] font-bold text-gh-text">Unstop</h4>
+                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Manage and receive applications on Unstop.</p>
+                      </div>
+                    </button>
+
+                    <button 
+                      className="flex-1 flex items-center gap-4 p-5 rounded-xl border-2 border-dashed border-gh-border transition-all text-left opacity-60 cursor-not-allowed group"
+                    >
+                      <div className="w-10 h-10 bg-gh-bg-tertiary rounded-full flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">link</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-[14px] font-bold text-gh-text">Other platform</h4>
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-orange-500 uppercase">
+                            <span className="material-symbols-outlined text-[12px]">star</span> Contact Sales
+                          </span>
+                        </div>
+                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Redirect candidates to an external website.</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Timeline Section */}
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm">
+                  <div className="flex items-center justify-between mb-6 cursor-pointer group">
+                    <h3 className="text-[15px] font-bold text-blue-500 flex items-center gap-2 group-hover:underline">
+                      Registration Timeline <span className="material-symbols-outlined text-[18px]">expand_less</span>
+                    </h3>
+                  </div>
+
+                  <div className="relative pl-8 space-y-4">
+                    {/* Vertical Line */}
+                    <div className="absolute left-[7px] top-2 bottom-8 border-l-2 border-dashed border-blue-500/30"></div>
+                    
+                    {/* Live Section */}
+                    <div className="relative">
+                      <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full bg-blue-500 border-4 border-gh-bg-secondary z-10"></div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[14px] font-bold text-gh-text w-12 text-left">Live</span>
+                        <div className="flex-1 relative">
+                          <button 
+                            onClick={() => {
+                              setTempDate(new Date(formData.startDate));
+                              setShowDatePicker('startDate');
+                            }}
+                            className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
+                          >
+                            {new Date(formData.startDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+                            <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Close Section */}
+                    <div className="relative">
+                      <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full border-2 border-blue-500 bg-gh-bg-secondary z-10"></div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[14px] font-bold text-gh-text w-12 text-left">Close</span>
+                        <div className="flex-1 relative">
+                          <button 
+                            onClick={() => {
+                              setTempDate(new Date(formData.endDate));
+                              setShowDatePicker('endDate');
+                            }}
+                            className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
+                          >
+                            {new Date(formData.endDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+                            <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Summary Message */}
+                    <div className="pt-6 border-t border-gh-border/50 flex items-start gap-3">
+                      <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">calendar_month</span>
+                      <p className="text-[12px] text-gh-text-secondary leading-normal">
+                        Candidates will be able to apply for this Opportunity from 
+                        <span className="font-bold text-gh-text mx-1">
+                          {new Date(formData.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {new Date(formData.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        to 
+                        <span className="font-bold text-gh-text mx-1">
+                          {new Date(formData.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {new Date(formData.endDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </span> 
+                        for a period of <span className="font-bold text-gh-text">{calculateDays(formData.startDate, formData.endDate)} Days</span>.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -584,7 +1353,7 @@ const CreateMissionView = () => {
       </div>
 
       {/* Sticky Bottom Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg px-12 py-4 border-t border-gh-border flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg-secondary px-8 py-3 border-t border-gh-border flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
         <button 
           onClick={() => activeStep > 1 && setActiveStep(1)}
           className="text-gh-text-secondary font-bold text-[14px] hover:text-gh-text transition-colors"
@@ -607,6 +1376,167 @@ const CreateMissionView = () => {
           </button>
         </div>
       </div>
+      {/* Add Questions Modal */}
+      {showAddQuestionModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gh-bg border border-gh-border w-full max-w-xl shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="px-8 py-6 border-b border-gh-border flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gh-text">Add Questions</h2>
+                <p className="text-[13px] text-gh-text-secondary mt-1">Ask candidates custom questions when they register.</p>
+              </div>
+              <button 
+                onClick={() => setShowAddQuestionModal(false)}
+                className="text-gh-text-secondary hover:text-gh-text transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="p-8">
+              <h3 className="text-[15px] font-bold text-gh-text mb-6">Custom</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Few Words (Text Box)', icon: 'short_text' },
+                  { label: 'Paragraph (Text Area)', icon: 'subject' },
+                  { label: 'Radio Button', icon: 'radio_button_checked' },
+                  { label: 'Check Box', icon: 'check_box' },
+                  { label: 'Dropdown', icon: 'arrow_drop_down_circle' },
+                  { label: 'File', icon: 'upload_file' },
+                  { label: 'Accept Box (E.g. Accept Te...', icon: 'task_alt' }
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    className="flex items-center gap-4 p-4 bg-gh-bg-secondary border border-gh-border rounded-xl hover:bg-gh-bg-tertiary hover:border-blue-500/50 transition-all group text-left"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center text-white shrink-0 shadow-sm">
+                      <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
+                    </div>
+                    <span className="text-[13px] font-bold text-gh-text group-hover:text-blue-500 transition-colors">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Premium Date Picker Modal */}
+      {showDatePicker && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-gh-bg border border-gh-border w-full max-w-[320px] rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Calendar Header */}
+            <div className="px-4 py-3 border-b border-gh-border flex items-center justify-between">
+              <button 
+                onClick={() => setTempDate(new Date(tempDate.setMonth(tempDate.getMonth() - 1)))}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gh-bg-tertiary transition-colors"
+                title="Prev Month"
+              >
+                <span className="material-symbols-outlined text-[20px]">keyboard_arrow_left</span>
+              </button>
+              <h3 className="text-sm font-bold text-gh-text">
+                {tempDate.toLocaleString('default', { month: 'short' })} {tempDate.getFullYear()}
+              </h3>
+              <button 
+                onClick={() => setTempDate(new Date(tempDate.setMonth(tempDate.getMonth() + 1)))}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gh-bg-tertiary transition-colors"
+                title="Next Month"
+              >
+                <span className="material-symbols-outlined text-[20px]">keyboard_arrow_right</span>
+              </button>
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="p-4">
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                  <div key={d} className="text-[11px] font-bold text-gh-text-secondary text-center py-1">{d}</div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 42 }).map((_, i) => {
+                  const firstDay = new Date(tempDate.getFullYear(), tempDate.getMonth(), 1).getDay();
+                  const date = new Date(tempDate.getFullYear(), tempDate.getMonth(), i - firstDay + 1);
+                  const isCurrentMonth = date.getMonth() === tempDate.getMonth();
+                  const isSelected = date.toDateString() === tempDate.toDateString();
+
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setTempDate(new Date(tempDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate())))}
+                      className={`h-9 w-9 flex items-center justify-center rounded-full text-[12px] transition-all ${
+                        isSelected 
+                          ? 'bg-blue-600 text-white font-bold' 
+                          : isCurrentMonth 
+                            ? 'text-gh-text hover:bg-gh-bg-tertiary' 
+                            : 'text-gh-text-secondary/30'
+                      }`}
+                    >
+                      {date.getDate()}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Time Picker Section */}
+            <div className="px-4 py-6 bg-gh-bg-secondary border-t border-gh-border flex flex-col items-center gap-4">
+              <div className="flex items-center gap-6">
+                <div className="flex flex-col items-center gap-1">
+                  <button 
+                    onClick={() => setTempDate(new Date(tempDate.setHours(tempDate.getHours() + 1)))}
+                    className="material-symbols-outlined text-gh-text-secondary hover:text-gh-text"
+                    title="Inc Hour"
+                  >
+                    keyboard_arrow_up
+                  </button>
+                  <span className="text-xl font-bold text-gh-text">{tempDate.getHours().toString().padStart(2, '0')}</span>
+                  <button 
+                    onClick={() => setTempDate(new Date(tempDate.setHours(tempDate.getHours() - 1)))}
+                    className="material-symbols-outlined text-gh-text-secondary hover:text-gh-text"
+                    title="Dec Hour"
+                  >
+                    keyboard_arrow_down
+                  </button>
+                </div>
+                <span className="text-xl font-bold text-gh-text mb-4">:</span>
+                <div className="flex flex-col items-center gap-1">
+                  <button 
+                    onClick={() => setTempDate(new Date(tempDate.setMinutes(tempDate.getMinutes() + 1)))}
+                    className="material-symbols-outlined text-gh-text-secondary hover:text-gh-text"
+                    title="Inc Min"
+                  >
+                    keyboard_arrow_up
+                  </button>
+                  <span className="text-xl font-bold text-gh-text">{tempDate.getMinutes().toString().padStart(2, '0')}</span>
+                  <button 
+                    onClick={() => setTempDate(new Date(tempDate.setMinutes(tempDate.getMinutes() - 1)))}
+                    className="material-symbols-outlined text-gh-text-secondary hover:text-gh-text"
+                    title="Dec Min"
+                  >
+                    keyboard_arrow_down
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Buttons */}
+            <div className="grid grid-cols-2 divide-x divide-gh-border border-t border-gh-border bg-gh-bg-secondary">
+              <button 
+                onClick={() => setShowDatePicker(null)}
+                className="py-3 text-[13px] font-bold text-gh-text-secondary hover:bg-gh-bg-tertiary transition-colors"
+              >
+                Close
+              </button>
+              <button 
+                onClick={() => handleDateSave(showDatePicker, tempDate)}
+                className="py-3 text-[13px] font-bold text-blue-500 hover:bg-gh-bg-tertiary transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
