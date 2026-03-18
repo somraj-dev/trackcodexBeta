@@ -28,7 +28,15 @@ const CreateMissionView = () => {
   const [formData, setFormData] = useState<any>({
     title: '',
     genderFilter: 'Default : Everyone can apply',
-    registrationPlatform: 'Unstop',
+    registrationPlatform: 'TrackCodex',
+    startDate: new Date().toISOString().slice(0, 16),
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+    type: 'General & Case Competitions',
+    subType: 'General Competition',
+    participationType: 'Individual',
+    mode: 'Online',
+    minTeamSize: '1',
+    maxTeamSize: '2',
     allowedRegister: ['Everyone can apply'],
     allowedClasses: ['All'],
     educationalYears: ['Allow All'],
@@ -53,6 +61,7 @@ const CreateMissionView = () => {
   const [showAllFields, setShowAllFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showGenderConfig, setShowGenderConfig] = useState(false);
   const [showCollegeConfig, setShowCollegeConfig] = useState(false);
@@ -268,6 +277,29 @@ const CreateMissionView = () => {
 
   const handleSaveAndNext = async () => {
     if (activeStep === 1) {
+      // Validate Step 1
+      const requiredFields = [
+        { key: 'title', label: 'Opportunity Title' },
+        { key: 'organization', label: 'Organisation Name' },
+        { key: 'type', label: 'Opportunity Type' },
+        { key: 'subType', label: 'Opportunity Sub-type' },
+        { key: 'description', label: 'Opportunity Description' },
+        { key: 'participationType', label: 'Participation Type' },
+        { key: 'mode', label: 'Mode of Opportunity' }
+      ];
+
+      const missingFields = requiredFields.filter(f => !formData[f.key] || formData[f.key].trim() === '');
+      const logoMissing = !logoPreview;
+      const registerMissing = !formData.allowedRegister || formData.allowedRegister.length === 0;
+
+      if (missingFields.length > 0 || logoMissing || registerMissing) {
+        setShowValidationErrors(true);
+        // Scroll to the first error or the top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      setShowValidationErrors(false);
       setActiveStep(2);
       return;
     }
@@ -348,7 +380,7 @@ const CreateMissionView = () => {
             </div>
             <p className="text-[11px] text-gh-text-secondary leading-relaxed">
               Facing any issues or need any help? <br/>
-              Reach us at <a href="mailto:support@unstop.com" className="text-blue-600 font-semibold">support@unstop.com</a>
+              Reach us at <a href="mailto:support@trackcodex.com" className="text-blue-600 font-semibold">support@trackcodex.com</a>
             </p>
             <button className="text-[11px] text-blue-600 font-bold underline mt-2 block">Get in touch with us here</button>
           </div>
@@ -371,9 +403,15 @@ const CreateMissionView = () => {
                 />
                 <div 
                   onClick={triggerLogoUpload}
-                  className={`flex items-start gap-6 border-2 border-dashed rounded-xl p-6 mb-8 cursor-pointer transition-all ${logoPreview ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10'}`}
+                  className={`flex items-start gap-6 border-2 border-dashed rounded-xl p-6 mb-8 cursor-pointer transition-all ${
+                    !logoPreview && showValidationErrors 
+                      ? 'border-red-500 bg-red-500/5' 
+                      : logoPreview 
+                        ? 'border-emerald-500/30 bg-emerald-500/5' 
+                        : 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10'
+                  }`}
                 >
-                  <div className="w-16 h-16 bg-gh-bg border border-gh-border rounded-xl flex flex-col items-center justify-center shadow-sm overflow-hidden text-blue-500">
+                  <div className={`w-16 h-16 bg-gh-bg border ${!logoPreview && showValidationErrors ? 'border-red-500' : 'border-gh-border'} rounded-xl flex flex-col items-center justify-center shadow-sm overflow-hidden text-blue-500`}>
                     {logoPreview ? (
                       <img src={logoPreview} alt="Logo Preview" className="w-full h-full object-cover" />
                     ) : (
@@ -400,13 +438,13 @@ const CreateMissionView = () => {
                     <label htmlFor="title" className="block text-sm font-semibold text-gh-text mb-2">
                       Opportunity Title <span className="text-red-500">*</span>
                     </label>
-                    <input
+                     <input
                       id="title"
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
                       placeholder="Enter Opportunity Title."
-                      className="w-full bg-gh-bg-tertiary border-2 border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                      className={`w-full bg-gh-bg-tertiary border-2 ${!formData.title?.trim() && showValidationErrors ? 'border-red-500' : 'border-gh-border'} focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm`}
                     />
                     <p className="text-xs text-gh-text-secondary mt-2">Max 100 characters</p>
                   </div>
@@ -416,21 +454,23 @@ const CreateMissionView = () => {
                       Organisation Name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <input
+                       <input
                         id="organization"
                         name="organization"
                         value={formData.organization}
                         onChange={(e) => handleOrgSearch(e.target.value)}
                         onFocus={() => formData.organization?.trim().length > 0 && setShowOrgSuggestions(true)}
                         placeholder="e.g. Madhav Institute of Technology and Science (MITS), Gwalior"
-                        className="w-full bg-gh-bg-tertiary border border-gh-border focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm"
+                        className={`w-full bg-gh-bg-tertiary border ${!formData.organization?.trim() && showValidationErrors ? 'border-red-500' : 'border-gh-border'} focus:border-blue-500 focus:bg-gh-bg rounded-xl px-4 py-3 text-sm text-gh-text outline-none transition-colors shadow-sm`}
                       />
-                      <button 
-                        onClick={() => setShowOrgSuggestions(false)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500/10 text-blue-500 text-[11px] font-bold rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all"
-                      >
-                        Create New
-                      </button>
+                      {formData.organization?.trim().length > 0 && orgSuggestions.length === 0 && (
+                        <button 
+                          onClick={() => setShowOrgSuggestions(false)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-500/10 text-blue-500 text-[11px] font-bold rounded-lg border border-blue-500/20 hover:bg-blue-500/20 transition-all animate-in fade-in zoom-in-95 duration-200"
+                        >
+                          Create New
+                        </button>
+                      )}
                     </div>
 
                     {showOrgSuggestions && (
@@ -590,12 +630,12 @@ const CreateMissionView = () => {
                       <div className="w-px h-4 bg-gh-border mx-1" />
                       <button className="p-1.5 hover:bg-gh-bg-secondary rounded text-gh-text-secondary"><span className="material-symbols-outlined text-[18px]">link</span></button>
                     </div>
-                    <textarea
+                     <textarea
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
                       placeholder="Write your description here..."
-                      className="w-full p-4 h-64 text-sm text-gh-text bg-gh-bg outline-none resize-y"
+                      className={`w-full p-4 h-64 text-sm text-gh-text bg-gh-bg outline-none resize-y border ${!formData.description?.trim() && showValidationErrors ? 'border-red-500 rounded-xl' : 'border-transparent'}`}
                     />
                   </div>
 
@@ -724,6 +764,9 @@ const CreateMissionView = () => {
                       <div>
                         <h4 className="text-sm font-semibold text-gh-text">Who can register? <span className="text-red-500">*</span></h4>
                         <p className="text-[12px] text-gh-text-secondary mt-0.5">Select the candidate type(s) eligible to register</p>
+                        {(!formData.allowedRegister || formData.allowedRegister.length === 0) && showValidationErrors && (
+                          <p className="text-[11px] text-red-500 font-bold mt-1 animate-in fade-in slide-in-from-top-1">Please select at least one candidate type</p>
+                        )}
                       </div>
                       <button 
                         onClick={() => handleWhoCanRegister('Everyone can apply')}
@@ -784,7 +827,7 @@ const CreateMissionView = () => {
                   )}
 
                   {/* Dynamic Section: Experience for Professionals */}
-                  {(formData.allowedRegister || []).includes('Professionals') && (
+                  {(formData.allowedRegister || []).includes('Professionals') && !(formData.allowedRegister || []).includes('School Students') && (
                     <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="flex items-center justify-between mb-4">
                         <div>
@@ -846,7 +889,7 @@ const CreateMissionView = () => {
                   )}
 
                   {/* Dynamic Section: Educational Background for College/Freshers/Professionals */}
-                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers', 'Professionals'].includes(t))) && (
+                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers', 'Professionals'].includes(t))) && !(formData.allowedRegister || []).includes('School Students') && (
                     <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="flex items-center justify-between mb-4">
                         <div>
@@ -904,7 +947,7 @@ const CreateMissionView = () => {
                   )}
 
                   {/* Dynamic Section: Passout Year for College/Freshers */}
-                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers'].includes(t))) && (
+                  {((formData.allowedRegister || []).some((t: string) => ['College Students', 'Freshers'].includes(t))) && !(formData.allowedRegister || []).includes('School Students') && (
                     <div className="border border-gh-border rounded-2xl p-6 bg-gh-bg/30 animate-in fade-in slide-in-from-top-2 duration-300">
                       <div className="flex items-center justify-between mb-4">
                         <div>
@@ -1135,17 +1178,17 @@ const CreateMissionView = () => {
                           {!field.locked ? (
                             <button
                               onClick={() => setActiveFieldMenu(activeFieldMenu === field.id ? null : field.id)}
-                              className={`flex items-center gap-2 px-3 py-1 rounded-lg border transition-all text-[12px] font-bold ${
+                              className={`flex items-center gap-1.5 px-2 py-1 transition-all text-[13px] font-bold ${
                                 field.status === 'Required' 
-                                  ? 'text-gh-text-secondary hover:bg-gh-bg-tertiary border-gh-border' 
-                                  : 'text-orange-500 bg-orange-500/5 border-orange-500/10 hover:bg-orange-500/10'
+                                  ? 'text-gh-text-secondary hover:text-gh-text' 
+                                  : 'text-orange-500 hover:text-orange-600'
                               }`}
                             >
                               {field.status}
-                              <span className="material-symbols-outlined text-[16px]">unfold_more</span>
+                              <span className={`material-symbols-outlined text-[18px] transition-transform ${activeFieldMenu === field.id ? 'rotate-180' : ''}`}>expand_more</span>
                             </button>
                           ) : (
-                            <span className="text-[12px] font-bold text-gh-text-secondary px-3 py-1">
+                            <span className="text-[13px] font-bold text-gh-text-secondary px-2 py-1">
                               {field.status}
                             </span>
                           )}
@@ -1245,15 +1288,15 @@ const CreateMissionView = () => {
 
                   <div className="flex flex-col md:flex-row gap-4">
                     <button 
-                      onClick={() => setFormData({ ...formData, registrationPlatform: 'Unstop' })}
-                      className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'Unstop' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
+                      onClick={() => setFormData({ ...formData, registrationPlatform: 'TrackCodex' })}
+                      className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'TrackCodex' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
                     >
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-white font-black text-[12px]">un</span>
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-white font-black text-[12px]">TC</span>
                       </div>
                       <div>
-                        <h4 className="text-[14px] font-bold text-gh-text">Unstop</h4>
-                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Manage and receive applications on Unstop.</p>
+                        <h4 className="text-[14px] font-bold text-gh-text">TrackCodex</h4>
+                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Manage and receive applications on TrackCodex.</p>
                       </div>
                     </button>
 
@@ -1294,14 +1337,17 @@ const CreateMissionView = () => {
                       <div className="flex items-center gap-4">
                         <span className="text-[14px] font-bold text-gh-text w-12 text-left">Live</span>
                         <div className="flex-1 relative">
-                          <button 
+                        <button 
                             onClick={() => {
-                              setTempDate(new Date(formData.startDate));
+                              const d = formData.startDate ? new Date(formData.startDate) : new Date();
+                              setTempDate(isNaN(d.getTime()) ? new Date() : d);
                               setShowDatePicker('startDate');
                             }}
                             className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
                           >
-                            {new Date(formData.startDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+                            {formData.startDate && !isNaN(new Date(formData.startDate).getTime())
+                              ? new Date(formData.startDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                              : 'Select start date'}
                             <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
                           </button>
                         </div>
@@ -1314,14 +1360,17 @@ const CreateMissionView = () => {
                       <div className="flex items-center gap-4">
                         <span className="text-[14px] font-bold text-gh-text w-12 text-left">Close</span>
                         <div className="flex-1 relative">
-                          <button 
+                        <button 
                             onClick={() => {
-                              setTempDate(new Date(formData.endDate));
+                              const d = formData.endDate ? new Date(formData.endDate) : new Date();
+                              setTempDate(isNaN(d.getTime()) ? new Date() : d);
                               setShowDatePicker('endDate');
                             }}
                             className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
                           >
-                            {new Date(formData.endDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}
+                            {formData.endDate && !isNaN(new Date(formData.endDate).getTime())
+                              ? new Date(formData.endDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                              : 'Select end date'}
                             <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
                           </button>
                         </div>
@@ -1332,15 +1381,27 @@ const CreateMissionView = () => {
                     <div className="pt-6 border-t border-gh-border/50 flex items-start gap-3">
                       <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">calendar_month</span>
                       <p className="text-[12px] text-gh-text-secondary leading-normal">
-                        Candidates will be able to apply for this Opportunity from 
-                        <span className="font-bold text-gh-text mx-1">
-                          {new Date(formData.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {new Date(formData.startDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        to 
-                        <span className="font-bold text-gh-text mx-1">
-                          {new Date(formData.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {new Date(formData.endDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        </span> 
-                        for a period of <span className="font-bold text-gh-text">{calculateDays(formData.startDate, formData.endDate)} Days</span>.
+                        {(() => {
+                          const start = new Date(formData.startDate);
+                          const end = new Date(formData.endDate);
+                          const validStart = !isNaN(start.getTime());
+                          const validEnd = !isNaN(end.getTime());
+                          if (!validStart || !validEnd) return 'Please select both Live and Close dates to see the registration window.';
+                          const days = Math.max(0, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                          return (
+                            <>
+                              Candidates will be able to apply for this Opportunity from{' '}
+                              <span className="font-bold text-gh-text mx-1">
+                                {start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              to{' '}
+                              <span className="font-bold text-gh-text mx-1">
+                                {end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {end.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                              </span>{' '}
+                              for a period of <span className="font-bold text-gh-text">{days} Days</span>.
+                            </>
+                          );
+                        })()}
                       </p>
                     </div>
                   </div>
@@ -1353,26 +1414,27 @@ const CreateMissionView = () => {
       </div>
 
       {/* Sticky Bottom Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg-secondary px-8 py-3 border-t border-gh-border flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.1)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-gh-bg-secondary/95 backdrop-blur-md px-8 py-2 border-t border-gh-border flex items-center justify-between z-50 shadow-[0_-1px_15px_rgba(0,0,0,0.08)]">
         <button 
           onClick={() => activeStep > 1 && setActiveStep(1)}
-          className="text-gh-text-secondary font-bold text-[14px] hover:text-gh-text transition-colors"
+          className="text-gh-text-secondary font-bold text-[13px] hover:text-gh-text transition-colors flex items-center gap-2"
         >
-          Back
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span> Back
         </button>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button 
             type="button" 
-            className="px-8 py-2.5 rounded-full border border-gh-border text-gh-text font-bold text-[14px] hover:bg-gh-bg-secondary transition-all"
+            className="px-6 py-2 rounded-lg border border-gh-border text-gh-text font-bold text-[13px] hover:bg-gh-bg-tertiary transition-all"
           >
             Save as Draft
           </button>
           <button 
             onClick={handleSaveAndNext}
             disabled={isSubmitting}
-            className="px-10 py-2.5 bg-blue-600 text-white rounded-full font-bold text-[14px] shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="px-8 py-2 bg-blue-600 text-white rounded-lg font-bold text-[13px] shadow-sm hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center gap-2"
           >
             {isSubmitting ? 'Saving...' : (activeStep === 1 ? 'Save and next' : 'Publish')}
+            {!isSubmitting && <span className="material-symbols-outlined text-[18px]">arrow_forward</span>}
           </button>
         </div>
       </div>
