@@ -123,7 +123,7 @@ const MainLayout: React.FC = () => {
   ) || isStandalone;
 
   const isFullScreenView = isIdeView || ["/messages", "/notifications"].includes(location.pathname);
-  const isFullPageAction = ["/repositories/new", "/repositories/import"].includes(location.pathname);
+  const isFullPageAction = ["/repositories/new", "/repositories/import", "/marketplace/missions/new"].includes(location.pathname);
 
   // Close menus on outside click
   useEffect(() => {

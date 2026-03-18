@@ -238,11 +238,12 @@ const AppRoutes = () => {
                 <Route path="webhooks" element={<StrataWebhooks />} />
               </Route>
             </Route>
+            <Route path="/marketplace/missions/new" element={<CreateMissionView />} />
 
             {/* Marketplace */}
             <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
-              <Route path="missions/new" element={<CreateMissionView />} />
+
               <Route path="missions" element={<MissionsView />} />
               <Route path="missions/:id" element={<MissionDetailView />} />
               <Route path="trials/:id" element={<MissionDetailView />} />
