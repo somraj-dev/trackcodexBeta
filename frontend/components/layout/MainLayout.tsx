@@ -63,6 +63,27 @@ const MainLayout: React.FC = () => {
     return () => window.removeEventListener("open-resume-modal", handleOpenResume);
   }, []);
 
+  // Global keyboard shortcut: Ctrl+K / Cmd+K / "/" opens the command palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+K or Cmd+K
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+      // Forward slash "/" — only if not typing in an input/textarea/select
+      else if (
+        e.key === "/" &&
+        !["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement).tagName)
+      ) {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Use simple boolean for focus mode for now
   const isFocusMode = false;
 

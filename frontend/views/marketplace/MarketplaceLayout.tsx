@@ -57,11 +57,6 @@ const MarketplaceLayout = () => {
               label="Hiring"
               icon="person_search"
             />
-            <MarketplaceTab
-              to="/marketplace/growth"
-              label="Growth"
-              icon="trending_up"
-            />
           </nav>
         </div>
       </header>

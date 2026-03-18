@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Job } from '../../types';
 import JobCard from '../../components/jobs/JobCard';
-import PostJobModal from '../../components/jobs/PostJobModal';
+
 import { cacheService } from '../../services/infra/cacheService';
 import { api } from '../../services/infra/api';
 
@@ -31,28 +31,7 @@ const MissionsView = () => {
     });
   }, []);
 
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [draftData, setDraftData] = useState<any>(null);
 
-  useEffect(() => {
-    const draft = localStorage.getItem('pending_job_draft');
-    if (draft) {
-      setDraftData(JSON.parse(draft));
-      setIsPostModalOpen(true);
-      localStorage.removeItem('pending_job_draft');
-    }
-  }, []);
-
-  const handlePostJob = async (newJobData: Partial<Job>) => {
-    // Real Post to Backend
-    try {
-      const createdJob = await api.post<Job>('/jobs', newJobData);
-      setLocalJobs(prev => [createdJob, ...prev]);
-      setIsPostModalOpen(false);
-    } catch (e) {
-      console.error("Failed to create job", e);
-    }
-  };
 
   const displayJobs = localJobs.filter(job => {
     if (!searchQuery) return true;
@@ -77,7 +56,7 @@ const MissionsView = () => {
             />
           </div>
           <button
-            onClick={() => setIsPostModalOpen(true)}
+            onClick={() => navigate('/marketplace/missions/new')}
             className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
           >
             Create New Mission
@@ -102,12 +81,7 @@ const MissionsView = () => {
           )}
         </div>
       </div>
-      <PostJobModal
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        onSubmit={handlePostJob}
-        initialData={draftData}
-      />
+
     </div>
   );
 };

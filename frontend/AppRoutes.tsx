@@ -110,6 +110,7 @@ const BillingAdditional = React.lazy(() => import("./views/settings/billing/Bill
 // Marketplace & Hiring
 const MarketplaceLayout = React.lazy(() => import("./views/marketplace/MarketplaceLayout"));
 const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView"));
+const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
 const TrialRepositoriesView = React.lazy(() => import("./views/marketplace/TrialRepositoriesView"));
@@ -124,11 +125,8 @@ const SessionSchedulerView = React.lazy(() => import("./views/hiring/SessionSche
 const InterviewerFeedbackView = React.lazy(() => import("./views/hiring/InterviewerFeedbackView"));
 const AssessmentsView = React.lazy(() => import("./views/hiring/AssessmentsView"));
 
-// Onboarding & Growth
+// Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));
-const GrowthLayout = React.lazy(() => import("./views/growth/GrowthLayout"));
-const SkillDashboardView = React.lazy(() => import("./views/growth/SkillDashboardView"));
-const DeveloperProfileView = React.lazy(() => import("./views/growth/DeveloperProfileView"));
 
 // Finance & Admin
 const WalletDashboard = React.lazy(() => import("./views/finance/WalletDashboard"));
@@ -248,6 +246,7 @@ const AppRoutes = () => {
             {/* Marketplace */}
             <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
+              <Route path="missions/new" element={<CreateMissionView />} />
               <Route path="missions" element={<MissionsView />} />
               <Route path="missions/:id" element={<MissionDetailView />} />
               <Route path="trials/:id" element={<MissionDetailView />} />
@@ -264,11 +263,6 @@ const AppRoutes = () => {
                 <Route path="jobs" element={<HiringJobsView />} />
                 <Route path="analytics" element={<ComingSoon />} />
                 <Route path="assessments" element={<ComingSoon />} />
-              </Route>
-              <Route path="growth" element={<GrowthLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<SkillDashboardView />} />
-                <Route path="profile/:id" element={<DeveloperProfileView />} />
               </Route>
             </Route>
 
