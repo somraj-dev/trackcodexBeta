@@ -193,9 +193,9 @@ const AppRoutes = () => {
             <Route path="/workspace/new" element={<CreateWorkspaceView />} />
             <Route path="/workspace/:id" element={<VSCodeWorkspaceView />} />
             <Route path="/workspace/:id/ide" element={<VSCodeWorkspaceView />} />
-            <Route path="/repositories" element={<RepositoriesView />} />
-            <Route path="/repositories/new" element={<CreateRepoView />} />
-            <Route path="/repositories/import" element={<ImportRepoView />} />
+            <Route path="/repositories" element={<ComingSoon />} />
+            <Route path="/repositories/new" element={<ComingSoon />} />
+            <Route path="/repositories/import" element={<ComingSoon />} />
             <Route path="/repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
