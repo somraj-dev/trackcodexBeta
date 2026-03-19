@@ -83,6 +83,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // If Firebase isn't configured (no env keys), bypass the listener entirely
     if (!isFirebaseConfigured) {
       console.warn("Bypassing Firebase Auth Context listener - Missing API Keys");
+
+      // DEV-ONLY: Auto-login with a mock user when running locally
+      const isDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      if (isDev && !user) {
+        const devUser: User = {
+          id: "dev-user-001",
+          email: "dev@trackcodex.com",
+          username: "devuser",
+          name: "Dev User",
+          avatar: "https://ui-avatars.com/api/?name=Dev+User&background=6366f1&color=fff",
+          role: "admin",
+        };
+        console.info("[AuthContext] DEV MODE: Auto-logging in as mock user");
+        setUser(devUser);
+        try {
+          localStorage.setItem("trackcodex_user", JSON.stringify(devUser));
+        } catch { /* ignore */ }
+        profileService.initFromAuth(devUser);
+      }
+
       // User already restored from localStorage in useState initializer above
       if (isMounted) setIsLoading(false);
       clearTimeout(loadingTimeout);

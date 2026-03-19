@@ -1,378 +1,163 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+/* ─── Data ─── */
+
 interface Project {
   id: string;
   name: string;
   domain: string;
   logo: string;
-  logoType: "icon" | "image";
+  logoBg: string;
   repoOwner: string;
   repoName: string;
-  lastCommitMessage: string;
-  lastDeployDate: string;
+  repoUrl: string;
+  commitMsg: string;
+  deployDate: string;
   branch: string;
 }
 
-const MOCK_PROJECTS: Project[] = [
-  {
-    id: "1",
-    name: "trackcodex",
-    domain: "trackcodex.com",
-    logo: "T",
-    logoType: "icon",
-    repoOwner: "somraj-dev",
-    repoName: "trackcodexBeta",
-    lastCommitMessage: "style: fix hardcoded dark themes in main layout and dashboard...",
-    lastDeployDate: "1h ago",
-    branch: "main",
-  },
-  {
-    id: "2",
-    name: "docs",
-    domain: "docs.trackcodex.com",
-    logo: "N",
-    logoType: "icon",
-    repoOwner: "somraj-dev",
-    repoName: "docs",
-    lastCommitMessage: "feat: update links to open in the same tab",
-    lastDeployDate: "Mar 14",
-    branch: "main",
-  },
-  {
-    id: "3",
-    name: "support",
-    domain: "support.trackcodex.com",
-    logo: "▲",
-    logoType: "icon",
-    repoOwner: "somraj-dev",
-    repoName: "support",
-    lastCommitMessage: "fix: resolve build failures by removing unused-vars and converti...",
-    lastDeployDate: "Mar 14",
-    branch: "main",
-  },
-  {
-    id: "4",
-    name: "browser",
-    domain: "blog.trackcodex.com",
-    logo: "W",
-    logoType: "icon",
-    repoOwner: "Quantaforge",
-    repoName: "trackcodex/br...",
-    lastCommitMessage: "feat: Initialize ForgeBrowser IDE project",
-    lastDeployDate: "Mar 2",
-    branch: "main",
-  },
+const PROJECTS: Project[] = [
+  { id: "trackcodex", name: "trackcodex", domain: "trackcodex.com", logo: "⬡", logoBg: "#111", repoOwner: "somraj-dev", repoName: "trackcodexBeta", repoUrl: "https://github.com/somraj-dev/trackcodexBeta", commitMsg: "style: fix hardcoded dark themes in main layout and dashboard...", deployDate: "1h ago", branch: "main" },
+  { id: "docs", name: "docs", domain: "docs.trackcodex.com", logo: "N", logoBg: "#111", repoOwner: "somraj-dev", repoName: "docs", repoUrl: "https://github.com/somraj-dev/docs", commitMsg: "feat: update links to open in the same tab", deployDate: "Mar 14", branch: "main" },
+  { id: "support", name: "support", domain: "support.trackcodex.com", logo: "▲", logoBg: "#111", repoOwner: "somraj-dev", repoName: "support", repoUrl: "https://github.com/somraj-dev/support", commitMsg: "fix: resolve build failures by removing unused-vars and converti...", deployDate: "Mar 14", branch: "main" },
+  { id: "browser", name: "browser", domain: "blog.trackcodex.com", logo: "W", logoBg: "linear-gradient(135deg,#7c3aed,#06b6d4)", repoOwner: "Quantaforge", repoName: "trackcodex/br...", repoUrl: "https://github.com/Quantaforge/trackcodex", commitMsg: "feat: Initialize ForgeBrowser IDE project", deployDate: "Mar 2", branch: "main" },
 ];
 
-interface UsageStat {
-  label: string;
-  used: string;
-  limit: string;
-}
 
-const USAGE_STATS: UsageStat[] = [
-  { label: "Edge Requests", used: "37K", limit: "1M" },
-  { label: "Fast Data Transfer", used: "483.85 MB", limit: "100 GB" },
-  { label: "ISR Reads", used: "1.3K", limit: "1M" },
-  { label: "Fast Origin Transfer", used: "8.96 MB", limit: "10 GB" },
-];
 
-interface PreviewItem {
-  branch: string;
-  message: string;
-  icon: string;
-  iconBg: string;
-  links: string[];
-}
+/* ─── Styles (inlined Vercel design tokens) ─── */
+const V = {
+  bg: "#000",
+  card: "#0a0a0a",
+  cardHover: "#111",
+  border: "#333",
+  borderLight: "#222",
+  text: "#ededed",
+  textSecondary: "#888",
+  textTertiary: "#666",
+  accent: "#0070f3",
+  green: "#0070f3",
+  font: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+};
 
-const RECENT_PREVIEWS: PreviewItem[] = [
-  {
-    branch: "master",
-    message: "Remove all Supabase depend...",
-    icon: "T",
-    iconBg: "bg-emerald-600",
-    links: ["Preview", "Source", "HP2eaFZNg"],
-  },
-  {
-    branch: "fix/footer-color",
-    message: "Match footer bac...",
-    icon: "N",
-    iconBg: "bg-black",
-    links: ["Preview", "Source", "CHD8B3FV2"],
-  },
-];
-
-const ProjectCard = ({ project }: { project: Project }) => {
-  const navigate = useNavigate();
-
+/* ─── Card ─── */
+const ProjectCard = ({ p }: { p: Project }) => {
+  const nav = useNavigate();
   return (
     <div
-      className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5 hover:border-gh-text-secondary/30 transition-all cursor-pointer group relative"
-      onClick={() => navigate(`/repo/${project.id}`)}
+      onClick={() => nav(`/dashboard/project/${p.id}`)}
+      style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, padding: 20, cursor: "pointer", fontFamily: V.font, transition: "border-color .15s" }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = "#555")}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = V.border)}
     >
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-lg bg-gh-bg-tertiary border border-gh-border flex items-center justify-center text-gh-text font-bold text-lg">
-            {project.logo}
+      {/* Head */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: p.logoBg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", color: V.text, fontSize: 16, fontWeight: 700 }}>
+            {p.logo}
           </div>
           <div>
-            <h3 className="text-sm font-bold text-gh-text group-hover:text-primary transition-colors">
-              {project.name}
-            </h3>
-            <p className="text-xs text-gh-text-secondary">{project.domain}</p>
+            <div style={{ fontSize: 14, fontWeight: 600, color: V.text, lineHeight: 1.3 }}>{p.name}</div>
+            <div style={{ fontSize: 12, color: V.textSecondary, lineHeight: 1.3, marginTop: 2 }}>{p.domain}</div>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={(e) => e.stopPropagation()}
-            className="size-8 rounded-full border border-gh-border flex items-center justify-center text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary transition-colors"
-          >
-            <span className="material-symbols-outlined !text-[16px]">edit</span>
-          </button>
-          <button
-            onClick={(e) => e.stopPropagation()}
-            className="size-8 rounded-full border border-gh-border flex items-center justify-center text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary transition-colors"
-          >
-            <span className="material-symbols-outlined !text-[16px]">more_horiz</span>
-          </button>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={e => e.stopPropagation()} style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }} title="Edit">✎</button>
+          <button onClick={e => e.stopPropagation()} style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }} title="More">⋯</button>
         </div>
       </div>
-
-      <div className="flex items-center gap-1.5 mb-2">
-        <span className="material-symbols-outlined !text-[14px] text-gh-text-secondary">account_tree</span>
-        <span className="text-xs text-gh-text-secondary font-medium">
-          {project.repoOwner}/{project.repoName}
-        </span>
-      </div>
-
-      <p className="text-xs text-gh-text-secondary mb-2 line-clamp-1">
-        {project.lastCommitMessage}
-      </p>
-
-      <div className="flex items-center gap-2 text-[11px] text-gh-text-secondary/70">
-        <span>{project.lastDeployDate}</span>
+      {/* Repo */}
+      <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: V.textSecondary, textDecoration: "none", marginBottom: 8 }}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>{p.repoOwner}/{p.repoName}</span>
+      </a>
+      {/* Commit */}
+      <div style={{ fontSize: 13, color: V.textSecondary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 8 }}>{p.commitMsg}</div>
+      {/* Date */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: V.textTertiary }}>
+        <span style={{ color: V.text }}>{p.deployDate}</span>
         <span>on</span>
-        <span className="material-symbols-outlined !text-[12px]">call_split</span>
-        <span>{project.branch}</span>
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style={{ opacity: .7 }}><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25z"/></svg>
+        <span>{p.branch}</span>
       </div>
     </div>
   );
 };
 
+/* ─── Main ─── */
 const ProjectDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const nav = useNavigate();
+  const [q, setQ] = useState("");
+  const [view, setView] = useState<"grid"|"list">("grid");
+  const [addOpen, setAddOpen] = useState(false);
 
-  const filteredProjects = MOCK_PROJECTS.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.domain.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = PROJECTS.filter(p => p.name.includes(q.toLowerCase()) || p.domain.includes(q.toLowerCase()));
 
   return (
-    <div className="flex-1 w-full bg-gh-bg p-6 md:p-8 overflow-y-auto custom-scrollbar">
-      <div className="max-w-[1200px] mx-auto">
-        {/* Header: Search + View Toggles + Add New */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined !text-[18px] text-gh-text-secondary">
-              search
-            </span>
+    <div style={{ flex: 1, width: "100%", background: V.bg, overflowY: "auto", fontFamily: V.font, color: V.text }}>
+      <div style={{ padding: "20px 24px" }}>
+
+        {/* Search bar */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center" }}>
+          <div style={{ flex: 1, position: "relative" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={V.textTertiary} strokeWidth="2" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 bg-gh-bg-secondary/60 border border-gh-border rounded-lg text-sm text-gh-text placeholder-gh-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+              value={q} onChange={e => setQ(e.target.value)}
               placeholder="Search Projects..."
+              style={{ width: "100%", height: 40, paddingLeft: 38, paddingRight: 12, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, color: V.text, fontSize: 14, fontFamily: V.font, outline: "none" }}
+              onFocus={e => e.currentTarget.style.borderColor = V.text}
+              onBlur={e => e.currentTarget.style.borderColor = V.border}
             />
           </div>
-
-          <div className="flex items-center border border-gh-border rounded-lg overflow-hidden">
-            <button
-              className="h-10 w-10 flex items-center justify-center text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-secondary transition-colors border-r border-gh-border"
-              title="Filter"
-            >
-              <span className="material-symbols-outlined !text-[18px]">tune</span>
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`h-10 w-10 flex items-center justify-center transition-colors border-r border-gh-border ${
-                viewMode === "grid"
-                  ? "bg-gh-bg-secondary text-gh-text"
-                  : "text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-secondary"
-              }`}
-              title="Grid view"
-            >
-              <span className="material-symbols-outlined !text-[18px]">grid_view</span>
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`h-10 w-10 flex items-center justify-center transition-colors ${
-                viewMode === "list"
-                  ? "bg-gh-bg-secondary text-gh-text"
-                  : "text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-secondary"
-              }`}
-              title="List view"
-            >
-              <span className="material-symbols-outlined !text-[18px]">view_list</span>
-            </button>
+          {/* Toggle */}
+          <div style={{ display: "flex", border: `1px solid ${V.border}`, borderRadius: 8, overflow: "hidden", height: 40 }}>
+            {[
+              { icon: "≡", key: "filter" as const },
+              { icon: "⊞", key: "grid" as const },
+              { icon: "☰", key: "list" as const },
+            ].map((b, i) => (
+              <button key={i} onClick={() => { if (b.key === "grid" || b.key === "list") setView(b.key); }}
+                style={{ width: 40, height: "100%", background: (b.key === view) ? V.cardHover : "transparent", color: (b.key === view) ? V.text : V.textSecondary, border: "none", borderRight: i < 2 ? `1px solid ${V.border}` : "none", cursor: "pointer", fontSize: 16, fontFamily: V.font }}
+              >{b.icon}</button>
+            ))}
           </div>
-
-          <div className="relative">
-            <button
-              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-              className="h-10 px-4 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-semibold text-gh-text hover:bg-gh-bg-tertiary transition-colors flex items-center gap-2"
+          {/* Add New */}
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setAddOpen(!addOpen)}
+              style={{ height: 40, padding: "0 14px", background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, color: V.text, fontSize: 14, fontFamily: V.font, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}
             >
-              Add New...
-              <span className="material-symbols-outlined !text-[16px]">expand_more</span>
+              Add New... <span style={{ fontSize: 12, color: V.textSecondary }}>▾</span>
             </button>
-            {isAddMenuOpen && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+            {addOpen && (
+              <div style={{ position: "absolute", right: 0, top: "100%", marginTop: 4, width: 200, background: V.cardHover, border: `1px solid ${V.border}`, borderRadius: 10, padding: "4px 0", zIndex: 50, boxShadow: "0 8px 30px rgba(0,0,0,.5)" }}>
                 {[
-                  { icon: "web", label: "New Project", to: "/repositories/new" },
-                  { icon: "account_tree", label: "New Repository", to: "/repositories/new" },
-                  { icon: "terminal", label: "New Workspace", to: "/workspace/new" },
-                  { icon: "upload", label: "Import Repo", to: "/repositories/import" },
-                ].map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => {
-                      setIsAddMenuOpen(false);
-                      navigate(item.to);
-                    }}
-                    className="w-full px-3 py-2 flex items-center gap-2 text-[13px] text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary transition-colors"
-                  >
-                    <span className="material-symbols-outlined !text-[16px]">{item.icon}</span>
-                    {item.label}
-                  </button>
+                  { label: "Project", to: "/repositories/new" },
+                  { label: "Repository", to: "/repositories/new" },
+                  { label: "Workspace", to: "/workspace/new" },
+                  { label: "Import Git Repository", to: "/repositories/import" },
+                ].map(it => (
+                  <button key={it.label} onClick={() => { setAddOpen(false); nav(it.to); }}
+                    style={{ width: "100%", padding: "8px 14px", background: "transparent", border: "none", color: V.textSecondary, fontSize: 13, fontFamily: V.font, cursor: "pointer", textAlign: "left" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = V.border; e.currentTarget.style.color = V.text; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = V.textSecondary; }}
+                  >{it.label}</button>
                 ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* Main Content: Sidebar + Projects Grid */}
-        <div className="flex gap-8">
-          {/* Left Sidebar - Usage & Alerts */}
-          <div className="w-[280px] shrink-0 hidden lg:block space-y-6">
-            {/* Usage Card */}
-            <div className="border border-gh-border rounded-xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-gh-border flex items-center justify-between bg-gh-bg-secondary/30">
-                <h3 className="text-xs font-bold text-gh-text-secondary uppercase tracking-wider">Usage</h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-gh-text-secondary">Last 30 days</span>
-                  <button className="px-2 py-0.5 text-[10px] font-bold text-primary bg-primary/10 rounded-md border border-primary/20 hover:bg-primary/20 transition-colors">
-                    Upgrade
-                  </button>
-                </div>
-              </div>
-              <div className="divide-y divide-gh-border">
-                {USAGE_STATS.map((stat) => (
-                  <div key={stat.label} className="px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="size-2 rounded-full bg-emerald-500"></div>
-                      <span className="text-xs text-gh-text">{stat.label}</span>
-                    </div>
-                    <span className="text-xs text-gh-text-secondary font-mono">
-                      {stat.used} / {stat.limit}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="px-4 py-2 flex justify-center">
-                <button className="text-gh-text-secondary hover:text-gh-text transition-colors">
-                  <span className="material-symbols-outlined !text-[16px]">expand_more</span>
-                </button>
-              </div>
+        {/* Projects */}
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: V.text, marginBottom: 12 }}>Projects</div>
+          {filtered.length > 0 ? (
+            <div style={{ display: "grid", gridTemplateColumns: view === "grid" ? "1fr 1fr" : "1fr", gap: 12 }}>
+              {filtered.map(p => <ProjectCard key={p.id} p={p} />)}
             </div>
-
-            {/* Alerts Card */}
-            <div className="border border-gh-border rounded-xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-gh-border bg-gh-bg-secondary/30">
-                <h3 className="text-xs font-bold text-gh-text-secondary uppercase tracking-wider">Alerts</h3>
-              </div>
-              <div className="p-4 text-center">
-                <h4 className="text-sm font-bold text-gh-text mb-1">Get alerted for anomalies</h4>
-                <p className="text-xs text-gh-text-secondary mb-4 leading-relaxed">
-                  Automatically monitor your projects for anomalies and get notified.
-                </p>
-                <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-xs font-bold text-gh-text hover:bg-gh-bg-tertiary transition-colors w-full">
-                  Upgrade to Observability Plus
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Content - Projects */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-bold text-gh-text-secondary uppercase tracking-wider mb-4">Projects</h2>
-
-            {filteredProjects.length > 0 ? (
-              <div
-                className={
-                  viewMode === "grid"
-                    ? "grid grid-cols-1 md:grid-cols-2 gap-4"
-                    : "space-y-3"
-                }
-              >
-                {filteredProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <span className="material-symbols-outlined !text-[48px] text-gh-text-secondary/30 mb-4">folder_off</span>
-                <p className="text-sm text-gh-text-secondary">No projects match your search.</p>
-              </div>
-            )}
-
-            {/* Recent Previews */}
-            <div className="mt-10">
-              <h2 className="text-sm font-bold text-gh-text-secondary uppercase tracking-wider mb-4">Recent Previews</h2>
-              <div className="border border-gh-border rounded-xl overflow-hidden divide-y divide-gh-border">
-                {RECENT_PREVIEWS.map((preview, idx) => (
-                  <div
-                    key={idx}
-                    className="px-4 py-3 flex items-center justify-between hover:bg-gh-bg-secondary/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`size-8 rounded-lg ${preview.iconBg} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                        {preview.icon}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="font-mono font-bold text-gh-text">{preview.branch}</span>
-                          <span className="text-gh-text-secondary truncate">{preview.message}</span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1">
-                          {preview.links.map((link, i) => (
-                            <span
-                              key={i}
-                              className="flex items-center gap-1 text-[11px] text-gh-text-secondary hover:text-primary cursor-pointer transition-colors"
-                            >
-                              <span className="material-symbols-outlined !text-[12px]">
-                                {i === 0 ? "visibility" : i === 1 ? "code" : "tag"}
-                              </span>
-                              {link}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      className="size-8 rounded-full flex items-center justify-center text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary transition-colors shrink-0"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <span className="material-symbols-outlined !text-[16px]">more_horiz</span>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: 60, color: V.textSecondary, fontSize: 14 }}>No projects match your search.</div>
+          )}
         </div>
       </div>
     </div>
