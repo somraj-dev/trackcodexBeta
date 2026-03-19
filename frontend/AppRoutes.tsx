@@ -46,6 +46,7 @@ const AcceptInvite = React.lazy(() => import("./views/AcceptInvite"));
 const Leaderboard = React.lazy(() => import("./views/community/Leaderboard"));
 const AdminRoomView = React.lazy(() => import("./views/admin/Admin"));
 const TaskVault = React.lazy(() => import("./views/TaskVault"));
+const ProjectDashboard = React.lazy(() => import("./views/ProjectDashboard"));
 const PlatformMatrix = React.lazy(() => import("./views/admin/PlatformMatrix"));
 const Terms = React.lazy(() => import("./views/legal/Terms"));
 const Privacy = React.lazy(() => import("./views/legal/Privacy"));
@@ -178,7 +179,7 @@ const AppRoutes = () => {
           <Route element={<MainLayout />}>
             <Route path="/taskvault" element={<TaskVault />} />
             <Route path="/" element={<HomeView />} />
-            <Route path="/dashboard" element={<ComingSoon />} />
+            <Route path="/dashboard" element={<ProjectDashboard />} />
             <Route path="/dashboard/home" element={<HomeView />} />
             <Route path="/onboarding/welcome" element={<WelcomeView />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />

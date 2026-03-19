@@ -169,14 +169,7 @@ const MainLayout: React.FC = () => {
               ].map((item) => (
                 <button key={item.label} onClick={() => { setIsSidebarOpen(false); navigate(item.to); }} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-[14px] font-medium ${location.pathname.startsWith(item.to) ? "text-gh-text bg-primary/15" : "text-gh-text hover:bg-gh-bg-secondary hover:text-gh-text"}`}>
                   <span className="material-symbols-outlined !text-[18px]">{item.icon}</span>
-                  <div className="flex-1 flex items-center justify-between">
-                    {item.label}
-                    {item.label === "Dashboard" && (
-                      <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[9px] font-black uppercase tracking-wider border border-amber-500/20">
-                        Dev
-                      </span>
-                    )}
-                  </div>
+                  {item.label}
                 </button>
               ))}
             </nav>
