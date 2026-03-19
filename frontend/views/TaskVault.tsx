@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
     Plus, 
     Search, 
@@ -12,13 +12,8 @@ import {
     Circle,
     MoreHorizontal
 } from 'lucide-react';
-import CreateProjectModal from '../components/modals/CreateProjectModal';
-import CreateTaskModal from '../components/modals/CreateTaskModal';
 
 const TaskVault: React.FC = () => {
-    const [showCreateProject, setShowCreateProject] = useState(false);
-    const [showCreateTask, setShowCreateTask] = useState(false);
-
     const profileChecklist = [
         { label: "Upload Your Profile Picture", desc: "Add a friendly photo so your teammates recognize you.", done: true },
         { label: "Set Your Job Title or Role", desc: "Helps your team understand what you do", done: false },
@@ -102,8 +97,7 @@ const TaskVault: React.FC = () => {
                 {/* ── Action Cards ── */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Create Project Card */}
-                    <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:shadow-lg transition-all group cursor-pointer"
-                        onClick={() => setShowCreateProject(true)}>
+                    <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:shadow-lg transition-all group cursor-pointer opacity-80">
                         <div className="flex items-start gap-4">
                             <div className="shrink-0 flex items-end gap-1">
                                 <div className="w-8 h-10 bg-gh-bg-tertiary rounded-md border border-gh-border" />
@@ -116,8 +110,7 @@ const TaskVault: React.FC = () => {
                                     Start by organizing your tasks into a project — big or small!
                                 </p>
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); setShowCreateProject(true); }}
-                                    className="px-4 py-2 rounded-xl text-xs font-bold text-gh-text bg-gh-bg border border-gh-border hover:bg-gh-bg-secondary transition-all flex items-center gap-1.5 group-hover:border-primary/50"
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-gh-text bg-gh-bg border border-gh-border cursor-default flex items-center gap-1.5"
                                 >
                                     Create Project
                                     <ChevronRight className="size-3.5" />
@@ -127,8 +120,7 @@ const TaskVault: React.FC = () => {
                     </div>
 
                     {/* Add Tasks Card */}
-                    <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:shadow-lg transition-all group cursor-pointer"
-                        onClick={() => setShowCreateTask(true)}>
+                    <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:shadow-lg transition-all group cursor-pointer opacity-80">
                         <div className="flex items-start gap-4">
                             <div className="shrink-0 flex flex-col gap-1.5">
                                 <div className="flex items-center gap-2">
@@ -150,8 +142,7 @@ const TaskVault: React.FC = () => {
                                     Break your project down into actionable steps by steps work
                                 </p>
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); setShowCreateTask(true); }}
-                                    className="px-4 py-2 rounded-xl text-xs font-bold text-gh-text bg-gh-bg border border-gh-border hover:bg-gh-bg-secondary transition-all flex items-center gap-1.5 group-hover:border-primary/50"
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-gh-text bg-gh-bg border border-gh-border cursor-default flex items-center gap-1.5"
                                 >
                                     Add Tasks
                                     <ChevronRight className="size-3.5" />
@@ -196,10 +187,6 @@ const TaskVault: React.FC = () => {
                 </div>
 
             </div>
-
-            {/* ── Modals ── */}
-            <CreateProjectModal isOpen={showCreateProject} onClose={() => setShowCreateProject(false)} />
-            <CreateTaskModal isOpen={showCreateTask} onClose={() => setShowCreateTask(false)} />
         </div>
     );
 };
