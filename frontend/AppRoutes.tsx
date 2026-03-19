@@ -106,7 +106,7 @@ const BillingPaymentInfo = React.lazy(() => import("./views/settings/billing/Bil
 const BillingPaymentHistory = React.lazy(() => import("./views/settings/billing/BillingPaymentHistory"));
 const BillingAdditional = React.lazy(() => import("./views/settings/billing/BillingAdditional"));
 
-// Marketplace & Hiring
+// Marketplace
 const MarketplaceLayout = React.lazy(() => import("./views/marketplace/MarketplaceLayout"));
 const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView"));
 const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));

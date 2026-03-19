@@ -36,7 +36,7 @@ const StatCard = ({ title, value, change, color }: any) => (
         {change}
       </span>
     </div>
-    <div className="text-2xl font-black text-white">{value}</div>
+    <div className="text-2xl font-black text-gh-text">{value}</div>
   </div>
 );
 
@@ -92,7 +92,7 @@ const Overview = () => {
       <div className="max-w-[1400px] mx-auto animate-in fade-in duration-500">
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-gh-border">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-gh-text tracking-tight">
               System Console
             </h1>
             <p className="text-gh-text-secondary text-xs mt-1">
@@ -221,7 +221,7 @@ const Overview = () => {
               <div className="rounded-xl border border-gh-border overflow-hidden bg-gh-bg-secondary">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#0A0A0A]lack/20 text-gh-text-secondary text-[10px] font-bold uppercase tracking-widest border-b border-gh-border">
+                    <tr className="bg-black/5 text-gh-text-secondary text-[10px] font-bold uppercase tracking-widest border-b border-gh-border">
                       <th className="px-6 py-4">Instance</th>
                       <th className="px-6 py-4">Status</th>
                       <th className="px-6 py-4">Context</th>
@@ -232,7 +232,7 @@ const Overview = () => {
                     {workspaces.map((ws) => (
                       <tr
                         key={ws.id}
-                        className="group hover:bg-white/5 transition-all cursor-pointer"
+                        className="group hover:bg-gh-bg transition-all cursor-pointer"
                       >
                         <td className="px-6 py-4">
                           <span className="text-sm font-bold text-gh-text group-hover:text-primary">
@@ -255,7 +255,7 @@ const Overview = () => {
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => navigate(`/workspace/${ws.id}`)}
-                            className="text-[10px] font-bold text-gh-text-secondary hover:text-white uppercase"
+                            className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase"
                           >
                             Re-Open
                           </button>
@@ -294,7 +294,7 @@ const Overview = () => {
                 {MOCK_AI_TASKS.map((task) => (
                   <div
                     key={task.id}
-                    className="flex gap-3 group cursor-pointer border-b border-gh-border last:border-[#1A1A1A] pb-4 last:pb-0"
+                    className="flex gap-3 group cursor-pointer border-b border-gh-border last:border-gh-border pb-4 last:pb-0"
                   >
                     <span className="material-symbols-outlined text-primary !text-[20px] mt-0.5">
                       auto_awesome

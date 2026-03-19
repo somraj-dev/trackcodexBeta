@@ -137,7 +137,7 @@ const HomeView = () => {
             </button>
             <div className="h-6 w-px bg-gh-border mx-1"></div>
             <span className="text-xs text-gh-text-secondary font-mono mr-2">TrackCodex AI</span>
-            <button className="size-8 flex items-center justify-center text-primary hover:text-white bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors">
+            <button className="size-8 flex items-center justify-center text-primary hover:text-primary-hover bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors">
               <span className="material-symbols-outlined !text-[18px]">send</span>
             </button>
           </div>
@@ -187,10 +187,10 @@ const HomeView = () => {
           <div className="space-y-4 mb-10">
             {/* Copilot Card */}
             {showBusinessBanner && (
-              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-[#6e40c9]/10 to-[#2f2f2f]/30 p-5 group hover:border-[#6e40c9]/50 transition-all">
+              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-primary/10 to-gh-bg-secondary/30 p-5 group hover:border-primary/50 transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex gap-4">
-                    <div className="size-10 rounded-lg bg-[#6e40c9] flex items-center justify-center text-white shadow-lg shadow-[#6e40c9]/20">
+                    <div className="size-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
                       <span className="material-symbols-outlined">auto_awesome</span>
                     </div>
                     <div>
@@ -198,7 +198,7 @@ const HomeView = () => {
                       <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
                         AI-powered coding for your team. Empower your developers with advanced context-aware suggestions and security monitoring.
                       </p>
-                      <button className="mt-3 px-4 py-1.5 bg-[#6e40c9] hover:bg-[#5a32a3] text-white text-xs font-bold rounded-md transition-colors shadow-md shadow-[#6e40c9]/20">
+                      <button className="mt-3 px-4 py-1.5 bg-primary hover:bg-primary-hover text-white text-xs font-bold rounded-md transition-colors shadow-md shadow-primary/20">
                         Activate Business
                       </button>
                     </div>
@@ -211,7 +211,7 @@ const HomeView = () => {
             )}
 
             {showRepoBanner && repos.length === 0 && !loadingRepos && (
-              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-amber-500/5 to-[#2f2f2f]/30 p-5 group hover:border-amber-500/30 transition-all">
+              <div className="relative overflow-hidden rounded-xl border border-gh-border bg-gradient-to-r from-amber-500/5 to-gh-bg-secondary/30 p-5 group hover:border-amber-500/30 transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex gap-4">
                     <div className="size-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shadow-sm">
