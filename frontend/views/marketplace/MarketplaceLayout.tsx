@@ -52,11 +52,7 @@ const MarketplaceLayout = () => {
               label="Trial Repositories"
               icon="rule"
             />
-            <MarketplaceTab
-              to="/marketplace/hiring"
-              label="Hiring"
-              icon="person_search"
-            />
+
           </nav>
         </div>
       </header>

@@ -113,13 +113,7 @@ const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMis
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
 const TrialRepositoriesView = React.lazy(() => import("./views/marketplace/TrialRepositoriesView"));
-const HiringLayout = React.lazy(() => import("./views/hiring/HiringLayout"));
-const CandidateDiscoveryView = React.lazy(() => import("./views/hiring/CandidateDiscoveryView"));
-const HiringJobsView = React.lazy(() => import("./views/hiring/HiringJobsView"));
-const CandidateScorecardView = React.lazy(() => import("./views/hiring/CandidateScorecardView"));
-const CandidateComparisonView = React.lazy(() => import("./views/hiring/CandidateComparisonView"));
-const OfferEditorView = React.lazy(() => import("./views/hiring/OfferEditorView"));
-const SessionSchedulerView = React.lazy(() => import("./views/hiring/SessionSchedulerView"));
+
 
 // Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));
@@ -249,18 +243,7 @@ const AppRoutes = () => {
               <Route path="trials/:id" element={<MissionDetailView />} />
               <Route path="applications" element={<MyApplicationsView />} />
               <Route path="trials" element={<TrialRepositoriesView />} />
-              <Route path="hiring" element={<HiringLayout />}>
-                <Route index element={<Navigate to="discovery" replace />} />
-                <Route path="discovery" element={<CandidateDiscoveryView />} />
-                <Route path="candidate/:id" element={<CandidateScorecardView />} />
-                <Route path="compare" element={<CandidateComparisonView />} />
-                <Route path="offer/:id" element={<OfferEditorView />} />
-                <Route path="schedule/:id" element={<SessionSchedulerView />} />
-                <Route path="feedback/:id" element={<ComingSoon />} />
-                <Route path="jobs" element={<HiringJobsView />} />
-                <Route path="analytics" element={<ComingSoon />} />
-                <Route path="assessments" element={<ComingSoon />} />
-              </Route>
+
             </Route>
 
             {/* Settings */}

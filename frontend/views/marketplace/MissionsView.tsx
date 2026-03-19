@@ -49,7 +49,7 @@ const MissionsView = () => {
           <div className="relative group">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-focus-within:text-primary">search</span>
             <input
-              className="bg-gh-bg-secondary border border-gh-border rounded-full pl-12 pr-6 py-3 text-sm text-white focus:ring-1 focus:ring-primary w-96 outline-none transition-all duration-300"
+              className="bg-gh-bg-secondary border border-gh-border rounded-full pl-12 pr-6 py-3 text-sm text-gh-text focus:ring-1 focus:ring-primary w-96 outline-none transition-all duration-300"
               placeholder="Search missions by title, skill, or company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
