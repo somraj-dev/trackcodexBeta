@@ -159,7 +159,7 @@ const MainLayout: React.FC = () => {
             <nav className="px-3 py-2 space-y-0.5">
               {[
                 { icon: "home", label: "Home", to: "/dashboard/home" },
-                { icon: "account_tree", label: "Dashboard", to: "/repositories" },
+                { icon: "account_tree", label: "Dashboard", to: "/dashboard" },
                 { icon: "terminal", label: "Workspaces", to: "/workspaces" },
                 { icon: "auto_stories", label: "Library", to: "/dashboard/library" },
                 { icon: "store", label: "Marketplace", to: "/marketplace" },
