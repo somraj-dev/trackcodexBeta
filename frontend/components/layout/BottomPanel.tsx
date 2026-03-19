@@ -40,7 +40,7 @@ const BottomPanel = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-[#0A0A0A]lack/20 overflow-hidden font-mono p-4">
+      <div className="flex-1 bg-black/20 overflow-hidden font-mono p-4">
          {activeTab === 'Terminal' && (
            <div className="text-[13px] leading-relaxed">
              <div className="flex items-center gap-2 text-primary font-bold mb-1">

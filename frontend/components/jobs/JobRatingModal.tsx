@@ -8,7 +8,7 @@ const JobRatingModal = ({ isOpen, onClose, onSubmit }: { isOpen: boolean, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-[#0A0A0A]lack/80 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-[#11141A] border border-primary/30 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col">
         <div className="p-6 border-b border-[#1E232E] flex items-center justify-between">
           <div>
@@ -53,7 +53,7 @@ const JobRatingModal = ({ isOpen, onClose, onSubmit }: { isOpen: boolean, onClos
           <button onClick={onClose} className="flex-1 py-3 text-sm font-bold text-slate-400 hover:text-white transition-colors">Discard</button>
           <button 
             onClick={() => onSubmit(rating, feedback)}
-            className="flex-1 py-3 bg-primary hover:bg-[#0A0A0A]lue-600 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-primary/20"
+            className="flex-1 py-3 bg-primary hover:bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-primary/20"
           >
             Submit & Complete
           </button>

@@ -109,7 +109,7 @@ const CreatePostBox = () => {
           <button 
             onClick={handlePost}
             disabled={isAnalyzing || !title.trim() || !content.trim()}
-            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-30"
+            className="bg-primary hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all shadow-lg shadow-primary/20 disabled:opacity-30"
           >
              Publish
           </button>

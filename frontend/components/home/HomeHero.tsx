@@ -94,7 +94,7 @@ const HomeHero = () => {
           <button
             onClick={handleAskAI}
             disabled={isAnalyzing || !prompt.trim()}
-            className="size-11 bg-primary hover:bg-[#0A0A0A]lue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transition-all active:scale-95 group/btn disabled:opacity-50"
+            className="size-11 bg-primary hover:bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transition-all active:scale-95 group/btn disabled:opacity-50"
           >
             <span
               className={`material-symbols-outlined group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform ${isAnalyzing ? "animate-spin" : ""}`}

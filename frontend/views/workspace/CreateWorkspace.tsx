@@ -12,7 +12,7 @@ const ToggleSwitch = ({
     type="button"
     aria-label="Toggle setting"
     onClick={onChange}
-    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${enabled ? "bg-primary" : "bg-slate-700"
+    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${enabled ? "bg-primary" : "bg-gh-bg-tertiary"
       }`}
   >
     <span
@@ -188,7 +188,7 @@ const CreateWorkspaceView = () => {
           <h1 className="text-4xl font-black text-gh-text mb-2 tracking-tight">
             Create New Workspace
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-gh-text-secondary font-medium">
             Set up your development command center with enterprise-grade
             defaults.
           </p>
@@ -206,7 +206,7 @@ const CreateWorkspaceView = () => {
               <div
                 className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${i <= step
                   ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(19,91,236,0.4)]"
-                  : "border-gh-border text-slate-500 group-hover:border-slate-500"
+                  : "border-gh-border text-gh-text-secondary group-hover:border-gh-text-secondary"
                   }`}
               >
                 {i < step ? (
@@ -218,7 +218,7 @@ const CreateWorkspaceView = () => {
                 )}
               </div>
               <span
-                className={`text-[10px] font-black uppercase tracking-widest ${i <= step ? "text-gh-text" : "text-slate-600"}`}
+                className={`text-[10px] font-black uppercase tracking-widest ${i <= step ? "text-gh-text" : "text-gh-text-secondary"}`}
               >
                 {s} Selection
               </span>
@@ -234,7 +234,7 @@ const CreateWorkspaceView = () => {
                 step >= 0 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
                 1: Workspace Type Selection
               </h2>
               <div className="grid grid-cols-3 gap-4">
@@ -263,11 +263,11 @@ const CreateWorkspaceView = () => {
                     onClick={() => setType(t.id)}
                     className={`p-5 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center group relative h-full ${type === t.id
                       ? "border-primary bg-primary/5 shadow-[0_0_20px_rgba(19,91,236,0.05)]"
-                      : "border-gh-border bg-gh-bg-secondary hover:border-slate-600"
+                      : "border-gh-border bg-gh-bg-secondary hover:border-gh-text-secondary"
                       }`}
                   >
                     <div
-                      className={`size-10 rounded-full flex items-center justify-center mb-4 transition-colors ${type === t.id ? "bg-primary text-white" : "bg-gh-bg text-slate-500"}`}
+                      className={`size-10 rounded-full flex items-center justify-center mb-4 transition-colors ${type === t.id ? "bg-primary text-white" : "bg-gh-bg-tertiary text-gh-text-secondary"}`}
                     >
                       <span className="material-symbols-outlined !text-[20px]">
                         {t.icon}
@@ -276,7 +276,7 @@ const CreateWorkspaceView = () => {
                     <h3 className="text-xs font-bold text-gh-text mb-2">
                       {t.label}
                     </h3>
-                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                    <p className="text-[10px] text-gh-text-secondary leading-relaxed">
                       {t.desc}
                     </p>
                     {type === t.id && (
@@ -297,12 +297,12 @@ const CreateWorkspaceView = () => {
                 step >= 1 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
                 2: Workspace Details
               </h2>
               <div className="grid grid-cols-2 gap-6">
                 <div className="col-span-1">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2 tracking-widest">
+                  <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
                     Workspace Name *
                   </label>
                   <input
@@ -315,7 +315,7 @@ const CreateWorkspaceView = () => {
                 <div className="col-span-1">
                   <label
                     htmlFor="ws-visibility"
-                    className="text-[10px] font-bold text-slate-500 uppercase block mb-2 tracking-widest"
+                    className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest"
                   >
                     Workspace Visibility
                   </label>
@@ -335,7 +335,7 @@ const CreateWorkspaceView = () => {
                 {/* Conditional Password Field for Private Workspaces */}
                 {visibility === "private" && (
                   <div className="col-span-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2 tracking-widest">
+                    <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
                       Access Password *
                     </label>
                     <input
@@ -345,7 +345,7 @@ const CreateWorkspaceView = () => {
                       className="w-full bg-gh-bg-secondary border border-gh-border rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary text-gh-text outline-none transition-all"
                       placeholder="Enter a password to protect this workspace"
                     />
-                    <p className="text-[10px] text-slate-500 mt-2">
+                    <p className="text-[10px] text-gh-text-secondary mt-2">
                       🔒 Other users will need this password to access your
                       workspace
                     </p>
@@ -353,7 +353,7 @@ const CreateWorkspaceView = () => {
                 )}
 
                 <div className="col-span-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase block mb-2 tracking-widest">
+                  <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
                     Optional Description
                   </label>
                   <textarea
@@ -372,7 +372,7 @@ const CreateWorkspaceView = () => {
                 step >= 2 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
                 3: Project & Repository Setup
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -386,7 +386,7 @@ const CreateWorkspaceView = () => {
                   <span
                     className={`material-symbols-outlined !text-[32px] mb-4 ${setupMode === "empty"
                       ? "text-primary"
-                      : "text-slate-600 group-hover:text-primary"
+                      : "text-gh-text-secondary group-hover:text-primary"
                       }`}
                   >
                     folder_open
@@ -476,7 +476,7 @@ const CreateWorkspaceView = () => {
                     value={repoUrl}
                     onChange={(e) => handleRepoUrlChange(e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full bg-[#0A0A0A]lack/40 border border-gh-border rounded p-2 text-[10px] text-white focus:ring-1 focus:ring-primary outline-none"
+                    className="w-full bg-black/40 border border-gh-border rounded p-2 text-[10px] text-white focus:ring-1 focus:ring-primary outline-none"
                     placeholder="https://github.com/username/repo.git"
                   />
                 </div>
@@ -491,7 +491,7 @@ const CreateWorkspaceView = () => {
                 step >= 3 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
                 4: ENVIRONMENT & SECURITY DEFAULTS
               </h2>
               <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 space-y-6 shadow-2xl">
@@ -533,7 +533,7 @@ const CreateWorkspaceView = () => {
                 </div>
 
                 <div className="pt-6 border-t border-gh-border">
-                  <p className="text-[11px] text-slate-500 font-medium">
+                  <p className="text-[11px] text-gh-text-secondary font-medium">
                     Encrypted at rest and in transit. Role-based access control.
                   </p>
                 </div>
@@ -546,7 +546,7 @@ const CreateWorkspaceView = () => {
                 <button
                   onClick={handleCreate}
                   disabled={isCreating}
-                  className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-12 py-3.5 rounded-xl font-black uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(19,91,236,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
+                  className="bg-primary hover:opacity-90 text-gh-bg px-12 py-3.5 rounded-xl font-black uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(var(--gh-primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
                 >
                   {isCreating ? (
                     <>
@@ -561,7 +561,7 @@ const CreateWorkspaceView = () => {
                 </button>
                 <button
                   disabled={isCreating}
-                  className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3.5 rounded-xl font-bold text-xs transition-all border border-gh-border disabled:opacity-30"
+                  className="bg-gh-bg-tertiary hover:bg-gh-bg-secondary text-gh-text px-8 py-3.5 rounded-xl font-bold text-xs transition-all border border-gh-border disabled:opacity-30"
                   onClick={() => navigate("/workspaces")}
                 >
                   Cancel
@@ -574,7 +574,7 @@ const CreateWorkspaceView = () => {
                     <span className="size-1.5 rounded-full bg-primary animate-pulse"></span>
                     Allocating cloud resources
                   </div>
-                  <div className="w-48 h-1 bg-slate-800 rounded-full overflow-hidden mt-1">
+                  <div className="w-48 h-1 bg-gh-bg-tertiary rounded-full overflow-hidden mt-1">
                     <div className="h-full bg-primary animate-[shimmer_2s_infinite_linear] w-[60%]"></div>
                   </div>
                 </div>
@@ -585,14 +585,14 @@ const CreateWorkspaceView = () => {
 
         <footer className="mt-32 text-center pb-12">
           <div className="flex items-center justify-center gap-2 mb-2 opacity-40">
-            <span className="material-symbols-outlined text-slate-500 !text-sm">
+            <span className="material-symbols-outlined text-gh-text-secondary !text-sm">
               hub
             </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gh-text-secondary">
               TrackCodex Infrastructure
             </span>
           </div>
-          <p className="text-[10px] text-slate-700 font-bold uppercase tracking-widest">
+          <p className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-widest">
             Enterprise Instance ID: QFC-9023-SEC
           </p>
         </footer>

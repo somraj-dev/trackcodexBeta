@@ -115,14 +115,14 @@ const ManageCommunities = () => {
                 <div className="space-y-2">
                     <button
                         onClick={() => setActiveTab('all')}
-                        className={`w-full text-left px-4 py-3 rounded-lg text-[14px] font-bold transition-colors ${activeTab === 'all' ? 'bg-[#1A1A1B] text-white' : 'text-[#A1A1AA] hover:bg-[#0A0A0A]'
+                        className={`w-full text-left px-4 py-3 rounded-lg text-[14px] font-bold transition-colors ${activeTab === 'all' ? 'bg-[#1A1A1B] text-white' : 'text-[#A1A1AA] hover:bg-gh-bg-tertiary'
                             }`}
                     >
                         All Communities
                     </button>
                     <button
                         onClick={() => setActiveTab('favorites')}
-                        className={`w-full text-left px-4 py-3 rounded-lg text-[14px] font-bold transition-colors ${activeTab === 'favorites' ? 'bg-[#1A1A1B] text-white' : 'text-[#A1A1AA] hover:bg-[#0A0A0A]'
+                        className={`w-full text-left px-4 py-3 rounded-lg text-[14px] font-bold transition-colors ${activeTab === 'favorites' ? 'bg-[#1A1A1B] text-white' : 'text-[#A1A1AA] hover:bg-gh-bg-tertiary'
                             }`}
                     >
                         Favorites

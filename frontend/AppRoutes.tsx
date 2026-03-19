@@ -112,7 +112,6 @@ const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView")
 const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
-const TrialRepositoriesView = React.lazy(() => import("./views/marketplace/TrialRepositoriesView"));
 
 
 // Onboarding
@@ -240,10 +239,7 @@ const AppRoutes = () => {
 
               <Route path="missions" element={<MissionsView />} />
               <Route path="missions/:id" element={<MissionDetailView />} />
-              <Route path="trials/:id" element={<MissionDetailView />} />
               <Route path="applications" element={<MyApplicationsView />} />
-              <Route path="trials" element={<TrialRepositoriesView />} />
-
             </Route>
 
             {/* Settings */}

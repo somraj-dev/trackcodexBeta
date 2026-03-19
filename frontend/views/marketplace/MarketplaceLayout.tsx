@@ -36,8 +36,7 @@ const MarketplaceLayout = () => {
                 Marketplace
               </h1>
               <p className="text-sm text-gh-text-secondary max-w-2xl leading-relaxed">
-                Discover high-value missions, prove your skills in real-world
-                trials, and collaborate with top engineering teams.
+                Discover high-value missions and collaborate with top engineering teams.
               </p>
             </div>
           </div>
@@ -47,12 +46,6 @@ const MarketplaceLayout = () => {
               label="Missions"
               icon="work"
             />
-            <MarketplaceTab
-              to="/marketplace/trials"
-              label="Trial Repositories"
-              icon="rule"
-            />
-
           </nav>
         </div>
       </header>

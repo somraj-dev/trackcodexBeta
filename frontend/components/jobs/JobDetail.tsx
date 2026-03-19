@@ -143,7 +143,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Associated Workspace</h3>
                <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-4">
-                     <div className="size-12 rounded-xl bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                     <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
                         <span className="material-symbols-outlined !text-3xl">terminal</span>
                      </div>
                      <div>

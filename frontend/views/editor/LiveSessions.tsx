@@ -343,7 +343,7 @@ const LiveSessions = () => {
 
       {/* Chat Sidebar with Mention System */}
       <aside className="w-[400px] border-l border-gh-border bg-gh-bg flex flex-col shrink-0 relative">
-        <div className="h-14 px-6 flex items-center justify-between border-b border-gh-border bg-[#0A0A0A]lack/10">
+        <div className="h-14 px-6 flex items-center justify-between border-b border-gh-border bg-black/10">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary !text-[18px] filled">forum</span>
             <span className="text-[11px] font-bold uppercase tracking-widest text-gh-text-secondary">Session Chat</span>
@@ -385,7 +385,7 @@ const LiveSessions = () => {
         {/* --- Mention Picker Dropdown --- */}
         {showMentionPicker && filteredParticipants.length > 0 && (
           <div className="absolute bottom-24 left-6 right-6 bg-[#1c2128] border border-gh-border rounded-lg shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 ring-1 ring-black/50">
-            <div className="px-3 py-2 border-b border-gh-border bg-[#0A0A0A]lack/20">
+            <div className="px-3 py-2 border-b border-gh-border bg-black/20">
               <p className="text-[9px] font-bold text-gh-text-secondary uppercase tracking-widest">Suggestions</p>
             </div>
             <div className="max-h-64 overflow-y-auto custom-scrollbar">

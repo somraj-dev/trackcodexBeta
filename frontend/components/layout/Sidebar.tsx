@@ -71,7 +71,7 @@ const OrgSwitcher = ({
       )}
       <style>{`
         .menu-item-gh {
-            @apply flex items-center gap-3 p-2 rounded-lg hover:bg-[#0A0A0A]lue-600/10 cursor-pointer text-sm text-gh-text hover:text-blue-400 transition-colors;
+            @apply flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600/10 cursor-pointer text-sm text-gh-text hover:text-blue-400 transition-colors;
         }
         .menu-item-gh .icon {
             @apply text-[18px] text-[#888888];

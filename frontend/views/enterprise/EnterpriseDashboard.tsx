@@ -70,7 +70,7 @@ export default function EnterpriseDashboard() {
           <p className="text-[#a1a1aa]">{error}</p>
           <button
             onClick={() => navigate("/")}
-            className="mt-6 px-4 py-2 bg-[#0A0A0A]lue-600 rounded"
+            className="mt-6 px-4 py-2 bg-blue-600 rounded"
           >
             Go Home
           </button>

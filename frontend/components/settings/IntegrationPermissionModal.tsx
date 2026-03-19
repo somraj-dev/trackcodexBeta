@@ -23,7 +23,7 @@ const IntegrationPermissionModal: React.FC<IntegrationPermissionModalProps> = ({
     if (!isOpen || !integration) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A0A0A]lack/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-[#1C1C1C] border border-[#333] rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden flex flex-col">
                 {/* Header with Logos */}
                 <div className="p-8 pb-6 flex flex-col items-center">
@@ -35,7 +35,7 @@ const IntegrationPermissionModal: React.FC<IntegrationPermissionModalProps> = ({
                     </button>
 
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="size-16 bg-[#0A0A0A]lack rounded-2xl border border-[#333] flex items-center justify-center shadow-lg">
+                        <div className="size-16 bg-black rounded-2xl border border-[#333] flex items-center justify-center shadow-lg">
                             {/* App Logo Placeholder - replace with actual app logo if available */}
                             <span className="material-symbols-outlined text-3xl text-white">hub</span>
                         </div>
@@ -44,7 +44,7 @@ const IntegrationPermissionModal: React.FC<IntegrationPermissionModalProps> = ({
                             <span className="size-1.5 rounded-full bg-gray-600"></span>
                             <span className="size-1.5 rounded-full bg-gray-600"></span>
                         </div>
-                        <div className="size-16 bg-[#0A0A0A]lack rounded-2xl border border-[#333] flex items-center justify-center shadow-lg">
+                        <div className="size-16 bg-black rounded-2xl border border-[#333] flex items-center justify-center shadow-lg">
                             <span className="material-symbols-outlined text-3xl text-white">
                                 {integration.icon}
                             </span>

@@ -295,7 +295,7 @@ const PersonalAccessTokensSettings = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={handleGenerate}
-            className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-all"
+            className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all"
           >
             Generate token
           </button>

@@ -19,8 +19,8 @@ const WorkflowStep = ({ step, status, label, date, last = false }: { step: numbe
                 {!last && <div className={`w-0.5 flex-1 ${status === 'approved' ? line : 'bg-slate-700'}`}></div>}
             </div>
             <div>
-                <p className="font-bold text-sm text-white">{label}</p>
-                <p className="text-xs text-slate-400">{date}</p>
+                <p className="font-bold text-sm text-gh-text">{label}</p>
+                <p className="text-xs text-gh-text-secondary">{date}</p>
             </div>
         </div>
     );
@@ -71,18 +71,18 @@ const OfferEditorView = () => {
 
 
     return (
-        <div className="h-full flex flex-col bg-gh-bg text-gh-text-secondary font-display -m-8">
+        <div className="h-full flex flex-col bg-gh-bg text-gh-text font-display -m-8">
             <header className="h-16 flex-shrink-0 flex items-center justify-between px-6 bg-gh-bg-secondary border-b border-gh-border">
-                <h1 className="text-lg font-bold text-white">TrackCodex Offer Editor</h1>
+                <h1 className="text-lg font-bold text-gh-text">TrackCodex Offer Editor</h1>
                 <div className="flex items-center gap-3">
-                    <button title="Candidates" className="text-sm font-medium text-slate-400 hover:text-white">Candidates</button>
-                    <button title="Templates" className="text-sm font-medium text-slate-400 hover:text-white">Templates</button>
+                    <button title="Candidates" className="text-sm font-medium text-gh-text-secondary hover:text-primary">Candidates</button>
+                    <button title="Templates" className="text-sm font-medium text-gh-text-secondary hover:text-primary">Templates</button>
                     <div className="w-px h-6 bg-gh-border mx-2"></div>
-                    <button title="Save Draft" className="px-4 py-1.5 text-sm font-bold bg-gh-bg-secondary border border-gh-border rounded-lg text-white hover:bg-slate-700">Save Draft</button>
+                    <button title="Save Draft" className="px-4 py-1.5 text-sm font-bold bg-gh-bg-secondary border border-gh-border rounded-lg text-gh-text hover:bg-gh-bg-tertiary">Save Draft</button>
                     <button
                         title="Send Offer"
                         onClick={() => navigate(`/offer/${id}/accept`)}
-                        className="px-4 py-1.5 text-sm font-bold bg-primary text-white rounded-lg hover:bg-[#0A0A0A]lue-600">Send Offer</button>
+                        className="px-4 py-1.5 text-sm font-bold bg-primary text-gh-bg rounded-lg hover:opacity-90">Send Offer</button>
                 </div>
             </header>
 
@@ -93,13 +93,13 @@ const OfferEditorView = () => {
                         <div className="flex items-center gap-4 mb-4">
                             <img src={candidate.avatar} alt={candidate.name} className="size-12 rounded-full" />
                             <div>
-                                <h2 className="font-bold text-white text-lg">{candidate.name}</h2>
-                                <p className="text-sm text-slate-400">{candidate.role}</p>
+                                <h2 className="font-bold text-gh-text text-lg">{candidate.name}</h2>
+                                <p className="text-sm text-gh-text-secondary">{candidate.role}</p>
                             </div>
                         </div>
                         <div className="p-4 bg-gh-bg-secondary border border-gh-border rounded-lg">
-                            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">Final Scorecard</p>
-                            <p className="text-3xl font-black text-white">4.8<span className="text-lg text-slate-500">/5</span></p>
+                            <p className="text-xs text-gh-text-secondary uppercase font-bold tracking-wider">Final Scorecard</p>
+                            <p className="text-3xl font-black text-gh-text">4.8<span className="text-lg text-gh-text-secondary">/5</span></p>
                         </div>
                     </div>
                     <div>
@@ -114,8 +114,8 @@ const OfferEditorView = () => {
 
                 {/* Main Editor */}
                 <main className="flex-1 p-8 overflow-y-auto custom-scrollbar">
-                    <h2 className="text-2xl font-bold text-white mb-2">Offer Details & Terms</h2>
-                    <p className="text-slate-400 mb-8">Configure the compensation and logistics for the candidate.</p>
+                    <h2 className="text-2xl font-bold text-gh-text mb-2">Offer Details & Terms</h2>
+                    <p className="text-gh-text-secondary mb-8">Configure the compensation and logistics for the candidate.</p>
 
                     <div className="space-y-8 max-w-xl">
                         {/* Compensation */}
@@ -164,14 +164,14 @@ const OfferEditorView = () => {
                         </section>
                         {/* Toggles */}
                         <div className="flex items-center justify-between p-4 bg-gh-bg-secondary border border-gh-border rounded-lg">
-                            <label htmlFor="includeRelocation" className="font-medium text-white">Include Relocation Package</label>
-                            <button id="includeRelocation" title="Toggle Relocation Package" onClick={() => handleToggle('includeRelocation')} className={`w-11 h-6 rounded-full relative transition-colors ${offer.includeRelocation ? 'bg-primary' : 'bg-slate-700'}`}>
+                            <label htmlFor="includeRelocation" className="font-medium text-gh-text">Include Relocation Package</label>
+                            <button id="includeRelocation" title="Toggle Relocation Package" onClick={() => handleToggle('includeRelocation')} className={`w-11 h-6 rounded-full relative transition-colors ${offer.includeRelocation ? 'bg-primary' : 'bg-gh-bg-tertiary'}`}>
                                 <span className={`absolute top-1 size-4 bg-white rounded-full transition-transform ${offer.includeRelocation ? 'translate-x-6' : 'translate-x-1'}`}></span>
                             </button>
                         </div>
                         <div className="flex items-center justify-between p-4 bg-gh-bg-secondary border border-gh-border rounded-lg">
-                            <label htmlFor="customNda" className="font-medium text-white">Custom NDA Required</label>
-                            <button id="customNda" title="Toggle Custom NDA" onClick={() => handleToggle('customNda')} className={`w-11 h-6 rounded-full relative transition-colors ${offer.customNda ? 'bg-primary' : 'bg-slate-700'}`}>
+                            <label htmlFor="customNda" className="font-medium text-gh-text">Custom NDA Required</label>
+                            <button id="customNda" title="Toggle Custom NDA" onClick={() => handleToggle('customNda')} className={`w-11 h-6 rounded-full relative transition-colors ${offer.customNda ? 'bg-primary' : 'bg-gh-bg-tertiary'}`}>
                                 <span className={`absolute top-1 size-4 bg-white rounded-full transition-transform ${offer.customNda ? 'translate-x-6' : 'translate-x-1'}`}></span>
                             </button>
                         </div>
@@ -179,11 +179,11 @@ const OfferEditorView = () => {
                 </main>
 
                 {/* Preview Panel */}
-                <aside className="w-[600px] bg-[#0A0A0A]lack p-8 shrink-0 flex flex-col items-center">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-base">visibility</span> Live Offer Preview</p>
-                    <div className="w-full bg-white text-slate-800 p-10 rounded-lg shadow-2xl flex-1 overflow-y-auto text-sm leading-relaxed">
+                <aside className="w-[600px] bg-gh-bg-secondary p-8 shrink-0 flex flex-col items-center border-l border-gh-border">
+                    <p className="text-xs font-bold text-gh-text-secondary uppercase tracking-wider mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-base">visibility</span> Live Offer Preview</p>
+                    <div className="w-full bg-gh-bg text-gh-text p-10 rounded-lg shadow-2xl flex-1 overflow-y-auto text-sm leading-relaxed border border-gh-border">
                         <header className="flex items-start justify-between mb-8">
-                            <div className="size-10 bg-[#0A0A0A]lack rounded-lg"></div>
+                            <div className="size-10 bg-primary rounded-lg"></div>
                             <div className="text-right text-xs text-slate-600">
                                 <p className="font-bold">TRACKCODEX INC.</p>
                                 <p>123 Tech Plaza, Suite 400</p>

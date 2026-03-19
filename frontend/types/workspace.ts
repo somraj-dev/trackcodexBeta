@@ -29,21 +29,3 @@ export interface LiveSession {
   participants: number;
 }
 
-export interface TrialRepo {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  salaryRange: string;
-  status: "Newly Active" | "Updated";
-  description: string;
-  challenges: string[];
-  tech: string[];
-  deployments: number;
-  coverage: number;
-  avgPrReview: string;
-  logo: string;
-  repoName: string;
-  readme?: string;
-}
-

@@ -26,7 +26,7 @@ const StrataSettings = ({ strata }: { strata: Strata }) => {
                     />
                 </div>
                 <div className="pt-4 flex justify-start">
-                    <button className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-[#0A0A0A]lue-600 transition-all">
+                    <button className="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-blue-600 transition-all">
                         Update profile
                     </button>
                 </div>

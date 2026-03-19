@@ -37,7 +37,7 @@ const PrivacySettings = () => {
 
             {/* Profile Visibility Alert */}
             {profileVisibility === "private" && (
-                <div className="bg-[#0A0A0A]lue-500/10 border border-blue-500/30 rounded-xl p-6">
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
                     <div className="flex items-start gap-4">
                         <span className="material-symbols-outlined text-blue-400 text-2xl">info</span>
                         <div className="flex-1">

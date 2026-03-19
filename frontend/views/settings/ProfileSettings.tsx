@@ -152,8 +152,8 @@ const ProfileSettings = () => {
   };
 
   // Helper Styles
-  const labelStyle = "block text-sm font-semibold text-white mb-2";
-  const inputStyle = "w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 text-sm text-gh-text focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors placeholder-gh-text-secondary";
+  const labelStyle = "block text-sm font-semibold text-gh-text mb-2";
+  const inputStyle = "w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 text-sm text-gh-text focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors placeholder-gh-text-secondary";
   const sectionTitleStyle = "text-xl font-normal text-gh-text pb-2 border-b border-gh-border mb-4";
 
   return (
@@ -175,7 +175,7 @@ const ProfileSettings = () => {
               onChange={handleChange}
               className={inputStyle}
             />
-            <p className="text-xs text-[#8b949e] mt-1">Your name may appear around TrackCodex where you contribute or are mentioned. You can remove it at any time.</p>
+            <p className="text-xs text-gh-text-secondary mt-1">Your name may appear around TrackCodex where you contribute or are mentioned. You can remove it at any time.</p>
           </div>
 
           <div>
@@ -193,7 +193,7 @@ const ProfileSettings = () => {
                 <option value="private">Don't show my email</option>
               </select>
             </div>
-            <p className="text-xs text-[#8b949e] mt-1">You can manage verified email addresses in your <a href="#" className="text-blue-400 hover:underline">email settings</a>.</p>
+            <p className="text-xs text-gh-text-secondary mt-1">You can manage verified email addresses in your <a href="#" className="text-primary hover:underline">email settings</a>.</p>
           </div>
 
           <div>
@@ -206,7 +206,7 @@ const ProfileSettings = () => {
               className={`${inputStyle} min-h-[100px] resize-y`}
               placeholder="Tell us a little bit about yourself"
             />
-            <p className="text-xs text-[#8b949e] mt-1">You can <strong>@mention</strong> other users and organizations to link to them.</p>
+            <p className="text-xs text-gh-text-secondary mt-1">You can <strong>@mention</strong> other users and organizations to link to them.</p>
           </div>
 
           <div>
@@ -240,7 +240,7 @@ const ProfileSettings = () => {
 
           <div>
             <label className={labelStyle}>Social accounts</label>
-            <p className="text-xs text-[#8b949e] mb-3">
+            <p className="text-xs text-gh-text-secondary mb-3">
               Paste your social media profile URLs and we'll automatically detect the platform
             </p>
             <div className="space-y-2">
@@ -249,7 +249,7 @@ const ProfileSettings = () => {
 
                 return (
                   <div key={idx} className="relative">
-                    <span className={`absolute left-3 top-2 ${platform ? platform.color : "text-[#8b949e]"}`}>
+                    <span className={`absolute left-3 top-2 ${platform ? platform.color : "text-gh-text-secondary"}`}>
                       <span className="material-symbols-outlined !text-[16px]">
                         {platform ? platform.icon : "link"}
                       </span>
@@ -262,7 +262,7 @@ const ProfileSettings = () => {
                       placeholder={`Link to social profile ${idx + 1}`}
                     />
                     {platform && (
-                      <span className="absolute right-3 top-2 text-xs text-[#8b949e] bg-[#11141A] px-2 py-0.5 rounded border border-[#1E232E]">
+                      <span className="absolute right-3 top-2 text-xs text-gh-text-secondary bg-gh-bg-secondary px-2 py-0.5 rounded border border-gh-border">
                         {platform.name}
                       </span>
                     )}
@@ -282,7 +282,7 @@ const ProfileSettings = () => {
               onChange={handleChange}
               className={inputStyle}
             />
-            <p className="text-xs text-[#8b949e] mt-1">You can <strong>@mention</strong> your company's TrackCodex organization to link it.</p>
+            <p className="text-xs text-gh-text-secondary mt-1">You can <strong>@mention</strong> your company's TrackCodex organization to link it.</p>
           </div>
 
           <div>
@@ -301,7 +301,7 @@ const ProfileSettings = () => {
                 onClick={handleGetLocation}
                 disabled={isLoadingLocation}
                 title="Use current location"
-                className="absolute right-2 top-1.5 p-1 text-[#8b949e] hover:text-blue-400 disabled:opacity-50 transition-colors"
+                className="absolute right-2 top-1.5 p-1 text-gh-text-secondary hover:text-primary disabled:opacity-50 transition-colors"
               >
                 <span className={`material-symbols-outlined !text-[18px] ${isLoadingLocation ? "animate-spin" : ""}`}>
                   {isLoadingLocation ? "progress_activity" : "my_location"}
@@ -311,7 +311,7 @@ const ProfileSettings = () => {
             {locationError && (
               <p className="text-xs text-rose-500 mt-1">{locationError}</p>
             )}
-            <p className="text-xs text-[#8b949e] mt-1">Click the <span className="material-symbols-outlined !text-[12px] align-text-bottom">my_location</span> icon to use your current GPS location.</p>
+            <p className="text-xs text-gh-text-secondary mt-1">Click the <span className="material-symbols-outlined !text-[12px] align-text-bottom">my_location</span> icon to use your current GPS location.</p>
           </div>
 
           <div className="flex items-start gap-2">
@@ -321,18 +321,18 @@ const ProfileSettings = () => {
               name="displayLocalTime"
               checked={profile.displayLocalTime || false}
               onChange={handleChange}
-              className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0"
+              className="mt-1 bg-gh-bg border-gh-border rounded text-primary focus:ring-0"
             />
             <div>
-              <label htmlFor="displayLocalTime" className="text-sm font-semibold text-white flex items-center gap-2">
+              <label htmlFor="displayLocalTime" className="text-sm font-semibold text-gh-text flex items-center gap-2">
                 Display current local time
                 {profile.displayLocalTime && (
-                  <span className="text-xs font-normal text-[#8b949e] bg-[#11141A] px-2 py-0.5 rounded-full border border-[#1E232E]">
+                  <span className="text-xs font-normal text-gh-text-secondary bg-gh-bg-secondary px-2 py-0.5 rounded-full border border-gh-border">
                     {currentTime} (Live Preview)
                   </span>
                 )}
               </label>
-              <p className="text-xs text-[#8b949e]">Other users will see the time difference from their local time.</p>
+              <p className="text-xs text-gh-text-secondary">Other users will see the time difference from their local time.</p>
             </div>
           </div>
 
@@ -350,7 +350,7 @@ const ProfileSettings = () => {
 
         {/* Right Column: Avatar */}
         <div className="md:col-span-4 pl-0 md:pl-8">
-          <h3 className="text-sm font-semibold text-white mb-2">Profile picture</h3>
+          <h3 className="text-sm font-semibold text-gh-text mb-2">Profile picture</h3>
           <div className="relative group w-fit">
             <img
               src={profile.avatar}
@@ -359,7 +359,7 @@ const ProfileSettings = () => {
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-2 left-0 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] text-[#c9d1d9] text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 transition-colors"
+              className="absolute bottom-2 left-0 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border text-gh-text text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 transition-colors"
             >
               <span className="material-symbols-outlined !text-[14px]">edit</span>
               Edit
@@ -385,18 +385,18 @@ const ProfileSettings = () => {
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
               <div>
-                <label className="text-sm font-semibold text-white">Make profile private and hide activity</label>
-                <p className="text-xs text-[#8b949e]">Enabling this will hide your contributions and activity from your TrackCodex profile and from social features like followers, stars, feeds, leaderboards and releases.</p>
+                <label className="text-sm font-semibold text-gh-text">Make profile private and hide activity</label>
+                <p className="text-xs text-gh-text-secondary">Enabling this will hide your contributions and activity from your TrackCodex profile and from social features like followers, stars, feeds, leaderboards and releases.</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <input type="checkbox" defaultChecked className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <input type="checkbox" defaultChecked className="mt-1 bg-gh-bg border-gh-border rounded text-primary focus:ring-0" />
               <div>
-                <label className="text-sm font-semibold text-white">Include private contributions on my profile</label>
-                <p className="text-xs text-[#8b949e]">Your contribution graph, achievements, and activity overview will show your private contributions without revealing any repository or organization information. <a href="#" className="text-blue-400 hover:underline">Read more</a>.</p>
+                <label className="text-sm font-semibold text-gh-text">Include private contributions on my profile</label>
+                <p className="text-xs text-gh-text-secondary">Your contribution graph, achievements, and activity overview will show your private contributions without revealing any repository or organization information. <a href="#" className="text-primary hover:underline">Read more</a>.</p>
               </div>
             </div>
-            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+            <button className="px-3 py-1.5 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border rounded-md text-sm font-semibold text-gh-text transition-colors mt-2">
               Update preferences
             </button>
           </div>
@@ -407,13 +407,13 @@ const ProfileSettings = () => {
           <h2 className={sectionTitleStyle}>Profile settings</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-2">
-              <input type="checkbox" defaultChecked className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <input type="checkbox" defaultChecked className="mt-1 bg-gh-bg border-gh-border rounded text-primary focus:ring-0" />
               <div>
-                <label className="text-sm font-semibold text-white">Show Achievements on my profile</label>
-                <p className="text-xs text-[#8b949e]">Your achievements will be shown on your profile.</p>
+                <label className="text-sm font-semibold text-gh-text">Show Achievements on my profile</label>
+                <p className="text-xs text-gh-text-secondary">Your achievements will be shown on your profile.</p>
               </div>
             </div>
-            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+            <button className="px-3 py-1.5 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border rounded-md text-sm font-semibold text-gh-text transition-colors mt-2">
               Update preferences
             </button>
           </div>
@@ -422,9 +422,9 @@ const ProfileSettings = () => {
         {/* TrackCodex Developer Program */}
         <section>
           <h2 className={sectionTitleStyle}>TrackCodex Developer Program</h2>
-          <div className="p-4 border border-[#1E232E] rounded-md bg-[#0A0D14]">
-            <p className="text-sm text-white">
-              Building an application, service, or tool that integrates with TrackCodex? <a href="#" className="text-blue-400 hover:underline">Join the TrackCodex Developer Program</a>, or read more about it at our <a href="#" className="text-blue-400 hover:underline">developer program</a>.
+          <div className="p-4 border border-gh-border rounded-md bg-gh-bg-secondary">
+            <p className="text-sm text-gh-text">
+              Building an application, service, or tool that integrates with TrackCodex? <a href="#" className="text-primary hover:underline">Join the TrackCodex Developer Program</a>, or read more about it at our <a href="#" className="text-primary hover:underline">developer program</a>.
             </p>
           </div>
         </section>
@@ -434,12 +434,12 @@ const ProfileSettings = () => {
           <h2 className={sectionTitleStyle}>Jobs profile</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-2">
-              <input type="checkbox" className="mt-1 bg-[#0A0D14] border-[#1E232E] rounded text-blue-500 focus:ring-0" />
+              <input type="checkbox" className="mt-1 bg-gh-bg border-gh-border rounded text-primary focus:ring-0" />
               <div>
-                <label className="text-sm font-semibold text-white">Available for hire</label>
+                <label className="text-sm font-semibold text-gh-text">Available for hire</label>
               </div>
             </div>
-            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+            <button className="px-3 py-1.5 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border rounded-md text-sm font-semibold text-gh-text transition-colors mt-2">
               Save jobs profile
             </button>
           </div>
@@ -457,8 +457,8 @@ const ProfileSettings = () => {
                 <option>French</option>
               </select>
             </div>
-            <p className="text-xs text-[#8b949e]">We'll use this language preference to filter the trending repository lists on <a href="#" className="text-blue-400 hover:underline">Explore</a> our <a href="#" className="text-blue-400 hover:underline">Trending Repositories</a> page.</p>
-            <button className="px-3 py-1.5 bg-[#11141A] hover:bg-[#30363d] border border-[#1E232E] rounded-md text-sm font-semibold text-[#c9d1d9] transition-colors mt-2">
+            <p className="text-xs text-gh-text-secondary">We'll use this language preference to filter the trending repository lists on <a href="#" className="text-primary hover:underline">Explore</a> our <a href="#" className="text-primary hover:underline">Trending Repositories</a> page.</p>
+            <button className="px-3 py-1.5 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border rounded-md text-sm font-semibold text-gh-text transition-colors mt-2">
               Save Trending settings
             </button>
           </div>

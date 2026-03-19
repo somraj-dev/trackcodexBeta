@@ -85,7 +85,7 @@ const OfferAcceptanceView = () => {
 
                         {/* Document Viewer */}
                         <div className="bg-[#11141A] border border-gh-border rounded-xl overflow-hidden">
-                            <div className="p-4 bg-[#0A0A0A]lack/20 border-b border-gh-border flex items-center justify-between">
+                            <div className="p-4 bg-black/20 border-b border-gh-border flex items-center justify-between">
                                 <p className="text-sm font-mono text-slate-400">Employment_Agreement_Alex_TechFlow.pdf</p>
                                 <div className="flex items-center gap-2">
                                     <button className="text-slate-500 hover:text-white"><span className="material-symbols-outlined !text-base">zoom_in</span></button>

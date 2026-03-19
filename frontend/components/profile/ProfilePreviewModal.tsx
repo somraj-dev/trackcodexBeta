@@ -106,7 +106,7 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0A0A0A]lack/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="w-full max-w-5xl max-h-[90vh] bg-[#0d0d12] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col m-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#1a1a1f]">
@@ -225,7 +225,7 @@ export const ProfilePreviewModal: React.FC<ProfilePreviewModalProps> = ({
           {/* Privacy Notice */}
           {(!profile.profileReadme || !profile.showReadme) &&
             (!profile.resumeUrl || !profile.showResume) && (
-              <div className="p-6 bg-[#0A0A0A]lue-500/10 border border-blue-500/20 rounded-xl text-blue-300">
+              <div className="p-6 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-300">
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined">info</span>
                   <div>

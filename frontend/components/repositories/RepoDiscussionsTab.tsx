@@ -192,7 +192,7 @@ const RepoDiscussionsTab: React.FC<RepoDiscussionsTabProps> = ({ repo }) => {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-[#0A0A0A]lack/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-gh-bg-secondary border border-gh-border rounded-xl w-full max-w-2xl shadow-xl overflow-hidden">
             <div className="p-4 border-b border-gh-border flex items-center justify-between">
               <h2 className="text-lg font-bold text-gh-text">New Discussion</h2>

@@ -355,9 +355,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             // Code block
             parts.push(
-                <div key={`code-${i}`} className="my-3 font-mono text-[13px] bg-black/50 rounded-lg overflow-hidden border border-white/10">
-                    <div className="bg-white/5 px-3 py-1.5 flex items-center justify-between border-b border-white/10">
-                        <span className="text-white/40 text-[10px] uppercase font-bold">{lang || 'code'}</span>
+                <div key={`code-${i}`} className="my-3 font-mono text-[13px] bg-gh-bg-secondary rounded-lg overflow-hidden border border-gh-border">
+                    <div className="bg-gh-bg px-3 py-1.5 flex items-center justify-between border-b border-gh-border">
+                        <span className="text-gh-text-secondary text-[10px] uppercase font-bold">{lang || 'code'}</span>
                         <button
                             onClick={() => executeSnippet(msg.id, code)}
                             className="text-[10px] bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-2 py-0.5 rounded transition-colors font-bold uppercase tracking-wider"
@@ -365,11 +365,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             Run
                         </button>
                     </div>
-                    <pre className="p-3 overflow-x-auto text-white/90">
+                    <pre className="p-3 overflow-x-auto text-gh-text">
                         <code>{code.trim()}</code>
                     </pre>
                     {snippetOutput[msg.id] && (
-                        <div className="bg-black/80 p-3 border-t border-green-500/30 font-mono text-[11px] text-green-400">
+                        <div className="bg-gh-bg p-3 border-t border-green-500/30 font-mono text-[11px] text-green-400">
                             <div className="flex items-center gap-2 mb-1 opacity-50">
                                 <div className="size-1.5 bg-green-500 rounded-full"></div>
                                 <span>OUTPUT</span>
@@ -440,9 +440,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         return (
             <div key={`sep-${date}`} className="flex items-center justify-center my-6">
-                <div className="h-px bg-white/10 flex-1" />
-                <span className="px-4 text-[11px] font-bold text-white/30 uppercase tracking-[0.2em]">{label}</span>
-                <div className="h-px bg-white/10 flex-1" />
+                <div className="h-px bg-gh-border flex-1" />
+                <span className="px-4 text-[11px] font-bold text-gh-text-secondary uppercase tracking-[0.2em]">{label}</span>
+                <div className="h-px bg-gh-border flex-1" />
             </div>
         );
     };
@@ -460,7 +460,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
 
     return (
-        <div className={`fixed inset-0 z-[600] flex items-center justify-center bg-black/90 backdrop-blur-xl p-0 md:p-10 animate-in fade-in duration-300 font-sans ${isHackerMode ? 'hacker-mode' : ''}`}>
+        <div className={`fixed inset-0 z-[600] flex items-center justify-center bg-gh-bg/90 backdrop-blur-xl p-0 md:p-10 animate-in fade-in duration-300 font-sans ${isHackerMode ? 'hacker-mode' : ''}`}>
             <style dangerouslySetInnerHTML={{
                 __html: `
                 .hacker-mode {
@@ -492,19 +492,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     box-shadow: 0 0 10px #22c55e;
                 }
             ` }} />
-            <div className="w-full h-full max-w-[1200px] max-h-[900px] bg-[#121212] rounded-none md:rounded-[1.5rem] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] flex border border-white/10 select-none">
+            <div className="w-full h-full max-w-[1200px] max-h-[900px] bg-gh-bg rounded-none md:rounded-[1.5rem] overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] flex border border-gh-border select-none">
 
                 {/* --- SIDEBAR --- */}
-                <div className="w-[350px] border-r border-white/10 flex flex-col bg-black">
+                <div className="w-[350px] border-r border-gh-border flex flex-col bg-gh-bg-secondary">
                     <div className="h-[75px] px-6 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2">
-                            <h1 className="text-2xl font-bold text-white tracking-tight">Direct</h1>
+                            <h1 className="text-2xl font-bold text-gh-text tracking-tight">Direct</h1>
                             <div className="size-2 bg-red-500 rounded-full animate-pulse mt-1"></div>
                         </div>
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setIsNewChatOpen(true)}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+                                className="p-2 hover:bg-gh-bg rounded-full transition-colors text-gh-text"
                                 aria-label="New Message"
                                 title="New Message"
                             >
@@ -515,21 +515,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                     <div className="px-6 mb-4 shrink-0">
                         <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-white transition-colors" size={18} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gh-text-secondary group-focus-within:text-gh-text transition-colors" size={18} />
                             <input
                                 type="text"
                                 placeholder="Search"
                                 value={sidebarSearchTerm}
                                 onChange={(e) => setSidebarSearchTerm(e.target.value)}
-                                className="w-full bg-[#262626] border-none rounded-xl py-2.5 pl-11 pr-4 text-[15px] text-white focus:ring-0 placeholder:text-white/30 transition-all font-light"
+                                className="w-full bg-gh-bg border-none rounded-xl py-2.5 pl-11 pr-4 text-[15px] text-gh-text focus:ring-0 placeholder:text-gh-text-secondary transition-all font-light"
                             />
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <div className="px-4 py-2 flex items-center justify-between text-[14px] font-semibold">
-                            <span className="text-white">Messages</span>
-                            <button className="text-white/50 hover:text-white transition-colors" aria-label="View Requests" title="View Requests">Requests</button>
+                            <span className="text-gh-text">Messages</span>
+                            <button className="text-gh-text-secondary hover:text-gh-text transition-colors" aria-label="View Requests" title="View Requests">Requests</button>
                         </div>
                         {filteredConversations.map(conv => {
                             const other = getOtherParticipant(conv);
@@ -539,7 +539,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 <div
                                     key={conv.id}
                                     onClick={() => handleConversationClick(conv.id)}
-                                    className={`px-5 py-3.5 cursor-pointer flex items-center gap-3.5 transition-all group ${isActive ? 'bg-[#262626]' : 'hover:bg-[#1a1a1a]'}`}
+                                    className={`px-5 py-3.5 cursor-pointer flex items-center gap-3.5 transition-all group ${isActive ? 'bg-gh-bg' : 'hover:bg-gh-bg/50'}`}
                                 >
                                     <div className="relative shrink-0">
                                         <div className={`absolute -inset-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity p-[1.5px] ${isActive ? 'opacity-100' : ''}`}>
@@ -550,15 +550,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-baseline mb-0.5">
-                                            <span className="text-[15px] font-medium text-white truncate">
+                                            <span className="text-[15px] font-medium text-gh-text truncate">
                                                 {other?.username || "Unknown"}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1.5 overflow-hidden">
-                                            <p className={`text-[13px] truncate ${isActive ? 'text-white/70' : 'text-white/40'}`}>
+                                            <p className={`text-[13px] truncate ${isActive ? 'text-gh-text/70' : 'text-gh-text-secondary'}`}>
                                                 {lastMsg?.content || "Sent an attachment"}
                                             </p>
-                                            <span className="shrink-0 text-[12px] text-white/30">
+                                            <span className="shrink-0 text-[12px] text-gh-text-secondary">
                                                 · {new Date(conv.lastMessageAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                                             </span>
                                         </div>
@@ -571,45 +571,45 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </div>
 
                 {/* --- CHAT AREA --- */}
-                <div className="flex-1 flex flex-col bg-black relative">
+                <div className="flex-1 flex flex-col bg-gh-bg relative">
                     {activeConversationId ? (
                         <>
                             {/* Header */}
-                            <div className="h-[75px] px-6 border-b border-white/10 flex items-center justify-between bg-black/80 backdrop-blur sticky top-0 z-20">
+                            <div className="h-[75px] px-6 border-b border-gh-border flex items-center justify-between bg-gh-bg/80 backdrop-blur sticky top-0 z-20">
                                 <div className="flex items-center gap-3">
                                     <div className="relative cursor-pointer group">
                                         <div className="absolute -inset-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity p-[1px]">
-                                            <div className="w-full h-full bg-black rounded-full" />
+                                            <div className="w-full h-full bg-gh-bg rounded-full" />
                                         </div>
-                                        <img src={displayUser?.avatar || "/default-avatar.png"} className="relative size-10 rounded-full object-cover border border-white/10" alt={`${displayUser?.username || 'User'}'s avatar`} />
+                                        <img src={displayUser?.avatar || "/default-avatar.png"} className="relative size-10 rounded-full object-cover border border-gh-border" alt={`${displayUser?.username || 'User'}'s avatar`} />
                                     </div>
                                     <div>
-                                        <h3 className="text-[16px] font-bold text-white leading-tight cursor-pointer hover:text-white/70 transition-colors">
+                                        <h3 className="text-[16px] font-bold text-gh-text leading-tight cursor-pointer hover:text-gh-text/70 transition-colors">
                                             {displayUser?.username}
                                         </h3>
                                         <div className="flex items-center gap-1">
-                                            <span className="text-[11px] text-white/40 uppercase tracking-tighter">{devStatus}</span>
+                                            <span className="text-[11px] text-gh-text-secondary uppercase tracking-tighter">{devStatus}</span>
                                             <div className="size-1.5 bg-green-500 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-5 text-white">
+                                <div className="flex items-center gap-5 text-gh-text">
                                     <button
                                         onClick={() => setIsHackerMode(!isHackerMode)}
-                                        className={`px-2 py-1 rounded border text-[10px] font-mono transition-all ${isHackerMode ? 'bg-green-500 border-green-400 text-black shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-transparent border-white/20 text-white/50 hover:text-white'}`}
+                                        className={`px-2 py-1 rounded border text-[10px] font-mono transition-all ${isHackerMode ? 'bg-green-500 border-green-400 text-black shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-transparent border-gh-border text-gh-text-secondary hover:text-gh-text'}`}
                                         title="Toggle Hacker Mode"
                                     >
                                         {isHackerMode ? '>_ HACKER' : '>_ NORMAL'}
                                     </button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Call" title="Call"><Phone size={24} strokeWidth={1.5} /></button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Video Call" title="Video Call"><Video size={26} strokeWidth={1.5} /></button>
-                                    <button className="p-1 hover:text-white/60 transition-colors" aria-label="Details" title="Details"><Info size={24} strokeWidth={1.5} /></button>
-                                    <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full md:hidden transition-colors" aria-label="Back" title="Back"><ChevronLeft size={24} /></button>
+                                    <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Call" title="Call"><Phone size={24} strokeWidth={1.5} /></button>
+                                    <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Video Call" title="Video Call"><Video size={26} strokeWidth={1.5} /></button>
+                                    <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Details" title="Details"><Info size={24} strokeWidth={1.5} /></button>
+                                    <button onClick={onClose} className="p-1 hover:bg-gh-bg-secondary rounded-full md:hidden transition-colors" aria-label="Back" title="Back"><ChevronLeft size={24} /></button>
                                 </div>
                             </div>
 
                             {/* Messages List */}
-                            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 custom-scrollbar bg-[#000000]">
+                            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 custom-scrollbar bg-gh-bg">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-full">
                                         <div className="animate-spin size-8 border-2 border-white/20 border-t-white rounded-full"></div>
@@ -618,9 +618,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     <>
                                         <div className="flex flex-col items-center py-10 opacity-50">
                                             <img src={displayUser?.avatar || "/default-avatar.png"} className="size-20 rounded-full mb-3" alt={`${displayUser?.username || 'User'}'s avatar`} />
-                                            <h4 className="text-xl font-bold text-white">{displayUser?.username}</h4>
-                                            <p className="text-sm">Instagram · {displayUser?.username}</p>
-                                            <button className="mt-4 px-4 py-1.5 bg-[#262626] hover:bg-[#363636] transition-colors rounded-lg text-sm font-semibold text-white">
+                                            <h4 className="text-xl font-bold text-gh-text">{displayUser?.username}</h4>
+                                            <p className="text-sm text-gh-text-secondary">Instagram · {displayUser?.username}</p>
+                                            <button className="mt-4 px-4 py-1.5 bg-gh-bg-secondary hover:bg-gh-bg transition-colors rounded-lg text-sm font-semibold text-gh-text">
                                                 View Profile
                                             </button>
                                         </div>
@@ -647,7 +647,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                             <div
                                                                 className={`px-4 py-2.5 rounded-[1.2rem] text-[15px] leading-snug break-words group-hover/msg:opacity-90 transition-opacity ${isMe
                                                                     ? 'bg-blue-600 text-white rounded-br-sm'
-                                                                    : 'bg-[#262626] text-white rounded-bl-sm'
+                                                                    : 'bg-gh-bg-secondary text-gh-text rounded-bl-sm'
                                                                     } ${nextFromSame ? (isMe ? 'rounded-br-[1.2rem]' : 'rounded-bl-[1.2rem]') : ''}`}
                                                             >
                                                                 {renderMessageContent(msg)}
@@ -657,9 +657,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                                             {msg.reactions && msg.reactions.length > 0 && (
                                                                 <div className={`flex flex-wrap gap-1 mt-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                                     {Array.from(new Set(msg.reactions.map(r => r.emoji))).map(emoji => (
-                                                                        <div key={emoji} className="bg-[#262626] border border-white/10 rounded-full px-1.5 py-0.5 text-[12px] flex items-center gap-1 shadow-sm">
+                                                                        <div key={emoji} className="bg-gh-bg-secondary border border-gh-border rounded-full px-1.5 py-0.5 text-[12px] flex items-center gap-1 shadow-sm">
                                                                             <span>{emoji}</span>
-                                                                            <span className="text-white/40 text-[10px] font-bold">
+                                                                            <span className="text-gh-text-secondary text-[10px] font-bold">
                                                                                 {msg.reactions?.filter(r => r.emoji === emoji).length}
                                                                             </span>
                                                                         </div>
@@ -731,19 +731,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             setInputValue(e.target.value);
                                             handleTyping();
                                         }}
-                                        className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-white py-2 placeholder:text-white/40"
+                                        className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-gh-text py-2 placeholder:text-gh-text-secondary"
                                     />
 
                                     {inputValue.trim() || isAILoading ? (
                                         <button
                                             type="submit"
                                             disabled={isAILoading}
-                                            className="text-white font-bold text-[15px] px-2 hover:text-white/80 active:scale-95 transition-all disabled:opacity-50"
+                                            className="text-gh-text font-bold text-[15px] px-2 hover:text-gh-text/80 active:scale-95 transition-all disabled:opacity-50"
                                         >
                                             {isAILoading ? 'Thinking...' : 'Send'}
                                         </button>
                                     ) : (
-                                        <div className="flex items-center gap-3 text-white">
+                                        <div className="flex items-center gap-3 text-gh-text">
                                             <button
                                                 type="button"
                                                 onClick={askAI}
@@ -769,11 +769,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full text-center px-10">
-                            <div className="size-24 border-2 border-white rounded-full flex items-center justify-center mb-6">
-                                <MessageSquare size={48} strokeWidth={1} className="text-white" />
+                            <div className="size-24 border-2 border-gh-text rounded-full flex items-center justify-center mb-6">
+                                <MessageSquare size={48} strokeWidth={1} className="text-gh-text" />
                             </div>
-                            <h2 className="text-2xl font-bold text-white mb-2">Your Messages</h2>
-                            <p className="text-white/50 text-[15px] max-w-xs mb-8">
+                            <h2 className="text-2xl font-bold text-gh-text mb-2">Your Messages</h2>
+                            <p className="text-gh-text-secondary text-[15px] max-w-xs mb-8">
                                 Send private photos and messages to a friend or group.
                             </p>
                             <button
@@ -788,23 +788,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                 {/* New Chat Modal */}
                 {isNewChatOpen && (
-                    <div className="fixed inset-0 z-[700] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                        <div className="w-full max-w-md bg-[#262626] rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-in zoom-in-95 duration-200">
-                            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-white">New Message</h2>
-                                <button onClick={() => setIsNewChatOpen(false)} className="text-white/50 hover:text-white">
+                    <div className="fixed inset-0 z-[700] flex items-center justify-center bg-gh-bg/60 backdrop-blur-sm p-4">
+                        <div className="w-full max-w-md bg-gh-bg-secondary rounded-2xl overflow-hidden shadow-2xl border border-gh-border animate-in zoom-in-95 duration-200">
+                            <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-gh-text">New Message</h2>
+                                <button onClick={() => setIsNewChatOpen(false)} className="text-gh-text-secondary hover:text-gh-text">
                                     <X size={24} />
                                 </button>
                             </div>
                             <div className="p-4">
                                 <div className="relative mb-4">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={18} />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gh-text-secondary" size={18} />
                                     <input
                                         type="text"
                                         placeholder="Search users..."
                                         value={userSearchQuery}
                                         onChange={(e) => handleUserSearch(e.target.value)}
-                                        className="w-full bg-black border-none rounded-xl py-2.5 pl-10 pr-4 text-white focus:ring-1 focus:ring-blue-500 placeholder:text-white/30"
+                                        className="w-full bg-gh-bg border-none rounded-xl py-2.5 pl-10 pr-4 text-gh-text focus:ring-1 focus:ring-blue-500 placeholder:text-gh-text-secondary"
                                         autoFocus
                                     />
                                 </div>
@@ -819,19 +819,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             <button
                                                 key={user.id}
                                                 onClick={() => startNewChat(user.id)}
-                                                className="w-full flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors"
+                                                className="w-full flex items-center gap-3 p-2 hover:bg-gh-bg rounded-xl transition-colors"
                                             >
                                                 <img src={user.avatar || "/default-avatar.png"} className="size-10 rounded-full object-cover" alt="" />
                                                 <div className="text-left">
-                                                    <p className="text-white font-medium">{user.username}</p>
-                                                    <p className="text-white/40 text-sm">{user.name || user.username}</p>
+                                                    <p className="text-gh-text font-medium">{user.username}</p>
+                                                    <p className="text-gh-text-secondary text-sm">{user.name || user.username}</p>
                                                 </div>
                                             </button>
                                         ))
                                     ) : userSearchQuery.length >= 2 ? (
-                                        <p className="text-center text-white/40 py-8">No users found</p>
+                                        <p className="text-center text-gh-text-secondary py-8">No users found</p>
                                     ) : (
-                                        <p className="text-center text-white/40 py-8">Search for people to chat with</p>
+                                        <p className="text-center text-gh-text-secondary py-8">Search for people to chat with</p>
                                     )}
                                 </div>
                             </div>
@@ -841,11 +841,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                 {/* Share File Modal */}
                 {isShareFileOpen && (
-                    <div className="fixed inset-0 z-[700] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                        <div className="w-full max-w-md bg-[#262626] rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-in zoom-in-95 duration-200">
-                            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-white">Share Workspace File</h2>
-                                <button onClick={() => setIsShareFileOpen(false)} className="text-white/50 hover:text-white">
+                    <div className="fixed inset-0 z-[700] flex items-center justify-center bg-gh-bg/60 backdrop-blur-sm p-4">
+                        <div className="w-full max-w-md bg-gh-bg-secondary rounded-2xl overflow-hidden shadow-2xl border border-gh-border animate-in zoom-in-95 duration-200">
+                            <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-gh-text">Share Workspace File</h2>
+                                <button onClick={() => setIsShareFileOpen(false)} className="text-gh-text-secondary hover:text-gh-text">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -854,15 +854,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     <button
                                         key={file.id}
                                         onClick={() => shareFile(file.id)}
-                                        className="w-full flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors text-white/70 hover:text-white text-sm"
+                                        className="w-full flex items-center gap-3 p-2 hover:bg-gh-bg rounded-xl transition-colors text-gh-text-secondary hover:text-gh-text text-sm"
                                     >
-                                        <div className="size-8 rounded bg-white/5 flex items-center justify-center">
+                                        <div className="size-8 rounded bg-gh-bg flex items-center justify-center">
                                             {file.type === 'folder' ? '📁' : '📄'}
                                         </div>
                                         <span>{file.name}</span>
                                     </button>
                                 )) : (
-                                    <p className="text-center text-white/40 py-8 text-sm">No files found in workspace</p>
+                                    <p className="text-center text-gh-text-secondary py-8 text-sm">No files found in workspace</p>
                                 )}
                             </div>
                         </div>

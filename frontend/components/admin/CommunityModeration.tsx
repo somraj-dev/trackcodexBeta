@@ -40,7 +40,7 @@ const CommunityModeration = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2">
+          <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2">
             <span className="material-symbols-outlined !text-[18px]">
               auto_awesome
             </span>

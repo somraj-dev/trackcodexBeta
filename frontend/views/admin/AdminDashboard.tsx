@@ -119,7 +119,7 @@ const AdminDashboard = () => {
                         className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${m.role === "OWNER"
                             ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                             : m.role === "ADMIN"
-                              ? "bg-[#0A0A0A]lue-500/10 text-blue-400 border border-blue-500/20"
+                              ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                               : "bg-gh-bg-tertiary text-gh-text-secondary border border-gh-border"
                           }`}
                       >

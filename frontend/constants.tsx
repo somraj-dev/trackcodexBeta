@@ -10,7 +10,6 @@ import {
   Job,
   Strata,
   Candidate,
-  TrialRepo,
   GrowthPathItem,
   SkillRadarData,
   OnboardingTask,
@@ -21,6 +20,7 @@ export const MOCK_REPOS: Repository[] = [
   {
     id: "trackcodex-backend",
     name: "trackcodex-backend",
+    createdAt: "2024-03-01T00:00:00Z",
     description:
       "Core API service for the **TrackCodex** platform handling `user authentication`, repository indexing, and AI analysis queuing. Check out the [API docs](#/repo/trackcodex-backend).",
     isPublic: false,
@@ -154,6 +154,7 @@ export const MOCK_REPOS: Repository[] = [
   {
     id: "dashboard-ui",
     name: "dashboard-ui",
+    createdAt: "2024-03-05T00:00:00Z",
     description:
       "*React-based* frontend for the main dashboard including all charting components, collaborative tools, and `AI insights`.",
     isPublic: true,
@@ -170,6 +171,7 @@ export const MOCK_REPOS: Repository[] = [
   {
     id: "documentation-site",
     name: "documentation-site",
+    createdAt: "2024-03-10T00:00:00Z",
     description:
       "Public facing documentation built with _Docusaurus_. Contains guides, [API reference](#), and platform architecture docs.",
     isPublic: true,
@@ -186,6 +188,7 @@ export const MOCK_REPOS: Repository[] = [
   {
     id: "legacy-importer",
     name: "legacy-importer",
+    createdAt: "2024-01-20T00:00:00Z",
     description:
       "Scripts to migrate data from the old SVN system. Currently in maintenance mode for enterprise legacy clients.",
     isPublic: false,
@@ -202,6 +205,7 @@ export const MOCK_REPOS: Repository[] = [
   {
     id: "mobile-app-flutter",
     name: "mobile-app-flutter",
+    createdAt: "2024-02-15T00:00:00Z",
     description:
       "Cross-platform mobile application for field agents. Integrated with camera and real-time sync via WebSocket.",
     isPublic: false,
@@ -269,28 +273,17 @@ export const MOCK_SECURITY_ALERTS: SecurityAlert[] = [
 export const MOCK_SESSIONS: LiveSession[] = [];
 
 export const MOCK_PROFILE: ProfileData = {
+  id: "mock-user-alex-chen",
   name: "Alex Chen",
   username: "alexcoder",
   avatar: "https://picsum.photos/seed/alexprofile/400",
-  bio: "Security-first developer specializing in Rust and cryptographic systems. 🛡️",
-  followers: "2.4k",
-  following: 180,
+  bio: "Security-first developer specializing in Rust and cryptographic systems. 🛡️ Rating: 4.9/5",
+  followersCount: 2400,
+  followingCount: 180,
   company: "TrackCodex Security",
   location: "Seattle, WA",
   website: "alexchen.security",
-  rating: "4.9/5",
-  pinnedRepos: [
-    {
-      name: "rust-crypto-guard",
-      description:
-        "High-performance cryptographic primitives for secure communication channels.",
-      language: "Rust",
-      langColor: "#f97316",
-      stars: "1.2k",
-      forks: 142,
-      isPublic: true,
-    },
-  ],
+  socialLinks: [],
 };
 
 export const MOCK_LIBRARY_RESOURCES: LibraryResource[] = [
@@ -450,133 +443,6 @@ export const MOCK_STRATA: Strata[] = [];
 
 export const MOCK_CANDIDATES: Candidate[] = [];
 
-export const MOCK_TRIAL_REPOS: TrialRepo[] = [
-  {
-    id: "trial-1",
-    title: "Senior Billing Engineer",
-    company: "Stripe",
-    location: "Remote",
-    salaryRange: "$180k - $240k",
-    status: "Newly Active",
-    description: "Implement idempotency keys for terminal reader connections.",
-    challenges: [],
-    tech: ["TypeScript", "React", "API Design"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://cdn.worldvectorlogo.com/logos/stripe-2.svg",
-    repoName: "stripe/stripe-terminal-js",
-    readme: `# Stripe Terminal JS
-
-This library provides bindings for the Stripe Terminal SDK.
-
-## Installation
-\`\`\`bash
-npm install @stripe/terminal-js
-\`\`\`
-
-## Features
-- Connection management
-- Payment processing
-- Reader updates
-
-## Idempotency Challenge
-Implement a robust idempotency key generation strategy for offline reader connections. Ensure that network flaps do not result in double charges.`,
-  },
-  {
-    id: "trial-2",
-    title: "Platform Integrity Engineer",
-    company: "Netflix",
-    location: "Los Gatos, CA",
-    salaryRange: "$220k - $310k",
-    status: "Updated",
-    description:
-      "Optimize circuit breaker timeout propagation for 5G edge cases.",
-    challenges: [],
-    tech: ["Java", "Spring", "Distributed Systems"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://cdn.worldvectorlogo.com/logos/netflix-3.svg",
-    repoName: "Netflix/Hystrix",
-    readme: `# Netflix Hystrix
-
-Hystrix is a latency and fault tolerance library designed to isolate points of access to remote systems, services and 3rd party libraries.
-
-## Circuit Breaker Pattern
-Stop cascading failures in complex distributed systems.
-
-## Challenge: 5G Timeout Propagation
-Optimize the timeout propagation logic to handle high-latency 5G edge cases without triggering false positives.`,
-  },
-  {
-    id: "trial-3",
-    title: "Frontend Infra Architect",
-    company: "Vercel",
-    location: "San Francisco, CA",
-    salaryRange: "$160k - $210k",
-    status: "Updated",
-    description:
-      "Refactor middleware runtime to support edge-cached WASM assets.",
-    challenges: [],
-    tech: ["Rust", "Go", "Next.js"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://cdn.worldvectorlogo.com/logos/vercel.svg",
-    repoName: "vercel/next.js",
-  },
-  {
-    id: "trial-4",
-    title: "Systems Security Lead",
-    company: "Airbnb",
-    location: "Remote",
-    salaryRange: "$195k - $265k",
-    status: "Newly Active",
-    description:
-      "Implement strict CSP policy enforcement across legacy modules.",
-    challenges: [],
-    tech: ["Node.js", "Security", "React"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://cdn.worldvectorlogo.com/logos/airbnb.svg",
-    repoName: "airbnb/javascript",
-  },
-  {
-    id: "trial-5",
-    title: "Site Reliability Engineer",
-    company: "Datadog",
-    location: "Paris, FR",
-    salaryRange: "$175k - $225k",
-    status: "Updated",
-    description:
-      "Optimize trace aggregation overhead in high-throughput nodes.",
-    challenges: [],
-    tech: ["Golang", "K8s", "Datadog"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://dashboard.snapcraft.io/site_media/appmedia/2021/01/datadog-agent-icon-256x256_5yT1F6E.png",
-    repoName: "DataDog/dd-trace-js",
-  },
-  {
-    id: "trial-6",
-    title: "Backend Core Engineer",
-    company: "Uber",
-    location: "Amsterdam, NL",
-    salaryRange: "$210k - $280k",
-    status: "Newly Active",
-    description: "Implement dynamic theme-switching engine for accessibility.",
-    challenges: [],
-    tech: ["React", "Styletron", "A11y"],
-    deployments: 0,
-    coverage: 0,
-    avgPrReview: "0m",
-    logo: "https://cdn.worldvectorlogo.com/logos/uber-2.svg",
-    repoName: "uber/baseui",
-  },
-];
 
 export const MOCK_GROWTH_DATA = {
   skillRadar: [

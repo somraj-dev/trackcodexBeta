@@ -24,7 +24,7 @@ const SecurityView = () => {
           <h1 className="text-3xl font-black tracking-tight">Security Dashboard</h1>
           <p className="text-slate-400">Monitor and resolve infrastructure vulnerabilities.</p>
         </div>
-        <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+        <button className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
           <span className="material-symbols-outlined text-[18px]">bolt</span>
           Trigger Manual Scan
         </button>

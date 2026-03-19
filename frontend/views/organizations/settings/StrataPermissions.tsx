@@ -35,13 +35,13 @@ const OrgPermissions = () => {
                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 !text-base">search</span>
                            <input placeholder="Filter by member..." className="w-64 bg-gh-bg-secondary border border-gh-border rounded-lg pl-9 pr-4 py-2 text-sm text-white" />
                         </div>
-                        <button className="px-4 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-[#0A0A0A]lue-600 transition-colors">Invite Member</button>
+                        <button className="px-4 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-blue-600 transition-colors">Invite Member</button>
                     </div>
                 </div>
 
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-lg overflow-hidden">
                     <table className="w-full text-left">
-                        <thead className="bg-[#0A0A0A]lack/20">
+                        <thead className="bg-black/20">
                             <tr className="text-xs text-slate-400 uppercase font-semibold tracking-wider">
                                 <th className="p-4">User</th>
                                 <th className="p-4">Role</th>
@@ -74,7 +74,7 @@ const OrgPermissions = () => {
                             ))}
                         </tbody>
                     </table>
-                     <div className="p-3 bg-[#0A0A0A]lack/20 border-t border-gh-border flex items-center justify-between text-xs text-slate-400">
+                     <div className="p-3 bg-black/20 border-t border-gh-border flex items-center justify-between text-xs text-slate-400">
                         <span>Showing 1 to 3 of 12 members</span>
                         <div className="flex items-center gap-2">
                             <button className="size-7 flex items-center justify-center bg-gh-bg border border-gh-border rounded"><span className="material-symbols-outlined !text-sm">chevron_left</span></button>
@@ -118,7 +118,7 @@ const OrgPermissions = () => {
                  </div>
                  <div className="flex justify-end gap-3 mt-6">
                     <button className="px-4 py-2 text-sm text-slate-300 hover:text-white">Cancel</button>
-                    <button className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-[#0A0A0A]lue-600 transition-colors">Save Changes</button>
+                    <button className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-blue-600 transition-colors">Save Changes</button>
                 </div>
             </section>
         </div>

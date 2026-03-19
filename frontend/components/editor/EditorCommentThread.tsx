@@ -143,7 +143,7 @@ const EditorCommentThread: React.FC<EditorCommentThreadProps> = ({ lineNumber, c
         )}
       </div>
 
-      <div className="p-5 bg-[#0A0A0A]lack/20 border-t border-[#1E232E]">
+      <div className="p-5 bg-black/20 border-t border-[#1E232E]">
         <form onSubmit={handleSubmit} className="space-y-3">
           {replyTo && (
             <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-xl px-4 py-2 animate-in slide-in-from-left-2 duration-200">
@@ -188,7 +188,7 @@ const EditorCommentThread: React.FC<EditorCommentThreadProps> = ({ lineNumber, c
                 <button 
                   type="submit"
                   disabled={!inputText.trim()}
-                  className="bg-primary hover:bg-[#0A0A0A]lue-600 disabled:opacity-30 disabled:scale-100 text-white px-5 py-2 rounded-xl text-[11px] font-black uppercase tracking-[0.1em] transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
+                  className="bg-primary hover:bg-blue-600 disabled:opacity-30 disabled:scale-100 text-white px-5 py-2 rounded-xl text-[11px] font-black uppercase tracking-[0.1em] transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
                 >
                   {replyTo ? 'Post Reply' : 'Add Comment'}
                 </button>

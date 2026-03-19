@@ -90,13 +90,13 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
         {(job.techStack || []).map((tag) => (
           <span
             key={tag}
-            className="px-2.5 py-1 bg-gh-bg rounded-lg border border-gh-border text-[10px] text-gh-text-secondary font-black uppercase tracking-tight group-hover:border-slate-600 transition-colors"
+            className="px-2.5 py-1 bg-gh-bg rounded-lg border border-gh-border text-[10px] text-gh-text-secondary font-black uppercase tracking-tight group-hover:border-primary/30 transition-colors"
           >
             {tag}
           </span>
         ))}
         {(job.techStack || []).length > 3 && (
-          <span className="px-2 py-1 text-[10px] text-slate-600 font-bold uppercase">
+          <span className="px-2 py-1 text-[10px] text-gh-text-secondary font-bold uppercase">
             +{(job.techStack || []).length - 3}
           </span>
         )}
@@ -109,12 +109,12 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
           </span>
           <span className="text-[18px] font-black text-gh-text tracking-tight flex items-center gap-1.5">
             {job.budget}
-            <span className="text-[10px] text-slate-600 font-bold lowercase">
+            <span className="text-[10px] text-gh-text-secondary font-bold lowercase">
               /{job.type === "Full-time" ? "yr" : "fixed"}
             </span>
           </span>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:bg-blue-600 hover:scale-[1.02] active:scale-95">
+        <button className="flex items-center gap-2 bg-primary text-gh-bg px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:opacity-90 hover:scale-[1.02] active:scale-95">
           {job.status === "Completed"
             ? "Review feedback"
             : job.status === "Pending"

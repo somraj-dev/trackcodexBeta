@@ -14,7 +14,7 @@ const TeamManager = () => {
             Manage developer clusters and organizational hierarchy.
           </p>
         </div>
-        <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+        <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">group_add</span>
           Create New Team
         </button>
@@ -44,7 +44,7 @@ const TeamManager = () => {
             </p>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-white/5">
+              <div className="p-3 bg-black/20 rounded-xl border border-white/5">
                 <p className="text-[10px] text-gh-text-secondary uppercase font-black">
                   Members
                 </p>
@@ -52,7 +52,7 @@ const TeamManager = () => {
                   {team.members}
                 </p>
               </div>
-              <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-white/5">
+              <div className="p-3 bg-black/20 rounded-xl border border-white/5">
                 <p className="text-[10px] text-gh-text-secondary uppercase font-black">
                   Repositories
                 </p>

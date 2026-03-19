@@ -141,13 +141,13 @@ const RepoActionsTab = () => {
         <div className="space-y-1">
           <button
             onClick={() => setCurrentView("overview")}
-            className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === "overview" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-[#11141A]"}`}
+            className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === "overview" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-gh-bg-tertiary"}`}
           >
             Overview
           </button>
           <button
             onClick={() => setCurrentView("workflows")}
-            className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === "workflows" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-[#11141A]"}`}
+            className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${currentView === "workflows" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-gh-bg-tertiary"}`}
           >
             Workflow runs
           </button>
@@ -161,7 +161,7 @@ const RepoActionsTab = () => {
             <button
               key={w.id}
               onClick={() => handleWorkflowClick(w)}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors truncate flex items-center gap-2 ${selectedWorkflow?.id === w.id && currentView === "workflow_detail" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-[#11141A]"}`}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors truncate flex items-center gap-2 ${selectedWorkflow?.id === w.id && currentView === "workflow_detail" ? "bg-[#1f6feb] text-white" : "text-[#c9d1d9] hover:bg-gh-bg-tertiary"}`}
             >
               <span
                 className={`size-2 rounded-full ${w.state === "ACTIVE" ? "bg-green-500" : "bg-gray-500"}`}
@@ -260,7 +260,7 @@ const RepoActionsTab = () => {
                     <div
                       key={run.id}
                       onClick={() => handleRunClick(run)}
-                      className="p-4 hover:bg-[#11141A] transition-colors cursor-pointer group flex items-start gap-4"
+                      className="p-4 hover:bg-gh-bg-tertiary transition-colors cursor-pointer group flex items-start gap-4"
                     >
                       <div
                         className={`mt-1 size-5 flex items-center justify-center rounded-full ${run.conclusion === "SUCCESS" ? "text-[#3fb950]" : run.conclusion === "FAILURE" ? "text-[#f85149]" : "text-[#d29922] animate-pulse"}`}

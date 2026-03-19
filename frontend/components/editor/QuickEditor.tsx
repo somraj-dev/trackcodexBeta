@@ -40,7 +40,7 @@ const QuickEditor: React.FC<QuickEditorProps> = ({ filename, initialContent, onS
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:bg-[#0A0A0A]lue-600 disabled:opacity-50 transition-all active:scale-95"
+            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:bg-blue-600 disabled:opacity-50 transition-all active:scale-95"
           >
             {isSaving ? (
               <span className="material-symbols-outlined animate-spin !text-[16px]">progress_activity</span>

@@ -22,7 +22,7 @@ const WorkspaceCard: React.FC<{ workspace: Workspace }> = ({ workspace }) => {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div
-                className={`w-10 h-10 rounded-lg ${isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-slate-500/10 text-slate-500"} flex items-center justify-center`}
+                className={`w-10 h-10 rounded-lg ${isActive ? "bg-emerald-500/10 text-emerald-500" : "bg-gh-bg-tertiary text-gh-text-secondary"} flex items-center justify-center`}
               >
                 <span className="material-symbols-outlined text-2xl">
                   terminal
@@ -34,10 +34,10 @@ const WorkspaceCard: React.FC<{ workspace: Workspace }> = ({ workspace }) => {
                 </h3>
                 <div className="flex items-center gap-1.5">
                   <span
-                    className={`w-2 h-2 rounded-full ${isActive ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
+                    className={`w-2 h-2 rounded-full ${isActive ? "bg-emerald-500 animate-pulse" : "bg-gh-bg-tertiary"}`}
                   ></span>
                   <span
-                    className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-emerald-500" : "text-slate-500"}`}
+                    className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? "text-emerald-500" : "text-gh-text-secondary"}`}
                   >
                     {workspace.status}
                   </span>
@@ -98,7 +98,7 @@ const WorkspaceCard: React.FC<{ workspace: Workspace }> = ({ workspace }) => {
           </button>
           <button
             onClick={() => navigate(`/workspace/${workspace.id}`)}
-            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-[#0A0A0A]lue-600 transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-bold bg-primary text-gh-bg rounded-lg hover:opacity-90 transition-colors"
           >
             Open
           </button>

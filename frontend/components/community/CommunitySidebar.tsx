@@ -67,7 +67,7 @@ const CommunitySidebar = () => {
            <span className="text-[11px] font-black uppercase tracking-widest">Weekly Digest</span>
         </div>
         <p className="text-[12px] text-slate-400 leading-relaxed mb-6 font-medium">Get the top engineering discussions delivered to your inbox every Monday.</p>
-        <button className="w-full py-2.5 bg-primary hover:bg-[#0A0A0A]lue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all">Subscribe</button>
+        <button className="w-full py-2.5 bg-primary hover:bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all">Subscribe</button>
       </div>
     </div>
   );

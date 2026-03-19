@@ -65,7 +65,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-8 bg-[#0A0A0A]lack/90 backdrop-blur-xl animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-8 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-[#11141A] border border-primary/30 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col font-display">
         <div className="p-6 border-b border-[#1E232E] bg-primary/5 flex items-center justify-between">
           <div>
@@ -108,7 +108,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 bg-[#0A0A0A]lack/60 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-2xl"
+                    className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-2xl"
                   >
                     <span className="material-symbols-outlined text-white">
                       edit
