@@ -122,7 +122,9 @@ const MainLayout: React.FC = () => {
     (path) => location.pathname.includes(path),
   ) || isStandalone;
 
-  const isFullScreenView = isIdeView || ["/messages", "/notifications"].includes(location.pathname);
+  const isFullScreenView = isIdeView || 
+    ["/messages", "/notifications"].includes(location.pathname) ||
+    location.pathname.startsWith("/dashboard/project/");
   const isFullPageAction = ["/repositories/new", "/repositories/import", "/marketplace/missions/new"].includes(location.pathname);
 
   // Close menus on outside click
@@ -178,7 +180,7 @@ const MainLayout: React.FC = () => {
       )}
 
       <div className="flex-1 flex min-h-0 relative">
-        <main ref={mainScrollRef} className={`flex-1 min-w-0 flex flex-col bg-gh-bg relative ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto custom-scrollbar"}`}>
+        <main ref={mainScrollRef} className={`flex-1 min-w-0 flex flex-col bg-gh-bg relative ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto no-scrollbar"}`}>
           {!isIdeView && !isFocusMode && (
             <div className={`h-12 border-b border-gh-border flex items-center px-4 bg-gh-bg-secondary shrink-0 sticky top-0 z-40 gap-2 transition-transform duration-300 ${isNavbarVisible ? "translate-y-0" : "-translate-y-full"}`}>
               <div className="flex items-center gap-3">

@@ -4,6 +4,15 @@ import ContinueWorkspaces from "../components/home/ContinueWorkspaces";
 import { api } from "../services/infra/api";
 import { Repository } from "../types";
 import EmptyState from "../components/common/EmptyState";
+import { CreateProjectModal } from "../components/modals/CreateProjectModal";
+import { useAppData } from "../context/AppDataContext";
+import { 
+    CheckCircle2, 
+    CircleDot, 
+    Code2, 
+    GitBranch, 
+    GitPullRequest
+} from 'lucide-react';
 
 interface RepoItemProps {
   repo: Repository;
@@ -54,9 +63,20 @@ const RepoItem = ({ repo }: RepoItemProps) => {
 
 const HomeView = () => {
   const navigate = useNavigate();
+  const { addTask, addProject } = useAppData();
   const [searchQuery, setSearchQuery] = useState("");
   const [repos, setRepos] = useState<Repository[]>([]);
   const [loadingRepos, setLoadingRepos] = useState(true);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'project' | 'goal' | 'task'>('project');
+
+  const handleCreate = (newItem: any) => {
+    if (modalMode === 'task') {
+        addTask({...newItem, status: 'To-do', people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium', type: 'Dashboard', estimation: '3 days'});
+    } else {
+        addProject(newItem);
+    }
+  };
 
   const [showBusinessBanner, setShowBusinessBanner] = useState(() => {
     if (localStorage.getItem("hideBusinessBanner") === "true") return false;
@@ -146,38 +166,37 @@ const HomeView = () => {
         {/* Quick Actions Row */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <button 
-            onClick={() => navigate("/taskvault")}
-            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+            onClick={() => { setModalMode('task'); setIsCreateModalOpen(true); }}
+            className="px-4 py-2 bg-gh-bg-secondary/50 border border-gh-border rounded-xl text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2 group"
           >
-            <span className="material-symbols-outlined !text-[18px]">task_alt</span>
+            <CheckCircle2 size={18} className="text-gh-text-secondary group-hover:text-primary transition-colors" />
             Task
           </button>
           <button 
-            onClick={() => navigate("/repositories")}
-            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-gh-bg-secondary/50 border border-gh-border rounded-xl text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2 group"
           >
-            <span className="material-symbols-outlined !text-[18px]">adjust</span>
+            <CircleDot size={18} className="text-gh-text-secondary group-hover:text-amber-500 transition-colors" />
             Create issue
           </button>
           <button 
             onClick={() => navigate("/editor")}
-            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-gh-bg-secondary/50 border border-gh-border rounded-xl text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2 group"
           >
-            <span className="material-symbols-outlined !text-[18px]">code</span>
+            <Code2 size={18} className="text-gh-text-secondary group-hover:text-purple-500 transition-colors" />
             Write code
           </button>
           <button 
             onClick={() => navigate("/repositories")}
-            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-gh-bg-secondary/50 border border-gh-border rounded-xl text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2 group"
           >
-            <span className="material-symbols-outlined !text-[18px]">call_split</span>
+            <GitBranch size={18} className="text-gh-text-secondary group-hover:text-emerald-500 transition-colors" />
             Git
           </button>
           <button 
             onClick={() => navigate("/repositories")}
-            className="px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-gh-bg-secondary/50 border border-gh-border rounded-xl text-sm font-bold text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all flex items-center gap-2 group"
           >
-            <span className="material-symbols-outlined !text-[18px]">merge_type</span>
+            <GitPullRequest size={18} className="text-gh-text-secondary group-hover:text-orange-500 transition-colors" />
             Pull requests
           </button>
         </div>
@@ -307,6 +326,7 @@ const HomeView = () => {
           </div>
         </div>
 
+        <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
       </div>
     </div>
   );

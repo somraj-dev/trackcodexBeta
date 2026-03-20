@@ -62,17 +62,21 @@ const AppContent = () => {
   );
 };
 
+import { AppDataProvider } from "./context/AppDataContext";
+
 const AppWithProviders = () => {
   const { user, isAuthenticated } = useAuth();
   return (
     <NotificationProvider>
-      {isAuthenticated && user ? (
-        <RealtimeProvider userId={user.id}>
-          <MessagingProvider><AppContent /></MessagingProvider>
-        </RealtimeProvider>
-      ) : (
-        <AppContent />
-      )}
+      <AppDataProvider>
+        {isAuthenticated && user ? (
+          <RealtimeProvider userId={user.id}>
+            <MessagingProvider><AppContent /></MessagingProvider>
+          </RealtimeProvider>
+        ) : (
+          <AppContent />
+        )}
+      </AppDataProvider>
     </NotificationProvider>
   );
 };

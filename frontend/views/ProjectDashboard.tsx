@@ -1,32 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Project } from "../types/project";
+import { CreateProjectModal } from "../components/modals/CreateProjectModal";
+import { useAppData } from "../context/AppDataContext";
+import { 
+    CheckCircle2, 
+    CircleDot, 
+    Code2, 
+    GitBranch, 
+    GitPullRequest 
+} from 'lucide-react';
 
-/* ─── Data ─── */
+// Initial projects moved to AppDataContext
 
-interface Project {
-  id: string;
-  name: string;
-  domain: string;
-  logo: string;
-  logoBg: string;
-  repoOwner: string;
-  repoName: string;
-  repoUrl: string;
-  commitMsg: string;
-  deployDate: string;
-  branch: string;
-}
-
-const PROJECTS: Project[] = [
-  { id: "trackcodex", name: "trackcodex", domain: "trackcodex.com", logo: "⬡", logoBg: "#111", repoOwner: "somraj-dev", repoName: "trackcodexBeta", repoUrl: "https://github.com/somraj-dev/trackcodexBeta", commitMsg: "style: fix hardcoded dark themes in main layout and dashboard...", deployDate: "1h ago", branch: "main" },
-  { id: "docs", name: "docs", domain: "docs.trackcodex.com", logo: "N", logoBg: "#111", repoOwner: "somraj-dev", repoName: "docs", repoUrl: "https://github.com/somraj-dev/docs", commitMsg: "feat: update links to open in the same tab", deployDate: "Mar 14", branch: "main" },
-  { id: "support", name: "support", domain: "support.trackcodex.com", logo: "▲", logoBg: "#111", repoOwner: "somraj-dev", repoName: "support", repoUrl: "https://github.com/somraj-dev/support", commitMsg: "fix: resolve build failures by removing unused-vars and converti...", deployDate: "Mar 14", branch: "main" },
-  { id: "browser", name: "browser", domain: "blog.trackcodex.com", logo: "W", logoBg: "linear-gradient(135deg,#7c3aed,#06b6d4)", repoOwner: "Quantaforge", repoName: "trackcodex/br...", repoUrl: "https://github.com/Quantaforge/trackcodex", commitMsg: "feat: Initialize ForgeBrowser IDE project", deployDate: "Mar 2", branch: "main" },
-];
-
-
-
-/* ─── Styles (inlined Vercel design tokens) ─── */
+/* ─── Styles (inlined TrackCodex design tokens) ─── */
 const V = {
   bg: "#000",
   card: "#0a0a0a",
@@ -41,13 +28,75 @@ const V = {
   font: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
 };
 
+/* ─── Dropdown Menu Component ─── */
+const MenuItem = ({ label, icon, isLabel, onClose }: { label: string, icon?: string, isLabel?: boolean, onClose: () => void }) => {
+  if (isLabel) return <div style={{ padding: "10px 12px 6px", fontSize: 11, fontWeight: 600, color: V.textTertiary, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>;
+  return (
+    <button 
+      onClick={e => { e.stopPropagation(); onClose(); }}
+      style={{ 
+        width: "100%", padding: "8px 12px", background: "transparent", border: "none", 
+        color: V.text, fontSize: 13, display: "flex", 
+        alignItems: "center", justifyContent: "space-between", cursor: "pointer", 
+        textAlign: "left", borderRadius: 8, transition: "background .12s ease" 
+      }}
+      onMouseEnter={e => e.currentTarget.style.background = "#141414"}
+      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+    >
+      <span style={{ fontWeight: 500 }}>{label}</span>
+      {icon && <span style={{ color: V.textTertiary, fontSize: 16 }}>{icon}</span>}
+    </button>
+  );
+};
+
+const ProjectActionMenu = ({ isOpen, onClose, anchorRef }: { isOpen: boolean, onClose: () => void, anchorRef: React.RefObject<HTMLButtonElement | null> }) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node) && 
+          anchorRef.current && !anchorRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose, anchorRef]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div ref={menuRef} style={{ 
+      position: "absolute", top: "100%", right: 0, marginTop: 8, width: 220, 
+      background: "#080808", border: `1px solid ${V.border}`, borderRadius: 12, 
+      padding: "6px", zIndex: 1000, boxShadow: "0 12px 40px rgba(0,0,0,0.8)" 
+    }}>
+      <MenuItem label="Add Favorite" icon="☆" onClose={onClose} />
+      <MenuItem label="Visit with Toolbar" onClose={onClose} />
+      <MenuItem label="View Logs" onClose={onClose} />
+      <MenuItem label="Manage Domains" onClose={onClose} />
+      <MenuItem label="Transfer Project" onClose={onClose} />
+      <MenuItem label="Settings" onClose={onClose} />
+      <div style={{ height: 1, background: V.border, margin: "6px 4px" }} />
+      <MenuItem label="Repository" isLabel onClose={onClose} />
+      <MenuItem label="Import Directory" onClose={onClose} />
+      <MenuItem label="View Git Repository" onClose={onClose} />
+    </div>
+  );
+};
+
 /* ─── Card ─── */
 const ProjectCard = ({ p }: { p: Project }) => {
   const nav = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
   return (
     <div
-      onClick={() => nav(`/dashboard/project/${p.id}`)}
-      style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, padding: 20, cursor: "pointer", fontFamily: V.font, transition: "border-color .15s" }}
+      onClick={() => nav(`/dashboard/project/${p.id}`, { state: { projectData: p } })}
+      style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, padding: 20, cursor: "pointer", fontFamily: V.font, transition: "all .15s", position: "relative" }}
       onMouseEnter={e => (e.currentTarget.style.borderColor = "#555")}
       onMouseLeave={e => (e.currentTarget.style.borderColor = V.border)}
     >
@@ -62,9 +111,26 @@ const ProjectCard = ({ p }: { p: Project }) => {
             <div style={{ fontSize: 12, color: V.textSecondary, lineHeight: 1.3, marginTop: 2 }}>{p.domain}</div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 6 }}>
-          <button onClick={e => e.stopPropagation()} style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }} title="Edit">✎</button>
-          <button onClick={e => e.stopPropagation()} style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }} title="More">⋯</button>
+        <div style={{ display: "flex", gap: 6, position: "relative" }}>
+          <button 
+            onClick={e => {
+              e.stopPropagation();
+              nav(`/dashboard/project/${p.id}?openChecklist=true`, { state: { projectData: p } });
+            }} 
+            style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }} 
+            title="Edit"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button 
+            ref={menuButtonRef}
+            onClick={e => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} 
+            style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: isMenuOpen ? "#222" : "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }} 
+            title="More"
+          >
+            ⋯
+          </button>
+          <ProjectActionMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} anchorRef={menuButtonRef} />
         </div>
       </div>
       {/* Repo */}
@@ -87,16 +153,70 @@ const ProjectCard = ({ p }: { p: Project }) => {
 
 /* ─── Main ─── */
 const ProjectDashboard: React.FC = () => {
-  const nav = useNavigate();
+  const { projects, addProject, addTask } = useAppData();
   const [q, setQ] = useState("");
   const [view, setView] = useState<"grid"|"list">("grid");
-  const [addOpen, setAddOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'project' | 'goal' | 'task'>('project');
 
-  const filtered = PROJECTS.filter(p => p.name.includes(q.toLowerCase()) || p.domain.includes(q.toLowerCase()));
+  const handleCreate = (newItem: any) => {
+    if (modalMode === 'task') {
+        addTask({...newItem, status: 'To-do', people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium', type: 'Dashboard', estimation: '3 days'});
+    } else {
+        addProject(newItem);
+    }
+  };
+
+  const filtered = projects.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.domain.toLowerCase().includes(q.toLowerCase()));
 
   return (
     <div style={{ flex: 1, width: "100%", background: V.bg, overflowY: "auto", fontFamily: V.font, color: V.text }}>
       <div style={{ padding: "20px 24px" }}>
+
+        {/* Shortcuts */}
+        <div style={{ display: "flex", gap: 12, marginBottom: 24, overflowX: "auto", paddingBottom: 8 }}>
+            <button 
+                onClick={() => { setModalMode('task'); setIsCreateModalOpen(true); }}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
+            >
+                <CheckCircle2 size={16} />
+                Task
+            </button>
+            <button 
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
+            >
+                <CircleDot size={16} />
+                Create issue
+            </button>
+            <button 
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
+            >
+                <Code2 size={16} />
+                Write code
+            </button>
+            <button 
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
+            >
+                <GitBranch size={16} />
+                Git
+            </button>
+            <button 
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
+            >
+                <GitPullRequest size={16} />
+                Pull requests
+            </button>
+        </div>
 
         {/* Search bar */}
         <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center" }}>
@@ -122,29 +242,12 @@ const ProjectDashboard: React.FC = () => {
               >{b.icon}</button>
             ))}
           </div>
-          {/* Add New */}
           <div style={{ position: "relative" }}>
-            <button onClick={() => setAddOpen(!addOpen)}
+            <button onClick={() => setIsCreateModalOpen(true)}
               style={{ height: 40, padding: "0 14px", background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, color: V.text, fontSize: 14, fontFamily: V.font, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: 500 }}
             >
-              Add New... <span style={{ fontSize: 12, color: V.textSecondary }}>▾</span>
+              Add New...
             </button>
-            {addOpen && (
-              <div style={{ position: "absolute", right: 0, top: "100%", marginTop: 4, width: 200, background: V.cardHover, border: `1px solid ${V.border}`, borderRadius: 10, padding: "4px 0", zIndex: 50, boxShadow: "0 8px 30px rgba(0,0,0,.5)" }}>
-                {[
-                  { label: "Project", to: "/repositories/new" },
-                  { label: "Repository", to: "/repositories/new" },
-                  { label: "Workspace", to: "/workspace/new" },
-                  { label: "Import Git Repository", to: "/repositories/import" },
-                ].map(it => (
-                  <button key={it.label} onClick={() => { setAddOpen(false); nav(it.to); }}
-                    style={{ width: "100%", padding: "8px 14px", background: "transparent", border: "none", color: V.textSecondary, fontSize: 13, fontFamily: V.font, cursor: "pointer", textAlign: "left" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = V.border; e.currentTarget.style.color = V.text; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = V.textSecondary; }}
-                  >{it.label}</button>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -160,6 +263,7 @@ const ProjectDashboard: React.FC = () => {
           )}
         </div>
       </div>
+      <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
     </div>
   );
 };
