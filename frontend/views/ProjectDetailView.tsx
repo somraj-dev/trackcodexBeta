@@ -951,7 +951,8 @@ const OverviewTab = ({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, 
             </div>
           </div>
   </div>
-);
+  );
+};
 
 const DeploymentsTab = ({ p }: { p: ProjInfo }) => {
   const [tab, setTab] = useState("All");
@@ -1395,7 +1396,6 @@ const AgentTab = () => (
     </div>
   </div>
 );
-};
 
 const AIGatewayTab = () => (
    <div style={{ padding: "32px 24px 60px" }}>
@@ -1459,7 +1459,9 @@ const UsageTab = ({ usageTab }: { usageTab: string }) => (
       </div>
     )}
   </div>
-);const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClose: () => void; domain: string }) => {
+);
+
+const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClose: () => void; domain: string }) => {
   if (!isOpen) return null;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://trackcodex.com/auth-redirect?url=${encodeURIComponent(`https://${domain}`)}`)}`;
 
