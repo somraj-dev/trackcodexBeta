@@ -30,7 +30,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
             where,
             include: {
                 creator: { select: { id: true, name: true, avatar: true } },
-                org: { select: { id: true, name: true, avatar: true } }
+                org: { select: { id: true, name: true } }
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -49,7 +49,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
             where: { id },
             include: {
                 creator: { select: { id: true, name: true, avatar: true } },
-                org: { select: { id: true, name: true, avatar: true } },
+                org: { select: { id: true, name: true } },
                 applications: {
                     select: { id: true, status: true, applicantId: true } // Minimal data for checking status
                 }
@@ -61,7 +61,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
 
     // Post a Job
     fastify.post('/jobs', async (request, reply) => {
-        const { title, description, budget, type, techStack, creatorId, orgId, repoId } = request.body as any;
+        const { title, description, budget, type, techStack, creatorId, orgId, repoId, metadata } = request.body as any;
 
         // Fallback creator for demo
         let finalCreatorId = creatorId;
@@ -81,8 +81,9 @@ export async function jobRoutes(fastify: FastifyInstance) {
                     techStack: techStack || [], // Array of strings
                     status: 'Open',
                     creatorId: finalCreatorId,
-                    orgId: orgId,
-                    repositoryId: repoId
+                    orgId: orgId?.trim() || null,
+                    repositoryId: repoId?.trim() || null,
+                    metadata: metadata || null
                 }
             }),
             prisma.outboxEvent.create({
@@ -100,6 +101,10 @@ export async function jobRoutes(fastify: FastifyInstance) {
                 }
             })
         ]);
+
+        // Invalidate the jobs cache so the new job appears immediately on next GET request
+        jobsCache = null;
+        lastCacheUpdate = 0;
 
         return job;
     });

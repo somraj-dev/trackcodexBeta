@@ -20,7 +20,7 @@ const getApiUrl = () => {
   if (import.meta.env?.VITE_API_URL) return import.meta.env.VITE_API_URL;
   // In production (deployed), use the production API; in local dev, use localhost
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return "http://localhost:4000";
+    return "http://127.0.0.1:4000";
   }
   return "https://api.trackcodex.com";
 };

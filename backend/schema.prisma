@@ -843,6 +843,7 @@ model Job {
   applications JobApplication[]
   contract     EscrowContract?
   reviews      JobReview[]
+  metadata     Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

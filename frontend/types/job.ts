@@ -30,6 +30,10 @@ export interface Job {
   offerDetails?: OfferDetails;
   applications?: any[];
   applicationsCount?: number;
+  metadata?: any;
+  updatedAt?: string;
+  category?: string;
+  website?: string;
 }
 
 export interface OnboardingTask {

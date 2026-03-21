@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/infra/api';
+import { cacheService } from '../../services/infra/cacheService';
 
 const ORG_LIST = [
   "Madhav Institute of Technology and Science (MITS), Gwalior",
@@ -13,7 +14,7 @@ const ORG_LIST = [
   "Balaji Institute of Technology and Science, Warangal"
 ];
 
-const FESTIVAL_LIST = [
+const DEFAULT_FESTIVAL_LIST = [
   "Unstop Awards 2024",
   "Flipkart GRiD 6.0",
   "Tata Imagination Challenge",
@@ -57,7 +58,8 @@ const CreateMissionView = () => {
     ],
   });
 
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(1);
+  const [step1Complete, setStep1Complete] = useState(false);
   const [showAllFields, setShowAllFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -74,6 +76,35 @@ const CreateMissionView = () => {
   const [showOrgSuggestions, setShowOrgSuggestions] = useState(false);
   const [festivalSuggestions, setFestivalSuggestions] = useState<string[]>([]);
   const [showFestivalSuggestions, setShowFestivalSuggestions] = useState(false);
+  const [isPlatformExpanded, setIsPlatformExpanded] = useState(true);
+  const [isTimelineExpanded, setIsTimelineExpanded] = useState(true);
+
+  // Merge custom festivals from localStorage
+  const [festivalList, setFestivalList] = useState<string[]>(DEFAULT_FESTIVAL_LIST);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('customFestivals');
+      if (stored) {
+        const custom: string[] = JSON.parse(stored);
+        setFestivalList([...DEFAULT_FESTIVAL_LIST, ...custom.filter(f => !DEFAULT_FESTIVAL_LIST.includes(f))]);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Re-check localStorage when window regains focus (user returns from CreateEventView)
+  useEffect(() => {
+    const handleFocus = () => {
+      try {
+        const stored = localStorage.getItem('customFestivals');
+        if (stored) {
+          const custom: string[] = JSON.parse(stored);
+          setFestivalList([...DEFAULT_FESTIVAL_LIST, ...custom.filter(f => !DEFAULT_FESTIVAL_LIST.includes(f))]);
+        }
+      } catch { /* ignore */ }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -204,7 +235,7 @@ const CreateMissionView = () => {
   const handleFestivalSearch = (val: string) => {
     setFormData({ ...formData, link: val });
     if (val.trim().length > 0) {
-      const matches = FESTIVAL_LIST.filter(fest => fest.toLowerCase().includes(val.toLowerCase()));
+      const matches = festivalList.filter(fest => fest.toLowerCase().includes(val.toLowerCase()));
       setFestivalSuggestions(matches);
       setShowFestivalSuggestions(true);
     } else {
@@ -300,6 +331,7 @@ const CreateMissionView = () => {
       }
 
       setShowValidationErrors(false);
+      setStep1Complete(true);
       setActiveStep(2);
       return;
     }
@@ -313,7 +345,6 @@ const CreateMissionView = () => {
         type: 'Gig',
         techStack: formData.skills ? formData.skills.split(',').map((s: string) => s.trim()) : [],
         budget: '$0',
-        repoId: '',
         status: 'Open',
         metadata: {
           startDate: formData.startDate,
@@ -328,6 +359,7 @@ const CreateMissionView = () => {
       };
 
       await api.post('/jobs', payload);
+      cacheService.invalidate('missions_list');
       navigate('/marketplace/missions');
     } catch (error) {
       console.error('Failed to create mission:', error);
@@ -350,8 +382,8 @@ const CreateMissionView = () => {
               onClick={() => setActiveStep(1)}
               className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${activeStep === 1 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${activeStep === 1 ? 'bg-blue-600 text-white' : 'bg-emerald-500 text-white'}`}>
-                {activeStep > 1 ? <span className="material-symbols-outlined text-sm">check</span> : '1'}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step1Complete ? 'bg-emerald-500 text-white' : activeStep === 1 ? 'bg-blue-600 text-white' : 'bg-gh-bg-tertiary text-gh-text-secondary'}`}>
+                {step1Complete ? <span className="material-symbols-outlined text-sm">check</span> : '1'}
               </div>
               <div>
                 <div className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-wider mb-0.5">Step 1</div>
@@ -360,13 +392,20 @@ const CreateMissionView = () => {
             </button>
             
             <button 
-              onClick={() => setActiveStep(2)}
-              className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${activeStep === 2 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
+              onClick={() => {
+                if (!step1Complete) {
+                  setShowValidationErrors(true);
+                  return;
+                }
+                setActiveStep(2);
+              }}
+              className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${!step1Complete ? 'opacity-50 cursor-not-allowed' : activeStep === 2 ? 'bg-blue-500/10' : 'hover:bg-gh-bg-tertiary'}`}
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${activeStep === 2 ? 'bg-blue-600 text-white' : 'bg-gh-bg-tertiary text-gh-text-secondary'}`}>2</div>
               <div>
                 <div className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-wider mb-0.5">Step 2</div>
                 <div className={`text-sm font-semibold ${activeStep === 2 ? 'text-blue-500' : 'text-gh-text'}`}>Registration Form</div>
+                {!step1Complete && <div className="text-[10px] text-amber-500 mt-0.5">Complete Step 1 first</div>}
               </div>
             </button>
           </div>
@@ -574,7 +613,7 @@ const CreateMissionView = () => {
                           <div className="p-4 text-[13px] text-gh-text-secondary bg-gh-bg-secondary rounded-xl">
                             Cannot Find <span className="font-bold text-gh-text">{formData.link}</span>, 
                             <button 
-                              onClick={() => setShowFestivalSuggestions(false)}
+                              onClick={() => navigate('/marketplace/missions/new/event')}
                               className="text-blue-500 font-bold ml-1 hover:underline text-[13px]"
                             >
                               Create One
@@ -1280,131 +1319,141 @@ const CreateMissionView = () => {
               <div className="space-y-6">
                 {/* Platform Section */}
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm">
-                  <div className="flex items-center justify-between mb-6 cursor-pointer group">
+                  <div 
+                    onClick={() => setIsPlatformExpanded(!isPlatformExpanded)}
+                    className="flex items-center justify-between mb-6 cursor-pointer group"
+                  >
                     <h3 className="text-[15px] font-bold text-blue-500 flex items-center gap-2 group-hover:underline">
-                      Platform <span className="material-symbols-outlined text-[18px]">expand_less</span>
+                      Platform <span className="material-symbols-outlined text-[18px] transition-transform duration-300" style={{ transform: isPlatformExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                     </h3>
                   </div>
 
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <button 
-                      onClick={() => setFormData({ ...formData, registrationPlatform: 'TrackCodex' })}
-                      className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'TrackCodex' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
-                    >
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-white font-semibold text-[12px]">TC</span>
-                      </div>
-                      <div>
-                        <h4 className="text-[14px] font-bold text-gh-text">TrackCodex</h4>
-                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Manage and receive applications on TrackCodex.</p>
-                      </div>
-                    </button>
-
-                    <button 
-                      className="flex-1 flex items-center gap-4 p-5 rounded-xl border-2 border-dashed border-gh-border transition-all text-left opacity-60 cursor-not-allowed group"
-                    >
-                      <div className="w-10 h-10 bg-gh-bg-tertiary rounded-full flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">link</span>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-[14px] font-bold text-gh-text">Other platform</h4>
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-orange-500 uppercase">
-                            <span className="material-symbols-outlined text-[12px]">star</span> Contact Sales
-                          </span>
+                  {isPlatformExpanded && (
+                    <div className="flex flex-col md:flex-row gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <button 
+                        onClick={() => setFormData({ ...formData, registrationPlatform: 'TrackCodex' })}
+                        className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'TrackCodex' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                          <span className="text-white font-semibold text-[12px]">TC</span>
                         </div>
-                        <p className="text-[12px] text-gh-text-secondary mt-0.5">Redirect candidates to an external website.</p>
-                      </div>
-                    </button>
-                  </div>
+                        <div>
+                          <h4 className="text-[14px] font-bold text-gh-text">TrackCodex</h4>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Manage and receive applications on TrackCodex.</p>
+                        </div>
+                      </button>
+
+                      <button 
+                        className="flex-1 flex items-center gap-4 p-5 rounded-xl border-2 border-dashed border-gh-border transition-all text-left opacity-60 cursor-not-allowed group"
+                      >
+                        <div className="w-10 h-10 bg-gh-bg-tertiary rounded-full flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">link</span>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-[14px] font-bold text-gh-text">Other platform</h4>
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-orange-500 uppercase">
+                              <span className="material-symbols-outlined text-[12px]">star</span> Contact Sales
+                            </span>
+                          </div>
+                          <p className="text-[12px] text-gh-text-secondary mt-0.5">Redirect candidates to an external website.</p>
+                        </div>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Timeline Section */}
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 shadow-sm">
-                  <div className="flex items-center justify-between mb-6 cursor-pointer group">
+                  <div 
+                    onClick={() => setIsTimelineExpanded(!isTimelineExpanded)}
+                    className="flex items-center justify-between mb-6 cursor-pointer group"
+                  >
                     <h3 className="text-[15px] font-bold text-blue-500 flex items-center gap-2 group-hover:underline">
-                      Registration Timeline <span className="material-symbols-outlined text-[18px]">expand_less</span>
+                      Registration Timeline <span className="material-symbols-outlined text-[18px] transition-transform duration-300" style={{ transform: isTimelineExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
                     </h3>
                   </div>
 
-                  <div className="relative pl-8 space-y-4">
-                    {/* Vertical Line */}
-                    <div className="absolute left-[7px] top-2 bottom-8 border-l-2 border-dashed border-blue-500/30"></div>
-                    
-                    {/* Live Section */}
-                    <div className="relative">
-                      <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full bg-blue-500 border-4 border-gh-bg-secondary z-10"></div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-[14px] font-bold text-gh-text w-12 text-left">Live</span>
-                        <div className="flex-1 relative">
-                        <button 
-                            onClick={() => {
-                              const d = formData.startDate ? new Date(formData.startDate) : new Date();
-                              setTempDate(isNaN(d.getTime()) ? new Date() : d);
-                              setShowDatePicker('startDate');
-                            }}
-                            className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
-                          >
-                            {formData.startDate && !isNaN(new Date(formData.startDate).getTime())
-                              ? new Date(formData.startDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
-                              : 'Select start date'}
-                            <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
-                          </button>
+                  {isTimelineExpanded && (
+                    <div className="relative pl-8 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      {/* Vertical Line */}
+                      <div className="absolute left-[7px] top-2 bottom-8 border-l-2 border-dashed border-blue-500/30"></div>
+                      
+                      {/* Live Section */}
+                      <div className="relative">
+                        <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full bg-blue-500 border-4 border-gh-bg-secondary z-10"></div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-[14px] font-bold text-gh-text w-12 text-left">Live</span>
+                          <div className="flex-1 relative">
+                          <button 
+                              onClick={() => {
+                                const d = formData.startDate ? new Date(formData.startDate) : new Date();
+                                setTempDate(isNaN(d.getTime()) ? new Date() : d);
+                                setShowDatePicker('startDate');
+                              }}
+                              className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
+                            >
+                              {formData.startDate && !isNaN(new Date(formData.startDate).getTime())
+                                ? new Date(formData.startDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                                : 'Select start date'}
+                              <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Close Section */}
-                    <div className="relative">
-                      <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full border-2 border-blue-500 bg-gh-bg-secondary z-10"></div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-[14px] font-bold text-gh-text w-12 text-left">Close</span>
-                        <div className="flex-1 relative">
-                        <button 
-                            onClick={() => {
-                              const d = formData.endDate ? new Date(formData.endDate) : new Date();
-                              setTempDate(isNaN(d.getTime()) ? new Date() : d);
-                              setShowDatePicker('endDate');
-                            }}
-                            className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
-                          >
-                            {formData.endDate && !isNaN(new Date(formData.endDate).getTime())
-                              ? new Date(formData.endDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
-                              : 'Select end date'}
-                            <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
-                          </button>
+                      {/* Close Section */}
+                      <div className="relative">
+                        <div className="absolute -left-[29px] top-2 w-4 h-4 rounded-full border-2 border-blue-500 bg-gh-bg-secondary z-10"></div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-[14px] font-bold text-gh-text w-12 text-left">Close</span>
+                          <div className="flex-1 relative">
+                          <button 
+                              onClick={() => {
+                                const d = formData.endDate ? new Date(formData.endDate) : new Date();
+                                setTempDate(isNaN(d.getTime()) ? new Date() : d);
+                                setShowDatePicker('endDate');
+                              }}
+                              className="w-full bg-gh-bg border border-gh-border rounded-xl px-4 py-3 text-sm text-gh-text text-left hover:border-blue-500 transition-all flex items-center justify-between"
+                            >
+                              {formData.endDate && !isNaN(new Date(formData.endDate).getTime())
+                                ? new Date(formData.endDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+                                : 'Select end date'}
+                              <span className="material-symbols-outlined text-gh-text-secondary">calendar_month</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Summary Message */}
-                    <div className="pt-6 border-t border-gh-border/50 flex items-start gap-3">
-                      <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">calendar_month</span>
-                      <p className="text-[12px] text-gh-text-secondary leading-normal">
-                        {(() => {
-                          const start = new Date(formData.startDate);
-                          const end = new Date(formData.endDate);
-                          const validStart = !isNaN(start.getTime());
-                          const validEnd = !isNaN(end.getTime());
-                          if (!validStart || !validEnd) return 'Please select both Live and Close dates to see the registration window.';
-                          const days = Math.max(0, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                          return (
-                            <>
-                              Candidates will be able to apply for this Opportunity from{' '}
-                              <span className="font-bold text-gh-text mx-1">
-                                {start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                              to{' '}
-                              <span className="font-bold text-gh-text mx-1">
-                                {end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {end.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                              </span>{' '}
-                              for a period of <span className="font-bold text-gh-text">{days} Days</span>.
-                            </>
-                          );
-                        })()}
-                      </p>
+                      {/* Summary Message */}
+                      <div className="pt-6 border-t border-gh-border/50 flex items-start gap-3">
+                        <span className="material-symbols-outlined text-gh-text-secondary text-[20px]">calendar_month</span>
+                        <p className="text-[12px] text-gh-text-secondary leading-normal">
+                          {(() => {
+                            const start = new Date(formData.startDate);
+                            const end = new Date(formData.endDate);
+                            const validStart = !isNaN(start.getTime());
+                            const validEnd = !isNaN(end.getTime());
+                            if (!validStart || !validEnd) return 'Please select both Live and Close dates to see the registration window.';
+                            const days = Math.max(0, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                            return (
+                              <>
+                                Candidates will be able to apply for this Opportunity from{' '}
+                                <span className="font-bold text-gh-text mx-1">
+                                  {start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                                to{' '}
+                                <span className="font-bold text-gh-text mx-1">
+                                  {end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })}, {end.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                </span>{' '}
+                                for a period of <span className="font-bold text-gh-text">{days} Days</span>.
+                              </>
+                            );
+                          })()}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 

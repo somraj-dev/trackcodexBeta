@@ -350,6 +350,7 @@ export const MOCK_JOBS: Job[] = [
       avatar: "https://cdn.worldvectorlogo.com/logos/stripe-2.svg",
     },
     postedDate: "2 hours ago",
+    website: "stripe.com/billing",
     longDescription:
       "Stripe is looking for a Senior Billing Engineer to help build the financial infrastructure of the internet.\n\n### Responsibilities\n- Design and implement idempotency keys for terminal reader connections.\n- Optimize billing workflows for high-volume transaction processing.\n- Collaborate with product managers to define new billing features.\n\n### Requirements\n- 5+ years of experience with TypeScript and Node.js.\n- Strong understanding of distributed systems and API design.\n- Experience with financial software is a plus.",
   },
@@ -368,6 +369,7 @@ export const MOCK_JOBS: Job[] = [
       avatar: "https://cdn.worldvectorlogo.com/logos/netflix-3.svg",
     },
     postedDate: "4 hours ago",
+    website: "netflix.com/careers",
     longDescription:
       "Netflix is redefining the future of entertainment.\n\n### The Role\nJoin our Platform Integrity team to ensure our global streaming service remains resilient under all conditions. You will be working on core infrastructure components that handle millions of requests per second.",
   },

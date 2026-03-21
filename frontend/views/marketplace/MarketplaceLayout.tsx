@@ -1,29 +1,5 @@
 import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
-
-const MarketplaceTab = ({
-  to,
-  label,
-  icon,
-}: {
-  to: string;
-  label: string;
-  icon: string;
-}) => (
-  <NavLink
-    to={to}
-    end={false} // Allow nested routes to keep the tab active
-    className={({ isActive }) =>
-      `flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-bold transition-all ${isActive
-        ? "bg-primary text-white shadow-lg"
-        : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
-      }`
-    }
-  >
-    <span className="material-symbols-outlined !text-base">{icon}</span>
-    {label}
-  </NavLink>
-);
+import { Outlet } from "react-router-dom";
 
 const MarketplaceLayout = () => {
   return (
@@ -40,13 +16,6 @@ const MarketplaceLayout = () => {
               </p>
             </div>
           </div>
-          <nav className="mt-8 flex items-center gap-2 p-2 bg-gh-bg-secondary border border-gh-border rounded-xl w-fit">
-            <MarketplaceTab
-              to="/marketplace/missions"
-              label="Missions"
-              icon="work"
-            />
-          </nav>
         </div>
       </header>
       <main className="flex-1">

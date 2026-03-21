@@ -114,7 +114,8 @@ const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView")
 const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
-
+const CreateEventView = React.lazy(() => import("./views/marketplace/CreateEventView"));
+const MissionRegistrationView = React.lazy(() => import("./views/marketplace/MissionRegistrationView"));
 
 // Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));
@@ -236,13 +237,15 @@ const AppRoutes = () => {
               </Route>
             </Route>
             <Route path="/marketplace/missions/new" element={<CreateMissionView />} />
+            <Route path="/marketplace/missions/new/event" element={<CreateEventView />} />
+            <Route path="/marketplace/missions/:id" element={<MissionDetailView />} />
+            <Route path="/marketplace/missions/:id/register" element={<MissionRegistrationView />} />
 
             {/* Marketplace */}
             <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
 
               <Route path="missions" element={<MissionsView />} />
-              <Route path="missions/:id" element={<MissionDetailView />} />
               <Route path="applications" element={<MyApplicationsView />} />
             </Route>
 

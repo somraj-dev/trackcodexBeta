@@ -1,6 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Job } from "../../types";
+import ShareModal from "../modals/ShareModal";
 
 interface JobCardProps {
   job: Job;
@@ -9,120 +9,96 @@ interface JobCardProps {
 
 // Typed as React.FC to resolve 'key' prop errors when component is used in list mappings
 const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
-  const navigate = useNavigate();
-  const statusColors = {
-    Open: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-    "In Progress": "text-amber-400 bg-amber-400/10 border-amber-400/20",
-    InProgress: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-    Completed: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-    Pending: "text-blue-400 bg-blue-400/10 border-blue-400/20 animate-pulse",
-  };
-
-  const handleRepoClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/repo/${job.repoId}`);
-  };
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   return (
+    <>
     <div
       onClick={onClick}
-      className="group bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:border-primary/50 transition-all duration-300 shadow-sm hover:shadow-xl cursor-pointer flex flex-col relative overflow-hidden"
+      className="group bg-white border border-slate-200 rounded-[24px] p-6 hover:border-blue-300 transition-all duration-300 shadow-sm hover:shadow-xl cursor-pointer flex flex-col relative overflow-hidden h-[320px]"
     >
-      {/* Decorative background element */}
-      <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
-        <span className="material-symbols-outlined text-[100px] font-semibold">
-          terminal
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between mb-5 relative z-10">
-        <div
-          className={`px-2 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-widest border ${statusColors[job.status]}`}
-        >
-          {job.status}
-        </div>
-        <div
-          onClick={handleRepoClick}
-          className="flex items-center gap-1.5 px-2 py-1 bg-gh-bg border border-gh-border rounded-lg text-[10px] text-gh-text-secondary font-bold hover:text-primary hover:border-primary/50 transition-all"
-          title="View Associated Repository"
-        >
-          <span className="material-symbols-outlined !text-[14px]">
-            account_tree
-          </span>
-          {job.repoId}
-        </div>
-      </div>
-
-      <div className="flex items-start gap-4 mb-5 relative z-10">
-        <div className="size-12 rounded-xl bg-gh-bg flex items-center justify-center overflow-hidden border border-gh-border shrink-0 group-hover:border-primary/30 transition-colors shadow-inner">
-          <img
-            src={job.creator?.avatar || "https://github.com/ghost.png"}
-            className="size-full object-cover"
-            alt={job.creator?.name || "Anonymous"}
-          />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-gh-text group-hover:text-primary transition-colors truncate leading-tight mb-1 uppercase tracking-tight">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex-1 min-w-0 pr-4">
+          <h3 className="text-[17px] font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate leading-tight mb-1.5">
             {job.title}
           </h3>
-          <div className="flex items-center gap-2">
-            <p className="text-[11px] text-gh-text-secondary font-bold truncate">
-              @
-              {job.creator?.name
-                ? job.creator.name.replace(/\s+/g, "").toLowerCase()
-                : "anonymous"}
-            </p>
-            <div className="flex items-center gap-1 bg-amber-500/5 px-1.5 py-0.5 rounded border border-amber-500/10">
-              <span className="material-symbols-outlined text-amber-500 filled !text-[12px]">
-                star
-              </span>
-              <span className="text-[10px] font-semibold text-amber-500">4.9</span>
-            </div>
-          </div>
+          <p className="text-[14px] font-medium text-slate-600 truncate">
+            {job.creator?.name || "Organisation Name"}
+          </p>
+        </div>
+        <div className="size-14 rounded-xl border border-slate-100 bg-slate-50 p-1 shrink-0 overflow-hidden shadow-sm">
+          <img
+            src={job.creator?.avatar || "https://github.com/ghost.png"}
+            className="size-full object-cover rounded-lg"
+            alt={job.creator?.name || "Logo"}
+          />
         </div>
       </div>
 
-      <p className="text-[13px] text-gh-text-secondary leading-relaxed mb-6 line-clamp-2 min-h-[40px] relative z-10">
-        {job.description}
-      </p>
+      <div className="space-y-2.5 mb-5">
+        <div className="flex items-center gap-2.5 text-slate-500">
+          <span className="material-symbols-outlined !text-[18px]">group</span>
+          <span className="text-[13px] font-medium">{job.metadata?.teamSize || "1 - 4 Members"}</span>
+          <span className="w-px h-3 bg-slate-200 mx-1" />
+        </div>
+        <div className="flex items-center gap-2.5 text-slate-500">
+          <span className="material-symbols-outlined !text-[18px]">location_on</span>
+          <span className="text-[13px] font-medium truncate">{job.offerDetails?.officeLocation || "Online"}</span>
+        </div>
+      </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-8 relative z-10">
-        {(job.techStack || []).map((tag) => (
+      <div className="flex flex-wrap gap-2 mb-auto">
+        {(job.techStack || []).slice(0, 3).map((tag) => (
           <span
             key={tag}
-            className="px-2.5 py-1 bg-gh-bg rounded-lg border border-gh-border text-[10px] text-gh-text-secondary font-medium uppercase tracking-tight group-hover:border-primary/30 transition-colors"
+            className="px-3 py-1.5 bg-slate-100 rounded-full text-[12px] text-slate-600 font-semibold tracking-wide"
           >
             {tag}
           </span>
         ))}
         {(job.techStack || []).length > 3 && (
-          <span className="px-2 py-1 text-[10px] text-gh-text-secondary font-bold uppercase">
+          <span className="px-3 py-1.5 bg-slate-100 rounded-full text-[12px] text-slate-600 font-bold">
             +{(job.techStack || []).length - 3}
           </span>
         )}
       </div>
 
-      <div className="mt-auto pt-5 border-t border-gh-border/50 flex items-center justify-between relative z-10">
-        <div className="flex flex-col">
-          <span className="text-[9px] text-gh-text-secondary font-medium uppercase tracking-[0.15em] mb-0.5">
-            Value
+      <div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
+        <div className="flex items-center gap-4 text-slate-500">
+          <span className="text-[13px] font-bold text-blue-600/80">
+            Posted {job.postedDate || "Mar 21, 2026"}
           </span>
-          <span className="text-[18px] font-semibold text-gh-text tracking-tight flex items-center gap-1.5">
-            {job.budget}
-            <span className="text-[10px] text-gh-text-secondary font-bold lowercase">
-              /{job.type === "Full-time" ? "yr" : "fixed"}
-            </span>
-          </span>
+          <div className="flex items-center gap-1.5 font-bold text-slate-700">
+            <span className="material-symbols-outlined !text-[18px]">hourglass_bottom</span>
+            <span className="text-[13px]">13 days left</span>
+          </div>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-gh-bg px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:opacity-90 hover:scale-[1.02] active:scale-95">
-          {job.status === "Completed"
-            ? "Review feedback"
-            : job.status === "Pending"
-              ? "View Offer"
-              : "Explore Brief"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            className="p-2 text-slate-400 hover:text-blue-500 transition-colors"
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              setIsShareModalOpen(true);
+            }}
+          >
+            <span className="material-symbols-outlined !text-[20px]">share</span>
+          </button>
+          <button 
+            className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+            onClick={(e) => { e.stopPropagation(); /* Favorite logic */ }}
+          >
+            <span className="material-symbols-outlined !text-[20px]">favorite</span>
+          </button>
+        </div>
       </div>
     </div>
+    
+    <ShareModal 
+      isOpen={isShareModalOpen} 
+      onClose={() => setIsShareModalOpen(false)} 
+      job={job}
+    />
+    </>
   );
 };
 
