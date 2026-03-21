@@ -2,11 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DeleteAccountModal } from "../../components/settings/DeleteAccountModal";
 import { apiInstance } from "../../services/infra/api";
+import { profileService, UserProfile } from "../../services/activity/profile";
+import { useEffect } from "react";
 
 const AccountSettings = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [profile, setProfile] = useState<UserProfile>(profileService.getProfile());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    return profileService.subscribe(setProfile);
+  }, []);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -59,7 +66,7 @@ const AccountSettings = () => {
   return (
     <div className="space-y-12">
       <header className="border-b border-gh-border pb-6">
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <h1 className="text-lg font-semibold text-white tracking-tight">
           Account settings
         </h1>
       </header>
@@ -84,7 +91,7 @@ const AccountSettings = () => {
         </h3>
         <p className="text-sm text-gh-text-secondary mb-6 leading-relaxed">
           Connect a Patreon account for{" "}
-          <span className="text-white font-bold">@Quantaforze-trackcodex</span>{" "}
+          <span className="text-gh-text font-bold">@{profile.username || "user"}</span>{" "}
           to sponsor maintainers with. Get recognition on TrackCodex for
           sponsorships made on Patreon when the sponsored person has linked
           Patreon and TrackCodex, too.
@@ -101,7 +108,7 @@ const AccountSettings = () => {
         </h3>
         <p className="text-sm text-gh-text-secondary mb-6 leading-relaxed">
           Export all repositories and profile metadata for{" "}
-          <span className="text-white font-bold">@Quantaforze-trackcodex</span>.
+          <span className="text-gh-text font-bold">@{profile.username || "user"}</span>.
           Exports will be available for 7 days.
         </p>
         <button
@@ -138,7 +145,7 @@ const AccountSettings = () => {
         </h3>
         <p className="text-sm text-gh-text-secondary mb-8 leading-relaxed">
           By clicking "Add Successor" below, I acknowledge that I am the owner
-          of the @Quantaforze-trackcodex account, and am authorizing TrackCodex
+          of the @{profile.username || "user"} account, and am authorizing TrackCodex
           to transfer content within that account to my TrackCodex Successor,
           designated below, in the event of my death. I understand that this
           appointment of a successor does not override legally binding
@@ -149,7 +156,7 @@ const AccountSettings = () => {
         </p>
 
         <div className="space-y-2">
-          <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest px-1">
+          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest px-1">
             Search by username, full name, or email address
           </label>
           <div className="flex gap-2">
