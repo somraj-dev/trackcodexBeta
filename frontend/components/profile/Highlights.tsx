@@ -35,7 +35,7 @@ const Highlights: React.FC<Props> = ({ profile }) => {
     >
       <span className={`material-symbols-outlined ${color} !text-[32px] opacity-40`}>{icon}</span>
       <p className="text-[12px] font-bold text-gh-text-secondary text-center">{hint}</p>
-      <span className="text-[10px] font-black text-primary uppercase tracking-widest opacity-70">
+      <span className="text-[10px] font-semibold text-primary uppercase tracking-widest opacity-70">
         {label} →
       </span>
     </div>
@@ -45,7 +45,7 @@ const Highlights: React.FC<Props> = ({ profile }) => {
     <div className="font-display">
       <div className="flex items-center gap-3 mb-8">
         <span className="material-symbols-outlined text-amber-500 filled !text-xl">bolt</span>
-        <h3 className="text-[16px] font-black uppercase tracking-tight text-gh-text">Highlights</h3>
+        <h3 className="text-[16px] font-medium uppercase tracking-tight text-gh-text">Highlights</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Code Activity */}
@@ -55,10 +55,10 @@ const Highlights: React.FC<Props> = ({ profile }) => {
             className="p-8 bg-gh-bg-secondary border border-gh-border rounded-2xl group hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden shadow-lg"
           >
             <div className="flex justify-between items-start mb-6">
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+              <span className="text-[10px] font-semibold text-primary uppercase tracking-widest">
                 Code Activity
               </span>
-              <div className="flex items-center gap-1 text-amber-500 font-black text-xs bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
+              <div className="flex items-center gap-1 text-amber-500 font-semibold text-xs bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
                 <span className="material-symbols-outlined !text-[16px]">commit</span>
                 {commits + prsMerged}
               </div>
@@ -87,7 +87,7 @@ const Highlights: React.FC<Props> = ({ profile }) => {
             className="p-8 bg-gh-bg-secondary border border-gh-border rounded-2xl group hover:border-emerald-500/50 transition-all cursor-pointer shadow-lg"
           >
             <div className="flex justify-between items-start mb-6">
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">
+              <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">
                 Security Impact
               </span>
               <span className="material-symbols-outlined text-emerald-500 filled !text-[20px]">check_circle</span>
@@ -116,11 +116,11 @@ const Highlights: React.FC<Props> = ({ profile }) => {
             className="p-8 bg-gh-bg-secondary border border-gh-border rounded-2xl group hover:border-amber-500/50 transition-all cursor-pointer shadow-lg"
           >
             <div className="flex justify-between items-start mb-6">
-              <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">
+              <span className="text-[10px] font-semibold text-amber-500 uppercase tracking-widest">
                 Gig Performance
               </span>
               {rating > 0 && (
-                <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 text-[9px] font-black rounded border border-amber-500/20 uppercase tracking-widest">
+                <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 text-[9px] font-semibold rounded border border-amber-500/20 uppercase tracking-widest">
                   {rating.toFixed(1)}★
                 </span>
               )}

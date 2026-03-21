@@ -311,7 +311,7 @@ const RepoAboutSidebar: React.FC<RepoAboutSidebarProps> = ({ repo }) => {
                     "--dynamic-gradient": `linear-gradient(135deg, hsl(${Math.abs(contributor.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 360}, 70%, 50%), hsl(${(Math.abs(contributor.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) + 40) % 360}, 70%, 50%))` 
                   } as React.CSSProperties}
                 ></div>
-                <span className="absolute text-[10px] font-black text-white uppercase">
+                <span className="absolute text-[10px] font-semibold text-white uppercase">
                   {contributor.username[0]}
                 </span>
               </Link>

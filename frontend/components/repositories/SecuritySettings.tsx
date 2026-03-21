@@ -49,7 +49,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ repoId }) => {
                 {dependencyGraph && (
                   <div className="mt-4 p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl flex items-center gap-3 animate-in zoom-in-95">
                     <span className="material-symbols-outlined text-amber-500 !text-[18px]">warning</span>
-                    <span className="text-[10px] font-black uppercase text-amber-500 tracking-widest">Active Monitoring Enabled</span>
+                    <span className="text-[10px] font-medium uppercase text-amber-500 tracking-widest">Active Monitoring Enabled</span>
                   </div>
                 )}
               </div>
@@ -108,7 +108,7 @@ const SecuritySettings: React.FC<SecuritySettingsProps> = ({ repoId }) => {
             Help your users report security vulnerabilities. 
             Create a <code>SECURITY.md</code> file in your repository to define how people can report vulnerabilities.
           </p>
-          <button className="text-xs font-black uppercase text-primary hover:text-emerald-500 transition-colors flex items-center gap-1 mt-4">
+          <button className="text-xs font-medium uppercase text-primary hover:text-emerald-500 transition-colors flex items-center gap-1 mt-4">
             Set up policy
             <span className="material-symbols-outlined !text-[14px]">arrow_forward</span>
           </button>

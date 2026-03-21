@@ -189,7 +189,7 @@ const PullRequestDetail = ({
                           className="flex items-center justify-between group"
                         >
                           <div className="flex items-center gap-2">
-                            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary border border-primary/30 uppercase font-black">
+                            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary border border-primary/30 uppercase font-semibold">
                               {review.reviewer.username.charAt(0)}
                             </div>
                             <span className="text-sm font-medium text-[#c9d1d9]">
@@ -199,7 +199,7 @@ const PullRequestDetail = ({
                           <div className="flex items-center gap-2">
                             {review.body?.includes("CODEOWNERS") && (
                               <span
-                                className="text-[9px] px-1.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded uppercase font-black"
+                                className="text-[9px] px-1.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded uppercase font-semibold"
                                 title="Auto-assigned via CODEOWNERS governance"
                               >
                                 Owner

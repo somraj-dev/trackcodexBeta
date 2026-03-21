@@ -225,7 +225,7 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
             {showBranchMenu && (
               <div className="absolute left-0 mt-2 w-64 bg-[#252526] border border-gh-border rounded-lg shadow-2xl z-50 py-2">
                 <div className="px-3 py-2 border-b border-gh-border">
-                  <span className="text-[10px] font-black uppercase text-gh-text-secondary">
+                  <span className="text-[10px] font-medium uppercase text-gh-text-secondary">
                     Switch branches/tags
                   </span>
                 </div>
@@ -357,10 +357,10 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
           </div>
 
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-1 text-sm font-bold">
+          <div className="flex items-center gap-1.5 text-sm">
             <button
               onClick={() => setCurrentPath("")}
-              className="text-primary hover:underline"
+              className={`hover:underline ${!currentPath ? 'font-semibold text-gh-text' : 'font-normal text-gh-text-secondary hover:text-primary'}`}
             >
               {repo.name}
             </button>
@@ -368,12 +368,12 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
               <React.Fragment key={idx}>
                 {part && (
                   <>
-                    <span className="text-gh-text-secondary">/</span>
+                    <span className="text-gh-text-secondary/50 font-normal">/</span>
                     <button
                       onClick={() =>
                         setCurrentPath(arr.slice(0, idx + 1).join("/"))
                       }
-                      className="text-primary hover:underline"
+                      className={`hover:underline ${idx === arr.length - 1 ? 'font-semibold text-gh-text' : 'font-normal text-gh-text-secondary hover:text-primary'}`}
                     >
                       {part}
                     </button>
@@ -683,7 +683,7 @@ const RepoCodeTab: React.FC<RepoCodeTabProps> = ({ repo }) => {
               <div className="space-y-2">
                 <label
                   htmlFor="new-file-name"
-                  className="text-xs font-black uppercase text-gh-text-secondary"
+                  className="text-xs font-medium uppercase text-gh-text-secondary"
                 >
                   File Name
                 </label>

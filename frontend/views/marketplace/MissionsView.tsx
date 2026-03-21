@@ -57,7 +57,7 @@ const MissionsView = () => {
           </div>
           <button
             onClick={() => navigate('/marketplace/missions/new')}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-gh-bg rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-gh-bg rounded-xl font-medium uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
           >
             Create New Mission
           </button>

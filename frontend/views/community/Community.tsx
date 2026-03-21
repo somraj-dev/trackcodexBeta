@@ -99,7 +99,7 @@ const CommunityView = () => {
   };
 
   return (
-    <div className="h-full overflow-hidden flex bg-[#030303]">
+    <div className="h-full overflow-hidden flex bg-gh-bg transition-colors">
       {/* Left Sidebar */}
       <CommunityLeftSidebar
         user={currentUser}
@@ -120,16 +120,16 @@ const CommunityView = () => {
       ) : view === 'feed' ? (
         <>
           {/* Main Feed */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#030303]">
+          <div className="flex-1 overflow-y-auto custom-scrollbar bg-gh-bg">
             <div className="max-w-[740px] mx-auto py-8 px-4">
               {/* Header with Plus Dropdown */}
               <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-white">Community</h1>
+                <h1 className="text-2xl font-bold text-gh-text">Community</h1>
                 <div className="relative">
                   <button
                     onClick={() => setShowAddMenu(!showAddMenu)}
                     aria-label="Create menu"
-                    className="size-10 rounded-full bg-[#1A1A1B] border border-[#343536] flex items-center justify-center text-white hover:border-white transition-all active:scale-95"
+                    className="size-10 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center text-gh-text hover:border-gh-text transition-all active:scale-95"
                   >
                     <span className="material-symbols-outlined !text-[24px]">{showAddMenu ? 'close' : 'add'}</span>
                   </button>
@@ -140,13 +140,13 @@ const CommunityView = () => {
                         className="fixed inset-0 z-40"
                         onClick={() => setShowAddMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-56 rounded-md bg-[#1A1A1B] border border-[#343536] shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="absolute right-0 mt-2 w-56 rounded-md bg-gh-bg-secondary border border-gh-border shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
                         <button
                           onClick={() => {
                             setView('create-post');
                             setShowAddMenu(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#D7DADC] hover:bg-[#272729] transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gh-text-secondary hover:bg-gh-bg-tertiary transition-colors"
                         >
                           <span className="material-symbols-outlined !text-[20px]">edit_note</span>
                           Create Post
@@ -156,7 +156,7 @@ const CommunityView = () => {
                             setShowCreateCommunityModal(true);
                             setShowAddMenu(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#D7DADC] hover:bg-[#272729] transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gh-text-secondary hover:bg-gh-bg-tertiary transition-colors"
                         >
                           <span className="material-symbols-outlined !text-[20px]">groups</span>
                           Create Community
@@ -171,8 +171,8 @@ const CommunityView = () => {
               {/* Feed Posts */}
               <div className="space-y-0">
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-[#818384]">
-                    <span className="material-symbols-outlined !text-4xl animate-spin mb-4 text-[#0079D3]">
+                  <div className="flex flex-col items-center justify-center py-20 text-gh-text-tertiary">
+                    <span className="material-symbols-outlined !text-4xl animate-spin mb-4 text-primary">
                       progress_activity
                     </span>
                     <p className="font-bold">Fetching feed...</p>

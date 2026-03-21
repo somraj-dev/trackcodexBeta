@@ -59,8 +59,8 @@ const MessagesView = () => {
             {/* Sidebar - Conversation List */}
             <div className="w-[320px] border-r border-gh-border flex flex-col bg-gh-bg shrink-0">
                 <div className="p-4 border-b border-gh-border flex justify-between items-center">
-                    <h2 className="text-lg font-semibold text-white">Messages</h2>
-                    <button className="text-gh-text-secondary hover:text-white transition-colors">
+                    <h2 className="text-lg font-semibold text-gh-text">Messages</h2>
+                    <button className="text-gh-text-secondary hover:text-gh-text transition-colors">
                         <span className="material-symbols-outlined !text-[20px]">edit_square</span>
                     </button>
                 </div>
@@ -88,7 +88,7 @@ const MessagesView = () => {
                                             {otherParticipant.avatar ? (
                                                 <img src={otherParticipant.avatar} alt="" className="w-10 h-10 rounded-full bg-gh-bg-tertiary object-cover border border-gh-border" />
                                             ) : (
-                                                <div className="w-10 h-10 rounded-full bg-[#30363d] border border-gh-border flex flex-col items-center justify-center text-gh-text text-sm font-bold">
+                                                <div className="w-10 h-10 rounded-full bg-gh-bg-tertiary border border-gh-border flex flex-col items-center justify-center text-gh-text text-sm font-bold">
                                                     {otherParticipant.name?.charAt(0) || "?"}
                                                 </div>
                                             )}
@@ -97,11 +97,11 @@ const MessagesView = () => {
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-baseline mb-0.5">
-                                                <span className="font-semibold text-[14px] text-[#c9d1d9] truncate">
+                                                <span className="font-semibold text-[14px] text-gh-text truncate">
                                                     {otherParticipant.name}
                                                 </span>
                                             </div>
-                                            <p className="text-[13px] text-[#8b949e] truncate">
+                                            <p className="text-[13px] text-gh-text-secondary truncate">
                                                 {conv.lastMessage || "No messages yet"}
                                             </p>
                                         </div>
@@ -123,7 +123,7 @@ const MessagesView = () => {
 
                                 return (
                                     <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                                        <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-[14px] ${isMine ? "bg-[#1f6feb] text-white rounded-br-sm" : "bg-[#30363d] text-[#c9d1d9] rounded-bl-sm"
+                                        <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-[14px] ${isMine ? "bg-primary text-white rounded-br-sm" : "bg-gh-bg-tertiary text-gh-text rounded-bl-sm"
                                             }`}>
                                             <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                                             <div className={`text-[11px] mt-1 opacity-70 flex items-center gap-1 ${isMine ? "justify-end" : "justify-start"}`}>
@@ -149,13 +149,13 @@ const MessagesView = () => {
                                         }
                                     }}
                                     placeholder="Message..."
-                                    className="w-full bg-[#0d1117] border border-gh-border hover:border-[#8b949e] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] rounded-xl pl-4 pr-12 py-3 text-[14px] text-[#c9d1d9] placeholder-[#8b949e] resize-none overflow-hidden transition-all duration-200 min-h-[48px] max-h-[120px]"
+                                    className="w-full bg-gh-bg border border-gh-border hover:border-gh-text-secondary focus:border-primary focus:ring-1 focus:ring-primary rounded-xl pl-4 pr-12 py-3 text-[14px] text-gh-text placeholder:text-gh-text-secondary resize-none overflow-hidden transition-all duration-200 min-h-[48px] max-h-[120px]"
                                     rows={Math.min(5, Math.max(1, inputValue.split("\n").length))}
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputValue.trim()}
-                                    className="absolute right-2 bottom-2 p-1.5 text-white bg-primary hover:bg-primary/90 disabled:bg-[#30363d] disabled:text-[#8b949e] rounded-lg transition-colors flex items-center justify-center"
+                                    className="absolute right-2 bottom-2 p-1.5 text-white bg-primary hover:opacity-90 disabled:bg-gh-bg-tertiary disabled:text-gh-text-secondary rounded-lg transition-colors flex items-center justify-center"
                                 >
                                     <span className="material-symbols-outlined !text-[18px]">send</span>
                                 </button>
@@ -163,9 +163,9 @@ const MessagesView = () => {
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-[#8b949e] bg-[#0d1117]">
+                    <div className="flex-1 flex flex-col items-center justify-center text-gh-text-secondary bg-gh-bg">
                         <span className="material-symbols-outlined !text-[64px] mb-4 opacity-50">forum</span>
-                        <h3 className="text-xl font-semibold text-[#c9d1d9] mb-2">Your Messages</h3>
+                        <h3 className="text-xl font-semibold text-gh-text mb-2">Your Messages</h3>
                         <p className="text-[14px] max-w-sm text-center">
                             Select a conversation from the sidebar or start a new one to connect with other developers.
                         </p>

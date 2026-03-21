@@ -94,7 +94,7 @@ const MissionDetailView = () => {
         <div className="space-y-12">
           <section>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[11px] font-black text-gh-text-secondary uppercase tracking-[0.2em]">
+              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                 Mission Briefing
               </h2>
               {isCompleted && (
@@ -109,7 +109,7 @@ const MissionDetailView = () => {
             </div>
           </section>
           <section>
-            <h3 className="text-[11px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
+            <h3 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
               Required Capabilities
             </h3>
             <div className="flex flex-wrap gap-3">
@@ -126,20 +126,20 @@ const MissionDetailView = () => {
         </div>
         <aside className="space-y-10">
           <div className="p-8 rounded-3xl bg-gh-bg-secondary border border-gh-border shadow-2xl">
-            <h3 className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-8">
+            <h3 className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-8">
               Mission Value
             </h3>
             <div>
-              <p className="text-4xl font-black text-gh-text tracking-tighter mb-1">
+              <p className="text-2xl font-semibold text-gh-text tracking-tighter mb-1">
                 {localJob.budget}
               </p>
-              <p className="text-[11px] text-gh-text-secondary uppercase font-black tracking-widest">
+              <p className="text-[11px] text-gh-text-secondary uppercase font-semibold tracking-widest">
                 Total Contract Payout
               </p>
             </div>
           </div>
           <div className="p-8 rounded-3xl bg-gh-bg-secondary border border-gh-border shadow-xl">
-            <h3 className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-8">
+            <h3 className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-8">
               Contracting Client
             </h3>
             <div className="flex items-center gap-5 mb-8">
@@ -149,7 +149,7 @@ const MissionDetailView = () => {
                 alt="Client"
               />
               <div>
-                <p className="text-lg font-black text-gh-text leading-tight uppercase">
+                <p className="text-sm font-semibold text-gh-text leading-tight uppercase">
                   {localJob.creator.name}
                 </p>
               </div>
@@ -157,11 +157,11 @@ const MissionDetailView = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleMessageClient}
-                className="flex-1 py-3 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[10px] font-black uppercase transition-colors"
+                className="flex-1 py-3 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[10px] font-medium uppercase transition-colors"
               >
                 Send DM
               </button>
-              <button className="flex-1 py-3 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[10px] font-black uppercase transition-colors">
+              <button className="flex-1 py-3 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[10px] font-medium uppercase transition-colors">
                 Profile
               </button>
             </div>
@@ -193,7 +193,7 @@ const MissionDetailView = () => {
                     }
                   }}
                   disabled={hasApplied}
-                  className={`w-full mt-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ${hasApplied ? 'bg-gh-bg-tertiary text-gh-text-secondary cursor-not-allowed shadow-none' : 'bg-primary text-gh-bg shadow-primary/20 hover:opacity-90'}`}
+                  className={`w-full mt-4 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg ${hasApplied ? 'bg-gh-bg-tertiary text-gh-text-secondary cursor-not-allowed shadow-none' : 'bg-primary text-gh-bg shadow-primary/20 hover:opacity-90'}`}
                 >
                   {hasApplied ? "Application Submitted" : "Apply for Mission"}
                 </button>
@@ -215,7 +215,7 @@ const MissionDetailView = () => {
                       addNotification({ type: "error", title: "Funding Failed", message: "Failed to secure funds. Please check wallet balance." } as any);
                     }
                   }}
-                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
+                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg shadow-blue-900/20"
                 >
                   Secure Funding (Escrow)
                 </button>
@@ -236,7 +236,7 @@ const MissionDetailView = () => {
                     addNotification({ type: "error", title: "Release Failed", message: "Failed to release payment." } as any);
                   }
                 }}
-                className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
+                className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
               >
                 <span className="material-symbols-outlined text-sm align-bottom mr-2">
                   payments
@@ -249,7 +249,7 @@ const MissionDetailView = () => {
             {!isCompleted && isCreator && localJob.status !== 'In Progress' && (
               <button
                 onClick={() => setIsRatingModalOpen(true)}
-                className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
+                className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg shadow-emerald-900/20"
               >
                 Mark Complete & Rate
               </button>

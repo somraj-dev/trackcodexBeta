@@ -4,7 +4,7 @@ const BillingAdditional = () => {
   return (
     <div className="space-y-8 pb-20">
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">Additional billing details</h1>
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">Additional billing details</h1>
         <p className="text-gh-text-secondary">View additional billing information and settings.</p>
       </header>
       <section>

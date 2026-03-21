@@ -154,11 +154,11 @@ const ProfileSettings = () => {
   // Helper Styles
   const labelStyle = "block text-sm font-semibold text-gh-text mb-2";
   const inputStyle = "w-full bg-gh-bg border border-gh-border rounded-md px-3 py-1.5 text-sm text-gh-text focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors placeholder-gh-text-secondary";
-  const sectionTitleStyle = "text-xl font-normal text-gh-text pb-2 border-b border-gh-border mb-4";
+  const sectionTitleStyle = "text-base font-semibold text-gh-text pb-2 border-b border-gh-border mb-4";
 
   return (
     <div className="max-w-[1000px] text-gh-text-secondary">
-      <h1 className="text-3xl font-normal text-gh-text mb-2">Public profile</h1>
+      <h1 className="text-xl font-semibold text-gh-text mb-2">Public profile</h1>
       <div className="border-b border-gh-border mb-8"></div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">

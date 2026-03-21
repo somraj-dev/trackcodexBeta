@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiInstance } from "../services/infra/api";
+import { PromptInputBox } from "../components/ui/ai-prompt-box";
 
 type Provider = "google" | "deepseek";
 
@@ -35,13 +36,14 @@ const ForgeAIView = () => {
   }, []);
 
 
-  const handleAsk = async () => {
-    if (!prompt.trim()) return;
+  const handleAsk = async (explicitPrompt?: string) => {
+    const finalPrompt = explicitPrompt || prompt;
+    if (!finalPrompt.trim()) return;
     setIsAnalyzing(true);
 
     try {
       const response = await apiInstance.post("/forgeai/complete", {
-        prompt,
+        prompt: finalPrompt,
         provider,
         model: provider === "google" ? "gemini-1.5-flash" : deepseekConfig.model,
         workspaceId: localStorage.getItem("current_workspace_id"),
@@ -49,7 +51,7 @@ const ForgeAIView = () => {
 
       const data = response.data;
       setResults((prev) => [{ type: "AI", content: data.content }, ...prev]);
-      setPrompt("");
+      if (!explicitPrompt) setPrompt("");
     } catch (error) {
       console.error(error);
       setResults((prev) => [
@@ -104,50 +106,13 @@ const ForgeAIView = () => {
             </div>
           )}
 
-          {/* Premium Chat Input */}
           <div className="w-full">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-[#d97757]/10 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-              <div className="relative bg-gh-bg-secondary border border-gh-border rounded-[28px] p-2 pr-4 shadow-2xl">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleAsk())
-                  }
-                  placeholder="How can I help you today?"
-                  className="w-full bg-transparent border-none px-6 py-5 text-[17px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none min-h-[140px] resize-none leading-relaxed"
-                />
-
-                <div className="flex items-center justify-between pl-3 pb-2 pt-2 border-t border-gh-border/10 mt-2">
-                  <div className="flex items-center gap-1">
-                    <button className="size-10 flex items-center justify-center text-[#888] hover:text-white hover:bg-white/5 rounded-full transition-all">
-                      <span className="material-symbols-outlined !text-[22px]">add</span>
-                    </button>
-                    <div className="h-4 w-[1px] bg-gh-border mx-1"></div>
-                    <button
-                      onClick={() => setShowSettings(!showSettings)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 hover:bg-white/5 rounded-full text-[#999] text-[13px] font-medium transition-all hover:text-white"
-                    >
-                      <span className="text-xs">Sonnet 4.6</span>
-                      <span className="text-gh-text-secondary">Extended</span>
-                      <span className="material-symbols-outlined !text-[16px] text-gh-text-secondary opacity-60">expand_more</span>
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleAsk}
-                    disabled={isAnalyzing || !prompt.trim()}
-                    className={`size-10 rounded-full flex items-center justify-center transition-all ${prompt.trim() ? "bg-[#d97757] text-white shadow-lg shadow-[#d97757]/20" : "bg-gh-tertiary text-gh-text-secondary opacity-50"
-                      }`}
-                  >
-                    <span className={`material-symbols-outlined !text-[20px] ${isAnalyzing ? "animate-spin" : ""}`}>
-                      {isAnalyzing ? "progress_activity" : "arrow_upward"}
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <PromptInputBox
+              isLoading={isAnalyzing}
+              onSend={(msg) => handleAsk(msg)}
+              placeholder="How can I help you today?"
+              className="max-w-3xl mx-auto"
+            />
 
             {/* Sub-toolbar tags */}
             <div className="flex flex-wrap justify-center gap-2 mt-8">

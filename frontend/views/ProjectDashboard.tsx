@@ -3,29 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { Project } from "../types/project";
 import { CreateProjectModal } from "../components/modals/CreateProjectModal";
 import { useAppData } from "../context/AppDataContext";
-import { 
-    CheckCircle2, 
-    CircleDot, 
-    Code2, 
-    GitBranch, 
-    GitPullRequest 
-} from 'lucide-react';
+
 
 // Initial projects moved to AppDataContext
 
 /* ─── Styles (inlined TrackCodex design tokens) ─── */
 const V = {
-  bg: "#000",
-  card: "#0a0a0a",
-  cardHover: "#111",
-  border: "#333",
-  borderLight: "#222",
-  text: "#ededed",
-  textSecondary: "#888",
-  textTertiary: "#666",
-  accent: "#0070f3",
-  green: "#0070f3",
-  font: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  bg: "var(--gh-bg)",
+  card: "var(--gh-bg-secondary)",
+  cardHover: "var(--gh-bg", // Using bg-hover semantic if available, otherwise just bg
+  border: "var(--gh-border)",
+  borderLight: "var(--gh-border)",
+  text: "var(--gh-text)",
+  textSecondary: "var(--gh-text-secondary)",
+  textTertiary: "var(--gh-text-secondary)",
+  accent: "var(--primary-color)",
+  green: "var(--gh-success)",
+  font: "var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
 };
 
 /* ─── Dropdown Menu Component ─── */
@@ -173,50 +167,7 @@ const ProjectDashboard: React.FC = () => {
     <div style={{ flex: 1, width: "100%", background: V.bg, overflowY: "auto", fontFamily: V.font, color: V.text }}>
       <div style={{ padding: "20px 24px" }}>
 
-        {/* Shortcuts */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 24, overflowX: "auto", paddingBottom: 8 }}>
-            <button 
-                onClick={() => { setModalMode('task'); setIsCreateModalOpen(true); }}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
-            >
-                <CheckCircle2 size={16} />
-                Task
-            </button>
-            <button 
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
-            >
-                <CircleDot size={16} />
-                Create issue
-            </button>
-            <button 
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
-            >
-                <Code2 size={16} />
-                Write code
-            </button>
-            <button 
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
-            >
-                <GitBranch size={16} />
-                Git
-            </button>
-            <button 
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: "#111", border: "1px solid #333", borderRadius: 12, color: "#888", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#555"; e.currentTarget.style.color = "#eee"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#333"; e.currentTarget.style.color = "#888"; }}
-            >
-                <GitPullRequest size={16} />
-                Pull requests
-            </button>
-        </div>
+
 
         {/* Search bar */}
         <div style={{ display: "flex", gap: 8, marginBottom: 24, alignItems: "center" }}>

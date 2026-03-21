@@ -25,7 +25,7 @@ const MyApplicationsView = () => {
 
     return (
         <div className="p-10 max-w-[1200px] mx-auto text-gh-text">
-            <h1 className="text-3xl font-black mb-2 tracking-tight">My Applications</h1>
+            <h1 className="text-xl font-semibold mb-2 tracking-tight">My Applications</h1>
             <p className="text-slate-500 font-medium mb-10">Track the status of your active proposals.</p>
 
             {loading ? (
@@ -51,7 +51,7 @@ const MyApplicationsView = () => {
                                     <td className="p-4 text-slate-400">{new Date(app.createdAt).toLocaleDateString()}</td>
                                     <td className="p-4 font-mono text-slate-300">${app.bidAmount}</td>
                                     <td className="p-4">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${app.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-500' :
+                                        <span className={`px-2 py-1 rounded text-[10px] font-medium uppercase ${app.status === 'ACCEPTED' ? 'bg-emerald-500/20 text-emerald-500' :
                                                 app.status === 'REJECTED' ? 'bg-red-500/20 text-red-500' :
                                                     app.status === 'INTERVIEW' ? 'bg-amber-500/20 text-amber-500' :
                                                         'bg-slate-500/20 text-slate-400'

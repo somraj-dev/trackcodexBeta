@@ -73,7 +73,7 @@ const RepoTagsTab: React.FC<RepoTagsTabProps> = ({ repo }) => {
                       {tag}
                       <span className="material-symbols-outlined !text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
                     </div>
-                    <div className="text-[10px] font-black uppercase text-gh-text-secondary mt-0.5 flex items-center gap-2 tracking-widest">
+                    <div className="text-[10px] font-medium uppercase text-gh-text-secondary mt-0.5 flex items-center gap-2 tracking-widest">
                       <span className="bg-gh-bg-tertiary px-1.5 rounded border border-gh-border">Git Tag</span>
                     </div>
                   </div>

@@ -27,7 +27,7 @@ const PrivacySettings = () => {
         <div className="space-y-8 pb-20">
             {/* Header */}
             <header className="border-b border-gh-border pb-6">
-                <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+                <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
                     Privacy and visibility
                 </h1>
                 <p className="text-sm text-gh-text-secondary leading-relaxed">
@@ -68,7 +68,7 @@ const PrivacySettings = () => {
             {/* Profile Visibility */}
             <section className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
                 <div className="p-6 border-b border-gh-border">
-                    <h2 className="text-lg font-bold text-gh-text mb-1">Profile visibility</h2>
+                    <h2 className="text-base font-semibold text-gh-text mb-1">Profile visibility</h2>
                     <p className="text-sm text-gh-text-secondary">
                         Choose who can see your profile and activity on TrackCodex.
                     </p>
@@ -112,7 +112,7 @@ const PrivacySettings = () => {
             {/* Profile Information */}
             <section className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
                 <div className="p-6 border-b border-gh-border">
-                    <h2 className="text-lg font-bold text-gh-text mb-1">Profile information</h2>
+                    <h2 className="text-base font-semibold text-gh-text mb-1">Profile information</h2>
                     <p className="text-sm text-gh-text-secondary">
                         Control what personal information is visible on your public profile.
                     </p>
@@ -179,7 +179,7 @@ const PrivacySettings = () => {
             {/* Activity and Contributions */}
             <section className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
                 <div className="p-6 border-b border-gh-border">
-                    <h2 className="text-lg font-bold text-gh-text mb-1">Activity and contributions</h2>
+                    <h2 className="text-base font-semibold text-gh-text mb-1">Activity and contributions</h2>
                     <p className="text-sm text-gh-text-secondary">
                         Control what activity and contribution data is visible to others.
                     </p>
@@ -303,7 +303,7 @@ const PrivacySettings = () => {
             {/* Social */}
             <section className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
                 <div className="p-6 border-b border-gh-border">
-                    <h2 className="text-lg font-bold text-gh-text mb-1">Social</h2>
+                    <h2 className="text-base font-semibold text-gh-text mb-1">Social</h2>
                     <p className="text-sm text-gh-text-secondary">
                         Control what social information is visible on your profile.
                     </p>
@@ -372,7 +372,7 @@ const PrivacySettings = () => {
             {/* Discoverability */}
             <section className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
                 <div className="p-6 border-b border-gh-border">
-                    <h2 className="text-lg font-bold text-gh-text mb-1">Discoverability</h2>
+                    <h2 className="text-base font-semibold text-gh-text mb-1">Discoverability</h2>
                     <p className="text-sm text-gh-text-secondary">
                         Control how others can find you on TrackCodex.
                     </p>

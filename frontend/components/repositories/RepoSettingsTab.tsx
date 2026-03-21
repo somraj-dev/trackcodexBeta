@@ -82,7 +82,7 @@ const CheckboxRow = ({
       className={`mt-1 size-5 rounded-md border flex items-center justify-center transition-all ${checked ? "bg-primary border-primary shadow-lg shadow-primary/20" : "bg-gh-bg border-gh-border group-hover:border-gh-text-secondary"}`}
     >
       {checked && (
-        <span className="material-symbols-outlined !text-[14px] text-white font-black">
+        <span className="material-symbols-outlined !text-[14px] text-white font-semibold">
           check
         </span>
       )}
@@ -93,7 +93,7 @@ const CheckboxRow = ({
         {description}
       </p>
       {subLabel && (
-        <p className="text-[10px] text-gh-text-tertiary mt-2 font-black uppercase tracking-widest">
+        <p className="text-[10px] text-gh-text-tertiary mt-2 font-medium uppercase tracking-widest">
           {subLabel}
         </p>
       )}
@@ -296,7 +296,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
       {saving && (
         <div className="fixed bottom-8 right-8 z-50 flex items-center gap-3 bg-gh-bg-secondary border border-gh-border px-5 py-2.5 rounded-2xl shadow-2xl animate-in slide-in-from-bottom-10">
           <div className="size-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-xs font-black uppercase tracking-widest text-gh-text">
+          <span className="text-xs font-medium uppercase tracking-widest text-gh-text">
             Saving changes...
           </span>
         </div>
@@ -334,7 +334,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
         ))}
 
         <div className="pt-6 pb-2 px-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-gh-text-tertiary">
+          <span className="text-[10px] font-medium uppercase tracking-widest text-gh-text-tertiary">
             Security Analysis
           </span>
         </div>
@@ -377,7 +377,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       onClick={() =>
                         handleUpdate((s) => ({ ...s, name: renameValue }))
                       }
-                      className="bg-gh-bg-secondary border border-gh-border hover:border-gh-text hover:bg-gh-bg-tertiary px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg"
+                      className="bg-gh-bg-secondary border border-gh-border hover:border-gh-text hover:bg-gh-bg-tertiary px-6 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all active:scale-95 shadow-lg"
                     >
                       Rename
                     </button>
@@ -413,7 +413,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
               description="The default branch is considered the “base” branch in your repository, against which all pull requests and code commits are automatically made."
             >
               <div className="flex items-center gap-3 p-4 bg-gh-bg border border-gh-border rounded-2xl group hover:border-primary/50 transition-all w-fit pr-10 shadow-sm">
-                <div className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-mono text-primary font-black">
+                <div className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-mono text-primary font-semibold">
                   {settings.defaultBranch}
                 </div>
                 <button className="material-symbols-outlined !text-[20px] text-gh-text-secondary hover:text-primary transition-colors">
@@ -453,7 +453,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     className="w-full h-full object-cover opacity-80 group-hover/img:scale-105 transition-transform duration-[2000ms]"
                   />
                   <div className="absolute top-6 left-6 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
-                    <button className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-xs font-black uppercase shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:scale-105 transition-all active:scale-95">
+                    <button className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-xs font-medium uppercase shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:scale-105 transition-all active:scale-95">
                       <span className="material-symbols-outlined !text-lg">
                         edit
                       </span>
@@ -514,7 +514,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                   {settings.features?.issues && (
                     <div className="p-6 border border-emerald-500/20 bg-emerald-500/5 rounded-3xl flex items-center justify-between ml-12 animate-in zoom-in-95 duration-300">
                       <div>
-                        <h4 className="text-sm font-black text-gh-text mb-1 uppercase tracking-widest">
+                        <h4 className="text-sm font-semibold text-gh-text mb-1 uppercase tracking-widest">
                           Organized Workflows
                         </h4>
                         <p className="text-xs text-gh-text-secondary opacity-70">
@@ -522,7 +522,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                           through the noise.
                         </p>
                       </div>
-                      <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95">
+                      <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-medium uppercase tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95">
                         Set up templates
                       </button>
                     </div>
@@ -586,7 +586,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       />
                       {settings.pullRequests?.allowMerge && (
                         <div className="ml-12 space-y-3 animate-in fade-in duration-300">
-                          <label className="text-[10px] font-black uppercase text-gh-text-tertiary tracking-tighter">
+                          <label className="text-[10px] font-medium uppercase text-gh-text-tertiary tracking-tighter">
                             Default commit message
                           </label>
                           <select
@@ -629,7 +629,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       />
                       {settings.pullRequests?.allowSquash && (
                         <div className="ml-12 space-y-3 animate-in fade-in duration-300">
-                          <label className="text-[10px] font-black uppercase text-gh-text-tertiary tracking-tighter">
+                          <label className="text-[10px] font-medium uppercase text-gh-text-tertiary tracking-tighter">
                             Default commit message
                           </label>
                           <select
@@ -675,7 +675,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                 <div className="h-px bg-gh-border/50 mx-4"></div>
 
                 <div className="space-y-4">
-                  <p className="text-xs text-gh-text-tertiary font-black uppercase tracking-widest pl-4">
+                  <p className="text-xs text-gh-text-tertiary font-medium uppercase tracking-widest pl-4">
                     Flow Optimization
                   </p>
                   <CheckboxRow
@@ -790,7 +790,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-red-500/10 last:border-[#1A1A1A] hover:bg-red-500/10 transition-all gap-4"
                   >
                     <div className="text-center md:text-left">
-                      <h4 className="text-[14px] font-black text-gh-text mb-1 uppercase tracking-tight">
+                      <h4 className="text-[14px] font-semibold text-gh-text mb-1 uppercase tracking-tight">
                         {item.label}
                       </h4>
                       <p className="text-xs text-gh-text-tertiary max-w-[500px] leading-relaxed font-medium">
@@ -799,7 +799,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     </div>
                     <button
                       onClick={item.action}
-                      className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border whitespace-nowrap active:brightness-90 ${item.danger ? "bg-red-600 text-white border-red-600 hover:bg-red-500 shadow-xl shadow-red-600/20" : "bg-gh-bg border-gh-border text-red-500/80 hover:border-red-500 hover:text-red-500 hover:shadow-lg"}`}
+                      className={`px-8 py-3 rounded-2xl text-[10px] font-medium uppercase tracking-widest transition-all active:scale-95 border whitespace-nowrap active:brightness-90 ${item.danger ? "bg-red-600 text-white border-red-600 hover:bg-red-500 shadow-xl shadow-red-600/20" : "bg-gh-bg border-gh-border text-red-500/80 hover:border-red-500 hover:text-red-500 hover:shadow-lg"}`}
                     >
                       {item.btn}
                     </button>
@@ -893,7 +893,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                   construction
                 </span>
               </div>
-              <h2 className="text-xl font-extrabold mb-2 uppercase tracking-widest">
+              <h2 className="text-base font-semibold mb-2 uppercase tracking-widest">
                 {activeSubTab} Dashboard
               </h2>
               <p className="max-w-xs text-center text-xs font-bold leading-relaxed">

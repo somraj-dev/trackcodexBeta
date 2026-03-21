@@ -28,19 +28,19 @@ const QuickEditor: React.FC<QuickEditorProps> = ({ filename, initialContent, onS
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-blue-400 !text-[20px]">javascript</span>
           <span className="text-[13px] font-bold text-slate-200">{filename}</span>
-          <span className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Editing</span>
+          <span className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] font-semibold text-slate-500 uppercase tracking-widest">Editing</span>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={onCancel}
-            className="px-3 py-1.5 text-[11px] font-black uppercase text-slate-500 hover:text-white transition-colors"
+            className="px-3 py-1.5 text-[11px] font-medium uppercase text-slate-500 hover:text-white transition-colors"
           >
             Cancel
           </button>
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:bg-blue-600 disabled:opacity-50 transition-all active:scale-95"
+            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white text-[11px] font-medium uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:bg-blue-600 disabled:opacity-50 transition-all active:scale-95"
           >
             {isSaving ? (
               <span className="material-symbols-outlined animate-spin !text-[16px]">progress_activity</span>
@@ -70,12 +70,12 @@ const QuickEditor: React.FC<QuickEditorProps> = ({ filename, initialContent, onS
         {/* Selection / Caret Decorations Overlay (Visual Polish) */}
         <div className="absolute bottom-4 right-4 bg-primary/10 border border-primary/20 rounded-lg px-2 py-1 flex items-center gap-2 text-primary pointer-events-none opacity-0 group-focus-within:opacity-100 transition-opacity">
            <span className="material-symbols-outlined !text-[14px]">info</span>
-           <span className="text-[10px] font-black uppercase">Standard IDE Keybindings Enabled</span>
+           <span className="text-[10px] font-medium uppercase">Standard IDE Keybindings Enabled</span>
         </div>
       </div>
 
       {/* Editor Status Bar */}
-      <div className="h-6 bg-primary text-white px-3 flex items-center justify-between text-[9px] font-black uppercase tracking-[0.1em]">
+      <div className="h-6 bg-primary text-white px-3 flex items-center justify-between text-[9px] font-medium uppercase tracking-[0.1em]">
         <div className="flex items-center gap-4">
            <span>UTF-8</span>
            <span>Ln {content.split('\n').length}, Col {content.length}</span>

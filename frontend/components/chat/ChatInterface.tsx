@@ -441,7 +441,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         return (
             <div key={`sep-${date}`} className="flex items-center justify-center my-6">
                 <div className="h-px bg-gh-border flex-1" />
-                <span className="px-4 text-[11px] font-bold text-gh-text-secondary uppercase tracking-[0.2em]">{label}</span>
+                <span className="px-4 text-[11px] font-bold text-gh-text-secondary uppercase tracking-widest">{label}</span>
                 <div className="h-px bg-gh-border flex-1" />
             </div>
         );
@@ -543,10 +543,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 >
                                     <div className="relative shrink-0">
                                         <div className={`absolute -inset-0.5 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity p-[1.5px] ${isActive ? 'opacity-100' : ''}`}>
-                                            <div className="w-full h-full bg-black rounded-full" />
+                                            <div className="w-full h-full bg-gh-bg rounded-full" />
                                         </div>
-                                        <img src={other?.avatar || "/default-avatar.png"} className="relative size-14 rounded-full object-cover border-2 border-black" alt={`${other?.username || 'User'}'s avatar`} />
-                                        <div className="absolute bottom-0.5 right-0.5 size-3.5 bg-green-500 rounded-full border-[3px] border-black"></div>
+                                        <img src={other?.avatar || "/default-avatar.png"} className="relative size-14 rounded-full object-cover border-2 border-gh-bg" alt={`${other?.username || 'User'}'s avatar`} />
+                                        <div className="absolute bottom-0.5 right-0.5 size-3.5 bg-green-500 rounded-full border-[3px] border-gh-bg"></div>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-baseline mb-0.5">
@@ -604,7 +604,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                     <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Call" title="Call"><Phone size={24} strokeWidth={1.5} /></button>
                                     <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Video Call" title="Video Call"><Video size={26} strokeWidth={1.5} /></button>
                                     <button className="p-1 hover:text-gh-text-secondary transition-colors" aria-label="Details" title="Details"><Info size={24} strokeWidth={1.5} /></button>
-                                    <button onClick={onClose} className="p-1 hover:bg-gh-bg-secondary rounded-full md:hidden transition-colors" aria-label="Back" title="Back"><ChevronLeft size={24} /></button>
+                                    <button onClick={onClose} className="p-1 hover:bg-gh-bg-secondary rounded-full transition-colors" aria-label="Back" title="Back"><ChevronLeft size={24} /></button>
                                 </div>
                             </div>
 
@@ -717,9 +717,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             <div className="px-6 py-5 shrink-0">
                                 <form
                                     onSubmit={handleSendMessage}
-                                    className="flex items-center gap-3 bg-black border border-white/20 rounded-[2rem] px-4 py-2 focus-within:border-white/40 transition-all"
+                                    className="flex items-center gap-3 bg-gh-bg-secondary border border-gh-border rounded-[2rem] px-4 py-2 focus-within:border-primary transition-all"
                                 >
-                                    <button type="button" className="p-1 hover:text-white/60 transition-colors text-white" aria-label="Emoji Picker" title="Emoji Picker">
+                                    <button type="button" className="p-1 hover:text-gh-text-secondary transition-colors text-gh-text" aria-label="Emoji Picker" title="Emoji Picker">
                                         <Smile size={26} strokeWidth={1.5} />
                                     </button>
 
@@ -743,7 +743,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             {isAILoading ? 'Thinking...' : 'Send'}
                                         </button>
                                     ) : (
-                                        <div className="flex items-center gap-3 text-gh-text">
+                                        <div className="flex items-center gap-3 text-gh-text-secondary">
                                             <button
                                                 type="button"
                                                 onClick={askAI}
@@ -755,13 +755,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                             <button
                                                 type="button"
                                                 onClick={fetchWorkspaceFiles}
-                                                className="p-1 hover:text-white/60 transition-colors"
+                                                className="p-1 hover:text-gh-text transition-colors"
                                                 aria-label="Add Media"
                                                 title="Share Workspace File"
                                             >
                                                 <ImageIcon size={26} strokeWidth={1.5} />
                                             </button>
-                                            <button type="button" className="p-1 hover:text-white/60 transition-colors text-white" aria-label="Like Message" title="Like Message"><Heart size={26} strokeWidth={1.5} /></button>
+                                            <button type="button" className="p-1 hover:text-gh-text transition-colors" aria-label="Like Message" title="Like Message"><Heart size={26} strokeWidth={1.5} /></button>
                                         </div>
                                     )}
                                 </form>
@@ -792,7 +792,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         <div className="w-full max-w-md bg-gh-bg-secondary rounded-2xl overflow-hidden shadow-2xl border border-gh-border animate-in zoom-in-95 duration-200">
                             <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-gh-text">New Message</h2>
-                                <button onClick={() => setIsNewChatOpen(false)} className="text-gh-text-secondary hover:text-gh-text">
+                                <button onClick={() => setIsNewChatOpen(false)} className="text-gh-text-secondary hover:text-gh-text" title="Close" aria-label="Close">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -812,7 +812,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                 <div className="max-h-[300px] overflow-y-auto custom-scrollbar space-y-2">
                                     {isSearchingUsers ? (
                                         <div className="flex justify-center p-8">
-                                            <div className="animate-spin size-6 border-2 border-white/20 border-t-white rounded-full"></div>
+                                            <div className="animate-spin size-6 border-2 border-gh-border border-t-primary rounded-full"></div>
                                         </div>
                                     ) : userSearchResults.length > 0 ? (
                                         userSearchResults.map(user => (
@@ -845,7 +845,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         <div className="w-full max-w-md bg-gh-bg-secondary rounded-2xl overflow-hidden shadow-2xl border border-gh-border animate-in zoom-in-95 duration-200">
                             <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-gh-text">Share Workspace File</h2>
-                                <button onClick={() => setIsShareFileOpen(false)} className="text-gh-text-secondary hover:text-gh-text">
+                                <button onClick={() => setIsShareFileOpen(false)} className="text-gh-text-secondary hover:text-gh-text" title="Close" aria-label="Close">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -872,7 +872,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Close Button overlay */}
             <button
+                onClick={onClose}
                 aria-label="Close Chat"
+                title="Close Chat"
+                className="absolute top-5 right-5 text-gh-text-secondary hover:text-gh-text transition-colors p-2 rounded-full hover:bg-gh-bg-secondary"
             >
                 <X size={32} strokeWidth={1} />
             </button>

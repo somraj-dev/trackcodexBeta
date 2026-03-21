@@ -148,7 +148,7 @@ const Workspaces = () => {
     <div className="p-8 flex-1 overflow-y-auto custom-scrollbar bg-gh-bg">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight mb-1">
+          <h1 className="text-2xl font-semibold tracking-tight mb-1">
             Workspaces
           </h1>
           <p className="text-gh-text-secondary text-sm">

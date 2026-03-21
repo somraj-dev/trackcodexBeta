@@ -26,7 +26,7 @@ const PagesSettings: React.FC<PagesSettingsProps> = ({ repoId }) => {
           <div>
             <h3 className="text-sm font-bold text-gh-text mb-4 uppercase tracking-widest opacity-60">Build and deployment</h3>
             <div className="space-y-4">
-              <label className="text-xs font-black uppercase text-gh-text-secondary block">Source</label>
+              <label className="text-xs font-medium uppercase text-gh-text-secondary block">Source</label>
               <select 
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
@@ -41,7 +41,7 @@ const PagesSettings: React.FC<PagesSettingsProps> = ({ repoId }) => {
             {source === "branch" && (
               <div className="mt-6 p-6 bg-gh-bg border border-gh-border rounded-2xl flex items-center gap-8 animate-in slide-in-from-top-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-gh-text-tertiary">Branch</label>
+                  <label className="text-[10px] font-medium uppercase text-gh-text-tertiary">Branch</label>
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined !text-[18px] text-gh-text-secondary">account_tree</span>
                     <select 
@@ -57,7 +57,7 @@ const PagesSettings: React.FC<PagesSettingsProps> = ({ repoId }) => {
                 </div>
                 <div className="w-px h-10 bg-gh-border mx-2"></div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase text-gh-text-tertiary">Folder</label>
+                  <label className="text-[10px] font-medium uppercase text-gh-text-tertiary">Folder</label>
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined !text-[18px] text-gh-text-secondary">folder</span>
                     <select 
@@ -103,7 +103,7 @@ const PagesSettings: React.FC<PagesSettingsProps> = ({ repoId }) => {
                   onClick={() => setEnforceHttps(!enforceHttps)}
                   className={`size-5 rounded-md border flex items-center justify-center cursor-pointer transition-all ${enforceHttps ? "bg-primary border-primary shadow-lg shadow-primary/20" : "bg-gh-bg border-gh-border"}`}
                 >
-                  {enforceHttps && <span className="material-symbols-outlined !text-[14px] text-white font-black">check</span>}
+                  {enforceHttps && <span className="material-symbols-outlined !text-[14px] text-white font-semibold">check</span>}
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-gh-text">Enforce HTTPS</span>
@@ -126,11 +126,11 @@ const PagesSettings: React.FC<PagesSettingsProps> = ({ repoId }) => {
             Once finished, it will be available at <span className="text-primary font-bold hover:underline cursor-pointer">https://{repoId}.pages.trackcodex.io/</span>
           </p>
           <div className="flex items-center gap-4 mt-4">
-            <button className="text-xs font-black uppercase text-primary hover:text-emerald-500 transition-colors flex items-center gap-1">
+            <button className="text-xs font-medium uppercase text-primary hover:text-emerald-500 transition-colors flex items-center gap-1">
               Visit Site
               <span className="material-symbols-outlined !text-[14px]">open_in_new</span>
             </button>
-            <button className="text-xs font-black uppercase text-gh-text-secondary hover:text-gh-text transition-colors">
+            <button className="text-xs font-medium uppercase text-gh-text-secondary hover:text-gh-text transition-colors">
               View Deployment Runs
             </button>
           </div>

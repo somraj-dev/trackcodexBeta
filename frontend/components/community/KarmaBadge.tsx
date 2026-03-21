@@ -20,7 +20,7 @@ const KarmaBadge = ({ karma }: { karma: number }) => {
   };
 
   return (
-    <div className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-[0.1em] border flex items-center gap-1.5 shrink-0 transition-all hover:scale-105 ${styles[level]}`}>
+    <div className={`px-2 py-0.5 rounded text-[9px] font-medium uppercase tracking-[0.1em] border flex items-center gap-1.5 shrink-0 transition-all hover:scale-105 ${styles[level]}`}>
       <span className="material-symbols-outlined !text-[14px] filled">
         {level === 'Maintainer' ? 'military_tech' : level === 'Expert' ? 'psychology' : 'person'}
       </span>

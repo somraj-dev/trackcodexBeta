@@ -7,7 +7,7 @@ const HiringJobsView = () => {
         <div className="p-8 text-gh-text max-w-[1200px] mx-auto">
             <div className="flex justify-between items-end mb-8">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight mb-2">Hiring Jobs</h1>
+                    <h1 className="text-xl font-semibold tracking-tight mb-2">Hiring Jobs</h1>
                     <p className="text-gh-text-secondary font-medium">
                         Manage your open engineering roles and hiring pipeline.
                     </p>

@@ -30,14 +30,14 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
     >
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
-        <span className="material-symbols-outlined text-[100px] font-black">
+        <span className="material-symbols-outlined text-[100px] font-semibold">
           terminal
         </span>
       </div>
 
       <div className="flex items-center justify-between mb-5 relative z-10">
         <div
-          className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${statusColors[job.status]}`}
+          className={`px-2 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-widest border ${statusColors[job.status]}`}
         >
           {job.status}
         </div>
@@ -62,7 +62,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
           />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-black text-gh-text group-hover:text-primary transition-colors truncate leading-tight mb-1 uppercase tracking-tight">
+          <h3 className="text-base font-semibold text-gh-text group-hover:text-primary transition-colors truncate leading-tight mb-1 uppercase tracking-tight">
             {job.title}
           </h3>
           <div className="flex items-center gap-2">
@@ -76,7 +76,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
               <span className="material-symbols-outlined text-amber-500 filled !text-[12px]">
                 star
               </span>
-              <span className="text-[10px] font-black text-amber-500">4.9</span>
+              <span className="text-[10px] font-semibold text-amber-500">4.9</span>
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
         {(job.techStack || []).map((tag) => (
           <span
             key={tag}
-            className="px-2.5 py-1 bg-gh-bg rounded-lg border border-gh-border text-[10px] text-gh-text-secondary font-black uppercase tracking-tight group-hover:border-primary/30 transition-colors"
+            className="px-2.5 py-1 bg-gh-bg rounded-lg border border-gh-border text-[10px] text-gh-text-secondary font-medium uppercase tracking-tight group-hover:border-primary/30 transition-colors"
           >
             {tag}
           </span>
@@ -104,17 +104,17 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
 
       <div className="mt-auto pt-5 border-t border-gh-border/50 flex items-center justify-between relative z-10">
         <div className="flex flex-col">
-          <span className="text-[9px] text-gh-text-secondary font-black uppercase tracking-[0.15em] mb-0.5">
+          <span className="text-[9px] text-gh-text-secondary font-medium uppercase tracking-[0.15em] mb-0.5">
             Value
           </span>
-          <span className="text-[18px] font-black text-gh-text tracking-tight flex items-center gap-1.5">
+          <span className="text-[18px] font-semibold text-gh-text tracking-tight flex items-center gap-1.5">
             {job.budget}
             <span className="text-[10px] text-gh-text-secondary font-bold lowercase">
               /{job.type === "Full-time" ? "yr" : "fixed"}
             </span>
           </span>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-gh-bg px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:opacity-90 hover:scale-[1.02] active:scale-95">
+        <button className="flex items-center gap-2 bg-primary text-gh-bg px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:opacity-90 hover:scale-[1.02] active:scale-95">
           {job.status === "Completed"
             ? "Review feedback"
             : job.status === "Pending"

@@ -11,7 +11,7 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({ title, isExpanded, chil
   return (
     <div>
       {isExpanded ? (
-        <p className="px-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 animate-in fade-in duration-200">
+        <p className="px-3 text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 animate-in fade-in duration-200">
           {title}
         </p>
       ) : (

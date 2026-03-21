@@ -71,7 +71,7 @@ const RepoContributorsTab: React.FC<RepoContributorsTabProps> = ({ repo }) => {
                     className="size-full object-cover"
                   />
                 </div>
-                <div className="absolute -bottom-1 -right-1 size-6 bg-[#1e1e1e] border border-gh-border rounded-full flex items-center justify-center text-[10px] font-black text-primary">
+                <div className="absolute -bottom-1 -right-1 size-6 bg-[#1e1e1e] border border-gh-border rounded-full flex items-center justify-center text-[10px] font-semibold text-primary">
                   #{idx + 1}
                 </div>
               </div>
@@ -82,14 +82,14 @@ const RepoContributorsTab: React.FC<RepoContributorsTabProps> = ({ repo }) => {
                 </h3>
                 <div className="flex items-center gap-3 mt-3">
                   <div className="flex flex-col">
-                    <span className="text-xl font-black text-primary leading-none">{c.commits}</span>
-                    <span className="text-[10px] font-black uppercase text-gh-text-secondary tracking-widest mt-1">Commits</span>
+                    <span className="text-base font-semibold text-primary leading-none">{c.commits}</span>
+                    <span className="text-[10px] font-medium uppercase text-gh-text-secondary tracking-widest mt-1">Commits</span>
                   </div>
                   <div className="w-[1px] h-8 bg-gh-border mx-2"></div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-emerald-500">+{c.additions?.toLocaleString() || 0}</span>
                     <span className="text-xs font-bold text-red-500">-{c.deletions?.toLocaleString() || 0}</span>
-                    <span className="text-[9px] font-black uppercase text-gh-text-secondary tracking-tighter mt-1">Impact</span>
+                    <span className="text-[9px] font-medium uppercase text-gh-text-secondary tracking-tighter mt-1">Impact</span>
                   </div>
                 </div>
               </div>

@@ -30,10 +30,10 @@ const OrgSwitcher = ({
         </div>
         {isExpanded && (
           <div className="flex flex-col min-w-0 flex-1 animate-in fade-in duration-300">
-            <span className="text-[12px] font-bold text-gh-text truncate leading-none mb-1">
+            <span className="text-[13px] font-medium text-gh-text truncate leading-none mb-1">
               {profile.name}
             </span>
-            <span className="text-[9px] text-gh-text-secondary font-black uppercase tracking-widest">
+            <span className="text-[11px] font-medium text-gh-text-secondary uppercase tracking-widest">
               {profile.systemRole}
             </span>
           </div>
@@ -241,10 +241,10 @@ const Sidebar = () => {
 
             {isExpanded && (
               <div className="flex flex-col min-w-0 flex-1 animate-in slide-in-from-left-2 duration-300">
-                <span className="text-[13px] font-bold text-gh-text truncate leading-none mb-1">
+                <span className="text-[13px] font-medium text-gh-text truncate leading-none mb-1">
                   {user?.name || profile.name}
                 </span>
-                <span className="text-[10px] text-gh-text-secondary truncate font-medium">
+                <span className="text-[12px] text-gh-text-secondary truncate font-medium">
                   {user?.email || "user@trackcodex.dev"}
                 </span>
               </div>

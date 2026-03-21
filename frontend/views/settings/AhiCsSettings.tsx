@@ -88,7 +88,7 @@ const AhiCsSettings = () => {
         <div className="space-y-8 pb-20">
             {/* Header */}
             <header className="border-b border-gh-border pb-6">
-                <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+                <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">
                     Code security
                 </h1>
                 <p className="text-sm text-gh-text-secondary leading-relaxed">

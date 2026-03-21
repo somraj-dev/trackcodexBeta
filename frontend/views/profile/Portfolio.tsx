@@ -44,7 +44,7 @@ const Portfolio = () => {
                     <h1 className="text-5xl font-bold">Portfolio</h1>
                     <button 
                         onClick={() => window.dispatchEvent(new CustomEvent("open-resume-modal"))}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(139,92,246,0.3)] w-fit"
+                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl text-sm font-medium uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_4px_12px_rgba(139,92,246,0.3)] w-fit"
                     >
                         <span className="material-symbols-outlined !text-[20px]">description</span>
                         Download Resume

@@ -101,7 +101,7 @@ const SettingsLayout: React.FC = () => {
         <aside className="w-full lg:w-[260px] shrink-0 space-y-8 pb-8 sticky top-0 self-start">
           <SettingsContextSwitcher currentContext="personal" />
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               Personal Settings
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -139,7 +139,7 @@ const SettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               Access
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -176,7 +176,7 @@ const SettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               Team Settings
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -189,7 +189,7 @@ const SettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               Developer Settings
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -203,7 +203,7 @@ const SettingsLayout: React.FC = () => {
 
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               StrataHub
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -216,7 +216,7 @@ const SettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               AHI & CS System
             </h3>
             <nav className="flex flex-col gap-0.5">
@@ -229,7 +229,7 @@ const SettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[11px] font-black uppercase text-gh-text-secondary tracking-widest mb-3">
+            <h3 className="px-3 text-[11px] font-medium uppercase text-gh-text-secondary tracking-widest mb-3">
               Moderation
             </h3>
             <nav className="flex flex-col gap-0.5">

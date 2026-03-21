@@ -81,10 +81,10 @@ const CreatePostBox = () => {
         <div className={`p-4 rounded-xl border flex items-start gap-3 animate-in slide-in-from-top-2 ${moderation.status === 'FLAGGED' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-500'}`}>
            <span className="material-symbols-outlined">{moderation.status === 'FLAGGED' ? 'block' : 'warning'}</span>
            <div className="flex-1">
-             <p className="text-xs font-black uppercase tracking-widest mb-1">ForgeAI Moderation Insight</p>
+             <p className="text-xs font-medium uppercase tracking-widest mb-1">ForgeAI Moderation Insight</p>
              <p className="text-[13px] font-medium leading-relaxed">{moderation.reason}</p>
              {moderation.status === 'WARNING' && (
-               <button onClick={handlePost} className="mt-2 text-[10px] font-black uppercase underline hover:text-white">Post anyway</button>
+               <button onClick={handlePost} className="mt-2 text-[10px] font-medium uppercase underline hover:text-white">Post anyway</button>
              )}
            </div>
         </div>

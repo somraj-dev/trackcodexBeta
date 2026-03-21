@@ -318,7 +318,7 @@ const RepoSecurityTab = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Severity
                   </span>
-                  <span className="text-xl font-black">
+                  <span className="text-base font-semibold">
                     {selectedAlert.severity}
                   </span>
                 </div>

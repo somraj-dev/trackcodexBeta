@@ -44,14 +44,14 @@ const ForgeAIUsageSettings = () => {
     <div className="space-y-12 animate-in fade-in duration-500">
       <header className="flex items-center justify-between pb-6 border-b border-gh-border">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-lg font-semibold text-white tracking-tight">
             ForgeAI Management
           </h1>
           <p className="text-sm text-gh-text-secondary mt-1">
             Monitor and manage your workspace's AI token consumption.
           </p>
         </div>
-        <button className="bg-[#a855f7] hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-xs flex items-center gap-2 transition-all shadow-lg shadow-[#a855f7]/20 active:scale-95">
+        <button className="bg-[#a855f7] hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-medium uppercase tracking-widest text-xs flex items-center gap-2 transition-all shadow-lg shadow-[#a855f7]/20 active:scale-95">
           <span className="material-symbols-outlined !text-[18px]">
             add_shopping_cart
           </span>
@@ -61,11 +61,11 @@ const ForgeAIUsageSettings = () => {
 
       <section className="p-8 bg-gh-bg-secondary border border-gh-border rounded-2xl flex items-center justify-between">
         <div>
-          <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-2">
             Current Usage
           </p>
           <div className="flex items-baseline gap-3">
-            <span className="text-5xl font-black text-white tracking-tighter">
+            <span className="text-5xl font-semibold text-white tracking-tighter">
               7,800
             </span>
             <span className="text-xl font-bold text-slate-500">
@@ -80,10 +80,10 @@ const ForgeAIUsageSettings = () => {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-2">
             Projected Usage
           </p>
-          <p className="text-3xl font-black text-white">~9,450 tokens</p>
+          <p className="text-xl font-semibold text-white">~9,450 tokens</p>
           <div className="flex items-center justify-end gap-2 mt-2 text-amber-500">
             <span className="material-symbols-outlined !text-[16px]">
               trending_up
@@ -95,7 +95,7 @@ const ForgeAIUsageSettings = () => {
         </div>
         <div className="self-stretch w-px bg-gh-border mx-4"></div>
         <div className="w-64 space-y-4">
-          <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2">
+          <h4 className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-2">
             Tokens by Workspace
           </h4>
           {tokensByWorkspace.map((ws) => (
@@ -145,7 +145,7 @@ const ForgeAIUsageSettings = () => {
         <div className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-gh-bg">
-              <tr className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <tr className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
                 <th className="px-6 py-3">Date</th>
                 <th className="px-6 py-3">Activity</th>
                 <th className="px-6 py-3">Tokens Consumed</th>

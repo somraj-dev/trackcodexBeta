@@ -44,7 +44,7 @@ const ScrollControls: React.FC<ScrollControlsProps> = ({ containerRef }) => {
           className="size-10 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all animate-fab border-2 border-[#0d1117] ring-4 ring-primary/20"
           title="Scroll to top"
         >
-          <span className="material-symbols-outlined !text-[24px] font-black">keyboard_double_arrow_up</span>
+          <span className="material-symbols-outlined !text-[24px] font-semibold">keyboard_double_arrow_up</span>
         </button>
       )}
       

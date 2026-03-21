@@ -57,12 +57,12 @@ export const AVAILABLE_THEMES: ThemeDefinition[] = [
     name: "Dark default",
     type: "dark",
     colors: {
-      bg: "#0d1117",
-      secondary: "#161b22",
-      tertiary: "#21262d",
-      text: "#c9d1d9",
-      textSecondary: "#8b949e",
-      border: "#30363d",
+      bg: "#000000",
+      secondary: "#0A0A0A",
+      tertiary: "#111111",
+      text: "#EDEDED",
+      textSecondary: "#A1A1A1",
+      border: "#1A1A1A",
       primary: "#58a6ff",
     },
   },
@@ -71,12 +71,12 @@ export const AVAILABLE_THEMES: ThemeDefinition[] = [
     name: "Dark dimmed",
     type: "dark",
     colors: {
-      bg: "#161b22",
-      secondary: "#22272e",
-      tertiary: "#2d333b",
-      text: "#adbac7",
-      textSecondary: "#768390",
-      border: "#444c56",
+      bg: "#0d1117",
+      secondary: "#161b22",
+      tertiary: "#21262d",
+      text: "#c9d1d9",
+      textSecondary: "#8b949e",
+      border: "#30363d",
       primary: "#539bf5",
     },
   },
@@ -85,12 +85,12 @@ export const AVAILABLE_THEMES: ThemeDefinition[] = [
     name: "Dark high contrast",
     type: "dark",
     colors: {
-      bg: "#0a0a0a",
-      secondary: "#010409",
-      tertiary: "#161b22",
-      text: "#f0f6fc",
-      textSecondary: "#c9d1d9",
-      border: "#f0f6fc",
+      bg: "#000000",
+      secondary: "#000000",
+      tertiary: "#0A0A0A",
+      text: "#ffffff",
+      textSecondary: "#cccccc",
+      border: "#ffffff",
       primary: "#409eff",
     },
   },
@@ -129,7 +129,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // 1. Theme Mode: 'single' or 'system'
+  // 1. System state tracking
+  const [systemIsDark, setSystemIsDark] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : false
+  );
+
+  // 2. Theme Mode: 'single' or 'system'
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     return (localStorage.getItem("tc_theme_mode") as ThemeMode) || "single";
   });
@@ -202,11 +209,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   // 5. Resolution Logic
   const getResolvedThemeId = (): ThemeId => {
     if (themeMode === "single") return activeThemeId;
-
-    // System logic
-    const systemIsDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
     return systemIsDark ? preferredDarkThemeId : preferredLightThemeId;
   };
 
@@ -284,17 +286,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Listen for system changes
   useEffect(() => {
-    if (themeMode !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const listener = () => {
-      // Trigger re-render by toggling a dummy state or just trusting React's nature?
-      // Actually we need state to force re-calc of getResolvedThemeId if it wasn't in useEffect dep.
-      // But getResolvedThemeId is called in render body. We need to force update.
-      setThemeMode((prev) => prev); // Cheap force update
+    const listener = (e: MediaQueryListEvent) => {
+      setSystemIsDark(e.matches);
     };
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
-  }, [themeMode]);
+  }, []);
 
   return (
     <ThemeContext.Provider

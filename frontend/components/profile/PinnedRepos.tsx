@@ -60,13 +60,13 @@ const PinnedRepos = () => {
           <span className="material-symbols-outlined text-gh-text-secondary !text-[20px]">
             bookmark
           </span>
-          <h3 className="text-[14px] font-black uppercase tracking-widest text-gh-text">
+          <h3 className="text-[14px] font-medium uppercase tracking-widest text-gh-text">
             Pinned Repositories
           </h3>
         </div>
         <button
           onClick={() => navigate("/repositories")}
-          className="text-[11px] font-black uppercase text-primary tracking-widest hover:underline transition-all"
+          className="text-[11px] font-medium uppercase text-primary tracking-widest hover:underline transition-all"
         >
           View all
         </button>
@@ -86,12 +86,12 @@ const PinnedRepos = () => {
                 <h4 className="text-[14px] font-bold text-primary group-hover:underline truncate">
                   {repo.name}
                 </h4>
-                <span className="px-2 py-0.5 rounded-full border border-gh-border text-[9px] text-gh-text-secondary font-black uppercase tracking-widest shrink-0">
+                <span className="px-2 py-0.5 rounded-full border border-gh-border text-[9px] text-gh-text-secondary font-medium uppercase tracking-widest shrink-0">
                   {repo.visibility || (repo.isPublic ? "Public" : "Private")}
                 </span>
               </div>
               <div
-                className={`size-8 rounded-full flex items-center justify-center text-[12px] font-black shrink-0 shadow-md
+                className={`size-8 rounded-full flex items-center justify-center text-[12px] font-semibold shrink-0 shadow-md
                 ${(repo.aiHealthLabel || "A").startsWith("A") ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400" : "bg-gh-bg border border-gh-border text-gh-text-secondary"}`}
               >
                 {repo.aiHealthLabel || "A"}
@@ -120,7 +120,7 @@ const PinnedRepos = () => {
                     } as React.CSSProperties
                   }
                 ></div>
-                <span className="text-gh-text-secondary uppercase text-[11px] font-black tracking-wider">
+                <span className="text-gh-text-secondary uppercase text-[11px] font-semibold tracking-wider">
                   {repo.language || repo.techStack || "Plain Text"}
                 </span>
               </div>
@@ -136,7 +136,7 @@ const PinnedRepos = () => {
                 </span>
                 <span>{repo.forks || 0}</span>
               </div>
-              <div className="ml-auto flex items-center gap-1.5 text-emerald-400 font-black">
+              <div className="ml-auto flex items-center gap-1.5 text-emerald-400 font-semibold">
                 <span className="material-symbols-outlined !text-[16px] filled">
                   auto_fix_high
                 </span>

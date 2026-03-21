@@ -34,7 +34,7 @@ const ContributionHeatmap: React.FC<Props> = ({ userId }) => {
   return (
     <div className="font-display animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-black text-gh-text-secondary uppercase tracking-widest">
+        <h3 className="text-sm font-semibold text-gh-text-secondary uppercase tracking-widest">
           {hasActivity
             ? `${totalContributions.toLocaleString()} contribs in the last year`
             : "No contributions in the last year"}

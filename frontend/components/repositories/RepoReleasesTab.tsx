@@ -148,12 +148,12 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
                       {release.name}
                     </h3>
                     {release.prerelease && (
-                      <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 ring-1 ring-inset ring-amber-500/20 rounded-full text-[10px] font-black uppercase">
+                      <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 ring-1 ring-inset ring-amber-500/20 rounded-full text-[10px] font-medium uppercase">
                         Pre-release
                       </span>
                     )}
                     {release.draft && (
-                      <span className="px-2 py-0.5 bg-gh-bg-tertiary text-gh-text-secondary rounded-full text-[10px] font-black uppercase border border-gh-border">
+                      <span className="px-2 py-0.5 bg-gh-bg-tertiary text-gh-text-secondary rounded-full text-[10px] font-medium uppercase border border-gh-border">
                         Draft
                       </span>
                     )}
@@ -213,7 +213,7 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
                               </span>
                               <span className="text-sm font-medium text-gh-text">{asset.name}</span>
                             </div>
-                            <div className="flex items-center gap-4 text-[10px] text-gh-text-secondary font-black uppercase">
+                            <div className="flex items-center gap-4 text-[10px] text-gh-text-secondary font-medium uppercase">
                               <span>{asset.size || '0 KB'}</span>
                               <span className="material-symbols-outlined !text-[14px]">download</span>
                             </div>
@@ -278,7 +278,7 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
             <form onSubmit={handleCreateRelease} className="p-6 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-thin">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-gh-text-secondary flex items-center gap-2">
+                  <label className="text-xs font-medium uppercase text-gh-text-secondary flex items-center gap-2">
                     Tag version
                     <span className="text-red-500">*</span>
                   </label>
@@ -296,7 +296,7 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-gh-text-secondary flex items-center gap-2">
+                  <label className="text-xs font-medium uppercase text-gh-text-secondary flex items-center gap-2">
                     Release title
                     <span className="text-red-500">*</span>
                   </label>
@@ -312,7 +312,7 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-gh-text-secondary">Describe this release</label>
+                <label className="text-xs font-medium uppercase text-gh-text-secondary">Describe this release</label>
                 <textarea
                   className="w-full bg-gh-bg border border-gh-border rounded-md px-4 py-3 text-sm text-gh-text focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all min-h-[150px] font-mono placeholder:opacity-30"
                   placeholder="Markdown supported..."
@@ -358,7 +358,7 @@ const RepoReleasesTab: React.FC<RepoReleasesTabProps> = ({ repo }) => {
               </div>
 
               <div className="space-y-4">
-                <label className="text-xs font-black uppercase text-gh-text-secondary">Attach binaries by dropping them here or selecting them</label>
+                <label className="text-xs font-medium uppercase text-gh-text-secondary">Attach binaries by dropping them here or selecting them</label>
                 <div className="border-2 border-dashed border-gh-border rounded-lg p-8 flex flex-col items-center justify-center bg-gh-bg-tertiary/10 hover:bg-gh-bg-tertiary/20 transition-all cursor-pointer group">
                   <span className="material-symbols-outlined !text-[32px] text-gh-text-tertiary group-hover:text-primary transition-colors mb-2">cloud_upload</span>
                   <p className="text-sm text-gh-text-secondary">

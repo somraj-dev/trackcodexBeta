@@ -74,7 +74,7 @@ const RepoWebhookSettings = ({ repoId }: { repoId: string }) => {
         <h3 className="text-lg font-bold text-gh-text">Webhooks</h3>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-primary/20"
+          className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-xl shadow-primary/20"
         >
           {showAdd ? "Cancel" : "Add Webhook"}
         </button>
@@ -109,7 +109,7 @@ const RepoWebhookSettings = ({ repoId }: { repoId: string }) => {
           </div>
           <button
             onClick={handleAdd}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20"
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl text-xs font-medium uppercase tracking-widest shadow-xl shadow-emerald-600/20"
           >
             Create Webhook
           </button>

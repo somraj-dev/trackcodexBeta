@@ -365,16 +365,16 @@ const RepoInsightsTab: React.FC<RepoInsightsTabProps> = ({ repo }) => {
             <h2 className="text-xl font-bold text-gh-text mb-6">Traffic</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-8 text-center shadow-sm">
-                <div className="text-[10px] font-black uppercase text-gh-text-tertiary mb-2 tracking-widest">Unique visitors</div>
-                <div className="text-4xl font-black text-gh-text">1.2k</div>
+                <div className="text-[10px] font-medium uppercase text-gh-text-tertiary mb-2 tracking-widest">Unique visitors</div>
+                <div className="text-2xl font-semibold text-gh-text">1.2k</div>
                 <div className="text-xs text-emerald-500 mt-2 font-bold flex items-center justify-center gap-1">
                   <span className="material-symbols-outlined !text-[14px]">trending_up</span>
                   +12.5% vs last week
                 </div>
               </div>
               <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-8 text-center shadow-sm">
-                <div className="text-[10px] font-black uppercase text-gh-text-tertiary mb-2 tracking-widest">Total clones</div>
-                <div className="text-4xl font-black text-gh-text">438</div>
+                <div className="text-[10px] font-medium uppercase text-gh-text-tertiary mb-2 tracking-widest">Total clones</div>
+                <div className="text-2xl font-semibold text-gh-text">438</div>
                 <div className="text-xs text-gh-text-secondary mt-2 font-bold">Updated just now</div>
               </div>
             </div>
@@ -390,11 +390,11 @@ const RepoInsightsTab: React.FC<RepoInsightsTabProps> = ({ repo }) => {
                     <code className="text-xs text-primary font-bold">{item.path}</code>
                     <div className="flex gap-8">
                       <div className="text-right">
-                        <div className="text-[10px] uppercase font-black text-gh-text-tertiary">Views</div>
+                        <div className="text-[10px] uppercase font-semibold text-gh-text-tertiary">Views</div>
                         <div className="text-sm font-bold text-gh-text">{item.views}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] uppercase font-black text-gh-text-tertiary">Unique</div>
+                        <div className="text-[10px] uppercase font-semibold text-gh-text-tertiary">Unique</div>
                         <div className="text-sm font-bold text-gh-text">{item.unique}</div>
                       </div>
                     </div>
@@ -413,15 +413,15 @@ const RepoInsightsTab: React.FC<RepoInsightsTabProps> = ({ repo }) => {
               <div className="size-24 rounded-full bg-primary/10 flex items-center justify-center mb-6 border border-primary/20 group-hover:scale-110 transition-transform duration-500">
                 <span className="material-symbols-outlined !text-[48px] text-primary">hub</span>
               </div>
-              <h3 className="text-2xl font-black text-gh-text mb-4">Interactive Network Mapping</h3>
+              <h3 className="text-lg font-semibold text-gh-text mb-4">Interactive Network Mapping</h3>
               <p className="text-sm text-gh-text-secondary max-w-md leading-relaxed">
                 We're finalizing the WebGL engine to render your repository's fork tree and cross-repo connections.
               </p>
               <div className="mt-10 flex gap-4">
-                <div className="px-6 py-2 bg-gh-bg border border-gh-border rounded-xl text-xs font-black uppercase text-gh-text-secondary tracking-widest shadow-sm">
+                <div className="px-6 py-2 bg-gh-bg border border-gh-border rounded-xl text-xs font-medium uppercase text-gh-text-secondary tracking-widest shadow-sm">
                   34 Nodes active
                 </div>
-                <div className="px-6 py-2 bg-gh-bg border border-gh-border rounded-xl text-xs font-black uppercase text-gh-text-secondary tracking-widest shadow-sm">
+                <div className="px-6 py-2 bg-gh-bg border border-gh-border rounded-xl text-xs font-medium uppercase text-gh-text-secondary tracking-widest shadow-sm">
                   12 Edge connections
                 </div>
               </div>

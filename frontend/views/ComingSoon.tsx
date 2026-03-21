@@ -20,7 +20,7 @@ const ComingSoon: React.FC = () => {
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-black text-white mb-4 tracking-tight">
+                <h1 className="text-xl font-semibold text-white mb-4 tracking-tight">
                     Under Development
                 </h1>
                 <p className="text-gh-text-secondary text-base mb-10 leading-relaxed">
@@ -45,7 +45,7 @@ const ComingSoon: React.FC = () => {
                 </div>
 
                 <div className="mt-16 pt-8 border-t border-gh-border">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#444] mb-3">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-[#444] mb-3">
                         TrackCodex Ecosystem
                     </p>
                     <div className="flex justify-center gap-4 text-gh-text-secondary/40">

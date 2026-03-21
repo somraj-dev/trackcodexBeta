@@ -105,7 +105,7 @@ const AppearanceSettings = () => {
   return (
     <div className="space-y-8 max-w-4xl">
       <header className="border-b border-gh-border pb-6">
-        <h1 className="text-2xl font-black text-gh-text tracking-tight">
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight">
           Theme preferences
         </h1>
         <p className="text-sm text-gh-text-secondary mt-1">

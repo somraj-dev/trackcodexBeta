@@ -16,7 +16,7 @@ const SplashScreen = () => {
           <div className="size-1.5 rounded-full bg-primary animate-bounce delay-150 shadow-[0_0_8px_rgba(19,91,236,1)]"></div>
           <div className="size-1.5 rounded-full bg-primary animate-bounce delay-300 shadow-[0_0_8px_rgba(19,91,236,1)]"></div>
         </div>
-        <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] animate-pulse">
+        <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-[0.3em] animate-pulse">
           Initializing Engineering OS
         </p>
       </div>

@@ -39,7 +39,7 @@ const StrataIndexView = () => {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+            <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
               Your Strata
             </h1>
             <p className="text-gh-text-secondary">

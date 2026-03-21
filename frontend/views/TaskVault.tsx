@@ -138,8 +138,8 @@ const TaskVault: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-3xl font-black text-gh-text">40%</p>
-                                    <p className="text-sm font-semibold text-gh-text-secondary mt-0.5">Let's Set Up Your Profile</p>
+                                    <p className="text-2xl font-semibold text-gh-text">40%</p>
+                                    <p className="text-sm font-medium text-gh-text-secondary mt-0.5">Let's Set Up Your Profile</p>
                                     <p className="text-xs text-gh-text-secondary/60">Help your team recognize you!</p>
                                 </div>
                                 <button
@@ -188,7 +188,7 @@ const TaskVault: React.FC = () => {
                                         <div className="w-8 h-8 bg-gh-bg-secondary rounded-md border border-gh-border" />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-base font-bold text-gh-text mb-1">Create Your First Goal</h3>
+                                        <h3 className="text-base font-semibold text-gh-text mb-1">Create Your First Goal</h3>
                                         <p className="text-xs text-gh-text-secondary mb-4 leading-relaxed">
                                             Start by organizing your tasks into a goal — big or small!
                                         </p>
@@ -221,7 +221,7 @@ const TaskVault: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-base font-bold text-gh-text mb-1">Add Your First Tasks</h3>
+                                        <h3 className="text-base font-semibold text-gh-text mb-1">Add Your First Tasks</h3>
                                         <p className="text-xs text-gh-text-secondary mb-4 leading-relaxed">
                                             Break your goal down into actionable steps by steps work
                                         </p>
@@ -242,7 +242,7 @@ const TaskVault: React.FC = () => {
                         {/* Craftboard Header */}
                         <div className="flex flex-wrap items-center justify-between gap-4">
                             <div className="flex items-center gap-6">
-                                <h2 className="text-2xl font-bold text-gh-text flex items-center gap-3">
+                                <h2 className="text-lg font-semibold text-gh-text flex items-center gap-3">
                                     <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">C</div>
                                     Craftboard
                                 </h2>
@@ -291,7 +291,7 @@ const TaskVault: React.FC = () => {
                                 </button>
                                 <button 
                                     onClick={() => viewMode === 'tasks' ? setIsCreateTaskModalOpen(true) : setIsCreateGoalModalOpen(true)}
-                                    className="bg-gh-text text-gh-bg px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:opacity-90 transition-all ml-1"
+                                    className="bg-gh-text text-gh-bg px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 hover:opacity-90 transition-all ml-1"
                                 >
                                     <Plus className="size-4" />
                                     {viewMode === 'tasks' ? 'New Task' : 'New Goal'}
@@ -317,7 +317,7 @@ const TaskVault: React.FC = () => {
                                         <div className="flex items-center justify-between text-gh-text-secondary">
                                             <div className="flex items-center gap-2">
                                                 <ChevronRight className={`size-4 transition-transform ${filteredItems.length > 0 ? 'rotate-90' : ''}`} />
-                                                <h3 className="text-sm font-bold text-gh-text">{status}</h3>
+                                                <h3 className="text-sm font-semibold text-gh-text">{status}</h3>
                                                 <span className="text-[10px] bg-gh-bg-secondary px-1.5 py-0.5 rounded-md border border-gh-border">{filteredItems.length || 0}</span>
                                             </div>
                                             <button onClick={() => viewMode === 'tasks' ? setIsCreateTaskModalOpen(true) : setIsCreateGoalModalOpen(true)} className="p-1 hover:bg-gh-bg-secondary rounded-md transition-all">
@@ -328,7 +328,7 @@ const TaskVault: React.FC = () => {
                                         <div className="overflow-hidden">
                                             <table className="w-full text-left border-collapse">
                                                 <thead>
-                                                    <tr className="text-[11px] font-bold text-gh-text-secondary border-b border-gh-border uppercase tracking-wider">
+                                                    <tr className="text-[11px] font-semibold text-gh-text-secondary border-b border-gh-border uppercase tracking-wider">
                                                         <th className="py-3 px-4 w-10"><CheckSquare className="size-3.5" /></th>
                                                         <th className="py-3 px-4 min-w-[200px]">
                                                             <div className="flex items-center gap-1.5">
@@ -368,7 +368,7 @@ const TaskVault: React.FC = () => {
                                                     {filteredItems.length > 0 ? filteredItems.map(task => (
                                                         <tr key={task.id} className="border-b border-gh-border/50 hover:bg-gh-bg-secondary/40 transition-colors group">
                                                             <td className="py-4 px-4"><div className="size-4 rounded border border-gh-border group-hover:border-primary transition-colors cursor-pointer" /></td>
-                                                            <td className="py-4 px-4 text-xs font-bold text-gh-text">{task.name}</td>
+                                                            <td className="py-4 px-4 text-xs font-semibold text-gh-text">{task.name}</td>
                                                             <td className="py-4 px-4 text-xs text-gh-text-secondary">{task.description}</td>
                                                             <td className="py-4 px-4 text-xs text-gh-text-secondary">{task.estimation}</td>
                                                             <td className="py-4 px-4">

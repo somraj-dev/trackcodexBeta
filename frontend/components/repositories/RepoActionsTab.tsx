@@ -225,7 +225,7 @@ const RepoActionsTab = () => {
                 <span className="text-[#8b949e] text-xs font-bold uppercase">
                   Total Runs
                 </span>
-                <div className="text-3xl font-black text-white mt-1">
+                <div className="text-xl font-semibold text-white mt-1">
                   {runs.length}
                 </div>
               </div>
@@ -233,7 +233,7 @@ const RepoActionsTab = () => {
                 <span className="text-[#8b949e] text-xs font-bold uppercase">
                   Success Rate
                 </span>
-                <div className="text-3xl font-black text-[#3fb950] mt-1">
+                <div className="text-xl font-semibold text-[#3fb950] mt-1">
                   {runs.length > 0
                     ? Math.round(
                         (runs.filter((r: WorkflowRun) => r.conclusion === "SUCCESS").length /

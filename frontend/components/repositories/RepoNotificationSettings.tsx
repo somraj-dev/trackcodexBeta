@@ -104,7 +104,7 @@ const RepoNotificationSettings: React.FC<RepoNotificationSettingsProps> = ({ rep
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-bold text-gh-text">{option.label}</span>
                 {watchLevel === option.id && (
-                  <span className="px-2 py-0.5 bg-primary/20 text-primary rounded-full text-[10px] font-black uppercase tracking-widest">
+                  <span className="px-2 py-0.5 bg-primary/20 text-primary rounded-full text-[10px] font-medium uppercase tracking-widest">
                     Active
                   </span>
                 )}
@@ -118,7 +118,7 @@ const RepoNotificationSettings: React.FC<RepoNotificationSettingsProps> = ({ rep
       </div>
 
       <div className="p-6 bg-amber-500/5 border border-amber-500/20 rounded-3xl space-y-3">
-        <h4 className="text-xs font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
+        <h4 className="text-xs font-semibold text-amber-500 uppercase tracking-widest flex items-center gap-2">
           <span className="material-symbols-outlined !text-[16px]">info</span>
           Notification Delivery
         </h4>

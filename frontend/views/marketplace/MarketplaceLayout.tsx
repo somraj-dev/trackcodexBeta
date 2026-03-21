@@ -32,7 +32,7 @@ const MarketplaceLayout = () => {
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+              <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
                 Marketplace
               </h1>
               <p className="text-sm text-gh-text-secondary max-w-2xl leading-relaxed">

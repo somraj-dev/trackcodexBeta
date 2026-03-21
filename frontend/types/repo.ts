@@ -63,6 +63,7 @@ export interface Repository {
   open_issues_count?: number;
   open_pull_requests_count?: number;
   commits_count?: number;
+  initReadme?: boolean;
 }
 
 export interface PinnedRepo {

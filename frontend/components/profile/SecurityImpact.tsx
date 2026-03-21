@@ -22,7 +22,7 @@ const SecurityImpact: React.FC<Props> = ({ profile }) => {
 
       <div className="flex items-center gap-3 mb-10 relative z-10">
         <span className="material-symbols-outlined text-emerald-500 !text-[22px] filled">verified_user</span>
-        <h3 className="text-[15px] font-black text-gh-text tracking-tight uppercase">Security Impact</h3>
+        <h3 className="text-[15px] font-semibold text-gh-text tracking-tight uppercase">Security Impact</h3>
         <div className="ml-auto size-8 bg-gh-bg border border-gh-border rounded-lg flex items-center justify-center shadow-inner group-hover:border-emerald-500/30 transition-all">
           <span className="material-symbols-outlined !text-[18px] text-gh-text-secondary">shield</span>
         </div>
@@ -32,18 +32,18 @@ const SecurityImpact: React.FC<Props> = ({ profile }) => {
         <>
           <div className="grid grid-cols-2 gap-6 mb-10 flex-1 relative z-10">
             <div className="p-7 rounded-2xl bg-gh-bg border border-gh-border/50 flex flex-col justify-center shadow-inner group-hover:border-emerald-500/20 transition-all">
-              <p className="text-5xl font-black text-emerald-500 leading-none mb-3 tracking-tighter drop-shadow-lg">
+              <p className="text-5xl font-semibold text-emerald-500 leading-none mb-3 tracking-tighter drop-shadow-lg">
                 {vulnsFixed !== null ? vulnsFixed : "—"}
               </p>
-              <p className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.25em]">
+              <p className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-[0.25em]">
                 Vulns Fixed
               </p>
             </div>
             <div className="p-7 rounded-2xl bg-gh-bg border border-gh-border/50 flex flex-col justify-center shadow-inner group-hover:border-rose-500/20 transition-all">
-              <p className="text-5xl font-black text-rose-500 leading-none mb-3 tracking-tighter">
+              <p className="text-5xl font-semibold text-rose-500 leading-none mb-3 tracking-tighter">
                 {securityIssues !== null ? securityIssues : "—"}
               </p>
-              <p className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.25em]">
+              <p className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-[0.25em]">
                 Issues Reported
               </p>
             </div>
@@ -76,7 +76,7 @@ const SecurityImpact: React.FC<Props> = ({ profile }) => {
           </p>
           <button
             onClick={() => navigate("/activity")}
-            className="text-[11px] font-black text-emerald-500 uppercase tracking-widest hover:underline"
+            className="text-[11px] font-semibold text-emerald-500 uppercase tracking-widest hover:underline"
           >
             View Activity →
           </button>

@@ -11,12 +11,12 @@ const MetricCard = ({ label, value, trend, icon, color }: any) => (
       <span className={`material-symbols-outlined !text-[18px] text-${color}`}>
         {icon}
       </span>
-      <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest">
+      <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
         {label}
       </span>
     </div>
     <div className="flex items-end justify-between">
-      <span className="text-3xl font-black text-gh-text leading-none">
+      <span className="text-xl font-semibold text-gh-text leading-none">
         {value}
       </span>
       <span
@@ -32,7 +32,7 @@ const AdminOverview = () => {
   return (
     <div className="animate-in fade-in duration-500">
       <div className="mb-10">
-        <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+        <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
           Platform Overview
         </h1>
         <p className="text-gh-text-secondary">
@@ -80,7 +80,7 @@ const AdminOverview = () => {
               </span>
               System Load
             </h2>
-            <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest">
+            <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
               Last 6 Hours
             </span>
           </div>
@@ -100,7 +100,7 @@ const AdminOverview = () => {
 
         <div className="space-y-8">
           <section>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gh-text-secondary mb-4">
+            <h3 className="text-[10px] font-medium uppercase tracking-widest text-gh-text-secondary mb-4">
               Security Critical
             </h3>
             <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-6">
@@ -112,19 +112,19 @@ const AdminOverview = () => {
                   <p className="text-sm font-bold text-white">
                     4 Unresolved Alerts
                   </p>
-                  <p className="text-[10px] text-gh-text-secondary uppercase font-black">
+                  <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
                     Requires Immediate Review
                   </p>
                 </div>
               </div>
-              <button className="w-full py-2 bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-black uppercase tracking-widest rounded-xl transition-all">
+              <button className="w-full py-2 bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-medium uppercase tracking-widest rounded-xl transition-all">
                 Review Escalations
               </button>
             </div>
           </section>
 
           <section>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gh-text-secondary mb-4">
+            <h3 className="text-[10px] font-medium uppercase tracking-widest text-gh-text-secondary mb-4">
               Live Activity
             </h3>
             <div className="space-y-4">
@@ -155,7 +155,7 @@ const AdminOverview = () => {
                       <span className="font-bold text-gh-text">{act.user}</span>{" "}
                       {act.action}
                     </p>
-                    <span className="text-[9px] font-black text-gh-text-secondary uppercase tracking-widest">
+                    <span className="text-[9px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                       {act.time}
                     </span>
                   </div>

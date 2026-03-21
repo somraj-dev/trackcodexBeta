@@ -39,7 +39,7 @@ const SkillDashboardView = () => {
       <div className="flex items-center gap-6 mb-10">
         <img src={user?.avatar || "https://ui-avatars.com/api/?name=User"} alt="Profile" className="size-24 rounded-full border-4 border-[#30363d] shadow-2xl" />
         <div>
-          <h1 className="text-3xl font-black tracking-tight mb-2">Growth Dashboard</h1>
+          <h1 className="text-xl font-semibold tracking-tight mb-2">Growth Dashboard</h1>
           <p className="text-gh-text-secondary font-medium">
             Track your engineering leveled progress and skill acquisition.
           </p>
@@ -92,7 +92,7 @@ const SkillDashboardView = () => {
                       <h3 className="font-bold text-white">{path.skill}</h3>
                       <p className="text-xs text-gh-text-secondary uppercase tracking-wider">{path.category}</p>
                     </div>
-                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase rounded text-right">
+                    <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-medium uppercase rounded text-right">
                       {path.recommendation}
                     </span>
                   </div>

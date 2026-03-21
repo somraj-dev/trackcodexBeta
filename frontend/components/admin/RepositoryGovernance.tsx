@@ -32,7 +32,7 @@ const RepositoryGovernance = () => {
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Repository Governance
           </h1>
           <p className="text-gh-text-secondary">
@@ -45,7 +45,7 @@ const RepositoryGovernance = () => {
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden shadow-2xl">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-[0.2em] border-b border-gh-border">
+            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">Repository</th>
               <th className="px-6 py-4">Org/Owner</th>
               <th className="px-6 py-4">AI Health</th>
@@ -68,7 +68,7 @@ const RepositoryGovernance = () => {
                       <p className="text-sm font-bold text-gh-text">
                         {repo.name}
                       </p>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-gh-text-secondary">
+                      <p className="text-[9px] font-medium uppercase tracking-widest text-gh-text-secondary">
                         {repo.visibility} • Last: {repo.modified}
                       </p>
                     </div>
@@ -79,24 +79,24 @@ const RepositoryGovernance = () => {
                 </td>
                 <td className="px-6 py-5">
                   <span
-                    className={`text-[10px] font-black uppercase tracking-widest ${repo.health.startsWith("A") ? "text-emerald-500" : "text-amber-500"}`}
+                    className={`text-[10px] font-medium uppercase tracking-widest ${repo.health.startsWith("A") ? "text-emerald-500" : "text-amber-500"}`}
                   >
                     {repo.health}
                   </span>
                 </td>
                 <td className="px-6 py-5">
                   <span
-                    className={`text-[10px] font-black uppercase tracking-widest ${repo.security === "Clean" ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`text-[10px] font-medium uppercase tracking-widest ${repo.security === "Clean" ? "text-emerald-500" : "text-rose-500"}`}
                   >
                     {repo.security}
                   </span>
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="px-3 py-1.5 rounded-lg bg-gh-bg text-gh-text-secondary text-[9px] font-black uppercase tracking-widest border border-gh-border transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-gh-bg text-gh-text-secondary text-[9px] font-medium uppercase tracking-widest border border-gh-border transition-all">
                       Lock Source
                     </button>
-                    <button className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white text-[9px] font-black uppercase tracking-widest border border-primary/20 transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white text-[9px] font-medium uppercase tracking-widest border border-primary/20 transition-all">
                       Archive
                     </button>
                   </div>

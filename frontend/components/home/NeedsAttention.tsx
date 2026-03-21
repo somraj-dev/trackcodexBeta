@@ -16,7 +16,7 @@ const NeedsAttention = () => {
               </p>
             </div>
           </div>
-          <button className="px-4 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20">
+          <button className="px-4 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-medium uppercase tracking-widest rounded-lg hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20">
             Fix Now
           </button>
         </div>
@@ -32,7 +32,7 @@ const NeedsAttention = () => {
               </p>
             </div>
           </div>
-          <button className="px-4 py-2 bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-gh-bg-tertiary hover:text-gh-text transition-all border border-gh-border">
+          <button className="px-4 py-2 bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest rounded-lg hover:bg-gh-bg-tertiary hover:text-gh-text transition-all border border-gh-border">
             Review
           </button>
         </div>

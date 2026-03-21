@@ -35,17 +35,17 @@ const FeatureCard = ({ title, desc, icon, to, color, count, label }: any) => (
       </div>
       {count !== undefined && (
         <div className="text-right">
-          <p className="text-2xl font-black text-gh-text tracking-tighter leading-none">
+          <p className="text-lg font-semibold text-gh-text tracking-tighter leading-none">
             {count}
           </p>
-          <p className="text-[8px] font-black text-gh-text-secondary uppercase tracking-widest mt-1">
+          <p className="text-[8px] font-semibold text-gh-text-secondary uppercase tracking-widest mt-1">
             {label}
           </p>
         </div>
       )}
     </div>
 
-    <h3 className="text-lg font-black text-gh-text mb-2 uppercase tracking-tight relative z-10">
+    <h3 className="text-sm font-semibold text-gh-text mb-2 uppercase tracking-tight relative z-10">
       {title}
     </h3>
     <p className="text-[13px] text-gh-text-secondary leading-relaxed mb-8 flex-1 relative z-10">
@@ -60,7 +60,7 @@ const FeatureCard = ({ title, desc, icon, to, color, count, label }: any) => (
 
     <div className="flex items-center justify-between relative z-10">
       <span
-        className={`text-[10px] font-black uppercase tracking-widest text-${color}`}
+        className={`text-[10px] font-medium uppercase tracking-widest text-${color}`}
       >
         Live Sync Active
       </span>
@@ -180,7 +180,7 @@ const ActivityLog = () => {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${
+              className={`px-4 py-1.5 text-[10px] font-medium uppercase tracking-widest rounded-lg transition-all ${
                 filter === f
                   ? "bg-primary text-white shadow-lg"
                   : "text-gh-text-secondary hover:text-gh-text"
@@ -190,7 +190,7 @@ const ActivityLog = () => {
             </button>
           ))}
         </div>
-        <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em]">
+        <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
           Platform History Stream
         </span>
       </div>
@@ -211,16 +211,16 @@ const ActivityLog = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-black text-gh-text group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">
+                  <h3 className="text-sm font-semibold text-gh-text group-hover:text-primary transition-colors leading-tight uppercase tracking-tight">
                     {activity.title}
                   </h3>
-                  <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest">
+                  <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                     {activity.relativeTime}
                   </span>
                 </div>
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-5 shadow-sm group-hover:shadow-xl transition-all relative overflow-hidden">
                   {activity.impact === "high" && (
-                    <div className="absolute top-0 right-0 px-3 py-1 bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase tracking-widest border-l border-b border-rose-500/20 rounded-bl-xl">
+                    <div className="absolute top-0 right-0 px-3 py-1 bg-rose-500/10 text-rose-500 text-[8px] font-medium uppercase tracking-widest border-l border-b border-rose-500/20 rounded-bl-xl">
                       High Impact
                     </div>
                   )}
@@ -232,7 +232,7 @@ const ActivityLog = () => {
                       Context:
                     </span>
                     <span
-                      className={`text-[10px] font-black uppercase tracking-tight hover:underline cursor-pointer ${getColor(activity.type)}`}
+                      className={`text-[10px] font-medium uppercase tracking-tight hover:underline cursor-pointer ${getColor(activity.type)}`}
                     >
                       {activity.entityName}
                     </span>
@@ -262,7 +262,7 @@ const PlatformMatrix = () => {
               <div className="size-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
                 <span className="material-symbols-outlined filled">hub</span>
               </div>
-              <h1 className="text-4xl font-black text-gh-text tracking-tighter uppercase">
+              <h1 className="text-2xl font-semibold text-gh-text tracking-tighter uppercase">
                 Platform Intelligence
               </h1>
             </div>
@@ -275,7 +275,7 @@ const PlatformMatrix = () => {
           <div className="flex bg-gh-bg-secondary border border-gh-border p-1 rounded-xl">
             <button
               onClick={() => setActiveTab("matrix")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === "matrix" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-medium uppercase tracking-widest transition-all ${activeTab === "matrix" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
             >
               <span className="material-symbols-outlined !text-[18px]">
                 view_quilt
@@ -284,7 +284,7 @@ const PlatformMatrix = () => {
             </button>
             <button
               onClick={() => setActiveTab("metrics")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === "metrics" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-medium uppercase tracking-widest transition-all ${activeTab === "metrics" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
             >
               <span className="material-symbols-outlined !text-[18px]">
                 monitoring
@@ -293,7 +293,7 @@ const PlatformMatrix = () => {
             </button>
             <button
               onClick={() => setActiveTab("activity")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${activeTab === "activity" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-lg text-xs font-medium uppercase tracking-widest transition-all ${activeTab === "activity" ? "bg-primary text-white shadow-lg" : "text-gh-text-secondary hover:text-gh-text"}`}
             >
               <span className="material-symbols-outlined !text-[18px] filled">
                 history
@@ -397,11 +397,11 @@ const PlatformMatrix = () => {
                   key={m.label}
                   className="p-6 bg-gh-bg-secondary border border-gh-border rounded-2xl"
                 >
-                  <p className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest mb-2">
+                  <p className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-2">
                     {m.label}
                   </p>
                   <div className="flex items-end justify-between">
-                    <span className={`text-3xl font-black ${m.color}`}>
+                    <span className={`text-xl font-semibold ${m.color}`}>
                       {m.value}
                     </span>
                     <span className="text-[10px] font-bold text-gh-text-secondary">
@@ -415,7 +415,7 @@ const PlatformMatrix = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="p-8 bg-gh-bg-secondary border border-gh-border rounded-3xl">
                 <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-sm font-black text-gh-text uppercase tracking-widest">
+                  <h3 className="text-sm font-semibold text-gh-text uppercase tracking-widest">
                     Platform Traffic
                   </h3>
                   <div className="flex items-center gap-2">
@@ -442,7 +442,7 @@ const PlatformMatrix = () => {
               </div>
 
               <div className="p-8 bg-gh-bg-secondary border border-gh-border rounded-3xl">
-                <h3 className="text-sm font-black text-gh-text uppercase tracking-widest mb-8">
+                <h3 className="text-sm font-semibold text-gh-text uppercase tracking-widest mb-8">
                   Service Health Matrix
                 </h3>
                 <div className="space-y-4">
@@ -462,7 +462,7 @@ const PlatformMatrix = () => {
                           {service}
                         </span>
                       </div>
-                      <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                      <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">
                         Operational
                       </span>
                     </div>

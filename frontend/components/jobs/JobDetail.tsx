@@ -44,9 +44,9 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                 <span className="material-symbols-outlined">arrow_back</span>
               </button>
               <div>
-                 <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                 <h1 className="text-lg font-semibold text-white tracking-tight flex items-center gap-3">
                    {job.title}
-                   <span className={`px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-widest bg-opacity-5 ${
+                   <span className={`px-2 py-0.5 rounded-full border text-[10px] font-medium uppercase tracking-widest bg-opacity-5 ${
                      currentStatus === 'Open' ? 'border-emerald-500 text-emerald-500' : 
                      currentStatus === 'In Progress' ? 'border-amber-500 text-amber-500' : 'border-purple-500 text-purple-500'
                    }`}>
@@ -62,7 +62,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
              {currentStatus === 'Open' && (
                <button 
                 onClick={handleStartWork}
-                className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
+                className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-xs transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
                >
                   <span className="material-symbols-outlined text-lg">rocket_launch</span>
                   Accept & Open Workspace
@@ -72,14 +72,14 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                <div className="flex gap-3">
                 <button 
                   onClick={handleStartWork}
-                  className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all border border-border-[#1A1A1A]ark hover:bg-slate-700"
+                  className="flex items-center gap-2 px-6 py-3 bg-slate-800 text-white rounded-xl font-medium uppercase tracking-widest text-xs transition-all border border-border-[#1A1A1A]ark hover:bg-slate-700"
                 >
                     <span className="material-symbols-outlined text-lg">open_in_new</span>
                     Continue to Workspace
                 </button>
                 <button 
                   onClick={handleCompleteJob}
-                  className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-emerald-500/20"
+                  className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium uppercase tracking-widest text-xs transition-all shadow-lg shadow-emerald-500/20"
                 >
                     <span className="material-symbols-outlined text-lg">check_circle</span>
                     Complete Job
@@ -87,7 +87,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                </div>
              )}
              {currentStatus === 'Completed' && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl text-xs font-black uppercase tracking-widest">
+                <div className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-xl text-xs font-medium uppercase tracking-widest">
                    <span className="material-symbols-outlined !text-[18px]">verified</span>
                    Finalized & Paid
                 </div>
@@ -107,7 +107,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
             </section>
 
             <section>
-              <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Required Skills</h3>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
                  {job.techStack.map(skill => (
                    <span key={skill} className="px-4 py-2 bg-primary/5 border border-primary/20 rounded-xl text-sm font-bold text-primary">
@@ -119,7 +119,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
 
             {currentStatus === 'Completed' && (
               <section className="p-6 bg-purple-500/5 border border-purple-500/20 rounded-2xl animate-in slide-in-from-bottom-2">
-                 <h3 className="text-sm font-black text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                 <h3 className="text-sm font-semibold text-purple-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <span className="material-symbols-outlined !text-[18px]">reviews</span>
                     Employer Feedback for Seeker
                  </h3>
@@ -131,7 +131,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                  <p className="text-slate-300 italic">"{submittedFeedback}"</p>
                  <div className="mt-6 flex items-center gap-2">
                     <div className="size-1.5 rounded-full bg-emerald-500"></div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Reputation scores updated on seeker profile</p>
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-slate-500">Reputation scores updated on seeker profile</p>
                  </div>
               </section>
             )}
@@ -140,7 +140,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-10 transition-opacity">
                   <span className="material-symbols-outlined text-[120px]">account_tree</span>
                </div>
-               <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-4">Associated Workspace</h3>
+               <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">Associated Workspace</h3>
                <div className="flex items-center justify-between relative z-10">
                   <div className="flex items-center gap-4">
                      <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
@@ -161,7 +161,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
 
           <div className="space-y-8">
             <div className="p-6 rounded-2xl bg-[#11141A] border border-[#1E232E]">
-               <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Financial Summary</h3>
+               <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-6">Financial Summary</h3>
                <div className="space-y-6">
                   <div className="flex items-center justify-between">
                      <span className="text-slate-500 text-sm">Budget Type</span>
@@ -169,14 +169,14 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                   </div>
                   <div className="flex items-center justify-between">
                      <span className="text-slate-500 text-sm">Estimated Total</span>
-                     <span className="text-2xl font-black text-emerald-500">{job.budget}</span>
+                     <span className="text-lg font-semibold text-emerald-500">{job.budget}</span>
                   </div>
                   <div className="pt-4 border-t border-[#1E232E]">
                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
                         <span className="material-symbols-outlined text-sm">verified</span>
                         Escrow Payment Verified
                      </div>
-                     <button className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+                     <button className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all">
                         Job Conditions
                      </button>
                   </div>
@@ -184,7 +184,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
             </div>
 
             <div className="p-6 rounded-2xl bg-[#11141A] border border-[#1E232E]">
-               <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">About the Client</h3>
+               <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-6">About the Client</h3>
                <div className="flex items-center gap-3 mb-6">
                   <img src={job.creator.avatar} className="size-12 rounded-full border border-border-[#1A1A1A]ark" />
                   <div>
@@ -195,7 +195,7 @@ const JobDetail = ({ job, onBack }: { job: Job, onBack: () => void }) => {
                     </div>
                   </div>
                </div>
-               <button className="w-full py-2 bg-transparent border border-[#1E232E] text-slate-500 hover:text-white rounded-xl text-[11px] font-black uppercase tracking-widest transition-all">
+               <button className="w-full py-2 bg-transparent border border-[#1E232E] text-slate-500 hover:text-white rounded-xl text-[11px] font-medium uppercase tracking-widest transition-all">
                  View Client Profile
                </button>
             </div>

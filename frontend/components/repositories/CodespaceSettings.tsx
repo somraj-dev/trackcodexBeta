@@ -83,9 +83,9 @@ const CodespaceSettings: React.FC<CodespaceSettingsProps> = ({ repoId }) => {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gh-bg-secondary">
               <tr>
-                <th className="px-6 py-3 text-[10px] font-black uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Branch</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Region</th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Status</th>
+                <th className="px-6 py-3 text-[10px] font-medium uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Branch</th>
+                <th className="px-6 py-3 text-[10px] font-medium uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Region</th>
+                <th className="px-6 py-3 text-[10px] font-medium uppercase text-gh-text-tertiary tracking-widest border-b border-gh-border">Status</th>
                 <th className="px-6 py-3 border-b border-gh-border"></th>
               </tr>
             </thead>
@@ -97,7 +97,7 @@ const CodespaceSettings: React.FC<CodespaceSettingsProps> = ({ repoId }) => {
                   </td>
                   <td className="px-6 py-4 text-xs text-gh-text">{pb.region}</td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase">{pb.status}</span>
+                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] font-medium uppercase">{pb.status}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 text-gh-text-secondary hover:text-gh-text rounded-md opacity-0 group-hover:opacity-100 transition-all">

@@ -66,7 +66,7 @@ const RepoBranchesTab: React.FC<RepoBranchesTabProps> = ({ repo }) => {
           {/* Default Branch Section */}
           <section className="bg-gh-bg border border-gh-border rounded-xl overflow-hidden shadow-sm">
             <div className="px-6 py-3 bg-gh-bg-secondary border-b border-gh-border">
-              <h3 className="text-xs font-black uppercase text-gh-text-secondary tracking-wider">Default Branch</h3>
+              <h3 className="text-xs font-medium uppercase text-gh-text-secondary tracking-wider">Default Branch</h3>
             </div>
             <div className="px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -76,7 +76,7 @@ const RepoBranchesTab: React.FC<RepoBranchesTabProps> = ({ repo }) => {
                 <div>
                   <div className="text-sm font-bold text-gh-text flex items-center gap-2">
                     {defaultBranch}
-                    <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] uppercase font-black tracking-tighter">Default</span>
+                    <span className="px-2 py-0.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] uppercase font-semibold tracking-tighter">Default</span>
                   </div>
                   <div className="text-[11px] text-gh-text-secondary mt-0.5">
                     Updated recently · <span className="text-primary hover:underline cursor-pointer">Last commit info</span>
@@ -94,7 +94,7 @@ const RepoBranchesTab: React.FC<RepoBranchesTabProps> = ({ repo }) => {
           {/* Active Branches Section */}
           <section className="bg-gh-bg border border-gh-border rounded-xl overflow-hidden shadow-sm">
             <div className="px-6 py-3 bg-gh-bg-secondary border-b border-gh-border">
-              <h3 className="text-xs font-black uppercase text-gh-text-secondary tracking-wider">Active Branches</h3>
+              <h3 className="text-xs font-medium uppercase text-gh-text-secondary tracking-wider">Active Branches</h3>
             </div>
             <div className="divide-y divide-gh-border">
               {branches.filter(b => b !== defaultBranch).length === 0 ? (

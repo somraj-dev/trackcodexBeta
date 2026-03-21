@@ -61,12 +61,12 @@ const TrackCodexLogo: React.FC<TrackCodexLogoProps> = ({
       {logoElement}
       <div className="flex flex-col select-none">
         <span
-          className={`font-black tracking-tighter text-white leading-none ${size === "lg" ? "text-2xl" : size === "xl" ? "text-3xl" : "text-lg"}`}
+          className={`font-semibold tracking-tighter text-white leading-none ${size === "lg" ? "text-2xl" : size === "xl" ? "text-3xl" : "text-lg"}`}
         >
           TrackCodex
         </span>
         {size !== "sm" && (
-          <span className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mt-0.5">
+          <span className="text-[10px] text-primary font-medium uppercase tracking-widest mt-0.5">
             Enterprise IDE
           </span>
         )}

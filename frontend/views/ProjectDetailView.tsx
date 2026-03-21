@@ -4,16 +4,16 @@ import { InviteModal } from '../components/modals/InviteModal';
 
 /* ─── Design tokens ─── */
 const V = {
-  bg: "#000",
-  card: "#0a0a0a",
-  cardHover: "#111",
-  border: "#333",
-  borderLight: "#222",
-  text: "#ededed",
-  textSecondary: "#888",
-  textTertiary: "#666",
-  accent: "#0070f3",
-  font: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  bg: "var(--gh-bg)",
+  card: "var(--gh-bg-secondary)",
+  cardHover: "var(--bg-hover)",
+  border: "var(--gh-border)",
+  borderLight: "var(--gh-border)",
+  text: "var(--gh-text)",
+  textSecondary: "var(--gh-text-secondary)",
+  textTertiary: "var(--gh-text-secondary)",
+  accent: "var(--primary-color)",
+  font: "var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
 };
 
 /* ─── Data ─── */
@@ -189,11 +189,11 @@ const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: bool
     <div className="fixed inset-0 z-[1000] flex justify-center pt-[10vh] px-4" onClick={onClose} style={{ fontFamily: V.font }}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
       <div 
-        className="relative w-full max-w-[680px] bg-[#11141A] border border-[#1E232E] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-top-4 duration-200"
+        className="relative w-full max-w-[680px] bg-[var(--gh-bg-secondary)41A] border border-gh-border rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-top-4 duration-200"
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-2 border-b border-[#1E232E] bg-[#11141A]">
-          <div className="flex items-center bg-[#0A0D14] border border-[#2f81f7] rounded-[6px] outline outline-1 outline-[#2f81f7] px-3 py-1.5 focus-within:shadow-[0_0_0_3px_rgba(47,129,247,0.4)] transition-shadow gap-2">
+        <div className="p-2 border-b border-gh-border bg-[var(--gh-bg-secondary)41A]">
+          <div className="flex items-center bg-gh-bg border border-[#2f81f7] rounded-[6px] outline outline-1 outline-[#2f81f7] px-3 py-1.5 focus-within:shadow-[0_0_0_3px_rgba(47,129,247,0.4)] transition-shadow gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7d8590" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               ref={inputRef}
@@ -201,23 +201,23 @@ const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: bool
               onChange={e => { setSearch(e.target.value); setSelectedIndex(0); }}
               onKeyDown={handleKeyDown}
               placeholder="Search project pages..."
-              className="flex-1 bg-transparent text-[14px] text-[#c9d1d9] placeholder-[#7d8590] border-none focus:ring-0 outline-none h-6 p-0"
+              className="flex-1 bg-transparent text-[14px] text-gh-text placeholder-gh-text-secondary border-none focus:ring-0 outline-none h-6 p-0"
               style={{ fontFamily: V.font }}
             />
-            <button onClick={onClose} className="text-[#7d8590] text-xs px-2 py-1 hover:bg-[#30363d] rounded transition-colors border border-[#1E232E] cursor-pointer">ESC</button>
+            <button onClick={onClose} className="text-gh-text-secondary text-xs px-2 py-1 hover:bg-gh-bg-tertiary rounded transition-colors border border-gh-border cursor-pointer">ESC</button>
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#0D1117] relative">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gh-bg relative">
           {filteredItems.length === 0 ? (
-            <div className="px-4 py-8 text-center text-[#7d8590] text-[14px]">No pages found matching "{search}"</div>
+            <div className="px-4 py-8 text-center text-gh-text-secondary text-[14px]">No pages found matching "{search}"</div>
           ) : (
             <div className="py-2">
               {Array.from(new Set(filteredItems.map(i => i.group))).map(group => {
                 const groupItems = filteredItems.filter(i => i.group === group);
                 return (
                   <div key={group} className="mb-2">
-                    <h3 className="px-3 py-1 text-[12px] font-semibold text-[#7d8590] uppercase tracking-wider">{group}</h3>
+                    <h3 className="px-3 py-1 text-[12px] font-semibold text-gh-text-secondary uppercase tracking-wider">{group}</h3>
                     <div className="space-y-0 text-[14px]">
                       {groupItems.map(item => {
                         const globalIndex = filteredItems.indexOf(item);
@@ -227,11 +227,11 @@ const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: bool
                             key={item.label}
                             onClick={() => onSelect(item)}
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
-                            className={`flex items-center gap-3 px-4 py-2 cursor-pointer relative transition-colors ${isSelected ? "bg-[#1f242c]" : "hover:bg-[#1f242c]"}`}
+                            className={`flex items-center gap-3 px-4 py-2 cursor-pointer relative transition-colors ${isSelected ? "bg-gh-bg-tertiary" : "hover:bg-gh-bg-tertiary"}`}
                           >
                             {isSelected && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#2f81f7]"></div>}
-                            <div className="text-[#7d8590] w-5 text-center flex items-center justify-center text-[16px]">{item.icon}</div>
-                            <span className={`${isSelected ? "text-white" : "text-[#c9d1d9]"}`}>{item.label}</span>
+                            <div className="text-gh-text-secondary w-5 text-center flex items-center justify-center text-[16px]">{item.icon}</div>
+                            <span className={`${isSelected ? "text-white" : "text-gh-text"}`}>{item.label}</span>
                           </div>
                         );
                       })}
@@ -319,7 +319,7 @@ const ProjectDetailView: React.FC = () => {
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>⊘</div>
         <div style={{ fontSize: 14, marginBottom: 16 }}>Project not found.</div>
-        <button onClick={() => nav("/dashboard")} style={{ padding: "8px 20px", background: V.accent, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: V.font }}>Back to Dashboard</button>
+        <button onClick={() => nav("/dashboard")} style={{ padding: "8px 20px", background: V.accent, color: V.text, border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: V.font }}>Back to Dashboard</button>
       </div>
     </div>
   );
@@ -620,8 +620,8 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
         }} 
       />
       <div style={{ 
-        position: "relative", width: "100%", maxWidth: 640, height: "100%", background: "#000", 
-        borderLeft: `1px solid #333`, display: "flex", flexDirection: "column", 
+        position: "relative", width: "100%", maxWidth: 640, height: "100%", background: V.bg, 
+        borderLeft: `1px solid ${V.border}`, display: "flex", flexDirection: "column", 
         boxShadow: "-20px 0 50px rgba(0,0,0,0.5)", animation: "slideIn .4s cubic-bezier(0.16, 1, 0.3, 1)" 
       }}>
         {/* Header Close Button */}
@@ -633,7 +633,7 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
               color: V.textTertiary, padding: 8, borderRadius: 8, transition: "background .15s",
               display: "flex", alignItems: "center", justifyContent: "center"
             }} 
-            onMouseEnter={e => e.currentTarget.style.background = "#111"} 
+            onMouseEnter={e => e.currentTarget.style.background = "var(--gh-bg-secondary)"} 
             onMouseLeave={e => e.currentTarget.style.background = "transparent"}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
@@ -651,7 +651,7 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
             }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            <h2 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 12px", color: "#fff", letterSpacing: "-0.02em" }}>Production Checklist</h2>
+            <h2 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 12px", color: V.text, letterSpacing: "-0.02em" }}>Production Checklist</h2>
             <p style={{ fontSize: 14, color: V.textSecondary, lineHeight: 1.6, maxWidth: 460, margin: "0 auto" }}>
               Get the most from TrackCodex as you prepare to take your project to production—review security and key feature settings.
             </p>
@@ -662,17 +662,17 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
               <div 
                 key={item.id} 
                 style={{ 
-                  border: `1px solid ${item.done ? "rgba(0,112,243,0.3)" : "#333"}`, 
+                  border: `1px solid ${item.done ? "rgba(0,112,243,0.3)" : "var(--gh-border)"}`, 
                   borderRadius: 14, padding: 24, 
-                  background: item.done ? "rgba(0,112,243,0.03)" : "#0a0a0a",
+                  background: item.done ? "rgba(0,112,243,0.03)" : "var(--gh-bg)",
                   transition: "all 0.2s ease",
                   position: "relative"
                 }}
               >
                 <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
                   <div style={{ 
-                    width: 40, height: 40, borderRadius: 10, background: "#111", 
-                    border: `1px solid #333`, display: "flex", alignItems: "center", 
+                    width: 40, height: 40, borderRadius: 10, background: V.bg, 
+                    border: `1px solid ${V.border}`, display: "flex", alignItems: "center", 
                     justifyContent: "center", color: item.done ? V.accent : V.textTertiary,
                     flexShrink: 0
                   }}>
@@ -680,11 +680,11 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: "#fff" }}>{item.title}</h3>
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: V.text }}>{item.title}</h3>
                       {item.done && (
                         <div style={{ 
                           width: 20, height: 20, borderRadius: "50%", background: V.accent, 
-                          display: "flex", alignItems: "center", justifyContent: "center", color: "#fff"
+                          display: "flex", alignItems: "center", justifyContent: "center", color: V.text
                         }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
@@ -695,17 +695,17 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
                     {!item.done && (
                       <div style={{ display: "flex", gap: 12 }}>
                         <button style={{ 
-                          background: "#fff", color: "#000", border: "none", borderRadius: 8, 
+                          background: "#fff", color: V.bg, border: "none", borderRadius: 8, 
                           padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer",
                           transition: "opacity .15s"
                         }} onMouseEnter={e => e.currentTarget.style.opacity = "0.9"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
                           {item.action}
                         </button>
                         <button style={{ 
-                          background: "transparent", color: V.textSecondary, border: `1px solid #333`, 
+                          background: "transparent", color: V.textSecondary, border: `1px solid ${V.border}`, 
                           borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer",
                           transition: "background .15s"
-                        }} onMouseEnter={e => e.currentTarget.style.background = "#111"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        }} onMouseEnter={e => e.currentTarget.style.background = "var(--gh-bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                           Skip
                         </button>
                       </div>
@@ -716,20 +716,20 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
             ))}
           </div>
 
-          <div style={{ marginTop: 40, borderTop: `1px solid #333`, paddingTop: 32 }}>
+          <div style={{ marginTop: 40, borderTop: `1px solid ${V.border}`, paddingTop: 32 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: V.textTertiary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>Further reading</div>
             <div 
               style={{ 
-                border: `1px solid #333`, borderRadius: 14, padding: "16px 20px", 
+                border: `1px solid ${V.border}`, borderRadius: 14, padding: "16px 20px", 
                 display: "flex", gap: 16, alignItems: "center", cursor: "pointer", 
-                background: "#0a0a0a", transition: "all 0.15s" 
+                background: V.bg, transition: "all 0.15s" 
               }} 
-              onMouseEnter={e => { e.currentTarget.style.background = "#111"; e.currentTarget.style.borderColor = "#444"; }} 
-              onMouseLeave={e => { e.currentTarget.style.background = "#0a0a0a"; e.currentTarget.style.borderColor = "#333"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "var(--gh-bg-secondary)"; e.currentTarget.style.borderColor = "var(--gh-border)"; }} 
+              onMouseLeave={e => { e.currentTarget.style.background = "var(--gh-bg)"; e.currentTarget.style.borderColor = "var(--gh-border)"; }}
             >
-               <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#111", border: `1px solid #333`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📖</div>
+               <div style={{ width: 44, height: 44, borderRadius: "50%", background: V.bg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📖</div>
                <div style={{ flex: 1 }}>
-                 <div style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Production checklist for launch</div>
+                 <div style={{ fontSize: 14, fontWeight: 600, color: V.text }}>Production checklist for launch</div>
                  <div style={{ fontSize: 12, color: V.textSecondary, marginTop: 2, lineHeight: 1.4 }}>Comprehensive guidelines by the TrackCodex team to help you prepare your project.</div>
                </div>
                <div style={{ color: V.textTertiary, fontSize: 18 }}>›</div>
@@ -738,11 +738,11 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
         </div>
 
         {/* Footer Actions */}
-        <div style={{ padding: "20px 48px", borderTop: `1px solid #333`, display: "flex", justifyContent: "flex-end", background: "#000" }}>
+        <div style={{ padding: "20px 48px", borderTop: `1px solid ${V.border}`, display: "flex", justifyContent: "flex-end", background: V.bg }}>
           <button 
             onClick={onClose} 
             style={{ 
-              background: "#fff", color: "#000", border: "none", borderRadius: 8, 
+              background: "#fff", color: V.bg, border: "none", borderRadius: 8, 
               padding: "10px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer",
               boxShadow: "0 4px 12px rgba(255,255,255,0.1)"
             }}
@@ -773,17 +773,17 @@ const OverviewTab = ({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, 
           <div style={{ display: "flex", gap: 8 }}>
             <Btn 
               href={p.repoUrl}
-              style={{ background: "#000", border: "1px solid #333", borderRadius: 8, padding: "0 16px", color: "#fff", display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}
+              style={{ background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, padding: "0 16px", color: V.text, display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
               Repository
             </Btn>
-            <Btn style={{ background: "#000", border: "1px solid #333", borderRadius: 8, padding: "0 16px", color: "#fff", display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}>
+            <Btn style={{ background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, padding: "0 16px", color: V.text, display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               Instant Rollback
             </Btn>
-            <div style={{ display: "flex", border: "1px solid #333", borderRadius: 8, overflow: "hidden", position: "relative", background: "#fff", height: 32, alignItems: "center" }}>
-              <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" style={{ padding: "0 14px", fontSize: 13, fontWeight: 600, color: "#000", background: "transparent", textDecoration: "none", fontFamily: V.font, display: "flex", alignItems: "center", height: "100%" }}>Visit</a>
+            <div style={{ display: "flex", border: `1px solid ${V.border}`, borderRadius: 8, overflow: "hidden", position: "relative", background: "#fff", height: 32, alignItems: "center" }}>
+              <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" style={{ padding: "0 14px", fontSize: 13, fontWeight: 600, color: V.bg, background: "transparent", textDecoration: "none", fontFamily: V.font, display: "flex", alignItems: "center", height: "100%" }}>Visit</a>
               <button 
                 onClick={() => setIsQRVisible(!isQRVisible)}
                 style={{ padding: "0 8px", borderLeft: "1px solid #eaeaea", background: "transparent", border: "none", color: "#666", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}
@@ -1099,12 +1099,12 @@ const ObservabilityOverview = () => {
       </div>
 
       {/* Banner */}
-      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: "12px 20px", background: "linear-gradient(90deg, #000, #111)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: "12px 20px", background: "linear-gradient(90deg, var(--gh-bg), var(--gh-bg-secondary))", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary }}>
            <span style={{ color: V.text, filter: "drop-shadow(0 0 4px #fff)" }}>✦</span>
            Unlock anomaly alerts, custom queries, 30-day retention, and more with Pro and Observability Plus.
         </div>
-        <Btn style={{ background: "#fff", color: "#000", border: "none", padding: "6px 16px", fontSize: 12, fontWeight: 600 }}>Upgrade to Pro</Btn>
+        <Btn style={{ background: "#fff", color: V.bg, border: "none", padding: "6px 16px", fontSize: 12, fontWeight: 600 }}>Upgrade to Pro</Btn>
       </div>
 
       {/* Charts Grid */}
@@ -1485,11 +1485,11 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
       <div 
         style={{ 
           width: 340, 
-          background: "#0a0a0a", 
-          border: "1px solid #333", 
+          background: V.bg, 
+          border: `1px solid ${V.border}`, 
           borderRadius: 16, 
           boxShadow: "0 20px 50px rgba(0,0,0,0.8)", 
-          color: "#fff", 
+          color: V.text, 
           fontFamily: V.font,
           overflow: "hidden",
           animation: "popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
@@ -1504,8 +1504,8 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
         `}</style>
         
         {/* Header */}
-        <div style={{ padding: "16px 20px", borderBottom: "1px solid #222", display: "flex", alignItems: "center", gap: 12, background: "#111" }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "#222", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #333" }}>
+        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${V.border}`, display: "flex", alignItems: "center", gap: 12, background: V.bg }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--gh-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${V.border}` }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
           <div style={{ flex: 1 }}>
@@ -1539,7 +1539,7 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
               position: "absolute", 
               width: 48, 
               height: 48, 
-              background: "#000", 
+              background: V.bg, 
               borderRadius: 10, 
               display: "flex", 
               alignItems: "center", 
@@ -1548,7 +1548,7 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
               border: "2px solid #fff",
               overflow: "hidden"
             }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>TC</div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: V.text, letterSpacing: -0.5 }}>TC</div>
             </div>
           </div>
         </div>
@@ -1562,7 +1562,7 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
             style={{ 
               width: "100%", 
               background: "#fff", 
-              color: "#000", 
+              color: V.bg, 
               fontWeight: 700, 
               fontSize: 13, 
               height: 40, 
@@ -2152,7 +2152,7 @@ const SettingsTab = ({ p, tab }: { p: ProjInfo, tab: string }) => {
             </div>
             <div style={{ padding: "16px 24px", background: V.card, borderTop: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontSize: 13, color: V.textSecondary }}>To delete your account, visit <span style={{ color: "#3291ff", cursor: "pointer" }}>Account Settings.</span></span>
-              <Btn style={{ background: "red", color: "#fff", border: "none" }}>Delete Project</Btn>
+              <Btn style={{ background: "red", color: V.text, border: "none" }}>Delete Project</Btn>
             </div>
           </div>
         </div>

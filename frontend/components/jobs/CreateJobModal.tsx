@@ -59,7 +59,7 @@ export const CreateJobModal: React.FC<CreateJobModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 max-w-xl w-full shadow-2xl animate-in zoom-in-95 duration-300">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-black text-gh-text tracking-tight">Post a New Opportunity</h2>
+          <h2 className="text-lg font-semibold text-gh-text tracking-tight">Post a New Opportunity</h2>
           <button onClick={onClose} className="text-gh-text-secondary hover:text-gh-text transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>

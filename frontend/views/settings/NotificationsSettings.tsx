@@ -56,7 +56,7 @@ const NotificationsSettings = () => {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">
           Notifications
         </h1>
       </header>

@@ -57,7 +57,7 @@ const SecretSettings: React.FC<SecretSettingsProps> = ({ repoId }) => {
             <h3 className="text-sm font-bold text-gh-text mb-6 uppercase tracking-widest">Add new repository secret</h3>
             <div className="space-y-6">
               <div>
-                <label className="text-xs font-black uppercase text-gh-text-secondary mb-2 block">Name</label>
+                <label className="text-xs font-medium uppercase text-gh-text-secondary mb-2 block">Name</label>
                 <input 
                   value={newSecret.name}
                   onChange={(e) => setNewSecret({...newSecret, name: e.target.value})}
@@ -66,7 +66,7 @@ const SecretSettings: React.FC<SecretSettingsProps> = ({ repoId }) => {
                 />
               </div>
               <div>
-                <label className="text-xs font-black uppercase text-gh-text-secondary mb-2 block">Value</label>
+                <label className="text-xs font-medium uppercase text-gh-text-secondary mb-2 block">Value</label>
                 <textarea 
                   value={newSecret.value}
                   onChange={(e) => setNewSecret({...newSecret, value: e.target.value})}
@@ -95,7 +95,7 @@ const SecretSettings: React.FC<SecretSettingsProps> = ({ repoId }) => {
 
         <div className="bg-gh-bg-secondary/20 border border-gh-border rounded-[2rem] overflow-hidden shadow-sm">
           <div className="px-8 py-4 bg-gh-bg-secondary border-b border-gh-border flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase text-gh-text-secondary tracking-widest">Repository secrets</h3>
+            <h3 className="text-xs font-medium uppercase text-gh-text-secondary tracking-widest">Repository secrets</h3>
             <span className="px-2 py-0.5 bg-gh-bg-tertiary rounded-full text-[10px] font-bold text-gh-text-secondary">{secrets.length}</span>
           </div>
           <div className="divide-y divide-gh-border">
@@ -143,7 +143,7 @@ const SecretSettings: React.FC<SecretSettingsProps> = ({ repoId }) => {
             Secrets are encrypted. They will only be available to Actions runners and will never be displayed in the UI after being saved.
           </p>
           <div className="flex items-center gap-4 mt-4">
-            <button className="text-xs font-black uppercase text-amber-500 hover:underline transition-all">
+            <button className="text-xs font-medium uppercase text-amber-500 hover:underline transition-all">
               Learn about secret security
             </button>
           </div>

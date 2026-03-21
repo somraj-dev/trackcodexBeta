@@ -69,7 +69,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
       <div className="bg-[#11141A] border border-primary/30 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col font-display">
         <div className="p-6 border-b border-[#1E232E] bg-primary/5 flex items-center justify-between">
           <div>
-            <h3 className="text-xl font-black text-white tracking-tight uppercase">
+            <h3 className="text-base font-semibold text-white tracking-tight uppercase">
               Initialize Repository
             </h3>
             <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-bold">
@@ -88,7 +88,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
           <div className="space-y-6">
             <div className="flex items-start gap-6">
               <div>
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 px-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-2 px-1">
                   Logo
                 </label>
                 <div className="relative group/avatar">
@@ -126,7 +126,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
                 </div>
               </div>
               <div className="flex-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 px-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-2 px-1">
                   Repository Name
                 </label>
                 <input
@@ -142,7 +142,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
             </div>
 
             <div>
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 px-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-2 px-1">
                 Short Description
               </label>
               <textarea
@@ -159,7 +159,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
               <div>
                 <label
                   htmlFor="repo-tech-stack"
-                  className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 px-1"
+                  className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-2 px-1"
                 >
                   Primary Tech Stack
                 </label>
@@ -179,7 +179,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 px-1">
+                <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block mb-2 px-1">
                   Visibility
                 </label>
                 <div className="flex bg-[#0A0D14] border border-[#1E232E] rounded-xl p-1">
@@ -188,7 +188,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
                     onClick={() =>
                       setFormData({ ...formData, visibility: "PUBLIC" })
                     }
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${formData.visibility === "PUBLIC" ? "bg-primary text-white shadow-lg" : "text-slate-500"}`}
+                    className={`flex-1 py-2 rounded-lg text-[10px] font-medium uppercase transition-all ${formData.visibility === "PUBLIC" ? "bg-primary text-white shadow-lg" : "text-slate-500"}`}
                   >
                     Public
                   </button>
@@ -197,7 +197,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
                     onClick={() =>
                       setFormData({ ...formData, visibility: "PRIVATE" })
                     }
-                    className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${formData.visibility === "PRIVATE" ? "bg-primary text-white shadow-lg" : "text-slate-500"}`}
+                    className={`flex-1 py-2 rounded-lg text-[10px] font-medium uppercase transition-all ${formData.visibility === "PRIVATE" ? "bg-primary text-white shadow-lg" : "text-slate-500"}`}
                   >
                     Private
                   </button>
@@ -216,7 +216,7 @@ const CreateRepoModal: React.FC<CreateRepoModalProps> = ({
             </button>
             <button
               type="submit"
-              className="flex-1 py-3.5 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:brightness-110 transition-all active:scale-95"
+              className="flex-1 py-3.5 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-xs shadow-lg shadow-primary/20 hover:brightness-110 transition-all active:scale-95"
             >
               Create Repository
             </button>

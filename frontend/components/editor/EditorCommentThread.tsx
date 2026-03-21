@@ -63,12 +63,12 @@ const EditorCommentItem: React.FC<EditorCommentItemProps> = ({
           <div className="mt-3 flex items-center gap-4">
             <button 
               onClick={() => onReply(comment.id, comment.author.username)}
-              className="text-[10px] font-black uppercase text-slate-500 hover:text-white transition-colors flex items-center gap-1.5"
+              className="text-[10px] font-medium uppercase text-slate-500 hover:text-white transition-colors flex items-center gap-1.5"
             >
               <span className="material-symbols-outlined !text-[14px]">reply</span>
               Reply
             </button>
-            <button className="text-[10px] font-black uppercase text-slate-500 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 flex items-center gap-1.5">
+            <button className="text-[10px] font-medium uppercase text-slate-500 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 flex items-center gap-1.5">
                <span className="material-symbols-outlined !text-[14px]">flag</span>
                Report
             </button>
@@ -118,7 +118,7 @@ const EditorCommentThread: React.FC<EditorCommentThreadProps> = ({ lineNumber, c
           <div className="size-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
             <span className="material-symbols-outlined !text-[16px] filled">forum</span>
           </div>
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Thread: Line {lineNumber}</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest text-slate-400">Thread: Line {lineNumber}</span>
           {comments.length > 0 && (
              <span className="text-[10px] font-bold text-slate-600 lowercase bg-slate-900 px-2 py-0.5 rounded-full border border-white/5">{comments.length} comments</span>
           )}
@@ -149,7 +149,7 @@ const EditorCommentThread: React.FC<EditorCommentThreadProps> = ({ lineNumber, c
             <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-xl px-4 py-2 animate-in slide-in-from-left-2 duration-200">
               <div className="flex items-center gap-2">
                  <span className="material-symbols-outlined text-primary !text-[16px]">reply</span>
-                 <span className="text-[11px] font-black uppercase text-primary">Replying to @{replyTo.username}</span>
+                 <span className="text-[11px] font-medium uppercase text-primary">Replying to @{replyTo.username}</span>
               </div>
               <button type="button" onClick={() => setReplyTo(null)} className="text-slate-500 hover:text-white transition-colors">
                 <span className="material-symbols-outlined !text-[16px]">close</span>
@@ -181,14 +181,14 @@ const EditorCommentThread: React.FC<EditorCommentThreadProps> = ({ lineNumber, c
                 <button 
                   type="button" 
                   onClick={onClose}
-                  className="px-4 py-2 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+                  className="px-4 py-2 text-[11px] font-medium uppercase tracking-widest text-slate-500 hover:text-white transition-colors rounded-xl hover:bg-white/5"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
                   disabled={!inputText.trim()}
-                  className="bg-primary hover:bg-blue-600 disabled:opacity-30 disabled:scale-100 text-white px-5 py-2 rounded-xl text-[11px] font-black uppercase tracking-[0.1em] transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
+                  className="bg-primary hover:bg-blue-600 disabled:opacity-30 disabled:scale-100 text-white px-5 py-2 rounded-xl text-[11px] font-medium uppercase tracking-[0.1em] transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95"
                 >
                   {replyTo ? 'Post Reply' : 'Add Comment'}
                 </button>

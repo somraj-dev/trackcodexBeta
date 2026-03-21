@@ -85,7 +85,7 @@ const LibraryCard: React.FC<{
       <div className="mt-auto flex items-center justify-between pt-4 border-t border-gh-border/50">
         <div className="flex items-center gap-2">
           {resource.isAudited && (
-            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20">
+            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[9px] font-medium uppercase tracking-widest border border-emerald-500/20">
               <span className="material-symbols-outlined !text-[12px] filled">
                 verified
               </span>
@@ -95,7 +95,7 @@ const LibraryCard: React.FC<{
           {resource.tags.slice(0, 1).map((tag) => (
             <span
               key={tag}
-              className="px-1.5 py-0.5 rounded bg-gh-bg-tertiary text-gh-text-secondary text-[9px] font-black uppercase tracking-widest border border-gh-border"
+              className="px-1.5 py-0.5 rounded bg-gh-bg-tertiary text-gh-text-secondary text-[9px] font-medium uppercase tracking-widest border border-gh-border"
             >
               {tag}
             </span>
@@ -103,7 +103,7 @@ const LibraryCard: React.FC<{
         </div>
         <button
           onClick={handleInsert}
-          className="flex items-center gap-2 text-gh-text-secondary/50 hover:text-gh-text text-[10px] font-black uppercase tracking-widest transition-all"
+          className="flex items-center gap-2 text-gh-text-secondary/50 hover:text-gh-text text-[10px] font-medium uppercase tracking-widest transition-all"
         >
           <span className="material-symbols-outlined !text-[16px]">add</span>
           Insert into Workspace
@@ -173,9 +173,9 @@ const LibraryDetail = ({
                 </span>
               </div>
               <div>
-                <h1 className="text-2xl font-black text-gh-text tracking-tight flex items-center gap-3">
+                <h1 className="text-lg font-semibold text-gh-text tracking-tight flex items-center gap-3">
                   {resource.name}
-                  <span className="px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-500 text-[10px] font-black uppercase tracking-widest bg-emerald-500/5 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-500 text-[10px] font-medium uppercase tracking-widest bg-emerald-500/5 flex items-center gap-1">
                     <span className="material-symbols-outlined !text-[12px] filled">
                       security
                     </span>
@@ -211,7 +211,7 @@ const LibraryDetail = ({
             </button>
             <button
               onClick={handleAddToWorkspace}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95"
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95"
             >
               <span className="material-symbols-outlined !text-[18px]">
                 add
@@ -221,7 +221,7 @@ const LibraryDetail = ({
             <button
               onClick={handleForgeAIPreview}
               disabled={isAnalyzing}
-              className={`flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-primary text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-purple-500/20 hover:brightness-110 active:scale-95 ${isAnalyzing ? "opacity-75 cursor-wait" : ""}`}
+              className={`flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-purple-500/20 hover:brightness-110 active:scale-95 ${isAnalyzing ? "opacity-75 cursor-wait" : ""}`}
             >
               <span
                 className={`material-symbols-outlined !text-[18px] filled ${isAnalyzing ? "animate-spin" : ""}`}
@@ -267,7 +267,7 @@ const LibraryDetail = ({
             {aiInsight && (
               <div className="p-6 bg-primary/5 border border-primary/20 rounded-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-                <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest mb-4">
+                <div className="flex items-center gap-2 text-primary text-[10px] font-medium uppercase tracking-widest mb-4">
                   <span className="material-symbols-outlined !text-[16px] filled">
                     auto_awesome
                   </span>
@@ -333,7 +333,7 @@ const LibraryDetail = ({
             {resource.snippetPreview && (
               <section>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black text-gh-text-secondary uppercase tracking-widest">
+                  <h3 className="text-sm font-semibold text-gh-text-secondary uppercase tracking-widest">
                     Code Snippet Preview
                   </h3>
                   <button className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest flex items-center gap-1.5 transition-colors">
@@ -361,7 +361,7 @@ const LibraryDetail = ({
 
             <section className="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-6 flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-black text-indigo-400 uppercase tracking-widest mb-1">
+                <h3 className="text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-1">
                   Freelancer Context
                 </h3>
                 <p className="text-[12px] text-gh-text-secondary">
@@ -375,8 +375,8 @@ const LibraryDetail = ({
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-black text-gh-text">~45h</p>
-                <p className="text-[10px] text-gh-text-secondary uppercase font-black">
+                <p className="text-lg font-semibold text-gh-text">~45h</p>
+                <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
                   Est. Effort Saved
                 </p>
               </div>
@@ -386,10 +386,10 @@ const LibraryDetail = ({
           <div className="space-y-8">
             <div className="p-6 rounded-2xl bg-gh-bg-secondary border border-gh-border">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xs font-black text-gh-text-secondary uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-gh-text-secondary uppercase tracking-widest">
                   Security & Quality
                 </h3>
-                <span className="px-2 py-0.5 rounded bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest">
+                <span className="px-2 py-0.5 rounded bg-emerald-500 text-white text-[9px] font-medium uppercase tracking-widest">
                   A+ Grade
                 </span>
               </div>
@@ -423,7 +423,7 @@ const LibraryDetail = ({
                     <p className="text-[11px] font-bold text-gh-text">
                       Maintained by
                     </p>
-                    <p className="text-[11px] text-primary font-black hover:underline cursor-pointer">
+                    <p className="text-[11px] text-primary font-semibold hover:underline cursor-pointer">
                       @schen_sec
                     </p>
                   </div>
@@ -432,7 +432,7 @@ const LibraryDetail = ({
             </div>
 
             <div className="p-6 rounded-2xl bg-gh-bg-secondary border border-gh-border">
-              <h3 className="text-xs font-black text-gh-text-secondary uppercase tracking-widest mb-6">
+              <h3 className="text-xs font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
                 Community
               </h3>
               <div className="flex items-center gap-2 mb-6">
@@ -446,7 +446,7 @@ const LibraryDetail = ({
                     </span>
                   ))}
                 </div>
-                <span className="text-xs font-black text-gh-text">4.8</span>
+                <span className="text-xs font-semibold text-gh-text">4.8</span>
                 <span className="text-xs text-gh-text-secondary">
                   (120 reviews)
                 </span>
@@ -469,7 +469,7 @@ const LibraryDetail = ({
                   </p>
                 </div>
               </div>
-              <button className="w-full mt-6 py-2 border border-primary/30 rounded-xl text-[11px] font-black text-primary uppercase tracking-widest hover:bg-primary/5 transition-all">
+              <button className="w-full mt-6 py-2 border border-primary/30 rounded-xl text-[11px] font-semibold text-primary uppercase tracking-widest hover:bg-primary/5 transition-all">
                 Ask a Question
               </button>
             </div>
@@ -478,12 +478,12 @@ const LibraryDetail = ({
               {resource.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-gh-bg-secondary border border-gh-border rounded-lg text-[10px] text-gh-text-secondary font-black uppercase tracking-widest hover:text-gh-text transition-all cursor-pointer"
+                  className="px-2 py-1 bg-gh-bg-secondary border border-gh-border rounded-lg text-[10px] text-gh-text-secondary font-medium uppercase tracking-widest hover:text-gh-text transition-all cursor-pointer"
                 >
                   #{tag.toLowerCase()}
                 </span>
               ))}
-              <span className="px-2 py-1 bg-gh-bg-secondary border border-gh-border rounded-lg text-[10px] text-gh-text-secondary font-black uppercase tracking-widest hover:text-gh-text transition-all cursor-pointer">
+              <span className="px-2 py-1 bg-gh-bg-secondary border border-gh-border rounded-lg text-[10px] text-gh-text-secondary font-medium uppercase tracking-widest hover:text-gh-text transition-all cursor-pointer">
                 #security-hardened
               </span>
             </div>
@@ -532,7 +532,7 @@ const LibraryView = () => {
       {/* Internal Library Sidebar */}
       <aside className="w-[280px] border-r border-gh-border flex flex-col shrink-0">
         <div className="p-6 border-b border-gh-border">
-          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-gh-text-secondary mb-6 flex items-center gap-2">
+          <h2 className="text-[11px] font-medium uppercase tracking-widest text-gh-text-secondary mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">
               filter_list
             </span>
@@ -540,7 +540,7 @@ const LibraryView = () => {
           </h2>
 
           <div className="space-y-1">
-            <p className="px-3 text-[10px] font-black text-gh-text-secondary uppercase tracking-widest mb-2 mt-4">
+            <p className="px-3 text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-2 mt-4">
               Resource Type
             </p>
             {MOCK_LIBRARY_CATEGORIES.map((cat) => (
@@ -563,7 +563,7 @@ const LibraryView = () => {
                 </span>
                 <span className="flex-1 text-left">{cat.name}</span>
                 <span
-                  className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${activeCategory === cat.name ? "bg-primary text-white" : "bg-gh-bg-tertiary text-gh-text-secondary"}`}
+                  className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${activeCategory === cat.name ? "bg-primary text-white" : "bg-gh-bg-tertiary text-gh-text-secondary"}`}
                 >
                   {cat.count}
                 </span>
@@ -572,7 +572,7 @@ const LibraryView = () => {
           </div>
 
           <div className="mt-8 space-y-4">
-            <p className="px-3 text-[10px] font-black text-gh-text-secondary uppercase tracking-widest mb-2">
+            <p className="px-3 text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-2">
               Filters
             </p>
             <div className="space-y-3 px-3">
@@ -603,13 +603,13 @@ const LibraryView = () => {
         </div>
 
         <div className="mt-auto p-6 space-y-4">
-          <div className="flex items-center gap-2 text-[11px] font-black text-emerald-500 uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-emerald-500 uppercase tracking-widest">
             <span className="material-symbols-outlined !text-[16px] filled">
               verified
             </span>
             Verified Safe
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-black text-gh-text-secondary uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest">
             <span className="material-symbols-outlined !text-[16px]">
               hourglass_empty
             </span>
@@ -634,9 +634,9 @@ const LibraryView = () => {
                 <span>/</span>
                 <span className="text-gh-text">backend-api</span>
               </nav>
-              <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+              <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
                 Backend API Templates{" "}
-                <span className="px-2 py-0.5 rounded-full border border-gh-border text-[11px] font-black uppercase text-gh-text-secondary ml-2">
+                <span className="px-2 py-0.5 rounded-full border border-gh-border text-[11px] font-medium uppercase text-gh-text-secondary ml-2">
                   Public
                 </span>
               </h1>
@@ -652,7 +652,7 @@ const LibraryView = () => {
                 </span>
                 Filter
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20">
+              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20">
                 <span className="material-symbols-outlined !text-[18px]">
                   add
                 </span>

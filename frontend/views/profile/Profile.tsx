@@ -308,7 +308,7 @@ const ProfileView = () => {
                         <span className="material-symbols-outlined filled !text-xl">
                           verified
                         </span>
-                        <h3 className="text-[10px] font-black uppercase tracking-widest">
+                        <h3 className="text-[10px] font-medium uppercase tracking-widest">
                           ForgeAI Audited
                         </h3>
                       </div>
@@ -360,7 +360,7 @@ const ProfileView = () => {
                     </div>
                     <div className="flex items-center gap-8">
                       <div>
-                        <div className="text-2xl font-black text-gh-text">
+                        <div className="text-lg font-semibold text-gh-text">
                           0
                         </div>
                         <div className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-widest">
@@ -368,7 +368,7 @@ const ProfileView = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="text-2xl font-black text-gh-text">
+                        <div className="text-lg font-semibold text-gh-text">
                           2
                         </div>
                         <div className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-widest">
@@ -376,7 +376,7 @@ const ProfileView = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="text-2xl font-black text-emerald-500">
+                        <div className="text-lg font-semibold text-emerald-500">
                           98%
                         </div>
                         <div className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-widest">
@@ -444,7 +444,7 @@ const ProfileView = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-black text-purple-400">
+                    <div className="text-xl font-semibold text-purple-400">
                       842
                     </div>
                     <div className="text-xs font-bold text-gh-text-secondary uppercase tracking-widest">
@@ -499,7 +499,7 @@ const ProfileView = () => {
                         {stat.icon}
                       </span>
                       <div>
-                        <div className="text-xl font-black text-gh-text">
+                        <div className="text-base font-semibold text-gh-text">
                           {stat.value}
                         </div>
                         <div className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-widest">

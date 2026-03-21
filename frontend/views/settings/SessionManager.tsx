@@ -87,7 +87,7 @@ const SessionManager: React.FC = () => {
               </div>
             </div>
             {session.isCurrent ? (
-              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] font-medium uppercase tracking-widest">
                 Active
               </span>
             ) : (

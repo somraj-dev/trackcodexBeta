@@ -36,7 +36,7 @@ const StatCard = ({ title, value, change, color }: any) => (
         {change}
       </span>
     </div>
-    <div className="text-2xl font-black text-gh-text">{value}</div>
+    <div className="text-lg font-semibold text-gh-text">{value}</div>
   </div>
 );
 

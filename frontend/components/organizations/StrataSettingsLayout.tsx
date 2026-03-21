@@ -39,7 +39,7 @@ const StrataSettingsLayout: React.FC = () => {
           </div>
 
           <section>
-            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Settings</h3>
+            <h3 className="px-3 text-[10px] font-medium uppercase text-slate-500 tracking-widest mb-2">Settings</h3>
             <nav className="flex flex-col gap-0.5">
               <SettingsNavItem to={`${basePath}/general`} label="General" icon="tune" />
               <SettingsNavItem to={`${basePath}/permissions`} label="Permissions" icon="lock_person" />
@@ -49,7 +49,7 @@ const StrataSettingsLayout: React.FC = () => {
           </section>
 
           <section>
-            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Security</h3>
+            <h3 className="px-3 text-[10px] font-medium uppercase text-slate-500 tracking-widest mb-2">Security</h3>
             <nav className="flex flex-col gap-0.5">
               <SettingsNavItem to={`${basePath}/authentication`} label="Authentication" icon="shield" />
               <SettingsNavItem to={`${basePath}/ssh-keys`} label="SSH & GPG Keys" icon="key" />

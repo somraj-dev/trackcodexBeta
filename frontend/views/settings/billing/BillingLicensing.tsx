@@ -4,7 +4,7 @@ const BillingLicensing = () => {
   return (
     <div className="space-y-8 pb-20">
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">Licensing</h1>
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">Licensing</h1>
         <p className="text-gh-text-secondary">Manage your licenses and seat allocations.</p>
       </header>
       <section>

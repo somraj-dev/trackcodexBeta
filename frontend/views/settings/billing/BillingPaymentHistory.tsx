@@ -4,7 +4,7 @@ const BillingPaymentHistory = () => {
   return (
     <div className="space-y-8 pb-20">
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">Payment history</h1>
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">Payment history</h1>
         <p className="text-gh-text-secondary">View your past invoices and payment records.</p>
       </header>
       <section>

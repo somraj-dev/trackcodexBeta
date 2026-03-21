@@ -72,7 +72,7 @@ const BranchProtectionSettings: React.FC<BranchProtectionSettingsProps> = ({ rep
           <h3 className="text-sm font-bold text-gh-text mb-4 uppercase tracking-widest">Add branch protection rule</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-black uppercase text-gh-text-secondary mb-2 block">Branch name pattern</label>
+              <label className="text-xs font-medium uppercase text-gh-text-secondary mb-2 block">Branch name pattern</label>
               <input 
                 value={newPattern}
                 onChange={(e) => setNewPattern(e.target.value)}
@@ -126,7 +126,7 @@ const BranchProtectionSettings: React.FC<BranchProtectionSettingsProps> = ({ rep
                     onClick={() => toggleRule(rule.id, "requirePR")}
                     className={`mt-1 size-5 rounded-md border flex items-center justify-center cursor-pointer transition-all ${rule.requirePR ? "bg-primary border-primary" : "bg-gh-bg border-gh-border"}`}
                   >
-                    {rule.requirePR && <span className="material-symbols-outlined !text-[14px] text-white font-black">check</span>}
+                    {rule.requirePR && <span className="material-symbols-outlined !text-[14px] text-white font-semibold">check</span>}
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-gh-text">Require a pull request before merging</h4>
@@ -141,7 +141,7 @@ const BranchProtectionSettings: React.FC<BranchProtectionSettingsProps> = ({ rep
                     onClick={() => toggleRule(rule.id, "requireSignedCommits")}
                     className={`mt-1 size-5 rounded-md border flex items-center justify-center cursor-pointer transition-all ${rule.requireSignedCommits ? "bg-primary border-primary" : "bg-gh-bg border-gh-border"}`}
                   >
-                    {rule.requireSignedCommits && <span className="material-symbols-outlined !text-[14px] text-white font-black">check</span>}
+                    {rule.requireSignedCommits && <span className="material-symbols-outlined !text-[14px] text-white font-semibold">check</span>}
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-gh-text">Require signed commits</h4>

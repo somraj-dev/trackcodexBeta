@@ -23,7 +23,7 @@ const SessionsSettings = () => {
     return (
         <div className="space-y-8 pb-20">
             <header>
-                <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+                <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
                     Sessions
                 </h1>
                 <p className="text-gh-text-secondary">
@@ -76,7 +76,7 @@ const SessionsSettings = () => {
             </section>
 
             <section className="pt-6 border-t border-gh-border">
-                <h3 className="text-lg font-bold text-gh-text mb-4">
+                <h3 className="text-base font-semibold text-gh-text mb-4">
                     Revoke all sessions
                 </h3>
                 <div className="border border-red-500/20 rounded-lg p-6 bg-red-900/5">

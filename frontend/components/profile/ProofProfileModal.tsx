@@ -30,7 +30,7 @@ const StatCard = ({
     <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
       {label}
     </h3>
-    <div className="text-4xl font-black text-white mb-2">{value}</div>
+    <div className="text-2xl font-semibold text-white mb-2">{value}</div>
     <div
       className={`text-xs font-bold ${trend.includes("+") ? "text-emerald-400" : "text-amber-400"}`}
     >
@@ -72,7 +72,7 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-3xl font-black text-white tracking-tight">
+                  <h1 className="text-xl font-semibold text-white tracking-tight">
                     {profile.name}
                   </h1>
                   <span className="material-symbols-outlined text-emerald-400 filled !text-xl">
@@ -111,7 +111,7 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
               </button>
                <button
                 onClick={onDownloadResume}
-                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all border border-purple-400/20"
+                className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-medium uppercase tracking-widest shadow-lg shadow-purple-600/20 transition-all border border-purple-400/20"
               >
                 Download Resume
               </button>
@@ -289,7 +289,7 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
               <div className="mt-auto bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl p-8 text-center border border-white/10 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                 <div className="relative z-10">
-                  <h2 className="text-2xl font-black text-white mb-2">
+                  <h2 className="text-lg font-semibold text-white mb-2">
                     Hire {profile.name.split(" ")[0]}
                   </h2>
                   <p className="text-purple-100 text-sm mb-6 leading-relaxed max-w-[80%] mx-auto">
@@ -298,7 +298,7 @@ const ProofProfileModal: React.FC<ProofProfileModalProps> = ({
                   </p>
                   <button
                     onClick={onProceed}
-                    className="w-full py-4 bg-white text-purple-900 rounded-xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
+                    className="w-full py-4 bg-white text-purple-900 rounded-xl font-medium uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
                   >
                     Start Direct Interview
                   </button>

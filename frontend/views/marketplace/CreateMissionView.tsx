@@ -1292,7 +1292,7 @@ const CreateMissionView = () => {
                       className={`flex-1 flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left ${formData.registrationPlatform === 'TrackCodex' ? 'border-blue-500 bg-blue-500/5' : 'border-gh-border hover:border-gh-border-secondary'}`}
                     >
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-white font-black text-[12px]">TC</span>
+                        <span className="text-white font-semibold text-[12px]">TC</span>
                       </div>
                       <div>
                         <h4 className="text-[14px] font-bold text-gh-text">TrackCodex</h4>

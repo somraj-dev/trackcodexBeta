@@ -46,11 +46,11 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
     };
 
     return (
-        <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#030303] animate-in fade-in duration-300">
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gh-bg animate-in fade-in duration-300">
             <div className="max-w-[740px] mx-auto py-8 px-4">
                 {/* Header */}
-                <div className="flex items-center justify-between pb-4 border-b border-[#1A1A1B] mb-6">
-                    <h1 className="text-xl font-bold text-white">Create post</h1>
+                <div className="flex items-center justify-between pb-4 border-b border-gh-border mb-6">
+                    <h1 className="text-xl font-bold text-gh-text">Create post</h1>
                     <button className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">Drafts</button>
                 </div>
 
@@ -58,29 +58,29 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                 <div className="relative mb-6">
                     <button
                         onClick={() => setShowCommunityDropdown(!showCommunityDropdown)}
-                        className="flex items-center gap-2 bg-[#1A1A1B] hover:bg-[#272729] border border-[#343536] rounded-full px-4 py-2 transition-colors min-w-[200px]"
+                        className="flex items-center gap-2 bg-gh-bg-secondary hover:bg-gh-bg-tertiary border border-gh-border rounded-full px-4 py-2 transition-colors min-w-[200px]"
                     >
                         {selectedCommunity ? (
                             <>
                                 <img src={selectedCommunity.avatar || `https://ui-avatars.com/api/?name=${selectedCommunity.name}`} className="size-5 rounded-full" alt="" />
-                                <span className="text-[14px] font-bold text-white">{selectedCommunity.name}</span>
+                                <span className="text-[14px] font-bold text-gh-text">{selectedCommunity.name}</span>
                             </>
                         ) : (
                             <>
-                                <div className="size-5 rounded-full bg-[#343536] flex items-center justify-center">
-                                    <span className="material-symbols-outlined !text-[14px] text-white">groups</span>
+                                <div className="size-5 rounded-full bg-gh-bg-tertiary flex items-center justify-center">
+                                    <span className="material-symbols-outlined !text-[14px] text-gh-text">groups</span>
                                 </div>
-                                <span className="text-[14px] font-bold text-[#D7DADC]">Select a community</span>
+                                <span className="text-[14px] font-bold text-gh-text-secondary">Select a community</span>
                             </>
                         )}
-                        <span className="material-symbols-outlined !text-[20px] ml-auto text-[#D7DADC]">expand_more</span>
+                        <span className="material-symbols-outlined !text-[20px] ml-auto text-gh-text-tertiary">expand_more</span>
                     </button>
 
                     {showCommunityDropdown && (
                         <>
                             <div className="fixed inset-0 z-40" onClick={() => setShowCommunityDropdown(false)} />
-                            <div className="absolute top-full left-0 mt-2 w-[300px] bg-[#1A1A1B] border border-[#343536] rounded-md shadow-2xl z-50 py-2">
-                                <p className="px-4 py-2 text-[10px] font-black uppercase tracking-wider text-[#575757]">Your Communities</p>
+                            <div className="absolute top-full left-0 mt-2 w-[300px] bg-gh-bg-secondary border border-gh-border rounded-md shadow-2xl z-50 py-2">
+                                <p className="px-4 py-2 text-[10px] font-medium uppercase tracking-wider text-gh-text-tertiary">Your Communities</p>
                                 {communities.map(c => (
                                     <button
                                         key={c.id}
@@ -88,10 +88,10 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                                             setSelectedCommunity(c);
                                             setShowCommunityDropdown(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-[#272729] transition-colors"
+                                        className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gh-bg-tertiary transition-colors"
                                     >
                                         <img src={c.avatar || `https://ui-avatars.com/api/?name=${c.name}`} className="size-6 rounded-full" alt="" />
-                                        <span className="text-sm text-[#D7DADC] font-medium">{c.name}</span>
+                                        <span className="text-sm text-gh-text font-medium">{c.name}</span>
                                     </button>
                                 ))}
                             </div>
@@ -100,16 +100,16 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                 </div>
 
                 {/* Tabbed Editor Box */}
-                <div className="bg-[#1A1A1B] border border-[#343536] rounded-md overflow-hidden">
+                <div className="bg-gh-bg-secondary border border-gh-border rounded-md overflow-hidden">
                     {/* Tabs */}
-                    <div className="flex border-b border-[#343536]">
+                    <div className="flex border-b border-gh-border">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold transition-colors border-b-2 hover:bg-[#272729] ${activeTab === tab.id
-                                    ? 'text-white border-white'
-                                    : 'text-[#818384] border-transparent'
+                                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold transition-colors border-b-2 hover:bg-gh-bg-tertiary ${activeTab === tab.id
+                                    ? 'text-gh-text border-gh-text'
+                                    : 'text-gh-text-tertiary border-transparent'
                                     }`}
                             >
                                 <span className="material-symbols-outlined !text-[20px]">{tab.icon}</span>
@@ -125,13 +125,13 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value.substring(0, 300))}
                                 placeholder="Title*"
-                                className="w-full bg-transparent border border-[#343536] rounded-md px-4 py-2 text-[14px] text-white placeholder-[#818384] focus:outline-none focus:border-white transition-all min-h-[40px] resize-none"
+                                className="w-full bg-transparent border border-gh-border rounded-md px-4 py-2 text-[14px] text-gh-text placeholder-gh-text-tertiary focus:outline-none focus:border-primary transition-all min-h-[40px] resize-none"
                             />
-                            <span className="absolute bottom-2 right-2 text-[10px] text-[#818384]">{title.length}/300</span>
+                            <span className="absolute bottom-2 right-2 text-[10px] text-gh-text-tertiary">{title.length}/300</span>
                         </div>
 
                         {/* Tag button */}
-                        <button className="flex items-center gap-2 px-3 py-1 bg-[#272729] hover:bg-[#343536] border border-[#343536] rounded-full text-xs font-bold text-[#D7DADC] transition-colors">
+                        <button className="flex items-center gap-2 px-3 py-1 bg-gh-bg-tertiary hover:bg-gh-bg-secondary border border-gh-border rounded-full text-xs font-bold text-gh-text-secondary transition-colors">
                             <span className="material-symbols-outlined !text-[16px]">add</span>
                             Add tags
                         </button>
@@ -139,32 +139,32 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                         {/* Tab-specific Content */}
                         <div className="min-h-[200px]">
                             {activeTab === 'text' && (
-                                <div className="border border-[#343536] rounded-md overflow-hidden bg-[#030303]">
-                                    <div className="flex items-center gap-4 px-3 py-2 border-b border-[#343536] bg-[#1A1A1B]">
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">format_bold</span>
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">format_italic</span>
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">link</span>
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">image</span>
-                                        <div className="w-px h-4 bg-[#343536]" />
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">format_list_bulleted</span>
-                                        <span className="material-symbols-outlined !text-[18px] text-[#818384] cursor-pointer hover:text-white">format_list_numbered</span>
+                                <div className="border border-gh-border rounded-md overflow-hidden bg-gh-bg">
+                                    <div className="flex items-center gap-4 px-3 py-2 border-b border-gh-border bg-gh-bg-secondary">
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">format_bold</span>
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">format_italic</span>
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">link</span>
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">image</span>
+                                        <div className="w-px h-4 bg-gh-border" />
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">format_list_bulleted</span>
+                                        <span className="material-symbols-outlined !text-[18px] text-gh-text-tertiary cursor-pointer hover:text-gh-text">format_list_numbered</span>
                                     </div>
                                     <textarea
                                         value={content}
                                         onChange={(e) => setContent(e.target.value)}
                                         placeholder="Body text (optional)"
-                                        className="w-full bg-transparent p-4 text-sm text-white placeholder-[#818384] focus:outline-none min-h-[160px] resize-y"
+                                        className="w-full bg-transparent p-4 text-sm text-gh-text placeholder-gh-text-tertiary focus:outline-none min-h-[160px] resize-y"
                                     />
                                 </div>
                             )}
 
                             {activeTab === 'image' && (
-                                <div className="border-2 border-dashed border-[#343536] rounded-md p-10 flex flex-col items-center justify-center gap-4 hover:border-white transition-colors group cursor-pointer">
-                                    <div className="p-4 rounded-full bg-[#272729] group-hover:bg-[#343536] transition-colors">
-                                        <span className="material-symbols-outlined !text-[32px] text-white">cloud_upload</span>
+                                <div className="border-2 border-dashed border-gh-border rounded-md p-10 flex flex-col items-center justify-center gap-4 hover:border-gh-text transition-colors group cursor-pointer">
+                                    <div className="p-4 rounded-full bg-gh-bg-tertiary group-hover:bg-gh-bg-secondary transition-colors">
+                                        <span className="material-symbols-outlined !text-[32px] text-gh-text">cloud_upload</span>
                                     </div>
-                                    <p className="text-sm font-bold text-white">Drag and Drop or upload media</p>
-                                    <p className="text-xs text-[#818384]">Images and videos supported</p>
+                                    <p className="text-sm font-bold text-gh-text">Drag and Drop or upload media</p>
+                                    <p className="text-xs text-gh-text-tertiary">Images and videos supported</p>
                                 </div>
                             )}
 
@@ -173,30 +173,30 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                                     value={linkUrl}
                                     onChange={(e) => setLinkUrl(e.target.value)}
                                     placeholder="Link URL *"
-                                    className="w-full bg-transparent border border-[#343536] rounded-md px-4 py-2 text-[14px] text-white placeholder-[#818384] focus:outline-none focus:border-white transition-all min-h-[80px] resize-none"
+                                    className="w-full bg-transparent border border-gh-border rounded-md px-4 py-2 text-[14px] text-gh-text placeholder-gh-text-tertiary focus:outline-none focus:border-primary transition-all min-h-[80px] resize-none"
                                 />
                             )}
 
                             {activeTab === 'poll' && (
                                 <div className="text-center py-10">
-                                    <span className="material-symbols-outlined !text-4xl text-[#343536] mb-2">poll</span>
-                                    <p className="text-sm text-[#818384]">Polls coming soon to TrackCodex</p>
+                                    <span className="material-symbols-outlined !text-4xl text-gh-border mb-2">poll</span>
+                                    <p className="text-sm text-gh-text-tertiary">Polls coming soon to TrackCodex</p>
                                 </div>
                             )}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-end gap-3 pt-6 border-t border-[#343536]">
+                        <div className="flex justify-end gap-3 pt-6 border-t border-gh-border">
                             <button
                                 onClick={onCancel}
-                                className="px-6 py-2 rounded-full border border-[#D7DADC] text-[#D7DADC] text-sm font-bold hover:bg-[#272729] transition-colors"
+                                className="px-6 py-2 rounded-full border border-gh-border text-gh-text-secondary text-sm font-bold hover:bg-gh-bg-tertiary transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading || !title.trim() || !selectedCommunity}
-                                className="px-6 py-2 rounded-full bg-[#D7DADC] hover:bg-[#ebedef] text-[#1A1A1B] text-sm font-bold transition-all disabled:opacity-50 active:scale-95"
+                                className="px-6 py-2 rounded-full bg-primary hover:opacity-90 text-white text-sm font-bold transition-all disabled:opacity-50 active:scale-95 shadow-md"
                             >
                                 {loading ? 'Posting...' : 'Post'}
                             </button>
@@ -204,13 +204,7 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({ onCancel, onPostCreated
                     </div>
                 </div>
 
-                {/* Footer Labels - Removing Reddit specific ones, keep TrackCodex feel */}
-                <div className="mt-8 flex flex-wrap gap-4 text-[12px] text-[#575757]">
-                    <span>TrackCodex Rules</span>
-                    <span>Privacy Policy</span>
-                    <span>User Agreement</span>
-                    <span className="ml-auto">© 2026 TrackCodex, Inc. All rights reserved.</span>
-                </div>
+
             </div>
         </div>
     );

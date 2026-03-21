@@ -148,7 +148,7 @@ const StrataHub = () => {
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-10">
-                    <h1 className="text-4xl font-black text-gh-text tracking-tight mb-2">
+                    <h1 className="text-2xl font-semibold text-gh-text tracking-tight mb-2">
                         StrataHub
                     </h1>
                     <p className="text-gh-text-secondary text-lg">

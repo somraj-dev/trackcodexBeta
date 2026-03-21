@@ -64,7 +64,7 @@ export const MOCK_REPOS: Repository[] = [
     <div class="size-24 bg-gradient-to-br from-white to-slate-400 rounded-xl flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(255,255,255,0.1)]">
         <span class="material-symbols-outlined !text-[48px] text-black">code_blocks</span>
     </div>
-    <h1 class="text-4xl font-black text-white mb-2 tracking-tight">QuantaCode</h1>
+    <h1 class="text-2xl font-semibold text-white mb-2 tracking-tight">QuantaCode</h1>
     <p class="text-xl text-slate-400 font-light">The Advanced AI-Powered Code Editor</p>
     
     <div class="flex items-center gap-2 mt-6">

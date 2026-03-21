@@ -57,7 +57,7 @@ const ResolveConflict = () => {
                     <div className="mx-auto h-16 w-16 bg-[#1f6feb]/10 rounded-full flex items-center justify-center mb-6 border border-[#1f6feb]/30">
                         <span className="material-symbols-outlined text-[#2f81f7] text-3xl">account_circle</span>
                     </div>
-                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Email already in use</h2>
+                    <h2 className="text-xl font-semibold text-white tracking-tight">Email already in use</h2>
                     <p className="mt-4 text-[#8b949e] text-sm leading-relaxed">
                         The email <span className="text-white font-semibold">{email}</span> is already associated with an account using <span className="text-[#2f81f7] font-semibold">{existingProvider === 'google.com' ? 'Google' : 'GitHub'}</span>.
                     </p>

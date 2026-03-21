@@ -220,7 +220,7 @@ const PersonalAccessTokensSettings = () => {
     return (
       <div className="space-y-8 animate-in fade-in duration-300">
         <header>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-lg font-semibold text-white tracking-tight">
             New personal access token
           </h1>
           <p className="text-sm text-gh-text-secondary mt-1">
@@ -314,7 +314,7 @@ const PersonalAccessTokensSettings = () => {
     <div className="space-y-8">
       <header className="flex items-center justify-between pb-6 border-b border-gh-border">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+          <h1 className="text-lg font-semibold text-white tracking-tight">
             Personal access tokens
           </h1>
           <p className="text-sm text-gh-text-secondary mt-1">
@@ -324,7 +324,7 @@ const PersonalAccessTokensSettings = () => {
         </div>
         <button
           onClick={() => setView("generate")}
-          className="px-5 py-2.5 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:brightness-110"
+          className="px-5 py-2.5 bg-primary text-white text-xs font-medium uppercase tracking-widest rounded-lg shadow-lg shadow-primary/20 hover:brightness-110"
         >
           Generate new token
         </button>

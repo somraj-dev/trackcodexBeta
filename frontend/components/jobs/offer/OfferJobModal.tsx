@@ -98,7 +98,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
             </div>
           </div>
 
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-4">
             Approval Workflow
           </h3>
           <div className="space-y-6 relative">
@@ -177,7 +177,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
               className="max-w-2xl space-y-8"
             >
               <section>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4">
+                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-4">
                   Compensation
                 </h3>
 
@@ -240,7 +240,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
               <div className="h-px bg-[#30363d]"></div>
 
               <section>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4">
+                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-4">
                   Logistics
                 </h3>
 

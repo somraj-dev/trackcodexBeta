@@ -99,7 +99,7 @@ const OfferEditorView = () => {
                         </div>
                         <div className="p-4 bg-gh-bg-secondary border border-gh-border rounded-lg">
                             <p className="text-xs text-gh-text-secondary uppercase font-bold tracking-wider">Final Scorecard</p>
-                            <p className="text-3xl font-black text-gh-text">4.8<span className="text-lg text-gh-text-secondary">/5</span></p>
+                            <p className="text-xl font-semibold text-gh-text">4.8<span className="text-lg text-gh-text-secondary">/5</span></p>
                         </div>
                     </div>
                     <div>

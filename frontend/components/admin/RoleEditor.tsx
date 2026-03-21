@@ -36,14 +36,14 @@ const RoleEditor = () => {
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Roles & Permissions
           </h1>
           <p className="text-gh-text-secondary">
             Define administrative scopes and granular permission sets.
           </p>
         </div>
-        <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+        <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">
             shield_with_heart
           </span>
@@ -68,13 +68,13 @@ const RoleEditor = () => {
                   <h3 className="text-lg font-bold text-gh-text leading-none">
                     {role.name}
                   </h3>
-                  <p className="text-[10px] text-gh-text-secondary uppercase font-black tracking-widest mt-1">
+                  <p className="text-[10px] text-gh-text-secondary uppercase font-semibold tracking-widest mt-1">
                     Scope: {role.scope}
                   </p>
                 </div>
               </div>
               {role.system && (
-                <span className="px-2 py-0.5 rounded bg-gh-bg-tertiary border border-gh-border text-[8px] font-black text-gh-text-secondary uppercase tracking-widest">
+                <span className="px-2 py-0.5 rounded bg-gh-bg-tertiary border border-gh-border text-[8px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                   System Role
                 </span>
               )}
@@ -82,28 +82,28 @@ const RoleEditor = () => {
 
             <div className="flex items-center gap-8 mb-8">
               <div className="flex flex-col">
-                <span className="text-[9px] text-gh-text-secondary uppercase font-black tracking-widest">
+                <span className="text-[9px] text-gh-text-secondary uppercase font-semibold tracking-widest">
                   Users
                 </span>
-                <span className="text-xl font-black text-gh-text">
+                <span className="text-base font-semibold text-gh-text">
                   {role.users}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[9px] text-gh-text-secondary uppercase font-black tracking-widest">
+                <span className="text-[9px] text-gh-text-secondary uppercase font-semibold tracking-widest">
                   Permissions
                 </span>
-                <span className="text-xl font-black text-gh-text">
+                <span className="text-base font-semibold text-gh-text">
                   {role.permissions}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="flex-1 py-2 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+              <button className="flex-1 py-2 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-white rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all">
                 Edit Matrix
               </button>
-              <button className="flex-1 py-2 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+              <button className="flex-1 py-2 bg-gh-bg border border-gh-border text-gh-text-secondary hover:text-white rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all">
                 Simulate
               </button>
             </div>

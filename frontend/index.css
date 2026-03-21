@@ -24,6 +24,15 @@
   --text-primary: var(--gh-text);
   --text-secondary: var(--gh-text-secondary);
   --bg-hover: rgba(0, 0, 0, 0.05);
+
+  /* Typography Scale */
+  --tc-font-xs: 12px;
+  --tc-font-sm: 13px;
+  --tc-font-base: 14px;
+  --tc-font-md: 16px;
+  --tc-font-lg: 18px;
+  --tc-font-xl: 20px;
+  --tc-font-2xl: 24px;
 }
 
 .dark {
@@ -75,11 +84,54 @@ body,
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Geist", "Inter", sans-serif;
+  font-size: var(--tc-font-base);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   background-color: var(--gh-bg);
   color: var(--gh-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Typography Utilities ===== */
+.tc-heading {
+  font-size: var(--tc-font-lg);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.tc-page-title {
+  font-size: var(--tc-font-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.tc-label {
+  font-size: var(--tc-font-sm);
+  font-weight: 500;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tc-body {
+  font-size: var(--tc-font-base);
+  font-weight: 400;
+  line-height: 1.5;
+}
+.tc-caption {
+  font-size: var(--tc-font-xs);
+  font-weight: 400;
+  line-height: 1.4;
+}
+.tc-breadcrumb {
+  font-size: var(--tc-font-base);
+  font-weight: 400;
+}
+.tc-breadcrumb-active {
+  font-size: var(--tc-font-base);
+  font-weight: 600;
 }
 
 /* ===== Glass Panel ===== */
@@ -163,7 +215,7 @@ html.anim-fast * {
 
 /* ===== Font Variables ===== */
 .font-inter {
-  --font-display: "Inter", sans-serif;
+  --font-display: "Geist", "Inter", sans-serif;
 }
 .font-system {
   --font-display:

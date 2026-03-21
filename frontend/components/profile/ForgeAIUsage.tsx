@@ -44,11 +44,11 @@ const ForgeAIUsage: React.FC<Props> = ({ profile }) => {
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-cyan-400 filled !text-[22px]">auto_awesome</span>
-          <h3 className="text-[15px] font-black text-gh-text tracking-tight uppercase">ForgeAI Usage</h3>
+          <h3 className="text-[15px] font-semibold text-gh-text tracking-tight uppercase">ForgeAI Usage</h3>
         </div>
         <button
           onClick={() => navigate("/settings")}
-          className="px-3 py-1 bg-cyan-400/5 border border-cyan-400/20 text-cyan-400 text-[9px] font-black uppercase tracking-widest rounded-lg hover:bg-cyan-400 hover:text-white transition-all"
+          className="px-3 py-1 bg-cyan-400/5 border border-cyan-400/20 text-cyan-400 text-[9px] font-medium uppercase tracking-widest rounded-lg hover:bg-cyan-400 hover:text-white transition-all"
         >
           Pro
         </button>
@@ -74,7 +74,7 @@ const ForgeAIUsage: React.FC<Props> = ({ profile }) => {
 
           <div className="flex items-center justify-between pt-6 border-t border-gh-border/50">
             <div className="flex flex-col">
-              <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest mb-1">
+              <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-1">
                 {totalActions} Total Actions
               </span>
               <div className="flex items-center gap-1">
@@ -82,7 +82,7 @@ const ForgeAIUsage: React.FC<Props> = ({ profile }) => {
                 <span className="text-[10px] font-bold text-gh-text-secondary uppercase">Operational</span>
               </div>
             </div>
-            <span className="text-[15px] font-black text-cyan-400 uppercase tracking-tight drop-shadow-md">
+            <span className="text-[15px] font-semibold text-cyan-400 uppercase tracking-tight drop-shadow-md">
               {aiAssistedPct !== null ? `${aiAssistedPct}% AI‑Assisted` : "—"}
             </span>
           </div>
@@ -97,7 +97,7 @@ const ForgeAIUsage: React.FC<Props> = ({ profile }) => {
           </p>
           <button
             onClick={() => navigate("/repositories")}
-            className="text-[11px] font-black text-cyan-400 uppercase tracking-widest hover:underline"
+            className="text-[11px] font-semibold text-cyan-400 uppercase tracking-widest hover:underline"
           >
             Go to Repositories →
           </button>

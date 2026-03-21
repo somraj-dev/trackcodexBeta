@@ -35,7 +35,7 @@ const SecuritySettings = () => {
   return (
     <div className="space-y-12 pb-20">
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+        <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
           Password and authentication
         </h1>
         <p className="text-gh-text-secondary">
@@ -44,7 +44,7 @@ const SecuritySettings = () => {
       </header>
 
       <section>
-        <h3 className="text-lg font-bold text-gh-text mb-4">Sign in methods</h3>
+        <h3 className="text-base font-semibold text-gh-text mb-4">Sign in methods</h3>
         <div className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden mb-8">
           <SecurityMethod
             icon="mail"
@@ -68,21 +68,21 @@ const SecuritySettings = () => {
       </section>
 
       <section className="pt-10 border-t border-gh-border">
-        <h3 className="text-lg font-bold text-gh-text mb-6">
+        <h3 className="text-base font-semibold text-gh-text mb-6">
           Two-factor authentication
         </h3>
         <div className="flex flex-col items-center py-12 px-6 text-center border border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg/30">
           <div className="size-16 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center text-slate-600 mb-6">
             <span className="material-symbols-outlined !text-[32px]">lock</span>
           </div>
-          <h4 className="text-xl font-bold text-gh-text mb-3">
+          <h4 className="text-sm font-semibold text-gh-text mb-3">
             Two-factor authentication is not enabled yet.
           </h4>
           <p className="text-sm text-gh-text-secondary max-w-lg mb-8 leading-relaxed">
             Two-factor authentication adds an additional layer of security to
             your account by requiring more than just a password to sign in.
           </p>
-          <button className="px-6 py-2.5 bg-[#238636] hover:bg-[#2ea043] text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg transition-all active:scale-95">
+          <button className="px-6 py-2.5 bg-[#238636] hover:bg-[#2ea043] text-white rounded-xl text-sm font-medium uppercase tracking-widest shadow-lg transition-all active:scale-95">
             Enable two-factor authentication
           </button>
         </div>
@@ -93,14 +93,14 @@ const SecuritySettings = () => {
       </section>
 
       <section className="pt-10 border-t border-gh-border">
-        <h3 className="text-lg font-bold text-gh-text mb-6">Security Log</h3>
+        <h3 className="text-base font-semibold text-gh-text mb-6">Security Log</h3>
         <SecurityAuditLog />
       </section>
 
       <section className="pt-10 border-t border-gh-border">
-        <h3 className="text-lg font-bold text-red-400 mb-4">Danger Zone</h3>
+        <h3 className="text-base font-semibold text-red-400 mb-4">Danger Zone</h3>
         <div className="border border-red-500/20 rounded-lg p-6 bg-red-900/5">
-          <h4 className="font-bold text-gh-text mb-2">Delete Account</h4>
+          <h4 className="font-semibold text-gh-text mb-2">Delete Account</h4>
           <p className="text-sm text-gh-text-secondary mb-4">
             Permanently delete your account and all associated data. This action
             cannot be undone.

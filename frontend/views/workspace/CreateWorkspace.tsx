@@ -185,7 +185,7 @@ const CreateWorkspaceView = () => {
     <div className="bg-gh-bg p-10 font-display">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-black text-gh-text mb-2 tracking-tight">
+          <h1 className="text-2xl font-semibold text-gh-text mb-2 tracking-tight">
             Create New Workspace
           </h1>
           <p className="text-gh-text-secondary font-medium">
@@ -194,37 +194,7 @@ const CreateWorkspaceView = () => {
           </p>
         </div>
 
-        {/* Stepper */}
-        <div className="flex items-center justify-center gap-4 mb-16 relative px-20">
-          <div className="absolute left-20 right-20 top-[11px] h-0.5 bg-gh-border -z-10"></div>
-          {steps.map((s, i) => (
-            <div
-              key={s}
-              onClick={() => !isCreating && setStep(i)}
-              className="flex flex-col items-center gap-2 relative bg-gh-bg px-4 cursor-pointer group"
-            >
-              <div
-                className={`size-6 rounded-full border-2 flex items-center justify-center transition-all ${i <= step
-                  ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(19,91,236,0.4)]"
-                  : "border-gh-border text-gh-text-secondary group-hover:border-gh-text-secondary"
-                  }`}
-              >
-                {i < step ? (
-                  <span className="material-symbols-outlined !text-[14px]">
-                    check
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold">{i + 1}</span>
-                )}
-              </div>
-              <span
-                className={`text-[10px] font-black uppercase tracking-widest ${i <= step ? "text-gh-text" : "text-gh-text-secondary"}`}
-              >
-                {s} Selection
-              </span>
-            </div>
-          ))}
-        </div>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-12">
@@ -234,7 +204,7 @@ const CreateWorkspaceView = () => {
                 step >= 0 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
                 1: Workspace Type Selection
               </h2>
               <div className="grid grid-cols-3 gap-4">
@@ -281,7 +251,7 @@ const CreateWorkspaceView = () => {
                     </p>
                     {type === t.id && (
                       <div className="absolute top-2 right-2 size-4 bg-primary rounded-full flex items-center justify-center animate-in zoom-in duration-200">
-                        <span className="material-symbols-outlined text-[10px] text-white font-black">
+                        <span className="material-symbols-outlined text-[10px] text-white font-semibold">
                           check
                         </span>
                       </div>
@@ -297,7 +267,7 @@ const CreateWorkspaceView = () => {
                 step >= 1 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
                 2: Workspace Details
               </h2>
               <div className="grid grid-cols-2 gap-6">
@@ -372,7 +342,7 @@ const CreateWorkspaceView = () => {
                 step >= 2 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
                 3: Project & Repository Setup
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -403,7 +373,7 @@ const CreateWorkspaceView = () => {
                     }`}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black text-gh-text uppercase tracking-widest">
+                    <span className="text-[10px] font-bold text-gh-text uppercase tracking-widest">
                       Import Git
                     </span>
                     <span className="material-symbols-outlined !text-[16px] text-primary">
@@ -491,7 +461,7 @@ const CreateWorkspaceView = () => {
                 step >= 3 ? "opacity-100" : "opacity-30 pointer-events-none"
               }
             >
-              <h2 className="text-[12px] font-black text-gh-text-secondary uppercase tracking-[0.2em] mb-6">
+              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
                 4: ENVIRONMENT & SECURITY DEFAULTS
               </h2>
               <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 space-y-6 shadow-2xl">
@@ -546,7 +516,7 @@ const CreateWorkspaceView = () => {
                 <button
                   onClick={handleCreate}
                   disabled={isCreating}
-                  className="bg-primary hover:opacity-90 text-gh-bg px-12 py-3.5 rounded-xl font-black uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(var(--gh-primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
+                  className="bg-primary hover:opacity-90 text-gh-bg px-12 py-3.5 rounded-xl font-bold uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(var(--gh-primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
                 >
                   {isCreating ? (
                     <>
@@ -570,7 +540,7 @@ const CreateWorkspaceView = () => {
 
               {isCreating && (
                 <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
-                  <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary">
+                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-primary">
                     <span className="size-1.5 rounded-full bg-primary animate-pulse"></span>
                     Allocating cloud resources
                   </div>
@@ -588,7 +558,7 @@ const CreateWorkspaceView = () => {
             <span className="material-symbols-outlined text-gh-text-secondary !text-sm">
               hub
             </span>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gh-text-secondary">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gh-text-secondary">
               TrackCodex Infrastructure
             </span>
           </div>

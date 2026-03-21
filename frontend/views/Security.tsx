@@ -21,7 +21,7 @@ const SecurityView = () => {
     <div className="p-8 flex-1 overflow-y-auto custom-scrollbar space-y-6">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight">Security Dashboard</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Security Dashboard</h1>
           <p className="text-slate-400">Monitor and resolve infrastructure vulnerabilities.</p>
         </div>
         <button className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">

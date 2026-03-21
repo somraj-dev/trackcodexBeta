@@ -43,7 +43,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const isPostPopular = post.isPopular;
 
   return (
-    <div className={`bg-[#0b1416] border border-transparent hover:border-[#343536] rounded-md transition-all mb-4 group overflow-hidden ${isPostPromoted ? 'opacity-95' : ''}`}>
+    <div className={`bg-gh-bg-secondary border border-gh-border hover:border-gh-text-tertiary rounded-md transition-all mb-4 group overflow-hidden ${isPostPromoted ? 'opacity-95' : ''}`}>
       {/* Post Header */}
       <div className="flex items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2">
@@ -64,19 +64,19 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                 e.stopPropagation();
                 if (post.community) navigate(`/community/${post.community.slug}`);
               }}
-              className="font-bold text-[#D7DADC] hover:underline cursor-pointer transition-colors hover:text-white">
+              className="font-bold text-gh-text hover:underline cursor-pointer transition-colors hover:text-primary">
               {post.community ? post.community.slug : post.author.username}
             </span>
-            <span className="text-[#717273]">•</span>
+            <span className="text-gh-text-tertiary">•</span>
             {isPostPromoted ? (
-              <span className="text-[#717273] font-medium">Promoted</span>
+              <span className="text-gh-text-tertiary font-medium">Promoted</span>
             ) : (
               <>
-                <span className="text-[#717273] hover:underline cursor-pointer">
+                <span className="text-gh-text-tertiary hover:underline cursor-pointer">
                   {new Date(post.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
                 </span>
-                <span className="text-[#717273]">•</span>
-                <span className="text-[#47abee] font-medium">
+                <span className="text-gh-text-tertiary">•</span>
+                <span className="text-primary font-medium">
                   {isPostPopular ? 'Popular near you' : 'Suggested for you'}
                 </span>
               </>
@@ -86,11 +86,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
         <div className="flex items-center gap-2">
           {!isPostPromoted && (
-            <button className={`${post.isJoined ? 'bg-transparent border border-[#343536] text-[#D7DADC]' : 'bg-[#0079D3] hover:bg-[#1484D6] text-white'} text-[12px] font-bold px-4 py-1.5 rounded-full transition-colors`}>
+            <button className={`${post.isJoined ? 'bg-transparent border border-gh-border text-gh-text-secondary' : 'bg-primary hover:opacity-90 text-white'} text-[12px] font-bold px-4 py-1.5 rounded-full transition-colors`}>
               {post.isJoined ? 'Joined' : 'Join'}
             </button>
           )}
-          <button className="text-[#818384] hover:bg-[#1A1A1B] p-1 rounded-full">
+          <button className="text-gh-text-tertiary hover:bg-gh-bg-tertiary p-1 rounded-full">
             <span className="material-symbols-outlined !text-[20px]">more_horiz</span>
           </button>
         </div>
@@ -98,7 +98,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       {/* Post Title */}
       <div className="px-4 pb-2">
-        <h3 className="text-[18px] font-bold text-[#D7DADC] leading-tight mb-2">
+        <h3 className="text-[18px] font-bold text-gh-text leading-tight mb-2">
           {post.title}
         </h3>
       </div>
@@ -106,7 +106,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       {/* Post Content / Media */}
       <div className="relative group/media">
         {post.mediaUrls && post.mediaUrls.length > 0 ? (
-          <div className="relative rounded-xl overflow-hidden bg-[#1A1A1B] border border-[#343536] mx-4 mb-2">
+          <div className="relative rounded-xl overflow-hidden bg-gh-bg-tertiary border border-gh-border mx-4 mb-2">
             <img
               src={post.mediaUrls[currentMediaIndex]}
               alt="Post media"
@@ -152,12 +152,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             )}
           </div>
         ) : post.mediaUrl ? (
-          <div className="mx-4 mb-2 rounded-xl overflow-hidden bg-[#1A1A1B] border border-[#343536]">
+          <div className="mx-4 mb-2 rounded-xl overflow-hidden bg-gh-bg-tertiary border border-gh-border">
             <img src={post.mediaUrl} alt="Post media" className="w-full h-auto max-h-[512px] object-contain mx-auto" />
           </div>
         ) : post.codeSnippet ? (
-          <div className="mx-4 mb-2 rounded-xl overflow-hidden bg-[#1A1A1B] border border-[#343536] p-4 font-mono text-[13px] text-[#A8AAAB]">
-            <div className="flex justify-between items-center mb-2 border-b border-[#343536] pb-2">
+          <div className="mx-4 mb-2 rounded-xl overflow-hidden bg-gh-bg-tertiary border border-gh-border p-4 font-mono text-[13px] text-gh-text-secondary">
+            <div className="flex justify-between items-center mb-2 border-b border-gh-border pb-2">
               <span className="text-secondary">{post.codeSnippet.language}</span>
               <span className="material-symbols-outlined !text-[16px]">content_copy</span>
             </div>
@@ -165,7 +165,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           </div>
         ) : (
           <div className="px-4 pb-2">
-            <p className="text-[14px] text-[#D7DADC] leading-relaxed">
+            <p className="text-[14px] text-gh-text-secondary leading-relaxed">
               {post.content}
             </p>
           </div>
@@ -175,38 +175,38 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       {/* Action Bar (Reddit Style) */}
       <div className="flex items-center px-4 py-2 gap-2">
         {/* Voting Pill */}
-        <div className="flex items-center bg-[#1A1A1B] hover:bg-[#272729] rounded-full p-0.5">
+        <div className="flex items-center bg-gh-bg-tertiary hover:bg-gh-bg-secondary rounded-full p-0.5">
           <button
             onClick={(e) => { e.stopPropagation(); handleVote('up'); }}
-            className={`p-1.5 rounded-full flex items-center justify-center transition-colors ${voteStatus === 'up' ? 'text-[#FF4500]' : 'text-[#818384] hover:bg-[#343536]'}`}
+            className={`p-1.5 rounded-full flex items-center justify-center transition-colors ${voteStatus === 'up' ? 'text-[#FF4500]' : 'text-gh-text-tertiary hover:bg-gh-bg-secondary'}`}
           >
             <span className={`material-symbols-outlined !text-[20px] ${voteStatus === 'up' ? 'filled' : ''}`}>arrow_upward</span>
           </button>
-          <span className={`text-[12px] font-bold px-1 min-w-[20px] text-center ${voteStatus === 'up' ? 'text-[#FF4500]' : voteStatus === 'down' ? 'text-[#7193FF]' : 'text-[#D7DADC]'}`}>
+          <span className={`text-[12px] font-bold px-1 min-w-[20px] text-center ${voteStatus === 'up' ? 'text-[#FF4500]' : voteStatus === 'down' ? 'text-[#7193FF]' : 'text-gh-text'}`}>
             {upvotes}
           </span>
           <button
             onClick={(e) => { e.stopPropagation(); handleVote('down'); }}
-            className={`p-1.5 rounded-full flex items-center justify-center transition-colors ${voteStatus === 'down' ? 'text-[#7193FF]' : 'text-[#818384] hover:bg-[#343536]'}`}
+            className={`p-1.5 rounded-full flex items-center justify-center transition-colors ${voteStatus === 'down' ? 'text-[#7193FF]' : 'text-gh-text-tertiary hover:bg-gh-bg-secondary'}`}
           >
             <span className={`material-symbols-outlined !text-[20px] ${voteStatus === 'down' ? 'filled' : ''}`}>arrow_downward</span>
           </button>
         </div>
 
         {/* Comments Pill */}
-        <button className="flex items-center gap-2 bg-[#1A1A1B] hover:bg-[#272729] px-3 py-1.5 rounded-full text-[#818384] transition-colors">
+        <button className="flex items-center gap-2 bg-gh-bg-tertiary hover:bg-gh-bg-secondary px-3 py-1.5 rounded-full text-gh-text-tertiary transition-colors">
           <span className="material-symbols-outlined !text-[20px]">chat_bubble</span>
           <span className="text-[12px] font-bold">{post.comments?.length || 0}</span>
         </button>
 
         {/* Awards Pill */}
-        <button className="flex items-center gap-2 bg-[#1A1A1B] hover:bg-[#272729] px-3 py-1.5 rounded-full text-[#818384] transition-colors">
+        <button className="flex items-center gap-2 bg-gh-bg-tertiary hover:bg-gh-bg-secondary px-3 py-1.5 rounded-full text-gh-text-tertiary transition-colors">
           <span className="material-symbols-outlined !text-[20px]">workspace_premium</span>
           <span className="text-[12px] font-bold">{post.awards || ''}</span>
         </button>
 
         {/* Share Pill */}
-        <button className="flex items-center gap-2 bg-[#1A1A1B] hover:bg-[#272729] px-3 py-1.5 rounded-full text-[#818384] transition-colors">
+        <button className="flex items-center gap-2 bg-gh-bg-tertiary hover:bg-gh-bg-secondary px-3 py-1.5 rounded-full text-gh-text-tertiary transition-colors">
           <span className="material-symbols-outlined !text-[20px]">share</span>
           <span className="text-[12px] font-bold">Share</span>
         </button>
