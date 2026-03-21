@@ -29,7 +29,7 @@ const PipelineVisualizer = ({
           <h3 className="font-bold text-white text-sm">{run.name}</h3>
           <div className="flex items-center gap-2 mt-2">
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${run.status === "success" ? "border-emerald-500/50 text-emerald-500 bg-emerald-500/10" : run.status === "failure" ? "border-rose-500/50 text-rose-500 bg-rose-500/10" : "border-blue-500/50 text-blue-500 bg-[#0A0A0A]lue-500/10"}`}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${run.status === "success" ? "border-emerald-500/50 text-emerald-500 bg-emerald-500/10" : run.status === "failure" ? "border-rose-500/50 text-rose-500 bg-rose-500/10" : "border-blue-500/50 text-blue-500 bg-blue-500/10"}`}
             >
               {run.status.replace("_", " ")}
             </span>
@@ -122,7 +122,7 @@ const PipelineVisualizer = ({
                 {step.logs.map((log, li) => (
                   <div
                     key={li}
-                    className="hover:bg-[#11141A] hover:text-[#c9d1d9] px-2 py-0.5 rounded-sm flex gap-4"
+                    className="hover:bg-gh-bg-tertiary hover:text-[#c9d1d9] px-2 py-0.5 rounded-sm flex gap-4"
                   >
                     <span className="opacity-30 select-none w-6 text-right">
                       {li + 1}

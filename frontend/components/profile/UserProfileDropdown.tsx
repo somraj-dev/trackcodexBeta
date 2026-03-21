@@ -21,7 +21,7 @@ const MenuItem = ({
 }: MenuItemProps) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] text-gh-text-secondary hover:text-white hover:bg-white/5 transition-colors group text-left"
+    className="w-full flex items-center gap-3 px-3 py-1.5 text-[13px] text-gh-text-secondary hover:bg-primary hover:text-white transition-colors group text-left"
   >
     <span className="material-symbols-outlined !text-[18px] opacity-70 group-hover:opacity-100">
       {icon}
@@ -29,7 +29,7 @@ const MenuItem = ({
     <span className="flex-1">{label}</span>
     {badge && (
       <span
-        className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold border border-white/10 ${badgeColor || "bg-gh-bg-secondary text-gh-text-secondary"}`}
+        className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold border border-gh-border ${badgeColor || "bg-gh-bg-secondary text-gh-text-secondary"}`}
       >
         {badge}
       </span>
@@ -73,7 +73,7 @@ const UserProfileDropdown = ({
       {/* Header Info */}
       <div
         onClick={() => handleNavigate("/profile")}
-        className="px-4 py-2 border-b border-gh-border mb-2 hover:bg-white/5 transition-colors cursor-pointer"
+        className="px-4 py-2 border-b border-gh-border mb-2 hover:bg-gh-bg-tertiary transition-colors cursor-pointer"
       >
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-3 overflow-hidden">

@@ -32,7 +32,7 @@ const OrgEnvironments = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <button className="px-4 py-2 text-sm bg-gh-bg-secondary border border-gh-border rounded-lg text-white flex items-center gap-2"><span className="material-symbols-outlined !text-base">upload</span> Import .env</button>
-                    <button onClick={() => setIsModalOpen(true)} className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-[#0A0A0A]lue-600 transition-colors flex items-center gap-2"><span className="material-symbols-outlined !text-base">add</span> New Variable</button>
+                    <button onClick={() => setIsModalOpen(true)} className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-blue-600 transition-colors flex items-center gap-2"><span className="material-symbols-outlined !text-base">add</span> New Variable</button>
                 </div>
             </header>
 
@@ -49,7 +49,7 @@ const OrgEnvironments = () => {
 
             <div className="bg-gh-bg-secondary border border-gh-border rounded-lg overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-[#0A0A0A]lack/20">
+                    <thead className="bg-black/20">
                         <tr className="text-xs text-slate-400 uppercase font-semibold tracking-wider">
                             <th className="p-4">Key</th>
                             <th className="p-4">Value</th>
@@ -76,7 +76,7 @@ const OrgEnvironments = () => {
                 </table>
             </div>
             
-            <div className="mt-8 p-5 bg-[#0A0A0A]lue-500/5 border border-blue-500/20 rounded-lg flex items-start gap-4">
+            <div className="mt-8 p-5 bg-blue-500/5 border border-blue-500/20 rounded-lg flex items-start gap-4">
                 <span className="material-symbols-outlined text-blue-400">lock</span>
                 <div>
                     <h4 className="font-bold text-white text-sm">Encryption Standard</h4>

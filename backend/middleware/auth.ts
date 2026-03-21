@@ -131,42 +131,99 @@ export async function requireAuth(
 >>>>>>> 54f61045784fe4c2d43a0f294d229b97529fa0dc
 =======
         if (isFirebaseConfigured) {
+          let fbEmail: string | undefined; // Hoisted so catch block can access it
           try {
             const fbUser = await firebaseAdmin.auth().getUser(firebaseUid);
+            fbEmail = fbUser.email || undefined;
             const email = fbUser.email || "";
             const name = fbUser.displayName || "TrackCodex User";
             const username = fbUser.email ? fbUser.email.split("@")[0] : `user_${firebaseUid.substring(0, 8)}`;
 
-            // Create the user in Postgres using upsert to handle race conditions
-            dbUser = await prisma.user.upsert({
-              where: { id: firebaseUid },
-              update: {
-                emailVerified: fbUser.emailVerified || false, // Sync latest status
-              },
-              create: {
-                id: firebaseUid,
-                email: email,
-                username: username,
-                name: name,
-                password: "", // Handled by Firebase
-                role: "user",
-                emailVerified: fbUser.emailVerified || false,
-              },
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                tokenVersion: true,
-              }
-            });
-            console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
+            // STEP 1: Try to find the user by email first (handles cases where
+            // user was created via a different auth method with the same email)
+            const existingByEmail = email
+              ? await prisma.user.findFirst({
+                  where: {
+                    OR: [
+                      { email: { equals: email, mode: "insensitive" } },
+                      { id: firebaseUid },
+                    ],
+                  },
+                  select: { id: true, email: true, role: true, tokenVersion: true },
+                })
+              : null;
+
+            if (existingByEmail) {
+              console.log(`[AUTH-SYNC] Found existing user by email/id lookup: ${existingByEmail.id}`);
+              dbUser = existingByEmail;
+            } else {
+              // STEP 2: Create a brand-new user via upsert
+              dbUser = await prisma.user.upsert({
+                where: { id: firebaseUid },
+                update: {
+                  emailVerified: fbUser.emailVerified || false,
+                },
+                create: {
+                  id: firebaseUid,
+                  email: email,
+                  username: username,
+                  name: name,
+                  password: "", // Handled by Firebase
+                  role: "user",
+                  emailVerified: fbUser.emailVerified || false,
+                },
+                select: {
+                  id: true,
+                  email: true,
+                  role: true,
+                  tokenVersion: true,
+                }
+              });
+              console.log(`[AUTH-SYNC] Successfully auto-synced user record for ${firebaseUid}`);
+            }
           } catch (syncErr: any) {
-            console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`, syncErr);
-            // If creation fails, we MUST NOT proceed with an unrecorded ID
-            return reply.code(401).send({
-              error: "Unauthorized",
-              message: "User synchronization failed. Please sign in again.",
-            });
+            const isConnectionError = syncErr?.message?.includes("Can't reach database") ||
+              syncErr?.message?.includes("connect") ||
+              syncErr?.message?.includes("ECONNREFUSED") ||
+              syncErr?.message?.includes("timeout") ||
+              syncErr?.code === "P1001" || syncErr?.code === "P1002";
+
+            console.error(`[AUTH-SYNC] Failed to auto-sync user ${firebaseUid}:`);
+            console.error(`[AUTH-SYNC]   Error: ${syncErr?.code} - ${syncErr?.message}`);
+
+            // STEP 3: Last-resort fallback — try to find the user by ANY means
+            if (!isConnectionError) {
+              try {
+                const fallbackUser = await prisma.user.findFirst({
+                  where: {
+                    OR: [
+                      ...(fbEmail ? [{ email: fbEmail }] : []),
+                      { id: firebaseUid },
+                    ],
+                  },
+                  select: { id: true, email: true, role: true, tokenVersion: true },
+                });
+
+                if (fallbackUser) {
+                  console.log(`[AUTH-SYNC] Fallback lookup succeeded: ${fallbackUser.id}`);
+                  dbUser = fallbackUser;
+                }
+              } catch (fallbackErr) {
+                console.error(`[AUTH-SYNC] Fallback lookup also failed:`, fallbackErr);
+              }
+            }
+
+            // If we STILL don't have a user, return appropriate error
+            if (!dbUser) {
+              const userMessage = isConnectionError
+                ? "Database is temporarily unavailable. Please try again in a moment."
+                : "User synchronization failed. Please sign in again.";
+
+              return reply.code(isConnectionError ? 503 : 401).send({
+                error: isConnectionError ? "Service Unavailable" : "Unauthorized",
+                message: userMessage,
+              });
+            }
           }
 >>>>>>> 0b9c9da6fdddbb394e1b8d775d8150cde90d5435
         }

@@ -35,9 +35,9 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-amber-500 filled !text-[22px]">work</span>
-          <h3 className="text-[15px] font-black text-gh-text tracking-tight uppercase">Freelance Profile</h3>
+          <h3 className="text-[15px] font-semibold text-gh-text tracking-tight uppercase">Freelance Profile</h3>
         </div>
-        <div className="flex items-center gap-1.5 font-black">
+        <div className="flex items-center gap-1.5 font-semibold">
           <span className="material-symbols-outlined !text-[20px] text-amber-500">star</span>
           <span className={`text-xl tracking-tighter ${rating !== null && rating > 0 ? "text-amber-500" : "text-gh-text-secondary"}`}>
             {rating !== null && rating > 0 ? rating.toFixed(1) : "N/A"}
@@ -55,7 +55,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
               <span className="text-[14px] font-bold text-gh-text-secondary group-hover/stat:text-gh-text transition-colors">
                 Jobs Completed
               </span>
-              <span className="text-2xl font-black text-gh-text">
+              <span className="text-lg font-semibold text-gh-text">
                 {jobsCompleted !== null ? jobsCompleted : "—"}
               </span>
             </button>
@@ -63,7 +63,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
               <span className="text-[13px] font-bold text-gh-text-secondary leading-tight">
                 Marketplace Status
               </span>
-              <span className="text-[14px] font-black text-gh-text uppercase tracking-tight">
+              <span className="text-[14px] font-semibold text-gh-text uppercase tracking-tight">
                 {freelancer?.isPublic ? "Active" : "Inactive"}
               </span>
             </div>
@@ -72,7 +72,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
           {repeatHireRate !== null ? (
             <div className="space-y-4 pt-6 border-t border-gh-border">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest">
+                <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                   {repeatHireRate}% Repeat Hire Rate
                 </span>
                 {ratingLabel && (
@@ -102,7 +102,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
           </p>
           <button
             onClick={() => navigate("/dashboard/jobs")}
-            className="text-[11px] font-black text-amber-500 uppercase tracking-widest hover:underline"
+            className="text-[11px] font-semibold text-amber-500 uppercase tracking-widest hover:underline"
           >
             Browse Jobs →
           </button>

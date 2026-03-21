@@ -48,7 +48,7 @@ const UserHoverCard: React.FC<UserHoverCardProps> = ({ user }) => {
           className="flex items-center gap-1 mb-0.5 cursor-pointer hover:underline decoration-white/30"
           onClick={handleProfileClick}
         >
-          <h4 className="text-[17px] font-black text-white tracking-tight leading-tight">{user.name}</h4>
+          <h4 className="text-[17px] font-semibold text-white tracking-tight leading-tight">{user.name}</h4>
           {user.isVerified && (
             <CheckCircle2 className="text-[#238636] fill-[#238636]/10" size={16} />
           )}

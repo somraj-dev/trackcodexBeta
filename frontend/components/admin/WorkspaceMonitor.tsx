@@ -35,7 +35,7 @@ const WorkspaceMonitor = () => {
     <div className="animate-in slide-in-from-right-4 duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Workspace Monitor
           </h1>
           <p className="text-gh-text-secondary">
@@ -45,7 +45,7 @@ const WorkspaceMonitor = () => {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
             <span className="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+            <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">
               {activeWorkspaces.length} Environments Running
             </span>
           </div>
@@ -66,10 +66,10 @@ const WorkspaceMonitor = () => {
             key={stat.label}
             className="bg-gh-bg-secondary border border-gh-border p-6 rounded-2xl"
           >
-            <p className="text-[10px] font-black text-gh-text-secondary uppercase tracking-widest mb-2">
+            <p className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-2">
               {stat.label}
             </p>
-            <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
+            <p className={`text-xl font-semibold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
       </div>
@@ -77,7 +77,7 @@ const WorkspaceMonitor = () => {
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden shadow-2xl">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-[0.2em] border-b border-gh-border">
+            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">Environment</th>
               <th className="px-6 py-4">Owner</th>
               <th className="px-6 py-4">Uptime</th>
@@ -125,10 +125,10 @@ const WorkspaceMonitor = () => {
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="px-3 py-1.5 rounded-lg bg-gh-bg-tertiary text-slate-300 hover:text-white text-[10px] font-black uppercase tracking-widest border border-gh-border transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-gh-bg-tertiary text-slate-300 hover:text-white text-[10px] font-medium uppercase tracking-widest border border-gh-border transition-all">
                       Audit Logs
                     </button>
-                    <button className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white text-[10px] font-black uppercase tracking-widest border border-rose-500/20 transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white text-[10px] font-medium uppercase tracking-widest border border-rose-500/20 transition-all">
                       Terminate
                     </button>
                   </div>

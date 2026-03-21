@@ -148,7 +148,7 @@ const StrataHub = () => {
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-10">
-                    <h1 className="text-4xl font-black text-gh-text tracking-tight mb-2">
+                    <h1 className="text-2xl font-semibold text-gh-text tracking-tight mb-2">
                         StrataHub
                     </h1>
                     <p className="text-gh-text-secondary text-lg">
@@ -172,7 +172,7 @@ const StrataHub = () => {
                         </div>
                         <button
                             onClick={() => navigate("/strata/new")}
-                            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+                            className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
                         >
                             <span className="material-symbols-outlined text-lg">add</span>
                             New Strata

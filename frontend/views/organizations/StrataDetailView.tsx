@@ -71,7 +71,7 @@ const StrataDetailView = () => {
               className="size-20 rounded-lg border-2 border-gh-border p-1 object-cover"
             />
             <div>
-              <h1 className="text-3xl font-black text-gh-text tracking-tight">
+              <h1 className="text-xl font-semibold text-gh-text tracking-tight">
                 {strata.name}
               </h1>
               <div className="flex items-center gap-4 mt-2 text-sm text-gh-text-secondary">

@@ -7,7 +7,7 @@ const PinnedRepoCard: React.FC<{ repo: PinnedRepo }> = ({ repo }) => (
     <div className="p-4 bg-[#0A0D14] border border-[#1E232E] rounded-lg group hover:border-[#8b949e] transition-all cursor-pointer flex flex-col">
         <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-bold text-primary group-hover:underline truncate">{repo.name}</h4>
-            <span className="px-2 py-0.5 rounded-full border border-[#1E232E] text-[9px] text-slate-500 font-black uppercase tracking-widest">
+            <span className="px-2 py-0.5 rounded-full border border-[#1E232E] text-[9px] text-slate-500 font-medium uppercase tracking-widest">
                 {repo.isPublic ? 'Public' : 'Private'}
             </span>
         </div>

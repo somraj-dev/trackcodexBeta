@@ -56,7 +56,7 @@ const HomeHero = () => {
           <div className="size-5">
             <TrackCodexLogo size="sm" collapsed={true} clickable={false} />
           </div>
-          <span className="text-[13px] font-black uppercase tracking-widest">
+          <span className="text-[13px] font-medium uppercase tracking-widest">
             Ask TrackCodex or start a task...
           </span>
         </div>
@@ -94,7 +94,7 @@ const HomeHero = () => {
           <button
             onClick={handleAskAI}
             disabled={isAnalyzing || !prompt.trim()}
-            className="size-11 bg-primary hover:bg-[#0A0A0A]lue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transition-all active:scale-95 group/btn disabled:opacity-50"
+            className="size-11 bg-primary hover:bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transition-all active:scale-95 group/btn disabled:opacity-50"
           >
             <span
               className={`material-symbols-outlined group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform ${isAnalyzing ? "animate-spin" : ""}`}
@@ -107,7 +107,7 @@ const HomeHero = () => {
 
       {aiOutput && (
         <div className="mb-6 p-6 bg-primary/5 border border-primary/20 rounded-2xl animate-in slide-in-from-top-4 duration-500 relative z-10">
-          <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest mb-4">
+          <div className="flex items-center gap-2 text-primary text-[10px] font-medium uppercase tracking-widest mb-4">
             <div className="size-4">
               <TrackCodexLogo size="sm" collapsed={true} clickable={false} />
             </div>
@@ -135,7 +135,7 @@ const HomeHero = () => {
             onClick={() => {
               setPrompt(chip.label);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-gh-bg border border-gh-border rounded-xl text-[11px] font-black uppercase tracking-widest text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all hover-lift"
+            className="flex items-center gap-2 px-4 py-2 bg-gh-bg border border-gh-border rounded-xl text-[11px] font-medium uppercase tracking-widest text-gh-text-secondary hover:text-gh-text hover:border-gh-text-secondary transition-all hover-lift"
           >
             <span className="material-symbols-outlined !text-[16px]">
               {chip.icon}

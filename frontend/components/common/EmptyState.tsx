@@ -38,12 +38,12 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       </div>
       <div className="max-w-md flex flex-col items-center">
         {title && (
-          <h2 className="text-[20px] font-semibold text-[#c9d1d9] mb-2">
+          <h2 className="text-[20px] font-semibold text-gh-text mb-2">
             {title}
           </h2>
         )}
         {displayDescription && (
-          <p className="text-[#8b949e] text-[14px] leading-relaxed">
+          <p className="text-gh-text-secondary text-[14px] leading-relaxed">
             {displayDescription}
           </p>
         )}

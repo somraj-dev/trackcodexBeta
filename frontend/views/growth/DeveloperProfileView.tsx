@@ -23,7 +23,7 @@ const DeveloperProfileView = () => {
           {currentUser?.id !== id && currentUser?.username !== id && (
             <button
               onClick={() => setShowChat(true)}
-              className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-[#0A0A0A]lue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20"
+              className="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20"
             >
               <span className="material-symbols-outlined !text-[20px]">chat</span>
               Message

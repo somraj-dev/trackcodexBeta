@@ -1,0 +1,269 @@
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 3 and 29 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+	new file:   .cursorrules
+	modified:   CONTRIBUTING.md
+	new file:   backend/debug-prisma.ts
+	new file:   backend/diagnose-search.ts
+	modified:   backend/middleware/auth.ts
+	modified:   backend/routes/enterprise/users.ts
+	modified:   backend/routes/git/insights.ts
+	modified:   backend/routes/git/repositories.ts
+	new file:   backend/routes/githubish/index.ts
+	new file:   backend/routes/githubish/issues.ts
+	new file:   backend/routes/githubish/pullRequests.ts
+	new file:   backend/routes/githubish/repos.ts
+	new file:   backend/routes/githubish/webhooks.ts
+	modified:   backend/routes/index.ts
+	modified:   backend/routes/infra/search.ts
+	modified:   backend/schema.prisma
+	modified:   backend/services/git/gitServer.ts
+	new file:   backend/services/git/gitStorageService.ts
+	modified:   backend/services/infra/prisma.ts
+	new file:   backend/test-users.ts
+	modified:   docker-compose.yml
+	new file:   fix_detail_themes.cjs
+	modified:   frontend/App.tsx
+	modified:   frontend/AppRoutes.tsx
+	new file:   frontend/DESIGN_GUIDE.md
+	new file:   frontend/build_output.txt
+	modified:   frontend/components/activity/ActivityFeed.tsx
+	modified:   frontend/components/admin/AdminOverview.tsx
+	modified:   frontend/components/admin/AuditLogs.tsx
+	modified:   frontend/components/admin/CommunityModeration.tsx
+	modified:   frontend/components/admin/JobOversight.tsx
+	modified:   frontend/components/admin/RepositoryGovernance.tsx
+	modified:   frontend/components/admin/RoleEditor.tsx
+	modified:   frontend/components/admin/TeamManager.tsx
+	modified:   frontend/components/admin/UserManager.tsx
+	modified:   frontend/components/admin/WorkspaceMonitor.tsx
+	modified:   frontend/components/applications/KanbanColumn.tsx
+	modified:   frontend/components/billing/PurchaseModal.tsx
+	modified:   frontend/components/branding/SplashScreen.tsx
+	modified:   frontend/components/branding/TrackCodexLogo.tsx
+	modified:   frontend/components/chat/ChatInterface.tsx
+	modified:   frontend/components/common/EmptyState.tsx
+	new file:   frontend/components/common/ReactionSystem.tsx
+	modified:   frontend/components/common/UniversalFileList.tsx
+	modified:   frontend/components/community/CommentItem.tsx
+	modified:   frontend/components/community/CommunityLeftSidebar.tsx
+	modified:   frontend/components/community/CommunityPage.tsx
+	modified:   frontend/components/community/CommunitySidebar.tsx
+	modified:   frontend/components/community/CreateCommunityModal.tsx
+	modified:   frontend/components/community/CreatePostBox.tsx
+	modified:   frontend/components/community/CreatePostView.tsx
+	modified:   frontend/components/community/KarmaBadge.tsx
+	modified:   frontend/components/community/ManageCommunities.tsx
+	modified:   frontend/components/community/PostCard.tsx
+	modified:   frontend/components/community/UserHoverCard.tsx
+	modified:   frontend/components/editor/EditorCommentThread.tsx
+	modified:   frontend/components/editor/QuickEditor.tsx
+	new file:   frontend/components/githubish/FileViewer.tsx
+	new file:   frontend/components/githubish/IssueList.tsx
+	new file:   frontend/components/githubish/PullRequestDetail.tsx
+	new file:   frontend/components/githubish/RepoTree.tsx
+	modified:   frontend/components/home/ContinueWorkspaces.tsx
+	modified:   frontend/components/home/HomeHero.tsx
+	modified:   frontend/components/home/JobHub.tsx
+	modified:   frontend/components/home/LearnGrow.tsx
+	modified:   frontend/components/home/NeedsAttention.tsx
+	modified:   frontend/components/ide/FileExplorer.tsx
+	modified:   frontend/components/ide/IDELayout.tsx
+	modified:   frontend/components/jobs/CreateJobModal.tsx
+	modified:   frontend/components/jobs/JobCard.tsx
+	modified:   frontend/components/jobs/JobDetail.tsx
+	modified:   frontend/components/jobs/JobRatingModal.tsx
+	deleted:    frontend/components/jobs/PostJobModal.tsx
+	modified:   frontend/components/jobs/offer/JobAcceptanceModal.tsx
+	modified:   frontend/components/jobs/offer/OfferJobModal.tsx
+	modified:   frontend/components/layout/ActivityBar.tsx
+	modified:   frontend/components/layout/BottomPanel.tsx
+	modified:   frontend/components/layout/CommandPalette.tsx
+	modified:   frontend/components/layout/MainLayout.tsx
+	modified:   frontend/components/layout/PublicLayout.tsx
+	modified:   frontend/components/layout/ScrollControls.tsx
+	modified:   frontend/components/layout/Sidebar.tsx
+	modified:   frontend/components/layout/SidebarSection.tsx
+	modified:   frontend/components/layout/StatusBar.tsx
+	modified:   frontend/components/messaging/MessageBubble.tsx
+	modified:   frontend/components/messaging/MessagingPanel.tsx
+	new file:   frontend/components/modals/CreateProjectModal.tsx
+	new file:   frontend/components/modals/InviteModal.tsx
+	modified:   frontend/components/notifications/NotificationDropdown.tsx
+	modified:   frontend/components/notifications/NotificationsModal.tsx
+	modified:   frontend/components/organizations/AddEnvVarModal.tsx
+	modified:   frontend/components/organizations/StrataOverview.tsx
+	modified:   frontend/components/organizations/StrataPeople.tsx
+	modified:   frontend/components/organizations/StrataRepositories.tsx
+	modified:   frontend/components/organizations/StrataSettings.tsx
+	modified:   frontend/components/organizations/StrataSettingsLayout.tsx
+	modified:   frontend/components/organizations/StrataTeams.tsx
+	modified:   frontend/components/profile/ActivityFeed.tsx
+	modified:   frontend/components/profile/CodingSnapshot.tsx
+	modified:   frontend/components/profile/ContributionHeatmap.tsx
+	modified:   frontend/components/profile/EditStatusModal.tsx
+	modified:   frontend/components/profile/ForgeAIUsage.tsx
+	modified:   frontend/components/profile/FreelanceCard.tsx
+	modified:   frontend/components/profile/Highlights.tsx
+	modified:   frontend/components/profile/PinnedRepos.tsx
+	modified:   frontend/components/profile/ProfilePreviewModal.tsx
+	modified:   frontend/components/profile/ProofProfileModal.tsx
+	modified:   frontend/components/profile/ResumePreviewModal.tsx
+	modified:   frontend/components/profile/ResumeTemplate.tsx
+	modified:   frontend/components/profile/ResumeUploader.tsx
+	modified:   frontend/components/profile/SecurityImpact.tsx
+	modified:   frontend/components/profile/UserProfileDropdown.tsx
+	modified:   frontend/components/profile/analytics/FreelancerCard.tsx
+	modified:   frontend/components/radar/SkillBreakdown.tsx
+	new file:   frontend/components/repositories/ActionSettings.tsx
+	new file:   frontend/components/repositories/BranchProtectionSettings.tsx
+	new file:   frontend/components/repositories/CodespaceSettings.tsx
+	modified:   frontend/components/repositories/CreateRepoModal.tsx
+	modified:   frontend/components/repositories/ManageAccess.tsx
+	new file:   frontend/components/repositories/PagesSettings.tsx
+	modified:   frontend/components/repositories/PipelineVisualizer.tsx
+	modified:   frontend/components/repositories/PullRequestDetail.tsx
+	new file:   frontend/components/repositories/RepoAboutSidebar.tsx
+	modified:   frontend/components/repositories/RepoActionsTab.tsx
+	new file:   frontend/components/repositories/RepoBranchesTab.tsx
+	modified:   frontend/components/repositories/RepoCodeTab.tsx
+	new file:   frontend/components/repositories/RepoCommitsTab.tsx
+	new file:   frontend/components/repositories/RepoContributorsTab.tsx
+	modified:   frontend/components/repositories/RepoDependencyGraph.tsx
+	modified:   frontend/components/repositories/RepoDiscussionsTab.tsx
+	modified:   frontend/components/repositories/RepoInsightsTab.tsx
+	modified:   frontend/components/repositories/RepoIssuesTab.tsx
+	new file:   frontend/components/repositories/RepoNotificationSettings.tsx
+	modified:   frontend/components/repositories/RepoProjectsTab.tsx
+	modified:   frontend/components/repositories/RepoPullRequestsTab.tsx
+	new file:   frontend/components/repositories/RepoReleasesTab.tsx
+	modified:   frontend/components/repositories/RepoSecurityTab.tsx
+	modified:   frontend/components/repositories/RepoSettingsTab.tsx
+	new file:   frontend/components/repositories/RepoTagsTab.tsx
+	modified:   frontend/components/repositories/RepoWebhookSettings.tsx
+	modified:   frontend/components/repositories/RepoWikiTab.tsx
+	new file:   frontend/components/repositories/SecretSettings.tsx
+	new file:   frontend/components/repositories/SecuritySettings.tsx
+	modified:   frontend/components/settings/DeleteAccountModal.tsx
+	modified:   frontend/components/settings/IntegrationPermissionModal.tsx
+	modified:   frontend/components/settings/SettingsLayout.tsx
+	modified:   frontend/components/social/ChatWidget.tsx
+	new file:   frontend/components/ui/ai-prompt-box.tsx
+	new file:   frontend/components/ui/ai-prompt-demo.tsx
+	modified:   frontend/constants.tsx
+	new file:   frontend/context/AppDataContext.tsx
+	modified:   frontend/context/AuthContext.tsx
+	modified:   frontend/context/ThemeContext.tsx
+	modified:   frontend/index.css
+	modified:   frontend/index.html
+	new file:   frontend/public/inbox-zero-classic.svg
+	modified:   frontend/services/activity/profile.ts
+	modified:   frontend/services/infra/api.ts
+	modified:   frontend/services/social/socialService.ts
+	new file:   frontend/types/project.ts
+	modified:   frontend/types/repo.ts
+	modified:   frontend/types/workspace.ts
+	modified:   frontend/views/ComingSoon.tsx
+	modified:   frontend/views/ForgeAI.tsx
+	modified:   frontend/views/Home.tsx
+	modified:   frontend/views/LandingPage.tsx
+	modified:   frontend/views/Library.tsx
+	modified:   frontend/views/NotificationsView.tsx
+	modified:   frontend/views/Overview.tsx
+	new file:   frontend/views/ProjectDashboard.tsx
+	new file:   frontend/views/ProjectDetailView.tsx
+	modified:   frontend/views/Security.tsx
+	modified:   frontend/views/Settings.tsx
+	modified:   frontend/views/TaskVault.tsx
+	modified:   frontend/views/TrackCoin.tsx
+	modified:   frontend/views/admin/Admin.tsx
+	modified:   frontend/views/admin/AdminDashboard.tsx
+	modified:   frontend/views/admin/PlatformMatrix.tsx
+	modified:   frontend/views/auth/ResolveConflict.tsx
+	modified:   frontend/views/ci/WorkflowRunDetail.tsx
+	modified:   frontend/views/community/Community.tsx
+	modified:   frontend/views/community/DiscussionDetail.tsx
+	modified:   frontend/views/community/Leaderboard.tsx
+	modified:   frontend/views/community/StrataHub.tsx
+	modified:   frontend/views/editor/Editor.tsx
+	modified:   frontend/views/editor/LiveSessions.tsx
+	modified:   frontend/views/editor/ReviewMode.tsx
+	modified:   frontend/views/enterprise/EnterpriseDashboard.tsx
+	modified:   frontend/views/finance/WalletDashboard.tsx
+	modified:   frontend/views/growth/DeveloperProfileView.tsx
+	modified:   frontend/views/growth/GrowthLayout.tsx
+	modified:   frontend/views/growth/SkillDashboardView.tsx
+	modified:   frontend/views/hiring/CandidateDiscoveryView.tsx
+	modified:   frontend/views/hiring/HiringAnalyticsView.tsx
+	modified:   frontend/views/hiring/HiringJobsView.tsx
+	modified:   frontend/views/hiring/OfferEditorView.tsx
+	modified:   frontend/views/ide/TrackCodexIDE.tsx
+	modified:   frontend/views/jobs/Jobs.tsx
+	new file:   frontend/views/marketplace/CreateMissionView.tsx
+	modified:   frontend/views/marketplace/MarketplaceLayout.tsx
+	modified:   frontend/views/marketplace/MissionDetailView.tsx
+	modified:   frontend/views/marketplace/MissionsView.tsx
+	modified:   frontend/views/marketplace/MyApplicationsView.tsx
+	deleted:    frontend/views/marketplace/TrialRepositoriesView.tsx
+	modified:   frontend/views/messages/MessagesView.tsx
+	modified:   frontend/views/organizations/CreateStrata.tsx
+	modified:   frontend/views/organizations/StrataDetailView.tsx
+	modified:   frontend/views/organizations/StrataIndexView.tsx
+	modified:   frontend/views/organizations/settings/StrataAuthenticationSecurity.tsx
+	modified:   frontend/views/organizations/settings/StrataEnvironments.tsx
+	modified:   frontend/views/organizations/settings/StrataPermissions.tsx
+	modified:   frontend/views/profile/Portfolio.tsx
+	modified:   frontend/views/profile/Profile.tsx
+	modified:   frontend/views/repo/CreateRepo.tsx
+	modified:   frontend/views/repo/IssueDetail.tsx
+	modified:   frontend/views/repo/PullRequestDetail.tsx
+	modified:   frontend/views/repo/RepoDetail.tsx
+	modified:   frontend/views/settings/AccessibilitySettings.tsx
+	modified:   frontend/views/settings/AccountSettings.tsx
+	modified:   frontend/views/settings/AhiCsSettings.tsx
+	modified:   frontend/views/settings/AppearanceSettings.tsx
+	modified:   frontend/views/settings/BillingSettings.tsx
+	modified:   frontend/views/settings/DeleteAccountModal.tsx
+	modified:   frontend/views/settings/EmailSettings.tsx
+	modified:   frontend/views/settings/ForgeAIUsageSettings.tsx
+	modified:   frontend/views/settings/IntegrationsSettings.tsx
+	modified:   frontend/views/settings/NotificationsSettings.tsx
+	modified:   frontend/views/settings/PersonalAccessTokensSettings.tsx
+	modified:   frontend/views/settings/PrivacySettings.tsx
+	modified:   frontend/views/settings/ProfileSettings.tsx
+	modified:   frontend/views/settings/SSHKeysSettings.tsx
+	modified:   frontend/views/settings/SecuritySettings.tsx
+	modified:   frontend/views/settings/SessionManager.tsx
+	modified:   frontend/views/settings/SessionsSettings.tsx
+	modified:   frontend/views/settings/billing/BillingAdditional.tsx
+	modified:   frontend/views/settings/billing/BillingAnalytics.tsx
+	modified:   frontend/views/settings/billing/BillingBudgets.tsx
+	modified:   frontend/views/settings/billing/BillingLicensing.tsx
+	modified:   frontend/views/settings/billing/BillingPaymentHistory.tsx
+	modified:   frontend/views/settings/billing/BillingPaymentInfo.tsx
+	modified:   frontend/views/settings/billing/BillingUsage.tsx
+	modified:   frontend/views/trials/OfferAcceptanceView.tsx
+	modified:   frontend/views/workspace/CreateWorkspace.tsx
+	modified:   frontend/views/workspace/WorkspaceSettings.tsx
+	modified:   frontend/views/workspace/Workspaces.tsx
+	modified:   package-lock.json
+	modified:   package.json
+	new file:   replace_dark_inline_styles.cjs
+	modified:   tailwind.config.js
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .gitignore
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	current_git_status.txt
+	run_status.bat
+

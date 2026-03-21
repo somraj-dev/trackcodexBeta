@@ -4,7 +4,7 @@ const BillingAnalytics = () => {
   return (
     <div className="space-y-8 pb-20">
       <header>
-        <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+        <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">
           Premium request analytics
         </h1>
         <p className="text-gh-text-secondary">

@@ -12,6 +12,8 @@ const RepoWikiTab: React.FC<RepoWikiTabProps> = ({ repo }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageSearch, setPageSearch] = useState("");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     fetchPages();
@@ -73,57 +75,137 @@ const RepoWikiTab: React.FC<RepoWikiTabProps> = ({ repo }) => {
   return (
     <div className="flex gap-8 p-6">
       {/* Wiki Sidebar */}
-      <div className="w-[240px] text-sm hidden md:block">
-        <div className="flex items-center justify-between font-bold text-[#c9d1d9] mb-2 px-2">
-          <span>Pages</span>
-        </div>
-        <ul className="text-[#c9d1d9] space-y-1">
-          {pages.map((page) => (
-            <li
-              key={page.slug}
-              onClick={() => setActiveSlug(page.slug)}
-              className={`px-2 py-1.5 rounded-md cursor-pointer ${
-                activeSlug === page.slug
-                  ? "bg-[#11141A] font-medium border-l-[3px] border-[#f78166]"
-                  : "hover:underline opacity-75 hover:opacity-100"
-              }`}
-            >
-              {page.title}
-            </li>
-          ))}
-          {pages.length === 0 && <li className="px-2 opacity-50">No pages</li>}
-        </ul>
+      <div className={`transition-all duration-300 ${isSidebarCollapsed ? "w-[40px]" : "w-[280px]"} text-sm hidden md:block`}>
+        {!isSidebarCollapsed ? (
+          <div className="bg-gh-bg border border-gh-border rounded-lg overflow-hidden shadow-sm">
+            <div className="bg-gh-bg-secondary px-4 py-2 border-b border-gh-border flex items-center justify-between">
+              <span className="font-bold text-gh-text text-xs uppercase tracking-wider">Pages</span>
+              <button onClick={() => setIsSidebarCollapsed(true)} className="text-gh-text-secondary hover:text-gh-text">
+                <span className="material-symbols-outlined !text-[18px]">chevron_left</span>
+              </button>
+            </div>
+            
+            <div className="p-3 border-b border-gh-border">
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 !text-[16px] text-gh-text-tertiary">search</span>
+                <input
+                  type="text"
+                  placeholder="Filter pages"
+                  value={pageSearch}
+                  onChange={(e) => setPageSearch(e.target.value)}
+                  className="w-full bg-gh-bg-tertiary border border-gh-border rounded-md pl-8 pr-2 py-1.5 text-xs text-gh-text focus:ring-1 focus:ring-primary outline-none"
+                />
+              </div>
+            </div>
 
-        <button
-          className="mt-4 w-full text-xs text-[#8b949e] hover:text-[#58a6ff] text-left px-2 mb-4"
-          onClick={() => {
-            const newTitle = prompt("Enter page title:");
-            if (newTitle) {
-              const slug = newTitle.replace(/\s+/g, "-");
-              setPages([...pages, { slug, title: newTitle }]);
-              setActiveSlug(slug);
-              setIsEditing(true);
-              setEditVal(`# ${newTitle}\n\nNew page content.`);
-            }
-          }}
-        >
-          + Add a custom page
-        </button>
+            <ul className="py-2 max-h-[600px] overflow-y-auto custom-scrollbar">
+              {(() => {
+                const filtered = pages.filter(p => p.title.toLowerCase().includes(pageSearch.toLowerCase()));
+                
+                // Build a nested structure
+                const tree: any = {};
+                filtered.forEach(page => {
+                  const parts = page.slug.split('/');
+                  let curr = tree;
+                  parts.forEach((part, i) => {
+                    if (i === parts.length - 1) {
+                      curr[part] = { type: 'page', page };
+                    } else {
+                      if (!curr[part]) curr[part] = { type: 'folder', children: {} };
+                      curr = curr[part].children;
+                    }
+                  });
+                });
 
-        <div className="border-t border-[#1E232E] pt-4">
-          <div className="text-[#8b949e] font-bold text-xs mb-2 px-2">
-            Clone this wiki locally
+                const renderTree = (node: any, depth = 0) => {
+                  return Object.entries(node).map(([key, value]: [string, any]) => {
+                    if (value.type === 'page') {
+                      return (
+                        <li
+                          key={value.page.slug}
+                          onClick={() => setActiveSlug(value.page.slug)}
+                          className={`px-4 py-2 cursor-pointer text-xs flex items-center gap-2 transition-colors ${
+                            activeSlug === value.page.slug
+                              ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
+                              : "text-gh-text-secondary hover:bg-gh-bg-tertiary hover:text-gh-text"
+                          }`}
+                          style={{ paddingLeft: `${16 + depth * 12}px` }}
+                        >
+                          <span className="material-symbols-outlined !text-[14px] opacity-60">description</span>
+                          <span className="truncate">{value.page.title}</span>
+                        </li>
+                      );
+                    } else {
+                      return (
+                        <React.Fragment key={key}>
+                          <li 
+                            className="px-4 py-1.5 text-[10px] uppercase font-bold text-gh-text-tertiary flex items-center gap-1 opacity-70 sticky top-0 bg-gh-bg z-10"
+                            style={{ paddingLeft: `${16 + depth * 12}px` }}
+                          >
+                            <span className="material-symbols-outlined !text-[12px]">folder</span>
+                            {key}
+                          </li>
+                          {renderTree(value.children, depth + 1)}
+                        </React.Fragment>
+                      );
+                    }
+                  });
+                };
+
+                return renderTree(tree);
+              })()}
+              {pages.length === 0 && <li className="px-4 py-3 text-center text-gh-text-tertiary italic">No pages found</li>}
+            </ul>
+
+            <div className="p-3 border-t border-gh-border">
+              <button
+                className="w-full flex items-center gap-2 text-xs font-bold text-gh-text-secondary hover:text-primary transition-colors py-1 px-1"
+                onClick={() => {
+                  const newTitle = prompt("Enter page title:");
+                  if (newTitle) {
+                    const slug = newTitle.replace(/\s+/g, "-");
+                    setPages([...pages, { slug, title: newTitle }]);
+                    setActiveSlug(slug);
+                    setIsEditing(true);
+                    setEditVal(`# ${newTitle}\n\nNew page content.`);
+                  }
+                }}
+              >
+                <span className="material-symbols-outlined !text-[16px]">add</span>
+                Add a custom page
+              </button>
+            </div>
+
+            <div className="bg-gh-bg-secondary p-4 border-t border-gh-border">
+              <div className="text-gh-text-secondary font-bold text-[10px] uppercase mb-2 tracking-widest text-center">
+                Clone Wiki
+              </div>
+              <div className="flex items-center bg-gh-bg border border-gh-border rounded-md overflow-hidden p-1">
+                <input
+                  type="text"
+                  aria-label="Wiki Clone URL"
+                  value={`https://trackcodex.dev/${repo.name}.wiki.git`}
+                  readOnly
+                  className="w-full bg-transparent text-[10px] text-gh-text-tertiary px-2 py-1 focus:outline-none"
+                />
+                <button 
+                  onClick={() => navigator.clipboard.writeText(`https://trackcodex.dev/${repo.name}.wiki.git`)}
+                  className="p-1 hover:text-primary transition-colors"
+                >
+                  <span className="material-symbols-outlined !text-[14px]">content_copy</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center bg-[#0A0D14] border border-[#1E232E] rounded-md overflow-hidden">
-            <input
-              type="text"
-              aria-label="Wiki Clone URL"
-              value={`https://trackcodex.dev/${repo.name}.wiki.git`}
-              readOnly
-              className="w-full bg-transparent text-xs text-[#c9d1d9] px-2 py-1 focus:outline-none"
-            />
-          </div>
-        </div>
+        ) : (
+          <button 
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="flex flex-col items-center gap-4 py-4 bg-gh-bg border border-gh-border rounded-lg text-gh-text-secondary hover:text-primary transition-all shadow-sm"
+          >
+            <span className="material-symbols-outlined">menu_open</span>
+            <span className="[writing-mode:vertical-lr] text-[10px] uppercase font-bold tracking-widest">Pages</span>
+          </button>
+        )}
       </div>
 
       {/* Wiki Content */}

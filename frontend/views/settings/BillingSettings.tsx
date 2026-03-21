@@ -17,7 +17,7 @@ const BillingSettings = () => {
 
     const usageByRepository = [
         { name: "TrackcodexBeta", color: "bg-emerald-500", amount: "$0.03" },
-        { name: "mits-college", color: "bg-[#0A0A0A]lue-500", amount: "$0.02" },
+        { name: "mits-college", color: "bg-blue-500", amount: "$0.02" },
         { name: "trackcodexbeta", color: "bg-red-500", amount: "<$0.01" },
         { name: "trackcodexVersion1.0.0", color: "bg-orange-500", amount: "<$0.01" },
     ];
@@ -26,7 +26,7 @@ const BillingSettings = () => {
         <div className="space-y-8 pb-20">
             {/* Header */}
             <header>
-                <h1 className="text-2xl font-black text-gh-text tracking-tight mb-2">
+                <h1 className="text-lg font-semibold text-gh-text tracking-tight mb-2">
                     Overview
                 </h1>
             </header>
@@ -35,7 +35,7 @@ const BillingSettings = () => {
             <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
                     <h3 className="text-sm font-bold text-gh-text mb-3">Current metered usage</h3>
-                    <p className="text-3xl font-black text-gh-text mb-2">$0.08</p>
+                    <p className="text-xl font-semibold text-gh-text mb-2">$0.08</p>
                     <p className="text-xs text-gh-text-secondary">
                         Gross metered usage for February 1 - February 27, 2026.
                     </p>
@@ -48,7 +48,7 @@ const BillingSettings = () => {
                             More details
                         </button>
                     </div>
-                    <p className="text-3xl font-black text-gh-text mb-2">$0.08</p>
+                    <p className="text-xl font-semibold text-gh-text mb-2">$0.08</p>
                     <p className="text-xs text-gh-text-secondary">
                         Included usage discounts for February 1 - February 27, 2026.
                     </p>
@@ -61,7 +61,7 @@ const BillingSettings = () => {
                             Payment history
                         </button>
                     </div>
-                    <p className="text-3xl font-black text-gh-text mb-2">-</p>
+                    <p className="text-xl font-semibold text-gh-text mb-2">-</p>
                 </div>
             </section>
 
@@ -76,13 +76,13 @@ const BillingSettings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
                         <h3 className="text-sm font-bold text-gh-text mb-2">GitHub Free</h3>
-                        <p className="text-2xl font-black text-gh-text">
+                        <p className="text-lg font-semibold text-gh-text">
                             $0.00 <span className="text-sm font-normal text-gh-text-secondary">per month</span>
                         </p>
                     </div>
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
                         <h3 className="text-sm font-bold text-gh-text mb-2">Copilot Free</h3>
-                        <p className="text-2xl font-black text-gh-text">
+                        <p className="text-lg font-semibold text-gh-text">
                             $0.00 <span className="text-sm font-normal text-gh-text-secondary">per month</span>
                         </p>
                     </div>
@@ -134,7 +134,7 @@ const BillingSettings = () => {
                                             View details
                                         </button>
                                     </div>
-                                    <p className="text-3xl font-black text-gh-text mb-2">$0</p>
+                                    <p className="text-xl font-semibold text-gh-text mb-2">$0</p>
                                     <p className="text-xs text-gh-text-secondary mb-4">
                                         <span className="font-bold">$0.04</span> consumed usage · <span className="font-bold">$0.04</span> discounts
                                     </p>
@@ -168,7 +168,7 @@ const BillingSettings = () => {
                                                 <span className="text-xs text-gh-text-secondary">0 GB used / 0.5 GB included</span>
                                             </div>
                                             <div className="h-1.5 bg-gh-bg rounded-full overflow-hidden">
-                                                <div className="h-full bg-[#0A0A0A]lue-500 w-0"></div>
+                                                <div className="h-full bg-blue-500 w-0"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@ const BillingSettings = () => {
                         {/* Visual Bar */}
                         <div className="h-2 bg-gh-bg rounded-full overflow-hidden flex mb-4">
                             <div className="bg-emerald-500 w-[40%]"></div>
-                            <div className="bg-[#0A0A0A]lue-500 w-[30%]"></div>
+                            <div className="bg-blue-500 w-[30%]"></div>
                             <div className="bg-purple-500 w-[15%]"></div>
                             <div className="bg-red-500 w-[10%]"></div>
                             <div className="bg-orange-500 w-[5%]"></div>

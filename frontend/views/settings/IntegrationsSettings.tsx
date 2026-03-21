@@ -60,7 +60,7 @@ const IntegrationCard: React.FC<{
       onClick={onToggle}
       className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${integration.connected
         ? "bg-transparent border-gh-border text-gh-text-secondary hover:text-white hover:border-red-500/50 hover:bg-red-500/10"
-        : "bg-primary border-transparent text-white hover:bg-[#0A0A0A]lue-600 shadow-lg shadow-primary/20"
+        : "bg-primary border-transparent text-white hover:bg-blue-600 shadow-lg shadow-primary/20"
         }`}
     >
       {integration.connected ? "Disconnect" : "Connect"}
@@ -346,7 +346,7 @@ const IntegrationsSettings = () => {
       />
 
       <header className="border-b border-gh-border pb-6">
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <h1 className="text-lg font-semibold text-white tracking-tight">
           Integrations
         </h1>
         <p className="text-sm text-gh-text-secondary mt-1 leading-relaxed">

@@ -51,9 +51,9 @@ const StatCard = ({
             <span className="text-[11px] font-bold text-[#22c55e] bg-[#22c55e]/10 px-2 py-0.5 rounded-full">{delta}</span>
         </div>
         <p className="text-[13px] text-[#8A9BA8] font-medium">{title}</p>
-        <p className="text-[28px] font-extrabold text-white tracking-tight leading-none">
+        <p className="text-[24px] font-semibold text-white tracking-tight leading-none">
             {value}
-            {suffix && <span className="text-[16px] font-bold text-[#8A9BA8] ml-1">{suffix}</span>}
+            {suffix && <span className="text-[16px] font-semibold text-[#8A9BA8] ml-1">{suffix}</span>}
         </p>
     </div>
 );
@@ -231,7 +231,7 @@ const TrackCoinView = () => {
                         <span className="material-symbols-outlined !text-[22px] text-[#22c55e]">token</span>
                     </div>
                     <div>
-                        <h1 className="text-xl font-extrabold text-white tracking-tight">TrackCoin</h1>
+                        <h1 className="text-lg font-semibold text-white tracking-tight">TrackCoin</h1>
                         <p className="text-[13px] text-[#8A9BA8]">Your earnings from the TrackCodex ecosystem</p>
                     </div>
                 </div>
@@ -245,7 +245,7 @@ const TrackCoinView = () => {
                     </button>
                     <button
                         onClick={handleRedeem}
-                        className="h-9 px-5 rounded-full bg-[#22c55e] text-black text-sm font-bold hover:bg-[#16a34a] transition-colors flex items-center gap-2"
+                        className="h-9 px-5 rounded-full bg-[#22c55e] text-black text-sm font-semibold hover:bg-[#16a34a] transition-colors flex items-center gap-2"
                     >
                         {redeemLoading ? (
                             <span className="material-symbols-outlined !text-[16px] animate-spin">progress_activity</span>
@@ -292,7 +292,7 @@ const TrackCoinView = () => {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <p className="text-[12px] text-[#8A9BA8] font-medium mb-1">Total Revenue</p>
-                            <p className="text-[32px] font-extrabold text-white tracking-tight">1,856,231,212</p>
+                            <p className="text-[28px] font-semibold text-white tracking-tight">1,856,231,212</p>
                             <p className="text-[13px] text-[#22c55e] font-semibold mt-1">
                                 +22,325 (12.2%) · last 12 months
                             </p>
@@ -324,7 +324,7 @@ const TrackCoinView = () => {
             <div className="px-8 py-4 pb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Ecosystem Breakdown */}
                 <div className="bg-[#0F1A20] border border-[#1C2D3A] rounded-2xl p-6">
-                    <h2 className="text-[14px] font-bold text-white mb-1">Earnings by Tool</h2>
+                    <h2 className="text-[14px] font-semibold text-white mb-1">Earnings by Tool</h2>
                     <p className="text-[12px] text-[#8A9BA8] mb-5">TrackCodex ecosystem contributions</p>
                     <div className="space-y-4">
                         {ECOSYSTEM_TOOLS.map(tool => {
@@ -357,7 +357,7 @@ const TrackCoinView = () => {
                     {/* Total summary */}
                     <div className="mt-6 pt-4 border-t border-[#1C2D3A] flex items-center justify-between">
                         <span className="text-[13px] text-[#8A9BA8]">Total earned (last 30 days)</span>
-                        <span className="text-[15px] font-extrabold text-[#22c55e]">
+                        <span className="text-[15px] font-semibold text-[#22c55e]">
                             +{ECOSYSTEM_TOOLS.reduce((acc, t) => acc + t.earned, 0).toLocaleString()} TCK
                         </span>
                     </div>
@@ -365,7 +365,7 @@ const TrackCoinView = () => {
 
                 {/* Activity Feed */}
                 <div className="bg-[#0F1A20] border border-[#1C2D3A] rounded-2xl p-6">
-                    <h2 className="text-[14px] font-bold text-white mb-1">Recent Activity</h2>
+                    <h2 className="text-[14px] font-semibold text-white mb-1">Recent Activity</h2>
                     <p className="text-[12px] text-[#8A9BA8] mb-5">Actions that earned you TrackCoin</p>
                     <div className="space-y-3">
                         {ACTIVITY_FEED.map(item => (
@@ -380,7 +380,7 @@ const TrackCoinView = () => {
                                     <p className="text-[13px] text-[#D4E0EA] font-medium truncate">{item.label}</p>
                                     <p className="text-[11px] text-[#4B6070]">{item.time}</p>
                                 </div>
-                                <span className="text-[13px] font-bold text-[#22c55e] shrink-0">{item.reward}</span>
+                                <span className="text-[13px] font-semibold text-[#22c55e] shrink-0">{item.reward}</span>
                             </div>
                         ))}
                     </div>

@@ -35,19 +35,6 @@ const LandingPage = () => {
             Build. Collaborate. Ship with confidence. TrackCodex turns your ideas into production ready code.
           </p>
 
-          {/* Testimonial Card */}
-          <div className="bg-white rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] w-full max-w-md border border-gray-100 relative">
-            <div className="absolute top-6 left-6 text-2xl text-[#ededed] font-serif leading-none">"</div>
-            <p className="text-gray-700 text-[15px] leading-relaxed mb-6 mt-4 relative z-10">
-              With TrackCodex, Your Code runs on autopilot security, deployed,
-              maintained, and scaled through Single Ecosystem with this you never
-              loss context.
-            </p>
-            <div>
-              <p className="font-bold text-gray-900">Somraj Lodhi</p>
-              <p className="text-sm text-[#888888]">Founder, QuantaForze</p>
-            </div>
-          </div>
         </div>
 
         {/* RIGHT COLUMN: Interactive Code Editor Mockup */}

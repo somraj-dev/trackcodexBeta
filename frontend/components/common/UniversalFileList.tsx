@@ -19,8 +19,49 @@ export interface UniversalFileListProps {
     time: string;
     avatar?: string;
     count?: string;
+    sha?: string;
   };
 }
+
+const getFileIcon = (name: string, type: "dir" | "file") => {
+  if (type === "dir") return "folder";
+  const ext = name.split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "md":
+    case "txt":
+      return "description";
+    case "js":
+    case "ts":
+    case "jsx":
+    case "tsx":
+    case "py":
+    case "go":
+    case "rb":
+    case "java":
+    case "cpp":
+    case "c":
+      return "code";
+    case "json":
+    case "yaml":
+    case "yml":
+    case "toml":
+      return "settings_input_component";
+    case "png":
+    case "jpg":
+    case "jpeg":
+    case "gif":
+    case "svg":
+      return "image";
+    case "css":
+    case "scss":
+    case "less":
+      return "palette";
+    case "html":
+      return "html";
+    default:
+      return "draft";
+  }
+};
 
 const UniversalFileList: React.FC<UniversalFileListProps> = ({
   files,
@@ -44,20 +85,30 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
               {latestCommit.author}
             </span>
           </div>
-          <span className="truncate flex-1 hover:text-primary cursor-pointer hover:underline">
-            {latestCommit.message}
-          </span>
-          <span className="text-gh-text-secondary whitespace-nowrap">
-            {latestCommit.time}
-          </span>
-          {latestCommit.count && (
-            <div className="text-gh-text-secondary font-mono text-xs flex items-center gap-1">
-              <span className="material-symbols-outlined !text-[14px]">
-                history
+          <div className="flex-1 flex items-center gap-2 min-w-0">
+            <span className="truncate hover:text-primary cursor-pointer hover:underline">
+              {latestCommit.message}
+            </span>
+            {latestCommit.sha && (
+              <span className="text-[10px] font-mono bg-gh-bg-tertiary px-1.5 py-0.5 rounded border border-gh-border text-gh-text-tertiary">
+                {latestCommit.sha.substring(0, 7)}
               </span>
-              <span>{latestCommit.count}</span>
-            </div>
-          )}
+            )}
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <span className="text-gh-text-secondary whitespace-nowrap">
+              {latestCommit.time}
+            </span>
+            {latestCommit.count && (
+              <div className="text-gh-text-secondary font-mono text-xs flex items-center gap-1 hover:text-primary cursor-pointer">
+                <span className="material-symbols-outlined !text-[14px]">
+                  history
+                </span>
+                <span className="font-bold">{latestCommit.count}</span>
+                <span className="text-[10px] opacity-60 ml-0.5">commits</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -77,7 +128,7 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
                     : "text-gh-text-secondary"
                 }`}
               >
-                {file.icon || (file.type === "dir" ? "folder" : "description")}
+                {file.icon || getFileIcon(file.name, file.type)}
               </span>
               <span className="text-gh-text text-sm hover:text-primary hover:underline truncate">
                 {file.name}
@@ -88,8 +139,31 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
                 {file.commitVal}
               </span>
             </div>
-            <div className="w-[100px] text-right text-gh-text-secondary text-sm whitespace-nowrap">
-              {file.time}
+            <div className="w-[120px] text-right text-gh-text-secondary text-sm whitespace-nowrap flex items-center justify-end gap-2">
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(file.path);
+                  }}
+                  title="Copy path"
+                  className="p-1 hover:bg-gh-bg-tertiary rounded transition-colors"
+                >
+                  <span className="material-symbols-outlined !text-[16px]">content_copy</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const permalink = `${window.location.origin}/repo/${window.location.pathname.split('/')[2]}/blob/main/${file.path}`;
+                    navigator.clipboard.writeText(permalink);
+                  }}
+                  title="Copy permalink"
+                  className="p-1 hover:bg-gh-bg-tertiary rounded transition-colors"
+                >
+                  <span className="material-symbols-outlined !text-[16px]">link</span>
+                </button>
+              </div>
+              <span>{file.time}</span>
             </div>
           </div>
         ))}

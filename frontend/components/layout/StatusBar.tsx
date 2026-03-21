@@ -22,7 +22,7 @@ const StatusBar = () => {
   return (
     <footer className="h-[22px] bg-[#135bec] flex items-center justify-between text-[10px] font-bold uppercase tracking-widest shrink-0 z-50 select-none">
       <div className="flex items-center h-full">
-        <StatusBarItem className="bg-[#0A0A0A]lack/10">
+        <StatusBarItem className="bg-black/10">
           <span className="material-symbols-outlined !text-[14px]">terminal</span>
           <span>Core-API Environment</span>
         </StatusBarItem>

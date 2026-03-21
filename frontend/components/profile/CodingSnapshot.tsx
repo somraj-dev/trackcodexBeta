@@ -52,13 +52,13 @@ const CodingSnapshot: React.FC<Props> = ({ profile }) => {
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary !text-[22px]">code</span>
-          <h3 className="text-[15px] font-black text-gh-text tracking-tight uppercase">
+          <h3 className="text-[15px] font-semibold text-gh-text tracking-tight uppercase">
             Coding Snapshot
           </h3>
         </div>
         <button
           onClick={() => navigate("/platform-matrix")}
-          className="text-[10px] font-black uppercase tracking-widest text-gh-text-secondary hover:text-primary transition-all flex items-center gap-1"
+          className="text-[10px] font-medium uppercase tracking-widest text-gh-text-secondary hover:text-primary transition-all flex items-center gap-1"
         >
           View Details
           <span className="material-symbols-outlined !text-[14px]">chevron_right</span>
@@ -86,10 +86,10 @@ const CodingSnapshot: React.FC<Props> = ({ profile }) => {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xl font-black text-gh-text">
+              <span className="text-base font-semibold text-gh-text">
                 {sessions !== null ? sessions : "—"}
               </span>
-              <span className="text-[9px] font-black text-gh-text-secondary uppercase tracking-widest">
+              <span className="text-[9px] font-semibold text-gh-text-secondary uppercase tracking-widest">
                 Actions
               </span>
             </div>
@@ -122,7 +122,7 @@ const CodingSnapshot: React.FC<Props> = ({ profile }) => {
                     {item.name}
                   </span>
                 </div>
-                <span className="text-[14px] font-black text-gh-text">{item.value}%</span>
+                <span className="text-[14px] font-semibold text-gh-text">{item.value}%</span>
               </div>
             ))
           ) : (
@@ -132,7 +132,7 @@ const CodingSnapshot: React.FC<Props> = ({ profile }) => {
               </p>
               <button
                 onClick={() => navigate("/repositories")}
-                className="text-[11px] font-black text-primary uppercase tracking-widest hover:underline text-left"
+                className="text-[11px] font-semibold text-primary uppercase tracking-widest hover:underline text-left"
               >
                 Start Contributing →
               </button>

@@ -35,7 +35,7 @@ const JobOversight = () => {
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Job Oversight
           </h1>
           <p className="text-gh-text-secondary">
@@ -48,7 +48,7 @@ const JobOversight = () => {
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden shadow-2xl">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-[0.2em] border-b border-gh-border">
+            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">Job Mission</th>
               <th className="px-6 py-4">Counterparties</th>
               <th className="px-6 py-4">Contract Value</th>
@@ -78,20 +78,20 @@ const JobOversight = () => {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-5 font-black text-gh-text text-sm">
+                <td className="px-6 py-5 font-semibold text-gh-text text-sm">
                   {job.value}
                 </td>
                 <td className="px-6 py-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/20">
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-emerald-500 bg-emerald-500/5 px-2 py-1 rounded border border-emerald-500/20">
                     {job.status}
                   </span>
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white text-[9px] font-black uppercase tracking-widest border border-amber-500/20 transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white text-[9px] font-medium uppercase tracking-widest border border-amber-500/20 transition-all">
                       Freeze
                     </button>
-                    <button className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white text-[9px] font-black uppercase tracking-widest border border-rose-500/20 transition-all">
+                    <button className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white text-[9px] font-medium uppercase tracking-widest border border-rose-500/20 transition-all">
                       Escalate
                     </button>
                   </div>

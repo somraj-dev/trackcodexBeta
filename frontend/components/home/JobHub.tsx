@@ -27,7 +27,7 @@ const JobHub = () => {
             <h4 className="text-sm font-bold text-gh-text group-hover:text-primary transition-colors">
               {job.title}
             </h4>
-            <span className="text-emerald-400 text-xs font-black bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
+            <span className="text-emerald-400 text-xs font-semibold bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">
               {job.pay}
             </span>
           </div>
@@ -38,7 +38,7 @@ const JobHub = () => {
             {job.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 bg-gh-bg text-gh-text-secondary text-[9px] font-black uppercase tracking-widest rounded border border-gh-border"
+                className="px-2 py-0.5 bg-gh-bg text-gh-text-secondary text-[9px] font-medium uppercase tracking-widest rounded border border-gh-border"
               >
                 {tag}
               </span>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import RedirectToLogin from "./components/auth/RedirectToLogin";
@@ -46,6 +46,8 @@ const AcceptInvite = React.lazy(() => import("./views/AcceptInvite"));
 const Leaderboard = React.lazy(() => import("./views/community/Leaderboard"));
 const AdminRoomView = React.lazy(() => import("./views/admin/Admin"));
 const TaskVault = React.lazy(() => import("./views/TaskVault"));
+const ProjectDashboard = React.lazy(() => import("./views/ProjectDashboard"));
+const ProjectDetailView = React.lazy(() => import("./views/ProjectDetailView"));
 const PlatformMatrix = React.lazy(() => import("./views/admin/PlatformMatrix"));
 const Terms = React.lazy(() => import("./views/legal/Terms"));
 const Privacy = React.lazy(() => import("./views/legal/Privacy"));
@@ -60,6 +62,12 @@ const ImportRepoView = React.lazy(() => import("./views/repo/ImportRepo"));
 const IssueDetail = React.lazy(() => import("./views/repo/IssueDetail"));
 const SearchResults = React.lazy(() => import("./views/SearchResults"));
 const TrackCoinView = React.lazy(() => import("./views/TrackCoin"));
+
+// GitHub-like features
+const RepoTree = React.lazy(() => import("./components/githubish/RepoTree").then(module => ({ default: module.RepoTree })));
+const FileViewer = React.lazy(() => import("./components/githubish/FileViewer").then(module => ({ default: module.FileViewer })));
+const IssueList = React.lazy(() => import("./components/githubish/IssueList").then(module => ({ default: module.IssueList })));
+const PullRequestDetail = React.lazy(() => import("./components/githubish/PullRequestDetail").then(module => ({ default: module.PullRequestDetail })));
 
 // Strata
 const StrataIndexView = React.lazy(() => import("./views/organizations/StrataIndexView"));
@@ -91,8 +99,7 @@ const PersonalAccessTokensSettings = React.lazy(() => import("./views/settings/P
 const IntegrationsSettings = React.lazy(() => import("./views/settings/IntegrationsSettings"));
 const SessionsSettings = React.lazy(() => import("./views/settings/SessionsSettings"));
 const SSHKeysSettings = React.lazy(() => import("./views/settings/SSHKeysSettings"));
-const AhiCsSettings = React.lazy(() => import("./views/settings/AhiCsSettings"));
-const PrivacySettings = React.lazy(() => import("./views/settings/PrivacySettings"));
+
 const BillingUsage = React.lazy(() => import("./views/settings/billing/BillingUsage"));
 const BillingAnalytics = React.lazy(() => import("./views/settings/billing/BillingAnalytics"));
 const BillingBudgets = React.lazy(() => import("./views/settings/billing/BillingBudgets"));
@@ -101,28 +108,16 @@ const BillingPaymentInfo = React.lazy(() => import("./views/settings/billing/Bil
 const BillingPaymentHistory = React.lazy(() => import("./views/settings/billing/BillingPaymentHistory"));
 const BillingAdditional = React.lazy(() => import("./views/settings/billing/BillingAdditional"));
 
-// Marketplace & Hiring
+// Marketplace
 const MarketplaceLayout = React.lazy(() => import("./views/marketplace/MarketplaceLayout"));
 const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView"));
+const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
-const TrialRepositoriesView = React.lazy(() => import("./views/marketplace/TrialRepositoriesView"));
-const HiringLayout = React.lazy(() => import("./views/hiring/HiringLayout"));
-const CandidateDiscoveryView = React.lazy(() => import("./views/hiring/CandidateDiscoveryView"));
-const HiringJobsView = React.lazy(() => import("./views/hiring/HiringJobsView"));
-const HiringAnalyticsView = React.lazy(() => import("./views/hiring/HiringAnalyticsView"));
-const CandidateScorecardView = React.lazy(() => import("./views/hiring/CandidateScorecardView"));
-const CandidateComparisonView = React.lazy(() => import("./views/hiring/CandidateComparisonView"));
-const OfferEditorView = React.lazy(() => import("./views/hiring/OfferEditorView"));
-const SessionSchedulerView = React.lazy(() => import("./views/hiring/SessionSchedulerView"));
-const InterviewerFeedbackView = React.lazy(() => import("./views/hiring/InterviewerFeedbackView"));
-const AssessmentsView = React.lazy(() => import("./views/hiring/AssessmentsView"));
 
-// Onboarding & Growth
+
+// Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));
-const GrowthLayout = React.lazy(() => import("./views/growth/GrowthLayout"));
-const SkillDashboardView = React.lazy(() => import("./views/growth/SkillDashboardView"));
-const DeveloperProfileView = React.lazy(() => import("./views/growth/DeveloperProfileView"));
 
 // Finance & Admin
 const WalletDashboard = React.lazy(() => import("./views/finance/WalletDashboard"));
@@ -185,6 +180,8 @@ const AppRoutes = () => {
           <Route element={<MainLayout />}>
             <Route path="/taskvault" element={<TaskVault />} />
             <Route path="/" element={<HomeView />} />
+            <Route path="/dashboard" element={<ProjectDashboard />} />
+            <Route path="/dashboard/project/:projectId" element={<ProjectDetailView />} />
             <Route path="/dashboard/home" element={<HomeView />} />
             <Route path="/onboarding/welcome" element={<WelcomeView />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />
@@ -207,6 +204,10 @@ const AppRoutes = () => {
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
             <Route path="/repo/:id/issues/:number" element={<IssueDetail />} />
+            <Route path="/github/:repoId" element={<RepoTree />} />
+            <Route path="/github/:repoId/blob/:branch/*" element={<FileViewer />} />
+            <Route path="/github/:repoId/issues" element={<IssueList />} />
+            <Route path="/github/:repoId/pulls/:prId" element={<PullRequestDetail />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
             <Route path="/dashboard/library" element={<LibraryView />} />
             <Route path="/editor" element={<EditorView />} />
@@ -234,32 +235,15 @@ const AppRoutes = () => {
                 <Route path="webhooks" element={<StrataWebhooks />} />
               </Route>
             </Route>
+            <Route path="/marketplace/missions/new" element={<CreateMissionView />} />
 
             {/* Marketplace */}
             <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
+
               <Route path="missions" element={<MissionsView />} />
               <Route path="missions/:id" element={<MissionDetailView />} />
-              <Route path="trials/:id" element={<MissionDetailView />} />
               <Route path="applications" element={<MyApplicationsView />} />
-              <Route path="trials" element={<TrialRepositoriesView />} />
-              <Route path="hiring" element={<HiringLayout />}>
-                <Route index element={<Navigate to="discovery" replace />} />
-                <Route path="discovery" element={<CandidateDiscoveryView />} />
-                <Route path="candidate/:id" element={<CandidateScorecardView />} />
-                <Route path="compare" element={<CandidateComparisonView />} />
-                <Route path="offer/:id" element={<OfferEditorView />} />
-                <Route path="schedule/:id" element={<SessionSchedulerView />} />
-                <Route path="feedback/:id" element={<ComingSoon />} />
-                <Route path="jobs" element={<HiringJobsView />} />
-                <Route path="analytics" element={<ComingSoon />} />
-                <Route path="assessments" element={<ComingSoon />} />
-              </Route>
-              <Route path="growth" element={<GrowthLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<SkillDashboardView />} />
-                <Route path="profile/:id" element={<DeveloperProfileView />} />
-              </Route>
             </Route>
 
             {/* Settings */}

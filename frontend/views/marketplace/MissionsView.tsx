@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Job } from '../../types';
 import JobCard from '../../components/jobs/JobCard';
-import PostJobModal from '../../components/jobs/PostJobModal';
+
 import { cacheService } from '../../services/infra/cacheService';
 import { api } from '../../services/infra/api';
 
@@ -31,28 +31,7 @@ const MissionsView = () => {
     });
   }, []);
 
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [draftData, setDraftData] = useState<any>(null);
 
-  useEffect(() => {
-    const draft = localStorage.getItem('pending_job_draft');
-    if (draft) {
-      setDraftData(JSON.parse(draft));
-      setIsPostModalOpen(true);
-      localStorage.removeItem('pending_job_draft');
-    }
-  }, []);
-
-  const handlePostJob = async (newJobData: Partial<Job>) => {
-    // Real Post to Backend
-    try {
-      const createdJob = await api.post<Job>('/jobs', newJobData);
-      setLocalJobs(prev => [createdJob, ...prev]);
-      setIsPostModalOpen(false);
-    } catch (e) {
-      console.error("Failed to create job", e);
-    }
-  };
 
   const displayJobs = localJobs.filter(job => {
     if (!searchQuery) return true;
@@ -68,24 +47,24 @@ const MissionsView = () => {
       <div className="max-w-[1400px] mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="relative group">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg group-focus-within:text-primary">search</span>
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gh-text-secondary text-lg group-focus-within:text-primary">search</span>
             <input
-              className="bg-gh-bg-secondary border border-gh-border rounded-full pl-12 pr-6 py-3 text-sm text-white focus:ring-1 focus:ring-primary w-96 outline-none transition-all duration-300"
+              className="bg-gh-bg-secondary border border-gh-border rounded-full pl-12 pr-6 py-3 text-sm text-gh-text focus:ring-1 focus:ring-primary w-96 outline-none transition-all duration-300"
               placeholder="Search missions by title, skill, or company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <button
-            onClick={() => setIsPostModalOpen(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
+            onClick={() => navigate('/marketplace/missions/new')}
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-gh-bg rounded-xl font-medium uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
           >
             Create New Mission
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {loading ? (
-            <div className="col-span-full py-12 text-center text-slate-500 flex flex-col items-center">
+            <div className="col-span-full py-12 text-center text-gh-text-secondary flex flex-col items-center">
               <span className="material-symbols-outlined animate-spin text-3xl mb-4 text-primary">autorenew</span>
               <p>Loading active missions...</p>
             </div>
@@ -94,7 +73,7 @@ const MissionsView = () => {
               <JobCard key={job.id} job={job} onClick={() => navigate(`/marketplace/missions/${job.id}`)} />
             ))
           ) : (
-            <div className="col-span-full py-16 text-center text-slate-500 border border-dashed border-gh-border rounded-2xl bg-gh-bg-secondary">
+            <div className="col-span-full py-16 text-center text-gh-text-secondary border border-dashed border-gh-border rounded-2xl bg-gh-bg-secondary">
               <span className="material-symbols-outlined text-4xl mb-4 opacity-50">search_off</span>
               <h3 className="text-lg font-bold text-gh-text mb-2">No missions found.</h3>
               <p className="text-sm">Try adjusting your search criteria or explore other categories.</p>
@@ -102,12 +81,7 @@ const MissionsView = () => {
           )}
         </div>
       </div>
-      <PostJobModal
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        onSubmit={handlePostJob}
-        initialData={draftData}
-      />
+
     </div>
   );
 };

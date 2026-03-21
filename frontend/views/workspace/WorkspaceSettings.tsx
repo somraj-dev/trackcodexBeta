@@ -141,7 +141,7 @@ const WorkspaceSettings: React.FC = () => {
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div>
-          <h1 className="text-xl font-bold text-gh-text">Workspace Settings</h1>
+          <h1 className="text-xl font-semibold text-gh-text">Workspace Settings</h1>
           <p className="text-sm text-gh-text-secondary">{workspace.name}</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("general")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "general"
-              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
+              ? "bg-primary/10 text-primary"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -164,7 +164,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("members")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "members"
-              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
+              ? "bg-primary/10 text-primary"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -174,7 +174,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("security")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "security"
-              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
+              ? "bg-primary/10 text-primary"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -184,7 +184,7 @@ const WorkspaceSettings: React.FC = () => {
           <button
             onClick={() => setActiveTab("ide")}
             className={`w-full text-left px-4 py-2 rounded-md transition-colors flex items-center gap-3 ${activeTab === "ide"
-              ? "bg-[#0A0A0A]lue-500/10 text-blue-400"
+              ? "bg-primary/10 text-primary"
               : "text-gh-text-secondary hover:bg-gh-bg-secondary hover:text-gh-text"
               }`}
           >
@@ -198,7 +198,7 @@ const WorkspaceSettings: React.FC = () => {
           {activeTab === "general" && (
             <div className="space-y-8">
               <section className="bg-gh-bg-secondary border border-gh-border rounded-xl p-6">
-                <h2 className="text-lg font-bold text-gh-text mb-4">
+                <h2 className="text-base font-semibold text-gh-text mb-4">
                   General Settings
                 </h2>
                 <div className="space-y-4">
@@ -239,7 +239,7 @@ const WorkspaceSettings: React.FC = () => {
 
               {isOwner && (
                 <section className="bg-gh-bg-secondary border border-[#f85149]/40 rounded-xl p-6">
-                  <h2 className="text-lg font-bold text-[#f85149] mb-4">
+                  <h2 className="text-base font-semibold text-[#f85149] mb-4">
                     Danger Zone
                   </h2>
                   <div className="flex items-center justify-between">
@@ -264,7 +264,7 @@ const WorkspaceSettings: React.FC = () => {
           {activeTab === "members" && (
             <div className="bg-gh-bg-secondary border border-gh-border rounded-xl overflow-hidden">
               <div className="p-4 border-b border-gh-border bg-gh-bg-secondary/50 flex justify-between items-center">
-                <h2 className="font-bold text-gh-text">Workspace Members</h2>
+                <h2 className="font-semibold text-gh-text">Workspace Members</h2>
                 {canManageMembers && (
                   <button className="px-3 py-1.5 bg-[#238636] text-white text-sm font-bold rounded-lg hover:bg-[#2ea043] transition-colors flex items-center gap-2">
                     <span className="material-symbols-outlined text-sm">
@@ -298,7 +298,7 @@ const WorkspaceSettings: React.FC = () => {
                         <p className="font-bold text-gh-text text-sm">
                           {member.user.name}
                           {member.userId === user?.id && (
-                            <span className="ml-2 px-1.5 py-0.5 bg-[#0A0A0A]lue-500/20 text-blue-400 text-[10px] rounded-full uppercase tracking-wider">
+                            <span className="ml-2 px-1.5 py-0.5 bg-primary/20 text-primary text-[10px] rounded-full uppercase tracking-wider">
                               You
                             </span>
                           )}
@@ -360,7 +360,7 @@ const WorkspaceSettings: React.FC = () => {
           {activeTab === "ide" && id && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-gh-text mb-2">IDE Preferences</h2>
+                <h2 className="text-base font-semibold text-gh-text mb-2">IDE Preferences</h2>
                 <p className="text-sm text-gh-text-secondary">
                   Manage your TrackCodex IDE environment. These settings apply specifically to this workspace.
                 </p>
@@ -418,13 +418,13 @@ const WorkspaceSettings: React.FC = () => {
                 ))}
               </div>
 
-              <section className="mt-8 p-6 bg-[#0A0A0A]lue-500/5 border border-blue-500/20 rounded-xl">
+              <section className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
                 <div className="flex gap-4">
-                  <div className="size-10 rounded-full bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
                     <span className="material-symbols-outlined">info</span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-gh-text mb-1">Seamless Integration</h4>
+                    <h4 className="text-sm font-semibold text-gh-text mb-1">Seamless Integration</h4>
                     <p className="text-xs text-gh-text-secondary leading-relaxed">
                       TrackCodex Workspace Settings are bridged directly with the underlying IDE.
                       Clicking any of the options above will take you back to your workspace and open the corresponding preference panel automatically.

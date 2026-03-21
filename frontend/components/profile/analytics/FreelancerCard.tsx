@@ -39,24 +39,24 @@ export const FreelancerCard: React.FC<FreelancerCardProps> = ({ profile }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#0A0A0A]lack/20 p-3 rounded-lg border border-zinc-800/50">
+                <div className="bg-black/20 p-3 rounded-lg border border-zinc-800/50">
                     <div className="text-sm text-zinc-500 mb-1">Rating</div>
                     <div className="text-2xl font-bold text-white flex items-center gap-1">
                         {profile.rating.toFixed(1)} <span className="text-yellow-500 text-lg">★</span>
                     </div>
                 </div>
 
-                <div className="bg-[#0A0A0A]lack/20 p-3 rounded-lg border border-zinc-800/50">
+                <div className="bg-black/20 p-3 rounded-lg border border-zinc-800/50">
                     <div className="text-sm text-zinc-500 mb-1">Jobs Done</div>
                     <div className="text-2xl font-bold text-white">{profile.jobsCompleted}</div>
                 </div>
 
-                <div className="bg-[#0A0A0A]lack/20 p-3 rounded-lg border border-zinc-800/50">
+                <div className="bg-black/20 p-3 rounded-lg border border-zinc-800/50">
                     <div className="text-sm text-zinc-500 mb-1">Repeat Hire</div>
                     <div className="text-2xl font-bold text-white">{profile.repeatHireRate}%</div>
                 </div>
 
-                <div className="bg-[#0A0A0A]lack/20 p-3 rounded-lg border border-zinc-800/50">
+                <div className="bg-black/20 p-3 rounded-lg border border-zinc-800/50">
                     <div className="text-sm text-zinc-500 mb-1">Rate</div>
                     <div className="text-2xl font-bold text-white">{profile.hourlyRate || 'N/A'}</div>
                 </div>

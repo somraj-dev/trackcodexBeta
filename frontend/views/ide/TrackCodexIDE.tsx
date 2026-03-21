@@ -82,7 +82,7 @@ const TrackCodexIDE: React.FC = () => {
         {/* Right: Actions */}
         <div className="flex items-center space-x-3">
           {/* Command Palette */}
-          <button className="flex items-center space-x-2 px-3 py-1.5 bg-[#1a1a2e]/80 hover:bg-[#1a1a2e] border border-[#2d1b4e]/50 rounded-md transition-all group">
+          <button className="flex items-center space-x-2 px-3 py-1.5 bg-[#1a1a2e]/80 hover:bg-gh-bg-tertiary border border-[#2d1b4e]/50 rounded-md transition-all group">
             <span className="material-symbols-outlined text-[#8b5cf6] text-[14px]">
               search
             </span>
@@ -95,7 +95,7 @@ const TrackCodexIDE: React.FC = () => {
           </button>
 
           {/* Settings */}
-          <button className="p-2 hover:bg-[#1a1a2e]/80 rounded-md transition-all group">
+          <button className="p-2 hover:bg-gh-bg-tertiary/80 rounded-md transition-all group">
             <span className="material-symbols-outlined text-[#6b7280] group-hover:text-[#8b5cf6] text-[18px]">
               settings
             </span>
@@ -138,7 +138,7 @@ const TrackCodexIDE: React.FC = () => {
                 className={`group flex items-center gap-2 px-3 py-1.5 rounded-t cursor-pointer transition-all ${
                   file.id === activeFileId
                     ? "bg-[#1e1e1e] text-white border-t-2 border-[#8b5cf6]"
-                    : "bg-transparent text-[#969696] hover:bg-[#2d2d2d]"
+                    : "bg-transparent text-[#969696] hover:bg-gh-bg-tertiary"
                 }`}
               >
                 <span className="material-symbols-outlined !text-[14px]">

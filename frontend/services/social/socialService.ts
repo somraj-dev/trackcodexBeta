@@ -48,8 +48,10 @@ export interface Community {
   slug: string;
   description: string;
   avatar: string;
+  coverImage?: string;
   memberCount: number;
   isMember: boolean;
+  createdAt?: string;
 }
 
 export interface TrendingRepo {

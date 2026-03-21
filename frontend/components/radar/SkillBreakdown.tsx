@@ -19,7 +19,7 @@ interface SkillBreakdownProps {
 const SkillBreakdown: React.FC<SkillBreakdownProps> = ({ data }) => {
     const metrics = [
         { label: 'Coding', value: data.coding, color: 'text-emerald-400', bar: 'bg-emerald-500' },
-        { label: 'Quality', value: data.quality, color: 'text-blue-400', bar: 'bg-[#0A0A0A]lue-500' },
+        { label: 'Quality', value: data.quality, color: 'text-blue-400', bar: 'bg-blue-500' },
         { label: 'Bug Detection', value: data.bugDetection, color: 'text-red-400', bar: 'bg-red-500' },
         { label: 'Security', value: data.security, color: 'text-orange-400', bar: 'bg-orange-500' },
         { label: 'Collaboration', value: data.collaboration, color: 'text-purple-400', bar: 'bg-purple-500' },

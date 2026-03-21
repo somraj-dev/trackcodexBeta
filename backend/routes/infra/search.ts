@@ -169,12 +169,9 @@ export async function searchRoutes(fastify: FastifyInstance) {
               deletedAt: null,
               accountLocked: false,
               isPrivate: false,
-              username: { not: null },
               OR: [
-                { username: { startsWith: q_lower, mode: "insensitive" } },
-                { name:     { startsWith: q_lower, mode: "insensitive" } },
-                { username: { contains:   q_lower, mode: "insensitive" } },
-                { name:     { contains:   q_lower, mode: "insensitive" } },
+                { username: { contains: q_lower, mode: "insensitive" } },
+                { name: { contains: q_lower, mode: "insensitive" } },
               ],
             },
             select: {
@@ -373,17 +370,13 @@ export async function searchRoutes(fastify: FastifyInstance) {
 
         // ── 2. Optimised Prisma fallback ──
         // Single OR with both startsWith and contains (prefix scan first, covers suffix)
-        const q_lower = q.trim();
         const where = {
           deletedAt: null,
           accountLocked: false,
           isPrivate: false,
-          username: { not: null as any },
           OR: [
-            { username: { startsWith: q_lower, mode: "insensitive" as const } },
-            { name:     { startsWith: q_lower, mode: "insensitive" as const } },
-            { username: { contains:   q_lower, mode: "insensitive" as const } },
-            { name:     { contains:   q_lower, mode: "insensitive" as const } },
+            { username: { contains: q_lower, mode: "insensitive" as const } },
+            { name: { contains: q_lower, mode: "insensitive" as const } },
           ],
         };
 

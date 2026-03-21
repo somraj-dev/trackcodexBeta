@@ -32,12 +32,11 @@ const MarketplaceLayout = () => {
         <div className="max-w-[1400px] mx-auto">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+              <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
                 Marketplace
               </h1>
               <p className="text-sm text-gh-text-secondary max-w-2xl leading-relaxed">
-                Discover high-value missions, prove your skills in real-world
-                trials, and collaborate with top engineering teams.
+                Discover high-value missions and collaborate with top engineering teams.
               </p>
             </div>
           </div>
@@ -46,21 +45,6 @@ const MarketplaceLayout = () => {
               to="/marketplace/missions"
               label="Missions"
               icon="work"
-            />
-            <MarketplaceTab
-              to="/marketplace/trials"
-              label="Trial Repositories"
-              icon="rule"
-            />
-            <MarketplaceTab
-              to="/marketplace/hiring"
-              label="Hiring"
-              icon="person_search"
-            />
-            <MarketplaceTab
-              to="/marketplace/growth"
-              label="Growth"
-              icon="trending_up"
             />
           </nav>
         </div>

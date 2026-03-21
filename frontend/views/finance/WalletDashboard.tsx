@@ -63,7 +63,7 @@ const WalletDashboard = () => {
         <div className="p-10 max-w-[1200px] mx-auto text-white">
             <div className="flex justify-between items-end mb-10">
                 <div>
-                    <h1 className="text-3xl font-black mb-2 tracking-tight">Financial Overview</h1>
+                    <h1 className="text-xl font-semibold mb-2 tracking-tight">Financial Overview</h1>
                     <p className="text-slate-500 font-medium">Manage your earnings, deposits, and escrow.</p>
                 </div>
                 <button
@@ -82,7 +82,7 @@ const WalletDashboard = () => {
                         <span className="material-symbols-outlined text-9xl">account_balance_wallet</span>
                     </div>
                     <h3 className="text-gh-text-secondary font-bold uppercase tracking-widest text-xs mb-4">Total Available</h3>
-                    <div className="text-4xl font-black tracking-tighter text-gh-text">
+                    <div className="text-2xl font-semibold tracking-tighter text-gh-text">
                         {loading ? '...' : formatMoney(balance.available)}
                     </div>
                 </div>
@@ -93,7 +93,7 @@ const WalletDashboard = () => {
                         <span className="material-symbols-outlined text-9xl">lock</span>
                     </div>
                     <h3 className="text-gh-text-secondary font-bold uppercase tracking-widest text-xs mb-4">Locked in Escrow</h3>
-                    <div className="text-4xl font-black tracking-tighter text-blue-400">
+                    <div className="text-2xl font-semibold tracking-tighter text-blue-400">
                         {loading ? '...' : formatMoney(balance.in_escrow)}
                     </div>
                 </div>
@@ -104,7 +104,7 @@ const WalletDashboard = () => {
                         <span className="material-symbols-outlined text-9xl">trending_up</span>
                     </div>
                     <h3 className="text-gh-text-secondary font-bold uppercase tracking-widest text-xs mb-4">Lifetime Volume</h3>
-                    <div className="text-4xl font-black tracking-tighter text-emerald-400">
+                    <div className="text-2xl font-semibold tracking-tighter text-emerald-400">
                         $0.00
                     </div>
                 </div>
@@ -134,7 +134,7 @@ const WalletDashboard = () => {
                             {transactions.map(tx => (
                                 <tr key={tx.id} className="hover:bg-gh-bg-tertiary transition-colors">
                                     <td className="p-4 pl-6">
-                                        <span className={`px-2 py-1 rounded text-[10px] font-black uppercase ${tx.type === 'DEPOSIT' ? 'bg-emerald-500/20 text-emerald-400' :
+                                        <span className={`px-2 py-1 rounded text-[10px] font-medium uppercase ${tx.type === 'DEPOSIT' ? 'bg-emerald-500/20 text-emerald-400' :
                                             tx.type === 'WITHDRAWAL' ? 'bg-rose-500/20 text-rose-400' :
                                                 'bg-blue-500/20 text-blue-400'
                                             }`}>
@@ -159,7 +159,7 @@ const WalletDashboard = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 w-[400px] shadow-2xl relative">
                         <button onClick={() => setIsDepositModalOpen(false)} className="absolute top-4 right-4 text-gh-text-secondary hover:text-gh-text" aria-label="Close" title="Close">✕</button>
-                        <h2 className="text-xl font-black mb-6 text-gh-text">Deposit Funds</h2>
+                        <h2 className="text-base font-semibold mb-6 text-gh-text">Deposit Funds</h2>
 
                         <div className="mb-6">
                             <label htmlFor="depositAmount" className="block text-xs font-bold text-gh-text-secondary uppercase mb-2">Amount (USD)</label>

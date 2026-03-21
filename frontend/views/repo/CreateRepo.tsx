@@ -52,7 +52,7 @@ const CreateRepo: React.FC = () => {
         }),
       );
 
-      navigate(`/repo/${created.id}`);
+      navigate(`/github/${created.id}`);
     } catch (err: any) {
       console.error(`Failed to create repository. Target: ${(import.meta as any).env?.VITE_API_URL || "Local/Proxy"}/api/v1/repositories`, err);
       const errorMessage = err?.response?.data?.message || err?.message || "Failed to create repository";
@@ -82,7 +82,7 @@ const CreateRepo: React.FC = () => {
             Repositories contain a project's files and version history. Have a project elsewhere?{" "}
             <button
               onClick={() => navigate("/repositories/import")}
-              className="text-[#0969da] hover:underline"
+              className="text-primary hover:underline"
             >
               Import a repository.
             </button>
@@ -151,7 +151,7 @@ const CreateRepo: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRepoName(suggestion)}
-                  className="text-[#0969da] font-semibold hover:underline"
+                  className="text-primary font-semibold hover:underline"
                 >
                   {suggestion}
                 </button>
@@ -186,7 +186,7 @@ const CreateRepo: React.FC = () => {
             </div>
 
             <div className="pl-11 space-y-4 animate-in slide-in-from-left-4 duration-500 delay-150">
-              <div className="bg-[#0A0D14] border border-gh-border rounded-md overflow-hidden shadow-sm">
+              <div className="bg-gh-bg-secondary border border-gh-border rounded-md overflow-hidden shadow-sm">
                 {/* Visibility Selection */}
                 <div className="p-4 border-b border-gh-border flex items-center justify-between hover:bg-gh-bg-secondary/30 transition-colors">
                   <div>
@@ -223,9 +223,9 @@ const CreateRepo: React.FC = () => {
                 {/* README initialization */}
                 <div className="p-4 border-b border-gh-border flex items-center justify-between hover:bg-gh-bg-secondary/30 transition-colors group/row">
                   <div>
-                    <h3 className="text-[14px] font-semibold text-gh-text group-hover/row:text-[#0969da] transition-colors">Add README</h3>
+                    <h3 className="text-[14px] font-semibold text-gh-text group-hover/row:text-primary transition-colors">Add README</h3>
                     <p className="text-[12px] text-gh-text-secondary mt-0.5">
-                      READMEs can be used as longer descriptions. <button type="button" className="text-[#0969da] hover:underline">About READMEs</button>
+                      READMEs can be used as longer descriptions. <button type="button" className="text-primary hover:underline">About READMEs</button>
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -235,7 +235,7 @@ const CreateRepo: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setInitReadme(!initReadme)}
-                      className={`relative w-[44px] h-[24px] rounded-full transition-all duration-[350ms] ease-in-out p-[3px] border ${initReadme ? "bg-[#238636] border-[#2ea44f]" : "bg-[#11141A] border-[#1E232E]"}`}
+                      className={`relative w-[44px] h-[24px] rounded-full transition-all duration-[350ms] ease-in-out p-[3px] border ${initReadme ? "bg-[#238636] border-[#2ea44f]" : "bg-gh-bg-tertiary border-gh-border"}`}
                       aria-label={`Toggle README: ${initReadme ? 'On' : 'Off'}`}
                     >
                       <div className={`size-[16px] bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform duration-[350ms] ease-in-out transform ${initReadme ? "translate-x-[20px]" : "translate-x-0"}`} />
@@ -248,10 +248,10 @@ const CreateRepo: React.FC = () => {
                   <div>
                     <h3 className="text-[14px] font-semibold text-gh-text">Add .gitignore</h3>
                     <p className="text-[12px] text-gh-text-secondary mt-0.5">
-                      .gitignore tells git which files not to track. <button type="button" className="text-[#0969da] hover:underline">About ignoring files</button>
+                      .gitignore tells git which files not to track. <button type="button" className="text-primary hover:underline">About ignoring files</button>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#8b949e] text-[12px] font-medium">
+                  <div className="flex items-center gap-2 text-gh-text-secondary text-[12px] font-medium">
                     <span>None</span>
                     <span className="material-symbols-outlined !text-[16px]">arrow_drop_down</span>
                   </div>
@@ -262,10 +262,10 @@ const CreateRepo: React.FC = () => {
                   <div>
                     <h3 className="text-[14px] font-semibold text-gh-text">Add license</h3>
                     <p className="text-[12px] text-gh-text-secondary mt-0.5">
-                      Licenses explain how others can use your code. <button type="button" className="text-[#0969da] hover:underline">About licenses</button>
+                      Licenses explain how others can use your code. <button type="button" className="text-primary hover:underline">About licenses</button>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#8b949e] text-[12px] font-medium">
+                  <div className="flex items-center gap-2 text-gh-text-secondary text-[12px] font-medium">
                     <span>None</span>
                     <span className="material-symbols-outlined !text-[16px]">arrow_drop_down</span>
                   </div>

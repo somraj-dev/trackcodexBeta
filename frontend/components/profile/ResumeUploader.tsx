@@ -236,7 +236,7 @@ export const ResumeUploader: React.FC<ResumeUploaderProps> = ({
       )}
 
       {/* Info Box */}
-      <div className="p-4 bg-[#0A0A0A]lue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-300">
+      <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-300">
         <strong>💡 Tip:</strong> Your resume will only be visible to others if
         you set it to "Public". You can toggle this anytime.
       </div>

@@ -77,6 +77,40 @@ export class GitServer {
   }
 
   /**
+   * List all branches in the repository.
+   */
+  async listBranches(repoId: string) {
+    const repoPath = this.getRepoPath(repoId);
+    try {
+      const branches = await git.listBranches({
+        fs,
+        gitdir: repoPath,
+      });
+      return branches;
+    } catch (e) {
+      console.error("Error listing branches", e);
+      return ["main"];
+    }
+  }
+
+  /**
+   * List all tags in the repository.
+   */
+  async listTags(repoId: string) {
+    const repoPath = this.getRepoPath(repoId);
+    try {
+      const tags = await git.listTags({
+        fs,
+        gitdir: repoPath,
+      });
+      return tags;
+    } catch (e) {
+      console.error("Error listing tags", e);
+      return [];
+    }
+  }
+
+  /**
    * List files/folders at a path (non-recursive) for UI browsing.
    * Returns: { name, type: 'blob'|'tree', path, mode, sha }
    */

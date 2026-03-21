@@ -190,7 +190,7 @@ const RepoDependencyGraph: React.FC<RepoDependencyGraphProps> = ({
                         <span
                           className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                             pkg.type === "runtime"
-                              ? "bg-[#0A0A0A]lue-500/20 text-blue-500"
+                              ? "bg-blue-500/20 text-blue-500"
                               : pkg.type === "dev"
                                 ? "bg-yellow-500/20 text-yellow-500"
                                 : "bg-gray-500/20 text-[#888888]"

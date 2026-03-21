@@ -91,7 +91,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
         <span className="material-symbols-outlined text-gh-text-secondary !text-[20px]">
           history
         </span>
-        <h3 className="text-[16px] font-black uppercase tracking-tight text-gh-text">
+        <h3 className="text-[16px] font-medium uppercase tracking-tight text-gh-text">
           Latest Activity
         </h3>
       </div>
@@ -120,7 +120,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
           </p>
           <button
             onClick={() => navigate("/repositories")}
-            className="text-[11px] font-black text-primary uppercase tracking-widest hover:underline"
+            className="text-[11px] font-semibold text-primary uppercase tracking-widest hover:underline"
           >
             Go to Repositories →
           </button>
@@ -129,7 +129,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
         <div className="relative pl-8">
           <div className="absolute left-[3px] top-2 bottom-8 w-[1px] bg-gh-border" />
           {monthLabel && (
-            <p className="text-[11px] font-black uppercase text-gh-text-secondary tracking-[0.3em] mb-8">
+            <p className="text-[11px] font-medium uppercase text-gh-text-secondary tracking-[0.3em] mb-8">
               {monthLabel}
             </p>
           )}
@@ -150,7 +150,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
 
                   <div className="min-w-0">
                     <p className="text-[14px] text-gh-text-secondary leading-snug">
-                      <span className="font-black text-gh-text group-hover:text-primary transition-colors">
+                      <span className="font-semibold text-gh-text group-hover:text-primary transition-colors">
                         {action}
                       </span>
                       {event.repoName && (
@@ -175,7 +175,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
                       </div>
                     )}
 
-                    <p className="text-[10px] text-gh-text-secondary mt-4 font-black uppercase tracking-widest">
+                    <p className="text-[10px] text-gh-text-secondary mt-4 font-medium uppercase tracking-widest">
                       {timeAgo(event.createdAt)}
                     </p>
                   </div>
@@ -189,7 +189,7 @@ const ActivityFeed: React.FC<Props> = ({ profile }) => {
       {events.length > 0 && (
         <button
           onClick={() => navigate("/activity")}
-          className="w-full mt-12 py-3 bg-gh-bg-secondary border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-sm hover:border-primary/40 active:scale-[0.98]"
+          className="w-full mt-12 py-3 bg-gh-bg-secondary border border-gh-border text-gh-text-secondary hover:text-gh-text rounded-xl text-[11px] font-medium uppercase tracking-widest transition-all shadow-sm hover:border-primary/40 active:scale-[0.98]"
         >
           View full activity
         </button>

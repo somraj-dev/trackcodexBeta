@@ -80,6 +80,7 @@ model User {
   discussionComments  DiscussionComment[]  @relation("DiscussionCommentAuthor")
   discussionReactions DiscussionReaction[] @relation("DiscussionReactions")
   comments            Comment[]
+  releases            Release[]            @relation("ReleaseAuthor")
 
   // Messaging
   conversationParticipants ConversationParticipant[]
@@ -410,6 +411,7 @@ model Repository {
   environments     Environment[]
   activityLogs     ActivityLog[]
   codeSymbols      CodeSymbol[]
+  releases         Release[]
 
   @@index([ownerId])
   @@index([orgId])
@@ -1787,4 +1789,25 @@ model ConversationParticipant {
   lastReadAt DateTime?
   @@unique([conversationId, userId])
   @@index([userId])
+}
+model Release {
+  id        String   @id @default(uuid())
+  tagName   String
+  name      String
+  body      String?  @db.Text
+  draft     Boolean  @default(false)
+  prerelease Boolean @default(false)
+  
+  repoId    String
+  repo      Repository @relation(fields: [repoId], references: [id])
+  
+  authorId  String
+  author    User     @relation("ReleaseAuthor", fields: [authorId], references: [id])
+  
+  assets    Json?    // Array of asset links/metadata
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([repoId, tagName])
 }

@@ -102,7 +102,7 @@ const EmailSettings = () => {
   return (
     <div className="space-y-10">
       <header className="border-b border-gh-border pb-6">
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <h1 className="text-lg font-semibold text-white tracking-tight">
           Emails
         </h1>
         <p className="text-sm text-gh-text-secondary mt-1">
@@ -124,17 +124,17 @@ const EmailSettings = () => {
                   {email.address}
                 </span>
                 {email.primary && (
-                  <span className="px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
+                  <span className="px-2 py-0.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-[10px] font-medium uppercase tracking-widest">
                     Primary
                   </span>
                 )}
                 {email.verified && (
-                  <span className="px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
+                  <span className="px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-[10px] font-medium uppercase tracking-widest">
                     Verified
                   </span>
                 )}
                 {email.linked && (
-                  <span className="px-2 py-0.5 rounded-full border border-gh-border bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-widest">
+                  <span className="px-2 py-0.5 rounded-full border border-gh-border bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest">
                     Connected to {email.linked}
                   </span>
                 )}
@@ -209,7 +209,7 @@ const EmailSettings = () => {
                 <button
                   type="submit"
                   disabled={!otpInput || isLoading}
-                  className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-[#0A0A0A]lue-600 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 flex items-center gap-2"
                 >
                   {isLoading ? "Verifying..." : "Verify"}
                 </button>
@@ -309,7 +309,7 @@ const EmailSettings = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+          <span className="text-[10px] font-medium uppercase tracking-widest text-slate-500">
             {keepPrivate ? "On" : "Off"}
           </span>
           <button

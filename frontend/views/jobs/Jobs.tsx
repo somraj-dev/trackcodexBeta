@@ -67,7 +67,7 @@ const Jobs = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-black tracking-tight mb-2">
+            <h1 className="text-xl font-semibold tracking-tight mb-2">
               Opportunities
             </h1>
             <p className="text-gh-text-secondary text-sm">
@@ -76,7 +76,7 @@ const Jobs = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
+            className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
           >
             <span className="material-symbols-outlined text-lg">post_add</span>
             Post a Gig
@@ -127,7 +127,7 @@ const Jobs = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-black text-emerald-500">
+                    <div className="text-sm font-semibold text-emerald-500">
                       {job.budget}
                     </div>
                     <div className="text-[10px] font-bold uppercase tracking-widest text-gh-text-secondary mt-1">

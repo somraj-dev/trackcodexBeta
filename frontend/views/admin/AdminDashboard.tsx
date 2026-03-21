@@ -47,7 +47,7 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-black text-gh-text tracking-tight">
+            <h1 className="text-lg font-semibold text-gh-text tracking-tight">
               Organization Settings
             </h1>
             <p className="text-sm text-gh-text-secondary mt-1">
@@ -116,10 +116,10 @@ const AdminDashboard = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${m.role === "OWNER"
+                        className={`px-2 py-1 rounded-full text-[10px] font-medium uppercase tracking-widest ${m.role === "OWNER"
                             ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                             : m.role === "ADMIN"
-                              ? "bg-[#0A0A0A]lue-500/10 text-blue-400 border border-blue-500/20"
+                              ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                               : "bg-gh-bg-tertiary text-gh-text-secondary border border-gh-border"
                           }`}
                       >

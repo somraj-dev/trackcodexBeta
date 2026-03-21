@@ -81,7 +81,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-[#0A0A0A]lack/90 backdrop-blur-md animate-in fade-in duration-300 font-display">
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300 font-display">
       <div className="bg-[#0A0D14] border border-[#1E232E] w-full max-w-5xl h-[85vh] rounded-2xl overflow-hidden shadow-2xl flex">
         {/* Sidebar: Approval Workflow */}
         <div className="w-64 border-r border-[#1E232E] bg-[#0A0D14] p-6 hidden md:flex flex-col">
@@ -98,7 +98,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
             </div>
           </div>
 
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
+          <h3 className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-4">
             Approval Workflow
           </h3>
           <div className="space-y-6 relative">
@@ -119,7 +119,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="size-5 rounded-full bg-[#0A0A0A]lue-500 flex items-center justify-center mt-0.5 ring-4 ring-[#010409] animate-pulse">
+              <div className="size-5 rounded-full bg-blue-500 flex items-center justify-center mt-0.5 ring-4 ring-[#010409] animate-pulse">
                 <span className="material-symbols-outlined !text-[12px] text-white">
                   schedule
                 </span>
@@ -160,7 +160,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
               <button
                 form="offer-form"
                 type="submit"
-                className="px-5 py-2 bg-[#0A0A0A]lue-600 hover:bg-[#0A0A0A]lue-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
               >
                 {isSubmitting ? "Processing..." : "Send Offer"}
                 <span className="material-symbols-outlined !text-[16px]">
@@ -177,7 +177,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
               className="max-w-2xl space-y-8"
             >
               <section>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4">
+                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-4">
                   Compensation
                 </h3>
 
@@ -240,7 +240,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
               <div className="h-px bg-[#30363d]"></div>
 
               <section>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-4">
+                <h3 className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-4">
                   Logistics
                 </h3>
 
@@ -336,7 +336,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
                         includeRelocation: !formData.includeRelocation,
                       })
                     }
-                    className={`w-10 h-5 rounded-full relative transition-colors ${formData.includeRelocation ? "bg-[#0A0A0A]lue-600" : "bg-[#30363d]"}`}
+                    className={`w-10 h-5 rounded-full relative transition-colors ${formData.includeRelocation ? "bg-blue-600" : "bg-[#30363d]"}`}
                   >
                     <div
                       className={`absolute top-1 left-1 size-3 bg-white rounded-full transition-transform ${formData.includeRelocation ? "translate-x-5" : ""}`}
@@ -356,7 +356,7 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
                         customNDA: !formData.customNDA,
                       })
                     }
-                    className={`w-10 h-5 rounded-full relative transition-colors ${formData.customNDA ? "bg-[#0A0A0A]lue-600" : "bg-[#30363d]"}`}
+                    className={`w-10 h-5 rounded-full relative transition-colors ${formData.customNDA ? "bg-blue-600" : "bg-[#30363d]"}`}
                   >
                     <div
                       className={`absolute top-1 left-1 size-3 bg-white rounded-full transition-transform ${formData.customNDA ? "translate-x-5" : ""}`}

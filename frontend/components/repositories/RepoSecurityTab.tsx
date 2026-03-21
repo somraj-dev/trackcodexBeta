@@ -110,7 +110,7 @@ const RepoSecurityTab = () => {
       case "MEDIUM":
         return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
       case "LOW":
-        return "text-blue-500 bg-[#0A0A0A]lue-500/10 border-blue-500/20";
+        return "text-blue-500 bg-blue-500/10 border-blue-500/20";
       default:
         return "text-[#888888] bg-gray-500/10 border-gray-500/20";
     }
@@ -289,7 +289,7 @@ const RepoSecurityTab = () => {
 
       {/* Alert Detail Modal */}
       {selectedAlert && (
-        <div className="fixed inset-0 bg-[#0A0A0A]lack/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-4 border-b border-gh-border flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -318,7 +318,7 @@ const RepoSecurityTab = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider">
                     Severity
                   </span>
-                  <span className="text-xl font-black">
+                  <span className="text-base font-semibold">
                     {selectedAlert.severity}
                   </span>
                 </div>

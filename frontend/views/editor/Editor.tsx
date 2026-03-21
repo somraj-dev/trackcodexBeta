@@ -147,7 +147,7 @@ const ForgeAIAssistantPanel: React.FC<ForgeAIAssistantPanelProps> = ({ editorRef
               }`}>
               {msg.text.split(/```(\w*)\n([\s\S]*?)```/g).map((part, index) => {
                 if (index % 3 === 2) {
-                  return <pre key={index} className="bg-[#0A0A0A]lack/50 p-3 rounded-md overflow-x-auto my-2"><code className="font-mono">{part}</code></pre>
+                  return <pre key={index} className="bg-black/50 p-3 rounded-md overflow-x-auto my-2"><code className="font-mono">{part}</code></pre>
                 }
                 if (index % 3 === 0) {
                   return <div key={index}>{part}</div>
@@ -211,7 +211,7 @@ const MenuBarItem = ({ label, items = [] }: { label: string; items?: (string | M
     <div className="relative z-50" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`px-3 py-1 text-[13px] hover:bg-[#333333] rounded-sm transition-colors cursor-default ${isOpen ? 'bg-[#333333] text-white' : 'text-[#cccccc]'}`}
+        className={`px-3 py-1 text-[13px] hover:bg-gh-bg-tertiary rounded-sm transition-colors cursor-default ${isOpen ? 'bg-[#333333] text-white' : 'text-[#cccccc]'}`}
       >
         {label}
       </button>
@@ -468,12 +468,9 @@ const EditorView = ({ isFocusMode = false }: { isFocusMode?: boolean }) => {
             <div className="p-4 text-xs text-slate-500">Loading workspace...</div>
           ) : (
             <FileExplorer
-              fileSystem={fileSystem}
+              files={fileSystem}
               onFileClick={handleFileClick}
-              openFiles={openFiles}
               activeFileId={activeFileId}
-              onCloseFile={handleCloseFile}
-              onAddFile={handleAddFile}
             />
           )}
         </div>

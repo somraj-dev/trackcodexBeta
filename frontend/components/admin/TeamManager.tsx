@@ -7,14 +7,14 @@ const TeamManager = () => {
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Team Management
           </h1>
           <p className="text-gh-text-secondary">
             Manage developer clusters and organizational hierarchy.
           </p>
         </div>
-        <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+        <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
           <span className="material-symbols-outlined text-lg">group_add</span>
           Create New Team
         </button>
@@ -33,30 +33,30 @@ const TeamManager = () => {
                 </span>
               </div>
               <span
-                className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${team.status === "Active" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20"}`}
+                className={`px-2 py-0.5 rounded text-[9px] font-medium uppercase tracking-widest border ${team.status === "Active" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-amber-500/10 text-amber-500 border-amber-500/20"}`}
               >
                 {team.status}
               </span>
             </div>
             <h3 className="text-lg font-bold text-gh-text mb-1">{team.name}</h3>
-            <p className="text-[10px] text-gh-text-secondary font-black uppercase tracking-widest mb-6">
+            <p className="text-[10px] text-gh-text-secondary font-medium uppercase tracking-widest mb-6">
               {team.org}
             </p>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-white/5">
-                <p className="text-[10px] text-gh-text-secondary uppercase font-black">
+              <div className="p-3 bg-black/20 rounded-xl border border-white/5">
+                <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
                   Members
                 </p>
-                <p className="text-xl font-black text-gh-text">
+                <p className="text-base font-semibold text-gh-text">
                   {team.members}
                 </p>
               </div>
-              <div className="p-3 bg-[#0A0A0A]lack/20 rounded-xl border border-white/5">
-                <p className="text-[10px] text-gh-text-secondary uppercase font-black">
+              <div className="p-3 bg-black/20 rounded-xl border border-white/5">
+                <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
                   Repositories
                 </p>
-                <p className="text-xl font-black text-gh-text">{team.repos}</p>
+                <p className="text-base font-semibold text-gh-text">{team.repos}</p>
               </div>
             </div>
 
@@ -69,7 +69,7 @@ const TeamManager = () => {
                   @{team.lead.split(" ")[0].toLowerCase()}
                 </span>
               </div>
-              <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-colors">
+              <button className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest hover:text-white transition-colors">
                 Manage Access
               </button>
             </div>

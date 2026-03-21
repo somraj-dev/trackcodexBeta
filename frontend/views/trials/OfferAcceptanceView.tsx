@@ -7,7 +7,7 @@ const OfferHighlight = ({ value, label, sublabel, icon }: { value: string; label
             <div className="size-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
                 <span className="material-symbols-outlined !text-xl">{icon}</span>
             </div>
-            <p className="text-xl font-black text-white">{value}</p>
+            <p className="text-base font-semibold text-white">{value}</p>
         </div>
         <p className="text-sm font-semibold text-slate-300">{label}</p>
         <p className="text-xs text-slate-500">{sublabel}</p>
@@ -63,7 +63,7 @@ const OfferAcceptanceView = () => {
                 <header className="flex items-start justify-between mb-8">
                     <div>
                         <p className="text-sm font-bold text-emerald-400 uppercase tracking-widest">Ready for Review</p>
-                        <h1 className="text-5xl font-black text-white mt-2">Congratulations, Alex!</h1>
+                        <h1 className="text-5xl font-semibold text-white mt-2">Congratulations, Alex!</h1>
                         <p className="text-2xl text-slate-400 mt-2">Your offer from <span className="text-emerald-300 font-bold">TechFlow</span> is ready.</p>
                     </div>
                     <div className="text-right">
@@ -85,7 +85,7 @@ const OfferAcceptanceView = () => {
 
                         {/* Document Viewer */}
                         <div className="bg-[#11141A] border border-gh-border rounded-xl overflow-hidden">
-                            <div className="p-4 bg-[#0A0A0A]lack/20 border-b border-gh-border flex items-center justify-between">
+                            <div className="p-4 bg-black/20 border-b border-gh-border flex items-center justify-between">
                                 <p className="text-sm font-mono text-slate-400">Employment_Agreement_Alex_TechFlow.pdf</p>
                                 <div className="flex items-center gap-2">
                                     <button className="text-slate-500 hover:text-white"><span className="material-symbols-outlined !text-base">zoom_in</span></button>

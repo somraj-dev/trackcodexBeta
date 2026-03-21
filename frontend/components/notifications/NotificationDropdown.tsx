@@ -60,7 +60,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                     ? "bg-emerald-500"
                     : notif.type === "alert"
                       ? "bg-red-500"
-                      : "bg-[#0A0A0A]lue-500"
+                      : "bg-blue-500"
                     }`}
                 ></div>
                 <div className="flex-1 min-w-0">

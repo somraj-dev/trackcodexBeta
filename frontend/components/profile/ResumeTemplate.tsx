@@ -59,14 +59,14 @@ export const ResumeTemplate: React.FC<ResumeTemplateProps> = ({ profile, isEdita
           </p>
           <div className="flex flex-wrap gap-8 pt-6 border-t border-white/5">
             <div>
-              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-black tracking-tighter mb-1">
+              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-semibold tracking-tighter mb-1">
                 <span className="material-symbols-outlined !text-sm">military_tech</span>
                 Grade:
               </div>
               <div className="text-xs font-bold text-white">Senior Developer +</div>
             </div>
             <div>
-              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-black tracking-tighter mb-1">
+              <div className="flex items-center gap-2 text-slate-500 text-[10px] uppercase font-semibold tracking-tighter mb-1">
                 <span className="material-symbols-outlined !text-sm">language</span>
                 Languages:
               </div>
@@ -250,8 +250,8 @@ export const ResumeTemplate: React.FC<ResumeTemplateProps> = ({ profile, isEdita
 
       {/* Footer Branded Bar */}
       <div className="bg-[#0A0A0B] px-10 py-6 border-t border-white/5 flex items-center justify-between opacity-40">
-        <div className="text-[9px] uppercase font-black tracking-widest text-slate-500">TrackCodex Verified Vault ID: {profile.id.substring(0, 12)}</div>
-        <div className="text-[9px] uppercase font-black tracking-widest text-slate-500">© 2026 TrackCodex ecosystem</div>
+        <div className="text-[9px] uppercase font-semibold tracking-widest text-slate-500">TrackCodex Verified Vault ID: {profile.id.substring(0, 12)}</div>
+        <div className="text-[9px] uppercase font-semibold tracking-widest text-slate-500">© 2026 TrackCodex ecosystem</div>
       </div>
     </div>
   );

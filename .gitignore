@@ -60,3 +60,10 @@ endpoint.txt
 status.txt
 manual_snapshots.json
 snapshots_complete.json
+
+# Tool/Test artifacts
+.vscode-test-web/
+.vscode_engine/
+vscode-engine/
+test-results/
+playwright-report/

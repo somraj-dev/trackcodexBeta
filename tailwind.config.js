@@ -52,7 +52,17 @@ export default {
                 },
             },
             fontFamily: {
+                sans: [
+                    "Geist",
+                    "Inter",
+                    "-apple-system",
+                    "BlinkMacSystemFont",
+                    "Segoe UI",
+                    "Roboto",
+                    "sans-serif",
+                ],
                 display: [
+                    "Geist",
                     "Inter",
                     "SF Pro Display",
                     "-apple-system",
@@ -70,6 +80,15 @@ export default {
                     "Consolas",
                     "monospace",
                 ],
+            },
+            fontSize: {
+                'xs': ['var(--tc-font-xs)', { lineHeight: '1.4' }],
+                'sm': ['var(--tc-font-sm)', { lineHeight: '1.4' }],
+                'base': ['var(--tc-font-base)', { lineHeight: '1.5' }],
+                'md': ['var(--tc-font-md)', { lineHeight: '1.4' }],
+                'lg': ['var(--tc-font-lg)', { lineHeight: '1.3' }],
+                'xl': ['var(--tc-font-xl)', { lineHeight: '1.2' }],
+                '2xl': ['var(--tc-font-2xl)', { lineHeight: '1.2' }],
             },
         },
     },

@@ -45,7 +45,7 @@ const BillingUsage = () => {
         <div className="space-y-6 pb-20">
             {/* Header */}
             <header className="flex items-center justify-between">
-                <h1 className="text-2xl font-black text-gh-text tracking-tight">
+                <h1 className="text-lg font-semibold text-gh-text tracking-tight">
                     Metered usage
                 </h1>
                 <button className="px-4 py-2 bg-gh-bg-secondary border border-gh-border text-gh-text rounded-lg text-sm font-bold hover:bg-gh-bg-tertiary transition-all flex items-center gap-2">

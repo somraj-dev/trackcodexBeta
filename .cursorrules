@@ -1,0 +1,28 @@
+# TrackCodex Development Rules
+
+To ensure consistency in styling, font size, and themes across all new features and pages:
+
+## 1. Design & Styling (Tailwind)
+
+- **Colors**: Never use hardcoded hex codes. Use theme-aware variables:
+  - Backgrounds: `bg-gh-bg`, `bg-gh-bg-secondary`, `bg-gh-bg-tertiary`
+  - Text: `text-gh-text`, `text-gh-text-secondary`, `text-gh-text-tertiary`
+  - Borders: `border-gh-border`
+  - Accent: `primary` (maps to `var(--gh-primary)`)
+
+- **Fonts**: Use the standardized font sizes:
+  - Base: `text-base` (14px)
+  - Small: `text-sm` (13px)
+  - Heading: `text-lg` (18px) or `text-xl` (20px)
+
+- **Dark Mode**: Supports pure black (#000000) and deep grays (#0A0A0A). Always test in both themes.
+
+## 2. Component Structure
+
+- Use **Geist** or **Inter** fonts.
+- Apply `.custom-scrollbar` to overflow containers.
+- Use `.material-symbols-outlined` for icons.
+
+## 3. Reference
+
+- Always refer to `frontend/DESIGN_GUIDE.md` for full implementation details.

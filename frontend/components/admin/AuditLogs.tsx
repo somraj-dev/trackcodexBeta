@@ -12,7 +12,7 @@ const AuditLogs = () => {
       case "Warning":
         return "bg-amber-500/10 text-amber-500 border-amber-500/30";
       default:
-        return "bg-[#0A0A0A]lue-500/10 text-blue-500 border-blue-500/30";
+        return "bg-blue-500/10 text-blue-500 border-blue-500/30";
     }
   };
 
@@ -20,7 +20,7 @@ const AuditLogs = () => {
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             Audit Logs
           </h1>
           <p className="text-gh-text-secondary">
@@ -29,10 +29,10 @@ const AuditLogs = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="bg-gh-bg-secondary border border-gh-border text-gh-text-secondary hover:text-gh-text px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+          <button className="bg-gh-bg-secondary border border-gh-border text-gh-text-secondary hover:text-gh-text px-5 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all">
             Filter logs
           </button>
-          <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+          <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all">
             Verify Chain
           </button>
         </div>
@@ -41,7 +41,7 @@ const AuditLogs = () => {
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden shadow-2xl">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-[0.2em] border-b border-gh-border">
+            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">Timestamp (UTC)</th>
               <th className="px-6 py-4">Actor</th>
               <th className="px-6 py-4">Action</th>
@@ -66,7 +66,7 @@ const AuditLogs = () => {
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded border border-primary/20">
+                  <span className="text-[10px] font-semibold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded border border-primary/20">
                     {log.action}
                   </span>
                 </td>
@@ -77,7 +77,7 @@ const AuditLogs = () => {
                 </td>
                 <td className="px-6 py-5 text-right">
                   <span
-                    className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${getSeverityStyle(log.severity)}`}
+                    className={`px-2 py-0.5 rounded text-[9px] font-medium uppercase border ${getSeverityStyle(log.severity)}`}
                   >
                     {log.severity}
                   </span>

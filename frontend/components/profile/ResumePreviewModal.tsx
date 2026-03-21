@@ -70,7 +70,7 @@ const ResumePreviewModal: React.FC<ResumePreviewModalProps> = ({ isOpen, onClose
             <button
               onClick={handleDownload}
               disabled={downloading}
-              className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_4px_12px_rgba(139,92,246,0.3)] disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl text-sm font-medium uppercase tracking-widest transition-all shadow-[0_4px_12px_rgba(139,92,246,0.3)] disabled:opacity-50"
             >
               <span className="material-symbols-outlined !text-[18px]">
                 {downloading ? "downloading" : "download"}

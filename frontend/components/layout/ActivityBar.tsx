@@ -43,7 +43,7 @@ const ActivityIcon = ({
     >
       <span className={`material-symbols-outlined !text-[24px]`}>{icon}</span>
       {badge && (
-        <span className="absolute top-2 right-2 size-4 bg-primary text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-gh-bg-secondary">
+        <span className="absolute top-2 right-2 size-4 bg-primary text-white text-[9px] font-semibold rounded-full flex items-center justify-center border-2 border-gh-bg-secondary">
           {badge}
         </span>
       )}

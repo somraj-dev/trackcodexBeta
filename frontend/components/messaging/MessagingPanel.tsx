@@ -36,18 +36,18 @@ const MessagingPanel = () => {
     <div className="fixed inset-0 z-[200] flex justify-end animate-in fade-in duration-300">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-[#0A0A0A]lack/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => setIsPanelOpen(false)}
       />
 
       {/* Panel */}
-      <div className="relative w-full max-w-[900px] h-full bg-[#0A0D14] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex border-l border-[#1E232E] animate-in slide-in-from-right duration-300">
+      <div className="relative w-full max-w-[900px] h-full bg-gh-bg shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex border-l border-gh-border animate-in slide-in-from-right duration-300">
         
         {/* Left Sidebar: Conversations */}
-        <aside className="w-[320px] border-r border-[#1E232E] flex flex-col shrink-0">
-          <div className="p-6 border-b border-[#1E232E] flex items-center justify-between">
-            <h2 className="text-xl font-black text-white">Direct</h2>
-            <button className="size-8 rounded-lg hover:bg-white/5 text-slate-400">
+        <aside className="w-[320px] border-r border-gh-border flex flex-col shrink-0">
+          <div className="p-6 border-b border-gh-border flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gh-text">Direct</h2>
+            <button className="size-8 rounded-lg hover:bg-gh-bg-secondary text-gh-text-secondary">
               <span className="material-symbols-outlined">edit_square</span>
             </button>
           </div>
@@ -60,16 +60,16 @@ const MessagingPanel = () => {
                   key={conv.id}
                   onClick={() => setActiveConvId(conv.id)}
                   className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all mb-1 ${
-                    isActive ? 'bg-primary/10 border border-primary/20' : 'hover:bg-white/5 border border-transparent'
+                    isActive ? 'bg-primary/10 border border-primary/20' : 'hover:bg-gh-bg-secondary border border-transparent'
                   }`}
                 >
-                  <img src={other.avatar} className="size-12 rounded-full border border-[#1E232E] object-cover" alt={other.name} />
+                  <img src={other.avatar} className="size-12 rounded-full border border-gh-border object-cover" alt={other.name} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-sm font-bold text-white truncate">{other.name}</span>
-                      <span className="text-[10px] text-slate-500 font-medium">{conv.lastTimestamp || 'New'}</span>
+                      <span className="text-sm font-bold text-gh-text truncate">{other.name}</span>
+                      <span className="text-[10px] text-gh-text-secondary font-medium">{conv.lastTimestamp || 'New'}</span>
                     </div>
-                    <p className={`text-[12px] truncate ${isActive ? 'text-slate-300' : 'text-slate-500'}`}>
+                    <p className={`text-[12px] truncate ${isActive ? 'text-gh-text' : 'text-gh-text-secondary'}`}>
                       {conv.lastMessage || 'Start a conversation'}
                     </p>
                   </div>
@@ -80,34 +80,34 @@ const MessagingPanel = () => {
         </aside>
 
         {/* Main Content: Chat Window */}
-        <main className="flex-1 flex flex-col min-w-0 bg-[#0A0D14]">
+        <main className="flex-1 flex flex-col min-w-0 bg-gh-bg">
           {activeConversation ? (
             <>
               {/* Header */}
-              <div className="h-[73px] border-b border-[#1E232E] flex items-center justify-between px-6 shrink-0">
+              <div className="h-[73px] border-b border-gh-border flex items-center justify-between px-6 shrink-0">
                 <div className="flex items-center gap-3">
-                  <img src={activeConversation.participants[0].avatar} className="size-9 rounded-full border border-[#1E232E]" alt="Avatar" />
+                  <img src={activeConversation.participants[0].avatar} className="size-9 rounded-full border border-gh-border" alt="Avatar" />
                   <div>
-                    <h3 className="text-sm font-bold text-white">{activeConversation.participants[0].name}</h3>
+                    <h3 className="text-sm font-bold text-gh-text">{activeConversation.participants[0].name}</h3>
                     <div className="flex items-center gap-1.5">
                       <span className="size-1.5 rounded-full bg-emerald-500"></span>
-                      <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">Active Now</span>
+                      <span className="text-[10px] font-medium uppercase text-emerald-500 tracking-widest">Active Now</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400">
+                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-gh-bg-secondary text-gh-text-secondary">
                     <span className="material-symbols-outlined">call</span>
                   </button>
-                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400">
+                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-gh-bg-secondary text-gh-text-secondary">
                     <span className="material-symbols-outlined">videocam</span>
                   </button>
-                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400">
+                  <button className="size-9 flex items-center justify-center rounded-full hover:bg-gh-bg-secondary text-gh-text-secondary">
                     <span className="material-symbols-outlined">info</span>
                   </button>
                   <button 
                     onClick={() => setIsPanelOpen(false)}
-                    className="size-9 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400 lg:hidden"
+                    className="size-9 flex items-center justify-center rounded-full hover:bg-gh-bg-secondary text-gh-text-secondary lg:hidden"
                   >
                     <span className="material-symbols-outlined">close</span>
                   </button>
@@ -130,11 +130,11 @@ const MessagingPanel = () => {
                 ))}
                 {isTyping && (
                   <div className="flex items-center gap-2 mb-4 animate-pulse">
-                    <img src={activeConversation.participants[0].avatar} className="size-7 rounded-full border border-[#1E232E]" />
-                    <div className="bg-[#2d333b] px-3 py-2 rounded-2xl flex gap-1 items-center">
-                       <div className="size-1 bg-slate-500 rounded-full animate-bounce"></div>
-                       <div className="size-1 bg-slate-500 rounded-full animate-bounce delay-100"></div>
-                       <div className="size-1 bg-slate-500 rounded-full animate-bounce delay-200"></div>
+                    <img src={activeConversation.participants[0].avatar} className="size-7 rounded-full border border-gh-border" alt="Typing indicator" />
+                    <div className="bg-gh-bg-tertiary px-3 py-2 rounded-2xl flex gap-1 items-center">
+                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce"></div>
+                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-100"></div>
+                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-200"></div>
                     </div>
                   </div>
                 )}
@@ -144,25 +144,25 @@ const MessagingPanel = () => {
               <div className="p-6">
                 <form 
                   onSubmit={handleSend}
-                  className="relative flex items-center gap-3 bg-[#11141A] border border-[#1E232E] rounded-full px-5 py-3 focus-within:border-primary/50 transition-all"
+                  className="relative flex items-center gap-3 bg-gh-bg-secondary border border-gh-border rounded-full px-5 py-3 focus-within:border-primary/50 transition-all"
                 >
-                  <button type="button" className="text-slate-400 hover:text-white">
+                  <button type="button" className="text-gh-text-secondary hover:text-gh-text">
                     <span className="material-symbols-outlined">sentiment_satisfied</span>
                   </button>
                   <input 
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="Message..."
-                    className="flex-1 bg-transparent border-none focus:ring-0 text-[14px] text-white placeholder:text-slate-600"
+                    className="flex-1 bg-transparent border-none focus:ring-0 text-[14px] text-gh-text placeholder:text-gh-text-secondary"
                   />
                   {inputText.trim() ? (
-                    <button type="submit" className="text-primary font-black text-[14px] uppercase tracking-widest hover:brightness-125">
+                    <button type="submit" className="text-primary font-semibold text-[14px] uppercase tracking-widest hover:brightness-125">
                       Send
                     </button>
                   ) : (
                     <div className="flex items-center gap-3">
-                      <button type="button" className="text-slate-400 hover:text-white"><span className="material-symbols-outlined">image</span></button>
-                      <button type="button" className="text-slate-400 hover:text-white"><span className="material-symbols-outlined">favorite</span></button>
+                      <button type="button" className="text-gh-text-secondary hover:text-gh-text"><span className="material-symbols-outlined">image</span></button>
+                      <button type="button" className="text-gh-text-secondary hover:text-gh-text"><span className="material-symbols-outlined">favorite</span></button>
                     </div>
                   )}
                 </form>
@@ -170,12 +170,12 @@ const MessagingPanel = () => {
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
-               <div className="size-24 rounded-full border-2 border-white/10 flex items-center justify-center text-white mb-6">
+               <div className="size-24 rounded-full border-2 border-gh-border flex items-center justify-center text-gh-text mb-6">
                   <span className="material-symbols-outlined !text-[48px]">send</span>
                </div>
-               <h2 className="text-2xl font-black text-white mb-2">Your Messages</h2>
-               <p className="text-slate-500 max-w-xs mx-auto text-sm">Send private messages to a colleague or client to collaborate on repositories and jobs.</p>
-               <button className="mt-8 bg-primary text-white px-6 py-2 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20">Send Message</button>
+               <h2 className="text-lg font-semibold text-gh-text mb-2">Your Messages</h2>
+               <p className="text-gh-text-secondary max-w-xs mx-auto text-sm">Send private messages to a colleague or client to collaborate on repositories and jobs.</p>
+               <button className="mt-8 bg-primary text-white px-6 py-2 rounded-xl font-medium uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20">Send Message</button>
             </div>
           )}
         </main>

@@ -3,6 +3,13 @@ import { repoService, FullRepoSettings } from "../../services/git/repoService";
 import ManageAccess from "./ManageAccess";
 import RepoWebhookSettings from "./RepoWebhookSettings";
 import EnvironmentSettings from "./EnvironmentSettings";
+import BranchProtectionSettings from "./BranchProtectionSettings";
+import ActionSettings from "./ActionSettings";
+import CodespaceSettings from "./CodespaceSettings";
+import PagesSettings from "./PagesSettings";
+import SecuritySettings from "./SecuritySettings";
+import SecretSettings from "./SecretSettings";
+import RepoNotificationSettings from "./RepoNotificationSettings";
 
 interface RepoSettingsTabProps {
   repo: any;
@@ -75,7 +82,7 @@ const CheckboxRow = ({
       className={`mt-1 size-5 rounded-md border flex items-center justify-center transition-all ${checked ? "bg-primary border-primary shadow-lg shadow-primary/20" : "bg-gh-bg border-gh-border group-hover:border-gh-text-secondary"}`}
     >
       {checked && (
-        <span className="material-symbols-outlined !text-[14px] text-white font-black">
+        <span className="material-symbols-outlined !text-[14px] text-white font-semibold">
           check
         </span>
       )}
@@ -86,7 +93,7 @@ const CheckboxRow = ({
         {description}
       </p>
       {subLabel && (
-        <p className="text-[10px] text-gh-text-tertiary mt-2 font-black uppercase tracking-widest">
+        <p className="text-[10px] text-gh-text-tertiary mt-2 font-medium uppercase tracking-widest">
           {subLabel}
         </p>
       )}
@@ -94,12 +101,109 @@ const CheckboxRow = ({
   </div>
 );
 
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText,
+  requireRepoName,
+  repoName,
+  isDanger,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  requireRepoName?: boolean;
+  repoName?: string;
+  isDanger?: boolean;
+}) => {
+  const [input, setInput] = useState("");
+  if (!isOpen) return null;
+
+  const isConfirmed = requireRepoName ? input === repoName : true;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+      <div className="bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-4 border-b border-gh-border flex items-center justify-between">
+          <h3 className="font-bold text-gh-text flex items-center gap-2 text-sm uppercase tracking-widest">
+            {isDanger && <span className="material-symbols-outlined text-red-500 !text-[18px]">warning</span>}
+            {title}
+          </h3>
+          <button onClick={onClose} className="text-gh-text-secondary hover:text-gh-text transition-colors">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-gh-text-secondary leading-relaxed">
+            {description}
+          </p>
+          {requireRepoName && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-gh-text">
+                Please type <span className="font-mono text-primary">{repoName}</span> to confirm.
+              </p>
+              <input
+                type="text"
+                className="w-full bg-gh-bg border border-gh-border rounded-lg px-4 py-2 text-sm text-gh-text focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={repoName}
+                autoFocus
+              />
+            </div>
+          )}
+        </div>
+        <div className="px-6 py-4 bg-gh-bg border-t border-gh-border flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 text-sm font-bold text-gh-text-secondary hover:bg-gh-bg-tertiary rounded-lg transition-all"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!isConfirmed}
+            onClick={() => {
+              onConfirm();
+              onClose();
+              setInput("");
+            }}
+            className={`flex-1 px-4 py-2 text-sm font-bold text-white rounded-lg transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100 ${isDanger ? "bg-red-600 hover:bg-red-500 shadow-red-600/20" : "bg-primary hover:bg-opacity-90 shadow-primary/20"}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
   const [settings, setSettings] = useState<FullRepoSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("General");
   const [renameValue, setRenameValue] = useState(repo.name);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmText: string;
+    onConfirm: () => void;
+    requireRepoName?: boolean;
+    isDanger?: boolean;
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    confirmText: "",
+    onConfirm: () => {},
+  });
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -192,7 +296,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
       {saving && (
         <div className="fixed bottom-8 right-8 z-50 flex items-center gap-3 bg-gh-bg-secondary border border-gh-border px-5 py-2.5 rounded-2xl shadow-2xl animate-in slide-in-from-bottom-10">
           <div className="size-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-xs font-black uppercase tracking-widest text-gh-text">
+          <span className="text-xs font-medium uppercase tracking-widest text-gh-text">
             Saving changes...
           </span>
         </div>
@@ -209,6 +313,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           { id: "Environments", icon: "cloud", label: "Environments" },
           { id: "Codespaces", icon: "terminal", label: "Codespaces" },
           { id: "Pages", icon: "browser_updated", label: "Pages" },
+          { id: "Notifications", icon: "notifications", label: "Notifications" },
         ].map((item) => (
           <button
             key={item.id}
@@ -229,7 +334,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
         ))}
 
         <div className="pt-6 pb-2 px-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-gh-text-tertiary">
+          <span className="text-[10px] font-medium uppercase tracking-widest text-gh-text-tertiary">
             Security Analysis
           </span>
         </div>
@@ -272,7 +377,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       onClick={() =>
                         handleUpdate((s) => ({ ...s, name: renameValue }))
                       }
-                      className="bg-gh-bg-secondary border border-gh-border hover:border-gh-text hover:bg-gh-bg-tertiary px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg"
+                      className="bg-gh-bg-secondary border border-gh-border hover:border-gh-text hover:bg-gh-bg-tertiary px-6 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all active:scale-95 shadow-lg"
                     >
                       Rename
                     </button>
@@ -308,7 +413,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
               description="The default branch is considered the “base” branch in your repository, against which all pull requests and code commits are automatically made."
             >
               <div className="flex items-center gap-3 p-4 bg-gh-bg border border-gh-border rounded-2xl group hover:border-primary/50 transition-all w-fit pr-10 shadow-sm">
-                <div className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-mono text-primary font-black">
+                <div className="px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-mono text-primary font-semibold">
                   {settings.defaultBranch}
                 </div>
                 <button className="material-symbols-outlined !text-[20px] text-gh-text-secondary hover:text-primary transition-colors">
@@ -348,7 +453,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     className="w-full h-full object-cover opacity-80 group-hover/img:scale-105 transition-transform duration-[2000ms]"
                   />
                   <div className="absolute top-6 left-6 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
-                    <button className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-xs font-black uppercase shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:scale-105 transition-all active:scale-95">
+                    <button className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-2xl text-xs font-medium uppercase shadow-[0_20px_50px_rgba(255,255,255,0.4)] hover:scale-105 transition-all active:scale-95">
                       <span className="material-symbols-outlined !text-lg">
                         edit
                       </span>
@@ -409,7 +514,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                   {settings.features?.issues && (
                     <div className="p-6 border border-emerald-500/20 bg-emerald-500/5 rounded-3xl flex items-center justify-between ml-12 animate-in zoom-in-95 duration-300">
                       <div>
-                        <h4 className="text-sm font-black text-gh-text mb-1 uppercase tracking-widest">
+                        <h4 className="text-sm font-semibold text-gh-text mb-1 uppercase tracking-widest">
                           Organized Workflows
                         </h4>
                         <p className="text-xs text-gh-text-secondary opacity-70">
@@ -417,7 +522,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                           through the noise.
                         </p>
                       </div>
-                      <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95">
+                      <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl text-xs font-medium uppercase tracking-widest shadow-xl shadow-emerald-600/20 transition-all active:scale-95">
                         Set up templates
                       </button>
                     </div>
@@ -481,7 +586,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       />
                       {settings.pullRequests?.allowMerge && (
                         <div className="ml-12 space-y-3 animate-in fade-in duration-300">
-                          <label className="text-[10px] font-black uppercase text-gh-text-tertiary tracking-tighter">
+                          <label className="text-[10px] font-medium uppercase text-gh-text-tertiary tracking-tighter">
                             Default commit message
                           </label>
                           <select
@@ -524,7 +629,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       />
                       {settings.pullRequests?.allowSquash && (
                         <div className="ml-12 space-y-3 animate-in fade-in duration-300">
-                          <label className="text-[10px] font-black uppercase text-gh-text-tertiary tracking-tighter">
+                          <label className="text-[10px] font-medium uppercase text-gh-text-tertiary tracking-tighter">
                             Default commit message
                           </label>
                           <select
@@ -570,7 +675,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                 <div className="h-px bg-gh-border/50 mx-4"></div>
 
                 <div className="space-y-4">
-                  <p className="text-xs text-gh-text-tertiary font-black uppercase tracking-widest pl-4">
+                  <p className="text-xs text-gh-text-tertiary font-medium uppercase tracking-widest pl-4">
                     Flow Optimization
                   </p>
                   <CheckboxRow
@@ -631,27 +736,53 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     label: "Change repository visibility",
                     desc: "This repository is currently public. Anyone on the internet can see it.",
                     btn: "Make Private",
-                  },
-                  {
-                    label: "Disable branch protection",
-                    desc: "Remove safeguards preventing direct pushes and forced deletion.",
-                    btn: "Disable Rules",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Change visibility",
+                      description: "Making this repository private will hide it from the public. Some features might be restricted.",
+                      confirmText: "Make private",
+                      onConfirm: () => console.log("Visibility changed")
+                    })
                   },
                   {
                     label: "Transfer ownership",
-                    desc: "Move this repository to another account or organization.",
+                    desc: "Move this repository to another account or organization. This action can be irreversible.",
                     btn: "Transfer",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Transfer repository",
+                      description: "Enter the username or organization name of the new owner.",
+                      confirmText: "Transfer repository",
+                      onConfirm: () => console.log("Transfer initialized")
+                    })
                   },
                   {
                     label: "Archive this repository",
-                    desc: "Mark as read-only and close all active development.",
+                    desc: "Mark this repository as read-only and close all active development. You can unarchive it later.",
                     btn: "Archive",
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Archive repository",
+                      description: "Archiving this repository will make it read-only. Issues and pull requests will be closed.",
+                      confirmText: "Archive this repository",
+                      isDanger: true,
+                      onConfirm: () => console.log("Archived")
+                    })
                   },
                   {
                     label: "Delete this repository",
                     desc: "Permanently remove this repository and all its history. There is no undo.",
                     btn: "Delete repository",
                     danger: true,
+                    action: () => setModalConfig({
+                      isOpen: true,
+                      title: "Delete repository",
+                      description: "This action cannot be undone. This will permanently delete the repository, its wiki, issues, and comments.",
+                      confirmText: "I understand the consequences, delete this repository",
+                      requireRepoName: true,
+                      isDanger: true,
+                      onConfirm: () => console.log("Deleted")
+                    })
                   },
                 ].map((item, idx) => (
                   <div
@@ -659,7 +790,7 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                     className="flex flex-col md:flex-row items-center justify-between p-8 border-b border-red-500/10 last:border-[#1A1A1A] hover:bg-red-500/10 transition-all gap-4"
                   >
                     <div className="text-center md:text-left">
-                      <h4 className="text-[14px] font-black text-gh-text mb-1 uppercase tracking-tight">
+                      <h4 className="text-[14px] font-semibold text-gh-text mb-1 uppercase tracking-tight">
                         {item.label}
                       </h4>
                       <p className="text-xs text-gh-text-tertiary max-w-[500px] leading-relaxed font-medium">
@@ -667,7 +798,8 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                       </p>
                     </div>
                     <button
-                      className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 border whitespace-nowrap active:brightness-90 ${item.danger ? "bg-red-600 text-white border-red-600 hover:bg-red-500 shadow-xl shadow-red-600/20" : "bg-gh-bg border-gh-border text-red-500/80 hover:border-red-500 hover:text-red-500 hover:shadow-lg"}`}
+                      onClick={item.action}
+                      className={`px-8 py-3 rounded-2xl text-[10px] font-medium uppercase tracking-widest transition-all active:scale-95 border whitespace-nowrap active:brightness-90 ${item.danger ? "bg-red-600 text-white border-red-600 hover:bg-red-500 shadow-xl shadow-red-600/20" : "bg-gh-bg border-gh-border text-red-500/80 hover:border-red-500 hover:text-red-500 hover:shadow-lg"}`}
                     >
                       {item.btn}
                     </button>
@@ -675,6 +807,12 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
                 ))}
               </div>
             </Section>
+            
+            <ConfirmationModal
+              {...modalConfig}
+              repoName={repo.name}
+              onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+            />
           </div>
         )}
 
@@ -696,17 +834,66 @@ const RepoSettingsTab: React.FC<RepoSettingsTabProps> = ({ repo }) => {
           </div>
         )}
 
+        {activeSubTab === "Branches" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <BranchProtectionSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Actions" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <ActionSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Codespaces" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <CodespaceSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Pages" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <PagesSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Security" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <SecuritySettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Secrets" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <SecretSettings repoId={repo.id} />
+          </div>
+        )}
+
+        {activeSubTab === "Notifications" && (
+          <div className="animate-in fade-in slide-in-from-right-10 duration-700">
+            <RepoNotificationSettings repoId={repo.id} />
+          </div>
+        )}
+
         {activeSubTab !== "General" &&
           activeSubTab !== "Access" &&
           activeSubTab !== "Webhooks" &&
-          activeSubTab !== "Environments" && (
+          activeSubTab !== "Environments" &&
+          activeSubTab !== "Branches" &&
+          activeSubTab !== "Actions" &&
+          activeSubTab !== "Codespaces" &&
+          activeSubTab !== "Pages" &&
+          activeSubTab !== "Security" &&
+          activeSubTab !== "Notifications" &&
+          activeSubTab !== "Secrets" && (
             <div className="flex flex-col items-center justify-center py-40 text-gh-text-secondary opacity-50 h-full animate-in zoom-in-95 duration-700">
               <div className="size-20 rounded-full bg-gh-border/10 flex items-center justify-center mb-6">
                 <span className="material-symbols-outlined !text-[48px]">
                   construction
                 </span>
               </div>
-              <h2 className="text-xl font-extrabold mb-2 uppercase tracking-widest">
+              <h2 className="text-base font-semibold mb-2 uppercase tracking-widest">
                 {activeSubTab} Dashboard
               </h2>
               <p className="max-w-xs text-center text-xs font-bold leading-relaxed">

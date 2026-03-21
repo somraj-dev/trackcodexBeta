@@ -58,7 +58,7 @@ const GrowthLayout = () => {
           />
         </nav>
         <div className="mt-auto">
-          <button className="w-full py-3 bg-primary hover:bg-[#0A0A0A]lue-600 text-white rounded-lg font-bold text-sm">
+          <button className="w-full py-3 bg-primary hover:bg-blue-600 text-white rounded-lg font-bold text-sm">
             Sync PR History
           </button>
         </div>

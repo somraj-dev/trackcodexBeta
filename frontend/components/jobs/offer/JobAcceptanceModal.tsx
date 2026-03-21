@@ -31,7 +31,7 @@ const JobAcceptanceModal: React.FC<JobAcceptanceModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 z-50 p-2 bg-[#0A0A0A]lack/50 hover:bg-[#0A0A0A]lack/80 rounded-full text-white transition-colors"
+          className="absolute top-6 right-6 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
@@ -42,10 +42,10 @@ const JobAcceptanceModal: React.FC<JobAcceptanceModalProps> = ({
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-500 to-cyan-500"></div>
 
           <div className="mb-10">
-            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-medium uppercase tracking-widest">
               Ready for Review
             </span>
-            <h1 className="text-5xl font-black text-white mt-6 leading-tight tracking-tight">
+            <h1 className="text-5xl font-semibold text-white mt-6 leading-tight tracking-tight">
               Congratulations, <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
                 Candidate!

@@ -7,7 +7,7 @@ const UserManager = () => {
     <div className="animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gh-text tracking-tight mb-2">
+          <h1 className="text-xl font-semibold text-gh-text tracking-tight mb-2">
             User Management
           </h1>
           <p className="text-gh-text-secondary">
@@ -24,7 +24,7 @@ const UserManager = () => {
               placeholder="Search users..."
             />
           </div>
-          <button className="bg-primary hover:bg-[#0A0A0A]lue-600 text-white px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+          <button className="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-xl text-xs font-medium uppercase tracking-widest transition-all">
             Export CSV
           </button>
         </div>
@@ -33,7 +33,7 @@ const UserManager = () => {
       <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden shadow-2xl">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-black uppercase tracking-[0.2em] border-b border-gh-border">
+            <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">User Details</th>
               <th className="px-6 py-4">System Role</th>
               <th className="px-6 py-4">Joined Date</th>
@@ -67,7 +67,7 @@ const UserManager = () => {
                 <td className="px-6 py-5">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-widest ${user.role === "Super Admin"
+                      className={`px-2 py-0.5 rounded-full border text-[9px] font-medium uppercase tracking-widest ${user.role === "Super Admin"
                           ? "bg-primary/10 border-primary/20 text-primary"
                           : user.role === "Moderator"
                             ? "bg-rose-500/10 border-rose-500/20 text-rose-500"

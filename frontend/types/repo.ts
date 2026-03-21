@@ -13,8 +13,10 @@ export type RepoPermission =
 export interface Repository {
   id: string;
   name: string;
+  createdAt: string;
   isPublic: boolean;
   description: string;
+  website?: string;
   techStack: string;
   techColor: string;
   language?: string;
@@ -35,10 +37,33 @@ export interface Repository {
   refactors?: RepoRefactor[];
   contributors?: string[];
   releaseVersion?: string;
-  owner?: string;
-  open_issues?: number;
   license?: string;
   updatedAt?: string;
+  settings?: {
+    defaultBranch?: string;
+    [key: string]: any;
+  };
+  watchers?: number;
+  topics?: string[];
+  owner?: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
+  permissions?: {
+    admin: boolean;
+    push: boolean;
+    pull: boolean;
+    triage?: boolean;
+    maintain?: boolean;
+  };
+  watchLevel?: string | null;
+  isPinned?: boolean;
+  isStarred?: boolean;
+  open_issues_count?: number;
+  open_pull_requests_count?: number;
+  commits_count?: number;
+  initReadme?: boolean;
 }
 
 export interface PinnedRepo {

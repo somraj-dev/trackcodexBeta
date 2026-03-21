@@ -29,7 +29,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-[#0A0A0A]lack/60 backdrop-blur-sm animate-in fade-in duration-200"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
 
@@ -84,14 +84,14 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({
               {notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className={`p-4 rounded-xl border border-transparent hover:border-[#1E232E] hover:bg-[#11141A] transition-all cursor-pointer group flex gap-4 ${!notif.read ? "bg-[#11141A]/50" : ""}`}
+                  className={`p-4 rounded-xl border border-transparent hover:border-[#1E232E] hover:bg-gh-bg-tertiary transition-all cursor-pointer group flex gap-4 ${!notif.read ? "bg-[#11141A]/50" : ""}`}
                 >
                   {/* Icon */}
                   <div
                     className={`mt-1 size-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 shadow-inner ${notif.type === "job"
                       ? "bg-amber-500/10 text-amber-500"
                       : notif.type === "comment"
-                        ? "bg-[#0A0A0A]lue-500/10 text-blue-500"
+                        ? "bg-blue-500/10 text-blue-500"
                         : notif.type === "community"
                           ? "bg-purple-500/10 text-purple-500"
                           : "bg-slate-500/10 text-slate-400"

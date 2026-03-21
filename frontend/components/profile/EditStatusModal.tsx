@@ -87,7 +87,7 @@ const EditStatusModal: React.FC<EditStatusModalProps> = ({ isOpen, onClose }) =>
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0A0A0A]lack/50 backdrop-blur-sm font-display p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm font-display p-4">
             <div className="bg-[#11141A] border border-[#1E232E] rounded-xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="px-4 py-3 border-b border-[#1E232E] flex items-center justify-between">
@@ -150,7 +150,7 @@ const EditStatusModal: React.FC<EditStatusModalProps> = ({ isOpen, onClose }) =>
                                     checked={busy}
                                     onChange={(e) => setBusy(e.target.checked)}
                                     title="Busy Status"
-                                    className="peer size-4 appearance-none rounded-sm border border-[#8b949e] bg-[#0A0D14] checked:bg-[#0A0A0A]lue-600 checked:border-blue-600 cursor-pointer focus:ring-0 focus:ring-offset-0"
+                                    className="peer size-4 appearance-none rounded-sm border border-[#8b949e] bg-[#0A0D14] checked:bg-blue-600 checked:border-blue-600 cursor-pointer focus:ring-0 focus:ring-offset-0"
                                 />
                                 <span className="material-symbols-outlined !text-[12px] text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 pointer-events-none">check</span>
                             </div>

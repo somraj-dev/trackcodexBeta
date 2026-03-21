@@ -5,7 +5,7 @@ const SettingsView = () => {
     <div className="p-8 flex-1 overflow-y-auto custom-scrollbar">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight mb-2 text-gh-text">
+          <h1 className="text-xl font-semibold tracking-tight mb-2 text-gh-text">
             Team & API Settings
           </h1>
           <p className="text-gh-text-secondary text-sm">
@@ -16,7 +16,7 @@ const SettingsView = () => {
 
         <section className="bg-gh-bg-secondary rounded-xl border border-gh-border overflow-hidden shadow-sm">
           <div className="flex items-center justify-between p-6 border-b border-gh-border">
-            <h2 className="text-lg font-bold text-gh-text">
+            <h2 className="text-sm font-semibold text-gh-text">
               Workspace Members
             </h2>
             <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
@@ -87,13 +87,13 @@ const SettingsView = () => {
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-gh-text">
+          <h2 className="text-base font-semibold text-gh-text">
             Security Preferences
           </h2>
           <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-start gap-4">
-                <div className="size-10 rounded-full bg-[#0A0A0A]lue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
+                <div className="size-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
                   <span className="material-symbols-outlined">
                     verified_user
                   </span>

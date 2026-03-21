@@ -39,7 +39,7 @@ const CandidateDiscoveryView = () => {
     <div className="p-8 text-gh-text max-w-[1200px] mx-auto">
       <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight mb-2">Candidate Discovery</h1>
+          <h1 className="text-xl font-semibold tracking-tight mb-2">Candidate Discovery</h1>
           <p className="text-gh-text-secondary font-medium">
             AI-curated talent pool based on your repository requirements.
           </p>
@@ -79,7 +79,7 @@ const CandidateDiscoveryView = () => {
                     <p className="text-sm text-primary font-mono">{candidate.role}</p>
                   </div>
                   {candidate.status === "Top Match" && (
-                    <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 text-[10px] font-black uppercase rounded-lg border border-amber-500/20">
+                    <span className="px-2.5 py-1 bg-amber-500/10 text-amber-500 text-[10px] font-medium uppercase rounded-lg border border-amber-500/20">
                       Top Match
                     </span>
                   )}

@@ -49,7 +49,7 @@ const OrgAuthenticationSecurity = () => {
                 <div className="bg-gh-bg-secondary border border-gh-border rounded-lg overflow-hidden">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-[#0A0A0A]lack/20 text-slate-500 text-[10px] uppercase tracking-wider font-bold">
+                            <tr className="bg-black/20 text-slate-500 text-[10px] uppercase tracking-wider font-bold">
                                 <th className="p-3">SAML Attribute Name</th>
                                 <th className="p-3">TrackCodex Field</th>
                                 <th className="p-3">Example Value</th>
@@ -127,7 +127,7 @@ const OrgAuthenticationSecurity = () => {
                         </div>
                         <div className="flex justify-end gap-3 pt-3">
                             <button className="px-4 py-2 text-sm text-slate-300 hover:text-white">Discard</button>
-                            <button onClick={handleSaveChanges} className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-[#0A0A0A]lue-600 transition-colors">Save Changes</button>
+                            <button onClick={handleSaveChanges} className="px-5 py-2 text-sm bg-primary rounded-lg text-white font-bold hover:bg-blue-600 transition-colors">Save Changes</button>
                         </div>
                     </div>
                 </section>

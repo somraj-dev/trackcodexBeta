@@ -70,7 +70,7 @@ const ContinueWorkspaces = () => {
               </p>
             </div>
             <div
-              className={`px-2 py-0.5 rounded border text-[10px] font-black uppercase flex items-center gap-1 shrink-0 
+              className={`px-2 py-0.5 rounded border text-[10px] font-medium uppercase flex items-center gap-1 shrink-0 
                 ${ws.status === "Running" ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" : "text-gh-text-secondary bg-gh-text-secondary/10 border-gh-text-secondary/20"}`}
             >
               <span className="material-symbols-outlined !text-[12px] filled">

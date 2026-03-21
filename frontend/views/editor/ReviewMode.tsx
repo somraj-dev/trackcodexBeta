@@ -30,7 +30,7 @@ const ActivityBarItem = ({
       {icon}
     </span>
     {badge && (
-      <span className="absolute top-2 right-2 size-4 bg-[#1f6feb] text-white text-[9px] font-black rounded-full flex items-center justify-center border-2 border-[#1e1e1e]">
+      <span className="absolute top-2 right-2 size-4 bg-[#1f6feb] text-white text-[9px] font-semibold rounded-full flex items-center justify-center border-2 border-[#1e1e1e]">
         {badge}
       </span>
     )}

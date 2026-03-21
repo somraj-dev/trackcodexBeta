@@ -85,7 +85,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply, depth = 0 }
             <KarmaBadge karma={comment.author.karma} />
             <span className="text-[11px] text-slate-500 font-medium">{comment.timestamp}</span>
             {isHighlightVisible && (
-              <span className="text-[9px] font-black text-primary uppercase tracking-widest animate-pulse">New</span>
+              <span className="text-[9px] font-semibold text-primary uppercase tracking-widest animate-pulse">New</span>
             )}
           </div>
           <p className="text-[13px] text-slate-300 leading-relaxed mb-2">

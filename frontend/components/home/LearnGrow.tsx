@@ -10,7 +10,7 @@ const LearnGrow = () => {
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em]">
+          <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
             Community
           </span>
           <span className="text-sm font-bold text-gh-text group-hover:text-primary transition-colors">
@@ -26,7 +26,7 @@ const LearnGrow = () => {
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em]">
+          <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
             Library Pack
           </span>
           <span className="text-sm font-bold text-gh-text group-hover:text-emerald-500 transition-colors">
@@ -42,7 +42,7 @@ const LearnGrow = () => {
           </span>
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-black text-gh-text-secondary uppercase tracking-[0.2em]">
+          <span className="text-[10px] font-semibold text-gh-text-secondary uppercase tracking-widest">
             ForgeAI Tip
           </span>
           <span className="text-sm font-bold text-gh-text group-hover:text-amber-500 transition-colors">
