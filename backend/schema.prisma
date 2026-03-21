@@ -61,6 +61,7 @@ model User {
   workspaceStars          WorkspaceStar[]
   workspaceInvitesSent    WorkspaceMember[] @relation("InvitedBy")
   workspaceInvitesCreated WorkspaceInvite[]
+  agentSessions           AgentSession[]
 
   profile             Profile?           @relation("UserProfile")
 
@@ -716,6 +717,34 @@ model AITask {
   result    String? // JSON string or text result
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+}
+
+model AgentSession {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt    String      @db.Text
+  model     String
+  provider  String
+  status    String      @default("ACTIVE") // ACTIVE, COMPLETED, FAILED, STOPPED
+  result    String?     @db.Text
+  steps     AgentStep[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model AgentStep {
+  id          String       @id @default(uuid())
+  sessionId   String
+  session     AgentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  title       String
+  description String?      @db.Text
+  status      String       @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  result      String?      @db.Text
+  toolCalls   Json?        // List of tool calls and results
+  position    Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Workspace {

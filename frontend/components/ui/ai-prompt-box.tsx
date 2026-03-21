@@ -1,7 +1,7 @@
 import React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode } from "lucide-react";
+import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, FolderCode, Zap, Brain, Cpu, ChevronDown as ChevronDownIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Utility function for className merging
@@ -438,11 +438,18 @@ const CustomDivider: React.FC = () => (
 
 // Main PromptInputBox Component
 interface PromptInputBoxProps {
-  onSend?: (message: string, files?: File[]) => void;
+  onSend?: (message: string, files?: File[], options?: { model?: string }) => void;
   isLoading?: boolean;
   placeholder?: string;
   className?: string;
 }
+
+const MODELS = [
+  { id: "gemini-1.5-flash", name: "Gemini Flash", icon: Zap, color: "text-yellow-400", desc: "Fast & Efficient" },
+  { id: "gemini-1.5-pro", name: "Gemini Pro", icon: Brain, color: "text-purple-400", desc: "Highest Intelligence" },
+  { id: "deepseek-coder", name: "DeepSeek Coder", icon: Cpu, color: "text-blue-400", desc: "Optimized for Code" },
+];
+
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
   const { onSend = () => {}, isLoading = false, placeholder = "Type your message here...", className } = props;
   const [input, setInput] = React.useState("");
@@ -453,8 +460,25 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const [showSearch, setShowSearch] = React.useState(false);
   const [showThink, setShowThink] = React.useState(false);
   const [showHand, setShowHand] = React.useState(false);
+  const [selectedModel, setSelectedModel] = React.useState(MODELS[0]);
+  const [showModelMenu, setShowModelMenu] = React.useState(false);
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
+
+  // Load saved model from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem("hand_selected_model");
+    if (saved) {
+      const model = MODELS.find(m => m.id === saved);
+      if (model) setSelectedModel(model);
+    }
+  }, []);
+
+  const handleModelSelect = (model: typeof MODELS[0]) => {
+    setSelectedModel(model);
+    localStorage.setItem("hand_selected_model", model.id);
+    setShowModelMenu(false);
+  };
 
   const handleToggleChange = (value: string) => {
     if (value === "search") {
@@ -538,7 +562,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
       else if (showThink) messagePrefix = "[Think: ";
       else if (showHand) messagePrefix = "[Hand: ";
       const formattedInput = messagePrefix ? `${messagePrefix}${input}]` : input;
-      onSend(formattedInput, files);
+      onSend(formattedInput, files, { model: selectedModel.id });
       setInput("");
       setFiles([]);
       setFilePreviews({});
@@ -773,6 +797,59 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   )}
                 </AnimatePresence>
               </button>
+
+              {showHand && (
+                <div className="relative ml-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowModelMenu(!showModelMenu)}
+                    className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 hover:border-orange-500/30 rounded-full h-8 transition-all group animate-in slide-in-from-left-2 duration-300"
+                  >
+                    <selectedModel.icon className={cn("w-3.5 h-3.5", selectedModel.color)} />
+                    <span className="text-[11px] font-bold text-gray-300 uppercase tracking-wider">{selectedModel.name.split(" ")[1]}</span>
+                    <ChevronDownIcon className="w-3 h-3 text-gray-500 group-hover:text-gray-300" />
+                  </button>
+
+                  <AnimatePresence>
+                    {showModelMenu && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowModelMenu(false)} />
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          className="absolute bottom-full left-0 mb-2 w-48 bg-[#1F2023] border border-gh-border rounded-xl shadow-2xl z-50 overflow-hidden"
+                        >
+                          <div className="p-2 border-b border-white/5 bg-white/5">
+                            <span className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-widest pl-2">Select Model</span>
+                          </div>
+                          {MODELS.map((m) => (
+                            <button
+                              key={m.id}
+                              onClick={() => handleModelSelect(m)}
+                              className={cn(
+                                "w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors text-left",
+                                selectedModel.id === m.id && "bg-orange-500/5 shadow-inner"
+                              )}
+                            >
+                              <div className="flex items-center gap-3">
+                                <m.icon className={cn("w-4 h-4", m.color)} />
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-bold text-white">{m.name}</span>
+                                  <span className="text-[10px] text-gh-text-secondary">{m.desc}</span>
+                                </div>
+                              </div>
+                              {selectedModel.id === m.id && (
+                                <div className="size-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
+                              )}
+                            </button>
+                          ))}
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
           </div>
 
