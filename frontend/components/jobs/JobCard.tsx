@@ -37,8 +37,14 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
 
       <div className="space-y-2.5 mb-5">
         <div className="flex items-center gap-2.5 text-slate-500">
-          <span className="material-symbols-outlined !text-[18px]">group</span>
-          <span className="text-[13px] font-medium">{job.metadata?.teamSize || "1 - 4 Members"}</span>
+          <span className="material-symbols-outlined !text-[18px]">
+            {job.metadata?.participationType === 'Team Participation' || job.metadata?.minTeamSize ? 'group' : 'person'}
+          </span>
+          <span className="text-[13px] font-medium">
+            {job.metadata?.participationType === 'Team Participation' || job.metadata?.minTeamSize 
+              ? `${job.metadata?.minTeamSize || 1} - ${job.metadata?.maxTeamSize || 4} Members` 
+              : "Individual"}
+          </span>
           <span className="w-px h-3 bg-slate-200 mx-1" />
         </div>
         <div className="flex items-center gap-2.5 text-slate-500">

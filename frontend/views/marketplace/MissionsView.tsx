@@ -5,6 +5,7 @@ import JobCard from '../../components/jobs/JobCard';
 
 import { cacheService } from '../../services/infra/cacheService';
 import { api } from '../../services/infra/api';
+import { MOCK_JOBS } from '../../constants';
 
 const MissionsView = () => {
   const navigate = useNavigate();
@@ -19,14 +20,13 @@ const MissionsView = () => {
       const data = await api.get<any>('/jobs');
       return Array.isArray(data) ? data : [];
     }).then(data => {
-      setLocalJobs(data);
+      // Merge mock jobs into real jobs for development/testing
+      const merged = [...MOCK_JOBS, ...(data || [])];
+      setLocalJobs(merged);
       setLoading(false);
     }).catch(err => {
       console.error("Failed to fetch jobs", err);
-      // Fallback to mock data if backend fails during development
-      import('../../constants').then(module => {
-        setLocalJobs(module.MOCK_JOBS);
-      });
+      setLocalJobs(MOCK_JOBS);
       setLoading(false);
     });
   }, []);

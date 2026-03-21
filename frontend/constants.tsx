@@ -436,6 +436,31 @@ export const MOCK_JOBS: Job[] = [
       avatar: "https://picsum.photos/seed/analytics/64",
     },
     postedDate: "Yesterday",
+    metadata: {
+      participationType: 'Team Participation',
+      minTeamSize: 3,
+      maxTeamSize: 5
+    }
+  },
+  {
+    id: "team-test-mission",
+    title: "Team Mission (Required: 3 Members)",
+    description: "Use this mission to test the Create A Team and Join A Team features.",
+    budget: "$5,000",
+    type: "Gig",
+    status: "Open",
+    techStack: ["Teamwork", "Collaboration"],
+    repoId: "test-repo",
+    creator: {
+      name: "TrackCodex Test",
+      avatar: "https://github.com/ghost.png",
+    },
+    postedDate: "Just now",
+    metadata: {
+      participationType: 'Team Participation',
+      minTeamSize: 3,
+      maxTeamSize: 3
+    }
   },
 ];
 

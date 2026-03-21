@@ -343,45 +343,6 @@ const MissionDetailView = () => {
           </div>
         </div>
 
-        {/* ── Frequently Asked Questions / Discussions ── */}
-        <div>
-          <SectionTitle>Frequently Asked Questions/Discussions</SectionTitle>
-          <div className="px-4 space-y-4">
-            <div className="bg-slate-50 rounded-lg p-6 flex flex-col items-center justify-center text-center pb-8 border border-slate-100">
-              <span className="material-symbols-outlined text-slate-400 text-3xl mb-1 mt-2">forum</span>
-              <p className="text-[12px] font-bold text-slate-700">No post yet! Start a new discussion.</p>
-            </div>
-            <div className="border border-slate-300 rounded-lg overflow-hidden flex flex-col focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
-              <textarea
-                placeholder="Ask a question (be specific)"
-                className="w-full p-4 h-[85px] outline-none resize-none text-[13px] text-slate-800 placeholder-slate-400 bg-white"
-              />
-              <div className="bg-white border-t border-slate-100 p-3 py-2 flex justify-end">
-                <button className="px-6 py-1 border border-blue-600 text-blue-600 rounded text-[13px] font-bold hover:bg-blue-50 transition-colors">
-                  Ask
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Banner ad (visual parity with Unstop) ── */}
-        <div className="w-full mt-8 rounded-xl overflow-hidden cursor-pointer relative shadow-sm border border-indigo-100">
-          <div className="w-full h-[110px] bg-indigo-50 flex flex-col justify-center px-10 relative overflow-hidden text-left">
-            <div className="z-10 relative">
-              <h2 className="text-[20px] font-black text-indigo-900 tracking-tight leading-none mb-1">
-                TrackCodex PRO
-              </h2>
-              <p className="text-[11px] text-indigo-800 font-semibold mb-3 max-w-[250px] leading-snug">
-                Exclusive mentorship, certification prep & more...
-              </p>
-              <button className="bg-indigo-900 text-white rounded-full px-5 py-1.5 text-[10px] font-bold hover:bg-indigo-800 shadow-xl">
-                Go Pro Now
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* ── TrackCodex Mission Actions ── */}
         <div className="px-4 py-6 mt-2 flex justify-center border-t border-slate-200 pt-8">
           {localJob.status === "Open" && !isCreator && (
