@@ -331,7 +331,7 @@ const PersonalAccessTokensSettings = () => {
       </header>
 
       {tokens.length === 0 ? (
-        <div className="py-20 border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl bg-gh-bg-secondary/30">
+        <div className="py-20 border-2 border-dashed border-gh-border rounded-2xl bg-gh-bg-secondary/30">
           <EmptyState />
         </div>
       ) : (

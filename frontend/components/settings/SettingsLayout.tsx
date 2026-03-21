@@ -39,7 +39,7 @@ const ExpandableMenuItem = ({
 
   // Check if any child route is active
   const isChildActive = React.Children.toArray(children).some((child: any) => {
-    return location.pathname.includes(child.props.to);
+    return child && child.props && child.props.to && location.pathname.includes(child.props.to);
   });
 
   const [isExpanded, setIsExpanded] = useState(isChildActive);

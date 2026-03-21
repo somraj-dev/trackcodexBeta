@@ -76,17 +76,17 @@ const SecurityAuditLog: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span
                         className={`material-symbols-outlined text-[18px] ${
-                          log.action.includes("login")
+                          (log.action || "").includes("login")
                             ? "text-blue-400"
-                            : log.action.includes("oauth")
+                            : (log.action || "").includes("oauth")
                               ? "text-purple-400"
                               : "text-[#a1a1aa]"
                         }`}
                       >
-                        {log.action.includes("login") ? "login" : "link"}
+                        {(log.action || "").includes("login") ? "login" : "link"}
                       </span>
                       <span className="capitalize">
-                        {log.action.replace("_", " ")}
+                        {(log.action || "").replace("_", " ")}
                       </span>
                     </div>
                   </td>
@@ -124,7 +124,8 @@ const SecurityAuditLog: React.FC = () => {
 };
 
 // Helper to clean up detailed UA strings
-function formatUserAgent(ua: string): string {
+function formatUserAgent(ua: string | undefined | null): string {
+  if (!ua) return "Unknown Device";
   if (ua.includes("Chrome")) return "Chrome";
   if (ua.includes("Firefox")) return "Firefox";
   if (ua.includes("Safari")) return "Safari";

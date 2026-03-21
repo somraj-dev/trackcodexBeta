@@ -105,12 +105,14 @@ const SessionManager: React.FC = () => {
   );
 };
 
-function getDeviceIcon(ua: string) {
+function getDeviceIcon(ua: string | undefined | null) {
+  if (!ua) return "laptop_mac";
   if (ua.includes("Mobile")) return "smartphone";
   return "laptop_mac";
 }
 
-function formatUserAgent(ua: string) {
+function formatUserAgent(ua: string | undefined | null) {
+  if (!ua) return "Unknown Device";
   if (ua.includes("Windows")) return "Windows PC";
   if (ua.includes("Macintosh")) return "Mac OS";
   if (ua.includes("Linux")) return "Linux";
