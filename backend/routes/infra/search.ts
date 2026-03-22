@@ -309,6 +309,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
       const page = Math.max(1, parseInt(pageStr || "1", 10));
       const limit = Math.min(50, parseInt(limitStr || "20", 10));
       const skip = (page - 1) * limit;
+      const q_lower = q.toLowerCase();
 
       try {
         // ── 1. Try Elasticsearch first ──
