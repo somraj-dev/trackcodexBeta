@@ -163,24 +163,42 @@ export async function searchRoutes(fastify: FastifyInstance) {
         // Uses OR with startsWith for prefix B-tree scan (O(log n) on indexed columns)
         // Falls back to contains only when query is short and prefix might miss results
         if (!type || type === "users") {
-          const q_lower = q.trim();
-          const users = await prisma.user.findMany({
-            where: {
-              deletedAt: null,
-              accountLocked: false,
-              isPrivate: false,
-              OR: [
-                { username: { contains: q_lower, mode: "insensitive" } },
-                { name: { contains: q_lower, mode: "insensitive" } },
-              ],
-            },
-            select: {
-              id: true, name: true, username: true, avatar: true,
-              profile: { select: { bio: true, location: true, followersCount: true } },
-            },
-            take: type === "users" ? 30 : 5,
-            orderBy: { name: "asc" },
-          });
+          const q_lower = q.trim().toLowerCase();
+          const words = q_lower.split(/\s+/).filter(Boolean);
+
+          const buildWordClauses = (word: string) => [
+            { username: { startsWith: word, mode: "insensitive" as const } },
+            { name: { startsWith: word, mode: "insensitive" as const } },
+            { username: { contains: word, mode: "insensitive" as const } },
+            { name: { contains: word, mode: "insensitive" as const } },
+          ];
+
+          const userWhere: any = {
+            deletedAt: null,
+            accountLocked: false,
+            AND: words.map((w) => ({ OR: buildWordClauses(w) })),
+          };
+
+          // Prefix matches first (Instagram-style ordering)
+          const prefixWhere: any = {
+            deletedAt: null,
+            accountLocked: false,
+            OR: words.flatMap((w) => [
+              { username: { startsWith: w, mode: "insensitive" as const } },
+              { name: { startsWith: w, mode: "insensitive" as const } },
+            ]),
+          };
+
+          const [prefixUsers, containsUsers] = await Promise.all([
+            prisma.user.findMany({ where: prefixWhere, select: { id: true, name: true, username: true, avatar: true, profile: { select: { bio: true, location: true, followersCount: true } } }, take: type === "users" ? 15 : 5, orderBy: { name: "asc" } }),
+            prisma.user.findMany({ where: userWhere, select: { id: true, name: true, username: true, avatar: true, profile: { select: { bio: true, location: true, followersCount: true } } }, take: type === "users" ? 30 : 5, orderBy: { name: "asc" } }),
+          ]);
+
+          const seen = new Set<string>();
+          const users: typeof containsUsers = [];
+          for (const u of [...prefixUsers, ...containsUsers]) {
+            if (!seen.has(u.id)) { seen.add(u.id); users.push(u); }
+          }
 
           request.log.info({ q, userCount: users.length }, "Prisma user search");
 
@@ -302,7 +320,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
         limit?: string;
       };
 
-      if (!q || q.length < 1) {
+      if (!q || q.trim().length < 1) {
         return { users: [], total: 0 };
       }
 
@@ -369,21 +387,51 @@ export async function searchRoutes(fastify: FastifyInstance) {
           }
         }
 
-        // ── 2. Optimised Prisma fallback ──
-        // Single OR with both startsWith and contains (prefix scan first, covers suffix)
-        const where = {
+        // ── 2. Optimised Prisma fallback (Instagram-style) ──
+        // Priority 1: prefix match on username/name (startsWith)
+        // Priority 2: contains match anywhere in username/name
+        // Multi-word support: "vatsal bh" -> split by spaces and match all tokens
+        const q_trimmed = q_lower.trim();
+        const words = q_trimmed.split(/\s+/).filter(Boolean);
+
+        // Build OR conditions for all words across all fields
+        const buildWordClauses = (word: string) => [
+          { username: { startsWith: word, mode: "insensitive" as const } },
+          { name: { startsWith: word, mode: "insensitive" as const } },
+          { username: { contains: word, mode: "insensitive" as const } },
+          { name: { contains: word, mode: "insensitive" as const } },
+        ];
+
+        // Single-word: OR all conditions. Multi-word: each word must appear somewhere.
+        const whereClause: any = {
           deletedAt: null,
           accountLocked: false,
-          isPrivate: false,
-          OR: [
-            { username: { contains: q_lower, mode: "insensitive" as const } },
-            { name: { contains: q_lower, mode: "insensitive" as const } },
-          ],
+          AND: words.map((w) => ({ OR: buildWordClauses(w) })),
         };
 
-        const [users, total] = await Promise.all([
+        // Run two queries: startsWith (prefix) first for relevance ordering
+        const prefixWhere: any = {
+          deletedAt: null,
+          accountLocked: false,
+          OR: words.flatMap((w) => [
+            { username: { startsWith: w, mode: "insensitive" as const } },
+            { name: { startsWith: w, mode: "insensitive" as const } },
+          ]),
+        };
+
+        const [prefixUsers, containsUsers, total] = await Promise.all([
           prisma.user.findMany({
-            where,
+            where: prefixWhere,
+            select: {
+              id: true, name: true, username: true, avatar: true,
+              profile: { select: { bio: true, location: true, followersCount: true } },
+              _count: { select: { followers: true } },
+            },
+            take: limit,
+            orderBy: [{ name: "asc" }],
+          }),
+          prisma.user.findMany({
+            where: whereClause,
             select: {
               id: true, name: true, username: true, avatar: true,
               profile: { select: { bio: true, location: true, followersCount: true } },
@@ -391,10 +439,21 @@ export async function searchRoutes(fastify: FastifyInstance) {
             },
             skip,
             take: limit,
-            orderBy: { name: "asc" },
+            orderBy: [{ name: "asc" }],
           }),
-          prisma.user.count({ where }),
+          prisma.user.count({ where: whereClause }),
         ]);
+
+        // Merge: prefix matches first, then contains, deduplicate by id
+        const seen = new Set<string>();
+        const mergedUsers: typeof containsUsers = [];
+        for (const u of [...prefixUsers, ...containsUsers]) {
+          if (!seen.has(u.id)) {
+            seen.add(u.id);
+            mergedUsers.push(u);
+          }
+        }
+        const users = mergedUsers.slice(0, limit);
 
         // If the current user is logged in, batch-check which result users they follow
         const currentUser = (request as any).user;
@@ -418,7 +477,6 @@ export async function searchRoutes(fastify: FastifyInstance) {
             avatar: u.avatar,
             bio: u.profile?.bio,
             location: u.profile?.location,
-            // Use live count from Follow table (more accurate than cached profile counter)
             followersCount: (u as any)._count?.followers ?? u.profile?.followersCount ?? 0,
             isFollowing: followingSet.has(u.id),
             url: `/profile/${u.username}`,
