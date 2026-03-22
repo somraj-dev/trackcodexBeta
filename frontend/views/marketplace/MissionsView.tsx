@@ -17,11 +17,12 @@ const MissionsView = () => {
   // Fetch Jobs from Real Backend with Cache
   useEffect(() => {
     cacheService.getOrFetch('missions_list', async () => {
-      const data = await api.get<any>('/jobs');
+      const data = await api.get<Job[]>('/jobs');
       return Array.isArray(data) ? data : [];
     }).then(data => {
-      // Merge mock jobs into real jobs for development/testing
-      const merged = [...MOCK_JOBS, ...(data || [])];
+      // Prioritize real jobs from database over mock jobs
+      const realJobs = Array.isArray(data) ? data : [];
+      const merged = [...realJobs, ...MOCK_JOBS];
       setLocalJobs(merged);
       setLoading(false);
     }).catch(err => {

@@ -31,6 +31,7 @@ export interface Job {
   applications?: any[];
   applicationsCount?: number;
   metadata?: any;
+  createdAt?: string;
   updatedAt?: string;
   category?: string;
   website?: string;

@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "../../utils/dateUtils";
 import { useState } from "react";
 import { Job } from "../../types";
 import ShareModal from "../modals/ShareModal";
@@ -72,7 +73,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, onClick }) => {
       <div className="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-4 text-slate-500">
           <span className="text-[13px] font-bold text-blue-600/80">
-            Posted {job.postedDate || "Mar 21, 2026"}
+            Posted {job.postedDate || (job.createdAt ? formatDistanceToNow(job.createdAt, { addSuffix: true }) : "recently")}
           </span>
           <div className="flex items-center gap-1.5 font-bold text-slate-700">
             <span className="material-symbols-outlined !text-[18px]">hourglass_bottom</span>
