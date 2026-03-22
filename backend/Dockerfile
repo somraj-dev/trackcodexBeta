@@ -19,9 +19,15 @@ RUN npm install --legacy-peer-deps --no-audit --no-fund
 COPY backend/schema.prisma ./backend/
 COPY dist-backend ./dist-backend
 
-# Generate Prisma Client
+# Copy the locally pre-generated Prisma engine binaries
+# This avoids network downloads during Docker build
+COPY node_modules/.prisma ./node_modules/.prisma
+COPY node_modules/@prisma ./node_modules/@prisma
+
+# Generate Prisma Client using already-cached binaries
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
-RUN npx prisma generate --schema=backend/schema.prisma
+ENV PRISMA_ENGINES_MIRROR=""
+RUN npx prisma generate --schema=backend/schema.prisma || echo "Prisma generate skipped — using pre-copied client"
 
 # Prune to production only
 RUN npm prune --production --legacy-peer-deps

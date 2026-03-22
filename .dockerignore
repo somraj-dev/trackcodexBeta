@@ -5,6 +5,8 @@
 
 # Development files
 node_modules
+!node_modules/.prisma
+!node_modules/@prisma
 .git
 .gitignore
 .vscode
