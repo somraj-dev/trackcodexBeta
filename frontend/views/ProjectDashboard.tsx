@@ -89,7 +89,7 @@ const ProjectCard = ({ p }: { p: Project }) => {
 
   return (
     <div
-      onClick={() => nav(`/dashboard/project/${p.id}`, { state: { projectData: p } })}
+      onClick={() => nav(`/project/${p.id}`, { state: { projectData: p } })}
       style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, padding: 20, cursor: "pointer", fontFamily: V.font, transition: "all .15s", position: "relative" }}
       onMouseEnter={e => (e.currentTarget.style.borderColor = "#555")}
       onMouseLeave={e => (e.currentTarget.style.borderColor = V.border)}
@@ -109,7 +109,7 @@ const ProjectCard = ({ p }: { p: Project }) => {
           <button 
             onClick={e => {
               e.stopPropagation();
-              nav(`/dashboard/project/${p.id}?openChecklist=true`, { state: { projectData: p } });
+              nav(`/project/${p.id}?openChecklist=true`, { state: { projectData: p } });
             }} 
             style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }} 
             title="Edit"

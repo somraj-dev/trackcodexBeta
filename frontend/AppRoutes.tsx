@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import RedirectToLogin from "./components/auth/RedirectToLogin";
@@ -39,6 +39,7 @@ const VSCodeWorkspaceView = React.lazy(() => import("./views/ide/VSCodeWorkspace
 const HomeView = React.lazy(() => import("./views/Home"));
 const ExploreView = React.lazy(() => import("./views/Explore"));
 const LibraryView = React.lazy(() => import("./views/Library"));
+const CreateLibraryResourceView = React.lazy(() => import("./views/CreateLibraryResource"));
 const ForgeAIView = React.lazy(() => import("./views/ForgeAI"));
 const NotificationsView = React.lazy(() => import("./views/NotificationsView"));
 const MessagesView = React.lazy(() => import("./views/messages/MessagesView"));
@@ -137,8 +138,19 @@ const AuditLogs = React.lazy(() => import("./components/admin/AuditLogs"));
 
 import { RoleGuard } from "./components/auth";
 
+const ProfileWrapper = () => {
+  const { username, userId } = useParams<{ username?: string; userId?: string }>();
+  const { user } = useAuth();
+  const identifier = username || userId;
+
+  if (user?.username === identifier || user?.id === identifier) {
+    return <ProfileView />;
+  }
+  return <PublicProfile />;
+};
+
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <Routes>
@@ -180,10 +192,9 @@ const AppRoutes = () => {
           
           <Route element={<MainLayout />}>
             <Route path="/taskvault" element={<TaskVault />} />
-            <Route path="/" element={<HomeView />} />
+            <Route path="/home" element={<HomeView />} />
             <Route path="/dashboard" element={<ProjectDashboard />} />
-            <Route path="/dashboard/project/:projectId" element={<ProjectDetailView />} />
-            <Route path="/dashboard/home" element={<HomeView />} />
+            <Route path="/project/:projectId" element={<ProjectDetailView />} />
             <Route path="/onboarding/welcome" element={<WelcomeView />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />
             <Route path="/team" element={<TeamPage />} />
@@ -211,10 +222,12 @@ const AppRoutes = () => {
             <Route path="/github/:repoId/issues/:number" element={<IssueDetail />} />
             <Route path="/github/:repoId/pulls/:prId" element={<PullRequestDetail />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
-            <Route path="/dashboard/library" element={<LibraryView />} />
+            <Route path="/library" element={<LibraryView />} />
+            <Route path="/library/:id" element={<LibraryView />} />
+            <Route path="/library/new" element={<CreateLibraryResourceView />} />
             <Route path="/editor" element={<EditorView />} />
-            <Route path="/profile" element={<ProfileView />} />
-            <Route path="/profile/:userId" element={<PublicProfile />} />
+            <Route path="/profile" element={<Navigate to={`/profile/${user?.username || "me"}`} replace />} />
+            <Route path="/profile/:username" element={<ProfileWrapper />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/notifications" element={<NotificationsView />} />
@@ -294,10 +307,16 @@ const AppRoutes = () => {
               <Route path="audit-logs" element={<AuditLogs />} />
             </Route>
 
+            {/* Redirects for legacy dashboard routes */}
+            <Route path="/dashboard/home" element={<Navigate to="/home" replace />} />
+            <Route path="/dashboard/library" element={<Navigate to="/library" replace />} />
+            <Route path="/dashboard/library/new" element={<Navigate to="/library/new" replace />} />
+            <Route path="/dashboard/jobs" element={<Navigate to="/marketplace/missions" replace />} />
+            <Route path="/dashboard/project/:projectId" element={<Navigate to="/project/:projectId" replace />} />
+
             {/* Catch-alls */}
             <Route path="/:owner/:repo/*" element={<RepoDetailView />} />
-            <Route path="/:username" element={<PublicProfile />} />
-            <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
         </>
       )}

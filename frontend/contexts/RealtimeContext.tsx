@@ -94,10 +94,16 @@ export const RealtimeProvider: React.FC<{
     return realtimeService.subscribe(listener);
   }, []);
 
+  const value = React.useMemo(() => ({ 
+    isConnected, 
+    presence, 
+    cursors, 
+    send, 
+    subscribe 
+  }), [isConnected, presence, cursors, send, subscribe]);
+
   return (
-    <RealtimeContext.Provider
-      value={{ isConnected, presence, cursors, send, subscribe }}
-    >
+    <RealtimeContext.Provider value={value}>
       {children}
     </RealtimeContext.Provider>
   );

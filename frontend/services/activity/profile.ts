@@ -1,7 +1,6 @@
 import { SystemRole } from "../../types";
 import { systemBus } from '../infra/systemBus';
 import { apiInstance } from '../infra/api';
-import { API_BASE_URL } from "../config/api";
 
 export interface Review {
   id: string;
@@ -211,12 +210,12 @@ export const profileService = {
     if (saved) {
       try {
         const profile = { ...DEFAULT_PROFILE, ...JSON.parse(saved) };
+        // Check for techStatus expiry but don't call updateProfile (side effect) during a getter
         if (
           profile.techStatus?.expiresAt &&
           Date.now() > profile.techStatus.expiresAt
         ) {
           delete profile.techStatus;
-          this.updateProfile(profile);
         }
         return profile;
       } catch (_e) {

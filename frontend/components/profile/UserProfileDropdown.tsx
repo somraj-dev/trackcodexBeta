@@ -72,7 +72,7 @@ const UserProfileDropdown = ({
     <div className="absolute top-full right-0 mt-2 w-72 bg-gh-bg-secondary border border-gh-border rounded-xl shadow-2xl z-[500] py-3 animate-in fade-in zoom-in-95 duration-200 backdrop-blur-xl bg-gh-bg-secondary/95">
       {/* Header Info */}
       <div
-        onClick={() => handleNavigate("/profile")}
+        onClick={() => handleNavigate(`/profile/${profile.username}`)}
         className="px-4 py-2 border-b border-gh-border mb-2 hover:bg-gh-bg-tertiary transition-colors cursor-pointer"
       >
         <div className="flex items-center justify-between group">
@@ -114,7 +114,7 @@ const UserProfileDropdown = ({
         <MenuItem
           icon="person"
           label="Your profile"
-          onClick={() => handleNavigate("/profile")}
+          onClick={() => handleNavigate(`/profile/${profile.username}`)}
         />
         <MenuItem
           icon="account_tree"

@@ -73,10 +73,16 @@ export class ResumeService {
       // 6. Write file
       await fs.writeFile(filePath, fileBuffer);
 
-      // 7. Update database
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
+      // 7. Update database (Upsert Profile if doesn't exist)
+      await prisma.profile.upsert({
+        where: { userId: userId },
+        create: {
+          userId: userId,
+          resumeUrl: `/uploads/resumes/${userId}/${safeFilename}`,
+          resumeFilename: filename,
+          resumeUploadedAt: new Date(),
+        },
+        update: {
           resumeUrl: `/uploads/resumes/${userId}/${safeFilename}`,
           resumeFilename: filename,
           resumeUploadedAt: new Date(),
@@ -101,15 +107,15 @@ export class ResumeService {
    */
   static async getResumePath(userId: string): Promise<string | null> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
+      const profile = await prisma.profile.findUnique({
+        where: { userId: userId },
         select: { resumeUrl: true },
       });
 
-      if (!user?.resumeUrl) return null;
+      if (!profile?.resumeUrl) return null;
 
       // Convert URL to file system path
-      const relPath = user.resumeUrl.replace("/uploads/resumes/", "");
+      const relPath = profile.resumeUrl.replace("/uploads/resumes/", "");
       return path.join(RESUME_STORAGE_PATH, relPath);
     } catch (error) {
       console.error("Error getting resume path:", error);
@@ -126,17 +132,17 @@ export class ResumeService {
     error?: string;
   }> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
+      const profile = await prisma.profile.findUnique({
+        where: { userId: userId },
         select: { resumeUrl: true, resumeFilename: true, showResume: true },
       });
 
-      if (!user?.resumeUrl) {
+      if (!profile?.resumeUrl) {
         return { error: "No resume found" };
       }
 
       // Check privacy settings
-      if (!user.showResume) {
+      if (!profile.showResume) {
         return { error: "Resume is private" };
       }
 
@@ -149,7 +155,7 @@ export class ResumeService {
 
       return {
         buffer,
-        filename: user.resumeFilename || "resume.pdf",
+        filename: profile.resumeFilename || "resume.pdf",
       };
     } catch (error) {
       console.error("Error downloading resume:", error);
@@ -171,8 +177,8 @@ export class ResumeService {
       }
 
       // Update database
-      await prisma.user.update({
-        where: { id: userId },
+      await prisma.profile.update({
+        where: { userId: userId },
         data: {
           resumeUrl: null,
           resumeFilename: null,
@@ -198,9 +204,13 @@ export class ResumeService {
     readme: string,
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
+      await prisma.profile.upsert({
+        where: { userId: userId },
+        create: {
+          userId: userId,
+          profileReadme: readme,
+        },
+        update: {
           profileReadme: readme,
         },
       });
@@ -228,9 +238,13 @@ export class ResumeService {
       if (showResume !== undefined) updateData.showResume = showResume;
       if (showReadme !== undefined) updateData.showReadme = showReadme;
 
-      await prisma.user.update({
-        where: { id: userId },
-        data: updateData,
+      await prisma.profile.upsert({
+        where: { userId: userId },
+        create: {
+          userId: userId,
+          ...updateData,
+        },
+        update: updateData,
       });
 
       return { success: true };

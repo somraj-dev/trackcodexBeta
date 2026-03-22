@@ -185,7 +185,7 @@ const Onboarding = () => {
                         </p>
 
                         <button
-                            onClick={() => navigate("/dashboard/home")}
+                            onClick={() => navigate("/home")}
                             className="inline-flex items-center px-12 py-3 bg-white text-[#0d1117] font-bold rounded-full hover:bg-[#e6edf3] transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                         >
                             Launch Dashboard

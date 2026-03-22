@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../config/api";
 import { profileService } from "../services/activity/profile";
 import { auth, isFirebaseConfigured } from "../lib/firebase";
 import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from "firebase/auth";
@@ -163,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = React.useCallback((userData: User, token: string) => {
     setUser(userData);
     setCsrfToken(token);
     // Persist so isAuthenticated survives navigation without Firebase
@@ -171,9 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("trackcodex_user", JSON.stringify(userData));
     } catch { /* ignore quota errors */ }
     profileService.initFromAuth(userData);
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     try {
       // Best effort backend session termination
       await api.post("/auth/logout");
@@ -195,10 +194,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       profileService.clearProfile();
       navigate("/", { replace: true }); // Changed from window.location.href to navigate
     }
-  };
+  }, [navigate]);
 
 
-  const getIdToken = async (): Promise<string | null> => {
+  const getIdToken = React.useCallback(async (): Promise<string | null> => {
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
@@ -210,20 +209,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("[AuthContext] Failed to get ID token:", err);
       return null;
     }
-  };
+  }, []);
+
+  const value = React.useMemo(() => ({
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    csrfToken,
+    getIdToken,
+  }), [user, isLoading, csrfToken, login, logout, getIdToken]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        logout,
-        csrfToken,
-        getIdToken,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -16,7 +16,7 @@ const RoleGuard: React.FC<RoleGuardProps> = ({ children }) => {
   }, []);
 
   if (!isAdmin(profile.systemRole)) {
-    return <Navigate to="/dashboard/home" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;

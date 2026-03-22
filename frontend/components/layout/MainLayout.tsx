@@ -124,12 +124,13 @@ const MainLayout: React.FC = () => {
 
   const isFullScreenView = isIdeView || 
     ["/messages", "/notifications"].includes(location.pathname) ||
-    location.pathname.startsWith("/dashboard/project/");
+    location.pathname.startsWith("/project/");
   const isFullPageAction = [
     "/repositories/new", 
     "/repositories/import", 
     "/marketplace/missions/new", 
-    "/marketplace/missions/new/event"
+    "/marketplace/missions/new/event",
+    "/library/new"
   ].includes(location.pathname) || location.pathname.startsWith("/marketplace/missions/");
 
   // Close menus on outside click
@@ -156,7 +157,7 @@ const MainLayout: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 z-[70] animate-in fade-in duration-200" onClick={() => setIsSidebarOpen(false)} />
           <div className="fixed top-0 left-0 h-full w-[320px] bg-gh-bg-secondary border-r border-gh-border z-[80] animate-in slide-in-from-left duration-300 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between px-4 h-14 shrink-0">
-              <button onClick={() => { setIsSidebarOpen(false); navigate("/dashboard/home"); }} className="text-gh-text">
+              <button onClick={() => { setIsSidebarOpen(false); navigate("/home"); }} className="text-gh-text">
                 <TrackCodexLogo size="sm" collapsed={true} clickable={false} />
               </button>
               <button onClick={() => setIsSidebarOpen(false)} className="text-gh-text-secondary h-8 w-8 flex items-center justify-center">
@@ -165,14 +166,14 @@ const MainLayout: React.FC = () => {
             </div>
             <nav className="px-3 py-2 space-y-0.5">
               {[
-                { icon: "home", label: "Home", to: "/dashboard/home" },
+                { icon: "home", label: "Home", to: "/home" },
                 { icon: "account_tree", label: "Dashboard", to: "/dashboard" },
                 { icon: "terminal", label: "Workspaces", to: "/workspaces" },
-                { icon: "auto_stories", label: "Library", to: "/dashboard/library" },
+                { icon: "auto_stories", label: "Library", to: "/library" },
                 { icon: "store", label: "Marketplace", to: "/marketplace" },
                 { icon: "diversity_3", label: "Community", to: "/community" },
                 { icon: "bolt", label: "ForgeAI", to: "/forge-ai" },
-                { icon: "account_circle", label: "Profile", to: "/profile" },
+                { icon: "account_circle", label: "Profile", to: `/profile/${profile.username}` },
               ].map((item) => (
                 <button key={item.label} onClick={() => { setIsSidebarOpen(false); navigate(item.to); }} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-[14px] font-medium ${location.pathname.startsWith(item.to) ? "text-gh-text bg-primary/15" : "text-gh-text hover:bg-gh-bg-secondary hover:text-gh-text"}`}>
                   <span className="material-symbols-outlined !text-[18px]">{item.icon}</span>
@@ -199,7 +200,7 @@ const MainLayout: React.FC = () => {
                 <button onClick={() => setIsSidebarOpen(true)} className="text-gh-text hover:text-primary h-8 w-8 flex items-center justify-center rounded-md hover:bg-gh-bg-tertiary">
                   <span className="material-symbols-outlined !text-[20px]">menu</span>
                 </button>
-                <button onClick={() => navigate("/dashboard/home")} aria-label="Home"><TrackCodexLogo size="sm" collapsed={true} clickable={false} /></button>
+                <button onClick={() => navigate("/home")} aria-label="Home"><TrackCodexLogo size="sm" collapsed={true} clickable={false} /></button>
               </div>
               <div className="flex-1 flex justify-center max-w-[720px] mx-auto">
                 <div 

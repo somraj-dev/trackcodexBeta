@@ -67,7 +67,7 @@ export const PublicProfile: React.FC = () => {
           to private.
         </p>
         <button
-          onClick={() => navigate("/dashboard/home")}
+          onClick={() => navigate("/home")}
           className="px-6 py-2 bg-gh-bg-secondary border border-gh-border rounded-lg text-sm font-bold text-gh-text hover:border-primary transition-all"
         >
           Return Home

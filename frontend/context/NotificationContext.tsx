@@ -94,7 +94,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setNotifications([]);
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Handle Realtime Events
   useEffect(() => {
@@ -130,35 +131,43 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
   // INTELLIGENT SKILL MATCHING LOGIC
   useEffect(() => {
+    let lastCheckedProfileId = "";
+    
     // Subscribe to profile updates to trigger check when skills change
     const unsubscribe = profileService.subscribe((profile) => {
-      checkJobMatches(profile);
+      // Basic check to avoid redundant calls if profile ID/username hasn't changed meaningfully
+      // (Deep comparison would be better, but ID is a good start)
+      const currentId = profile.id + (profile.skills?.length || 0);
+      if (currentId !== lastCheckedProfileId) {
+        lastCheckedProfileId = currentId;
+        checkJobMatches(profile);
+      }
     });
 
     // Initial check
-    checkJobMatches(profileService.getProfile());
+    const initialProfile = profileService.getProfile();
+    lastCheckedProfileId = initialProfile.id + (initialProfile.skills?.length || 0);
+    checkJobMatches(initialProfile);
 
     return () => unsubscribe();
   }, []);
 
 
-  const addNotification = (
+  const addNotification = React.useCallback((
     notif: Omit<Notification, "id" | "read" | "timestamp">,
   ) => {
     // For local system notifications (e.g. from other components)
-    // We might want to send these to backend too? For now keep local
     const newNotif: Notification = {
       ...notif,
       id: `notif-${Date.now()}`,
       read: false,
       timestamp: new Date().toISOString(),
-      type: notif.type || "system", // Ensure type is set
+      type: notif.type || "system",
     };
     setNotifications((prev) => [newNotif, ...prev]);
-  };
+  }, []);
 
-  const markAsRead = async (id: string) => {
-    // Optimistic update
+  const markAsRead = React.useCallback(async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
@@ -167,10 +176,9 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     } catch (e) {
       console.error("Failed to mark as read", e);
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
-    // Optimistic
+  const markAllAsRead = React.useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     try {
       if (user?.id) {
@@ -179,27 +187,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     } catch (e) {
       console.error("Failed to mark all as read", e);
     }
-  };
+  }, [user?.id]);
 
-  const deleteNotification = (id: string) => {
-    // Backend doesn't have delete yet? Just remove locally
+  const deleteNotification = React.useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  const value = React.useMemo(() => ({
+    notifications,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    isLoading,
+  }), [notifications, unreadCount, addNotification, markAsRead, markAllAsRead, deleteNotification, isLoading]);
+
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        unreadCount,
-        addNotification,
-        markAsRead,
-        markAllAsRead,
-        deleteNotification,
-        isLoading,
-      }}
-    >
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );

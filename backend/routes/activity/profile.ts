@@ -203,14 +203,11 @@ export async function profileRoutes(server: FastifyInstance) {
 
       try {
         const isPrivateUpdate = (req.body as any).isPrivate;
-        const result = await prisma.user.update({
+        
+        // Update User for isPrivate
+        const userUpdate = await prisma.user.update({
           where: { id: userId },
           data: {
-            // Note: showResume/showReadme are technically on Profile, but we maintain existing logic for now
-            // @ts-ignore
-            showResume: showResume !== undefined ? showResume : undefined,
-            // @ts-ignore
-            showReadme: showReadme !== undefined ? showReadme : undefined,
             isPrivate: isPrivateUpdate !== undefined ? isPrivateUpdate : undefined,
             settings: isPrivateUpdate !== undefined ? {
               upsert: {
@@ -222,10 +219,26 @@ export async function profileRoutes(server: FastifyInstance) {
           include: { settings: true }
         });
 
+        // Update Profile for showResume/showReadme
+        if (showResume !== undefined || showReadme !== undefined) {
+          await prisma.profile.upsert({
+            where: { userId: userId },
+            create: {
+              userId: userId,
+              showResume: showResume ?? false,
+              showReadme: showReadme ?? true,
+            },
+            update: {
+              showResume: showResume !== undefined ? showResume : undefined,
+              showReadme: showReadme !== undefined ? showReadme : undefined,
+            },
+          });
+        }
+
         return reply.send({
           success: true,
           message: "Privacy settings updated successfully",
-          isPrivate: result.isPrivate,
+          isPrivate: userUpdate.isPrivate,
         });
       } catch (error) {
         console.error("Privacy update error:", error);

@@ -58,19 +58,19 @@ const OAuthCallback: React.FC = () => {
           const redirectPath =
             localStorage.getItem("integration_return_path") ||
             localStorage.getItem("redirect_after_login") ||
-            "/dashboard/home";
+            "/home";
           localStorage.removeItem("integration_return_path");
           localStorage.removeItem("integration_pending_provider");
           localStorage.removeItem("redirect_after_login");
           navigate(redirectPath, { replace: true });
         } else if (isAuthenticated) {
           // Already authenticated (popup flow completed)
-          navigate("/dashboard/home", { replace: true });
+          navigate("/home", { replace: true });
         } else {
           // Wait briefly for auth state to update
           setTimeout(() => {
             if (auth.currentUser) {
-              navigate("/dashboard/home", { replace: true });
+              navigate("/home", { replace: true });
             } else {
               setError("Authentication did not complete. Please try again.");
               setTimeout(() => navigate("/login"), 3000);

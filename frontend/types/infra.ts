@@ -1,3 +1,20 @@
+export interface FileStructureItem {
+  id: string;
+  name: string;
+  type: "file" | "folder";
+  content?: string;
+  children?: FileStructureItem[];
+}
+
+export interface ChangelogEntry {
+  id: string;
+  commit: string;
+  status: string;
+  date: string;
+  branch: string;
+  changes: string;
+}
+
 export interface AuditLogEntry {
   id: string;
   timestamp: string;
@@ -72,6 +89,10 @@ export interface LibraryResource {
   tags: string[];
   snippetPreview?: string;
   version?: string;
+  fileStructure?: FileStructureItem[];
+  dependencies?: string[];
+  installationCommand?: string;
+  changelog?: ChangelogEntry[];
 }
 
 export interface LibraryCategory {

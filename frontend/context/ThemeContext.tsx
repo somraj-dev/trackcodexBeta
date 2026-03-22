@@ -294,35 +294,48 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => media.removeEventListener("change", listener);
   }, []);
 
+  const value = React.useMemo(() => ({
+    themeMode,
+    setThemeMode,
+    activeThemeId,
+    setActiveThemeId,
+    preferredLightThemeId,
+    setPreferredLightThemeId,
+    preferredDarkThemeId,
+    setPreferredDarkThemeId,
+    resolvedTheme,
+    // Legacy items
+    isHighContrast,
+    setIsHighContrast,
+    animationDensity,
+    setAnimationDensity,
+    fontTheme,
+    setFontTheme,
+    tabSize,
+    setTabSize: updateTabSize,
+    emojiSkinTone,
+    setEmojiSkinTone: updateEmojiSkinTone,
+    useMonospaceForMarkdown,
+    setUseMonospaceForMarkdown: updateUseMonospaceForMarkdown,
+    isMotionReduced,
+    setIsMotionReduced,
+  }), [
+    themeMode,
+    activeThemeId,
+    preferredLightThemeId,
+    preferredDarkThemeId,
+    resolvedTheme,
+    isHighContrast,
+    animationDensity,
+    fontTheme,
+    tabSize,
+    emojiSkinTone,
+    useMonospaceForMarkdown,
+    isMotionReduced
+  ]);
+
   return (
-    <ThemeContext.Provider
-      value={{
-        themeMode,
-        setThemeMode,
-        activeThemeId,
-        setActiveThemeId,
-        preferredLightThemeId,
-        setPreferredLightThemeId,
-        preferredDarkThemeId,
-        setPreferredDarkThemeId,
-        resolvedTheme,
-        // Legacy items
-        isHighContrast,
-        setIsHighContrast,
-        animationDensity,
-        setAnimationDensity,
-        fontTheme,
-        setFontTheme,
-        tabSize,
-        setTabSize: updateTabSize,
-        emojiSkinTone,
-        setEmojiSkinTone: updateEmojiSkinTone,
-        useMonospaceForMarkdown,
-        setUseMonospaceForMarkdown: updateUseMonospaceForMarkdown,
-        isMotionReduced,
-        setIsMotionReduced,
-      }}
-    >
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

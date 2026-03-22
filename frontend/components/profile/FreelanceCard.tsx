@@ -49,7 +49,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
         <>
           <div className="space-y-8 mb-10 flex-1">
             <button
-              onClick={() => navigate("/dashboard/jobs")}
+              onClick={() => navigate("/marketplace/missions")}
               className="flex items-center justify-between border-b border-gh-border pb-4 w-full group/stat hover:border-amber-500/50 transition-all"
             >
               <span className="text-[14px] font-bold text-gh-text-secondary group-hover/stat:text-gh-text transition-colors">
@@ -101,7 +101,7 @@ const FreelanceCard: React.FC<Props> = ({ profile }) => {
             Complete jobs on the marketplace to build your freelance profile.
           </p>
           <button
-            onClick={() => navigate("/dashboard/jobs")}
+            onClick={() => navigate("/marketplace/missions")}
             className="text-[11px] font-semibold text-amber-500 uppercase tracking-widest hover:underline"
           >
             Browse Jobs →

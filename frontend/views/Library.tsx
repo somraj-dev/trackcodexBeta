@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { MOCK_LIBRARY_RESOURCES, MOCK_LIBRARY_CATEGORIES } from "../constants";
-import { LibraryResource } from "../types";
+import { LibraryResource, FileStructureItem, ChangelogEntry } from "../types";
 import { forgeAIService } from "../services/ai/gemini";
 
 // Typed as React.FC to resolve TypeScript error regarding missing 'key' property in prop definition
@@ -113,6 +114,222 @@ const LibraryCard: React.FC<{
   );
 };
 
+const FileStructureView = ({ structure }: { structure?: FileStructureItem[] }) => {
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["src"]));
+  const [selectedFile, setSelectedFile] = useState<FileStructureItem | null>(null);
+
+  const toggleFolder = (id: string) => {
+    const newExpanded = new Set(expandedNodes);
+    if (newExpanded.has(id)) {
+      newExpanded.delete(id);
+    } else {
+      newExpanded.add(id);
+    }
+    setExpandedNodes(newExpanded);
+  };
+
+  const renderItem = (item: FileStructureItem, depth = 0) => {
+    const isExpanded = expandedNodes.has(item.id);
+    const isFolder = item.type === "folder";
+
+    return (
+      <div key={item.id}>
+        <div
+          onClick={() => isFolder ? toggleFolder(item.id) : setSelectedFile(item)}
+          className="flex items-center gap-2 py-1.5 px-4 hover:bg-white/5 cursor-pointer transition-colors group border-l-2 border-transparent hover:border-primary/30"
+          style={{ paddingLeft: `${depth * 1.5 + 1}rem` }}
+        >
+          <span className={`material-symbols-outlined !text-[18px] transition-transform duration-200 ${isFolder && isExpanded ? "rotate-90" : ""} ${isFolder ? "text-primary/70" : "text-gh-text-secondary"} group-hover:text-gh-text`}>
+            {isFolder ? "chevron_right" : "description"}
+          </span>
+          {isFolder && (
+            <span className="material-symbols-outlined !text-[18px] text-primary/50 group-hover:text-primary transition-colors">
+              {isExpanded ? "folder_open" : "folder"}
+            </span>
+          )}
+          <span className={`text-sm ${isFolder ? "font-medium text-gh-text" : "text-gh-text-secondary"} group-hover:text-gh-text`}>
+            {item.name}
+          </span>
+        </div>
+        {isFolder && isExpanded && (
+          <div className="animate-in slide-in-from-top-1 duration-200">
+            {item.children?.map((child) => renderItem(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative">
+      <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl overflow-hidden py-4 shadow-inner">
+        {structure?.map((item) => renderItem(item)) || (
+          <div className="p-8 text-center text-gh-text-secondary italic">
+            No file structure defined for this resource.
+          </div>
+        )}
+      </div>
+
+      {/* Code Review Modal */}
+      {selectedFile && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div 
+            className="w-full max-w-4xl bg-gh-bg-secondary border border-gh-border rounded-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-gh-border flex items-center justify-between bg-gh-bg-tertiary rounded-t-2xl">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary">description</span>
+                <span className="text-sm font-bold text-gh-text capitalize">{selectedFile.name}</span>
+                <span className="px-2 py-0.5 rounded bg-gh-bg-secondary border border-gh-border text-[10px] text-gh-text-secondary font-mono">
+                  {selectedFile.name.split('.').pop()?.toUpperCase()}
+                </span>
+              </div>
+              <button 
+                onClick={() => setSelectedFile(null)}
+                className="size-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-gh-text-secondary hover:text-gh-text transition-all"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-6 bg-black/20 custom-scrollbar">
+              <pre className="font-mono text-[13px] leading-relaxed text-gh-text-secondary selection:bg-primary/30">
+                <code>{selectedFile.content || "// No content available for this file."}</code>
+              </pre>
+            </div>
+            <div className="p-4 border-t border-gh-border bg-gh-bg-tertiary rounded-b-2xl flex justify-end gap-3">
+              <button 
+                onClick={() => setSelectedFile(null)}
+                className="px-4 py-2 text-xs font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest transition-all"
+              >
+                Close Preview
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:brightness-110">
+                <span className="material-symbols-outlined !text-[16px]">content_copy</span>
+                Copy Code
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DependenciesView = ({
+  installation,
+  dependencies,
+  snippet,
+}: {
+  installation?: string;
+  dependencies?: string[];
+  snippet?: string;
+}) => (
+  <div className="space-y-10">
+    <section>
+      <h3 className="text-xl font-bold text-gh-text mb-6">Installation</h3>
+      <div className="group relative">
+        <div className="bg-gh-bg-tertiary border border-gh-border rounded-xl p-4 font-mono text-sm text-primary flex items-center justify-between">
+          <span>{installation || "npm install @trackcodex/core"}</span>
+          <button className="material-symbols-outlined text-gh-text-secondary hover:text-gh-text transition-colors !text-[20px]">
+            content_copy
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3 className="text-xl font-bold text-gh-text mb-6">How to use</h3>
+      <div className="rounded-2xl border border-gh-border overflow-hidden bg-gh-bg-tertiary">
+        <div className="bg-gh-bg-secondary px-4 py-2 border-b border-gh-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="size-2.5 rounded-full bg-rose-500/50"></span>
+            <span className="size-2.5 rounded-full bg-amber-500/50"></span>
+            <span className="size-2.5 rounded-full bg-emerald-500/50"></span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest flex items-center gap-1.5">
+              <span className="material-symbols-outlined !text-[14px]">
+                content_copy
+              </span>
+              Copy prompt
+            </button>
+            <button className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest flex items-center gap-1.5">
+              <span className="material-symbols-outlined !text-[14px]">
+                code
+              </span>
+              Copy code
+            </button>
+          </div>
+        </div>
+        <pre className="p-6 font-mono text-[13px] text-gh-text-secondary leading-relaxed overflow-x-auto">
+          <code>{snippet || "// No snippet available"}</code>
+        </pre>
+      </div>
+    </section>
+
+    <section>
+      <h3 className="text-xl font-bold text-gh-text mb-6">Dependencies</h3>
+      <div className="flex flex-wrap gap-3">
+        {dependencies?.map((dep) => (
+          <div
+            key={dep}
+            className="flex items-center gap-2 px-4 py-2 bg-gh-bg-secondary border border-gh-border rounded-xl text-sm font-medium text-gh-text-secondary hover:border-primary/30 transition-all cursor-default"
+          >
+            {dep}
+            <span className="size-2 rounded-sm bg-rose-500/40"></span>
+          </div>
+        )) || "No dependencies listed."}
+      </div>
+    </section>
+  </div>
+);
+
+const ChangelogView = ({ logs }: { logs?: ChangelogEntry[] }) => (
+  <div className="space-y-4">
+    {logs?.map((log) => (
+      <div
+        key={log.id}
+        className="group flex items-center justify-between p-4 bg-gh-bg-secondary border border-gh-border rounded-xl hover:border-primary/20 transition-all"
+      >
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col items-center gap-1 min-w-[80px]">
+            <span className="text-sm font-bold text-gh-text tracking-tight">
+              {log.commit}
+            </span>
+            <span className="text-[10px] text-gh-text-secondary uppercase font-bold tracking-widest">
+              Production
+            </span>
+          </div>
+          <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            {log.status}
+          </div>
+          <span className="text-xs text-gh-text-secondary font-mono">
+            {log.date}
+          </span>
+          <div className="flex items-center gap-2 text-xs text-gh-text-secondary">
+            <span className="material-symbols-outlined !text-[16px]">
+              account_tree
+            </span>
+            {log.branch}
+          </div>
+          <p className="text-sm text-gh-text-secondary truncate max-w-md">
+            {log.changes}
+          </p>
+        </div>
+        <button className="material-symbols-outlined text-gh-text-secondary opacity-0 group-hover:opacity-100 transition-all !text-[20px]">
+          open_in_new
+        </button>
+      </div>
+    )) || (
+      <div className="p-12 text-center text-gh-text-secondary bg-gh-bg-secondary border border-gh-border rounded-2xl">
+        No changelog entries found.
+      </div>
+    )}
+  </div>
+);
+
 const LibraryDetail = ({
   resource,
   onBack,
@@ -152,6 +369,151 @@ const LibraryDetail = ({
       );
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "File Structure":
+        return <FileStructureView structure={resource.fileStructure} />;
+      case "Dependencies":
+        return (
+          <DependenciesView
+            installation={resource.installationCommand}
+            dependencies={resource.dependencies}
+            snippet={resource.snippetPreview}
+          />
+        );
+      case "Changelog":
+        return <ChangelogView logs={resource.changelog} />;
+      case "Integration":
+        return (
+          <div className="prose prose-invert max-w-none">
+            <h2 className="text-xl font-bold text-gh-text mb-4">Integration Guide</h2>
+            <p className="text-gh-text-secondary leading-relaxed mb-8">
+              To integrate this resource into your project, follow the standard TrackCodex workspace patterns. This component is designed to be fully compatible with our internal theme system and security middleware.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 bg-gh-bg-secondary border border-gh-border rounded-2xl">
+                <h4 className="font-bold text-gh-text mb-2">1. Initialize Workspace</h4>
+                <p className="text-xs text-gh-text-secondary mb-4">Ensure your workspace is set up for TrackCodex components.</p>
+                <code>trackcodex init</code>
+              </div>
+              <div className="p-6 bg-gh-bg-secondary border border-gh-border rounded-2xl">
+                <h4 className="font-bold text-gh-text mb-2">2. Import Resource</h4>
+                <p className="text-xs text-gh-text-secondary mb-4">Use the CLI to pull the latest version into your local dir.</p>
+                <code>trackcodex add {resource.name}</code>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="space-y-10">
+            <section>
+              <h2 className="text-xl font-bold text-gh-text mb-4">Overview</h2>
+              <p className="text-base text-gh-text-secondary leading-relaxed max-w-3xl">
+                {resource.longDescription || resource.description}
+              </p>
+
+              <div className="grid grid-cols-2 gap-6 mt-8">
+                {[
+                  {
+                    title: "CSRF Protection",
+                    desc: "Double-submit cookie pattern implemented.",
+                    icon: "security",
+                  },
+                  {
+                    title: "Rate Limiting",
+                    desc: "Redis-backed sliding window limiter.",
+                    icon: "speed",
+                  },
+                  {
+                    title: "Input Validation",
+                    desc: "Zod schemas for all API endpoints.",
+                    icon: "verified_user",
+                  },
+                  {
+                    title: "Secure Headers",
+                    desc: "Helmet.js pre-configured for strict CSP.",
+                    icon: "lock",
+                  },
+                ].map((feat) => (
+                  <div
+                    key={feat.title}
+                    className="p-5 rounded-xl bg-gh-bg-secondary border border-gh-border flex flex-col gap-3 group hover:border-emerald-500/30 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <span className="material-symbols-outlined !text-[18px] filled">
+                          {feat.icon}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-gh-text">
+                        {feat.title}
+                      </h4>
+                    </div>
+                    <p className="text-[12px] text-gh-text-secondary font-medium">
+                      {feat.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {resource.snippetPreview && (
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gh-text-secondary uppercase tracking-widest">
+                    Code Snippet Preview
+                  </h3>
+                  <button className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest flex items-center gap-1.5 transition-colors">
+                    <span className="material-symbols-outlined !text-[14px]">
+                      content_copy
+                    </span>
+                    Copy
+                  </button>
+                </div>
+                <div className="rounded-2xl border border-gh-border overflow-hidden bg-gh-bg-tertiary">
+                  <div className="bg-gh-bg-secondary px-4 py-2 border-b border-gh-border flex items-center gap-2">
+                    <span className="size-2.5 rounded-full bg-rose-500/50"></span>
+                    <span className="size-2.5 rounded-full bg-amber-500/50"></span>
+                    <span className="size-2.5 rounded-full bg-emerald-500/50"></span>
+                    <span className="ml-2 text-[10px] font-mono text-gh-text-secondary">
+                      server.ts
+                    </span>
+                  </div>
+                  <pre className="p-6 font-mono text-[13px] text-gh-text-secondary leading-relaxed overflow-x-auto">
+                    <code>{resource.snippetPreview}</code>
+                  </pre>
+                </div>
+              </section>
+            )}
+
+            <section className="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-1">
+                  Freelancer Context
+                </h3>
+                <p className="text-[12px] text-gh-text-secondary">
+                  Popular in high-value freelance gigs like{" "}
+                  <span className="text-indigo-300 font-bold">SaaS MVPs</span>{" "}
+                  and{" "}
+                  <span className="text-indigo-300 font-bold">
+                    Internal Dashboards
+                  </span>
+                  .
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-semibold text-gh-text">~45h</p>
+                <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
+                  Est. Effort Saved
+                </p>
+              </div>
+            </section>
+          </div>
+        );
     }
   };
 
@@ -279,108 +641,7 @@ const LibraryDetail = ({
               </div>
             )}
 
-            <section>
-              <h2 className="text-xl font-bold text-gh-text mb-4">Overview</h2>
-              <p className="text-base text-gh-text-secondary leading-relaxed max-w-3xl">
-                {resource.longDescription || resource.description}
-              </p>
-
-              <div className="grid grid-cols-2 gap-6 mt-8">
-                {[
-                  {
-                    title: "CSRF Protection",
-                    desc: "Double-submit cookie pattern implemented.",
-                    icon: "security",
-                  },
-                  {
-                    title: "Rate Limiting",
-                    desc: "Redis-backed sliding window limiter.",
-                    icon: "speed",
-                  },
-                  {
-                    title: "Input Validation",
-                    desc: "Zod schemas for all API endpoints.",
-                    icon: "verified_user",
-                  },
-                  {
-                    title: "Secure Headers",
-                    desc: "Helmet.js pre-configured for strict CSP.",
-                    icon: "lock",
-                  },
-                ].map((feat) => (
-                  <div
-                    key={feat.title}
-                    className="p-5 rounded-xl bg-gh-bg-secondary border border-gh-border flex flex-col gap-3 group hover:border-emerald-500/30 transition-all"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <span className="material-symbols-outlined !text-[18px] filled">
-                          {feat.icon}
-                        </span>
-                      </div>
-                      <h4 className="text-sm font-bold text-gh-text">
-                        {feat.title}
-                      </h4>
-                    </div>
-                    <p className="text-[12px] text-gh-text-secondary font-medium">
-                      {feat.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {resource.snippetPreview && (
-              <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gh-text-secondary uppercase tracking-widest">
-                    Code Snippet Preview
-                  </h3>
-                  <button className="text-[10px] font-bold text-gh-text-secondary hover:text-gh-text uppercase tracking-widest flex items-center gap-1.5 transition-colors">
-                    <span className="material-symbols-outlined !text-[14px]">
-                      content_copy
-                    </span>
-                    Copy
-                  </button>
-                </div>
-                <div className="rounded-2xl border border-gh-border overflow-hidden bg-gh-bg-tertiary">
-                  <div className="bg-gh-bg-secondary px-4 py-2 border-b border-gh-border flex items-center gap-2">
-                    <span className="size-2.5 rounded-full bg-rose-500/50"></span>
-                    <span className="size-2.5 rounded-full bg-amber-500/50"></span>
-                    <span className="size-2.5 rounded-full bg-emerald-500/50"></span>
-                    <span className="ml-2 text-[10px] font-mono text-gh-text-secondary">
-                      server.ts
-                    </span>
-                  </div>
-                  <pre className="p-6 font-mono text-[13px] text-gh-text-secondary leading-relaxed overflow-x-auto">
-                    <code>{resource.snippetPreview}</code>
-                  </pre>
-                </div>
-              </section>
-            )}
-
-            <section className="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-6 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-1">
-                  Freelancer Context
-                </h3>
-                <p className="text-[12px] text-gh-text-secondary">
-                  Popular in high-value freelance gigs like{" "}
-                  <span className="text-indigo-300 font-bold">SaaS MVPs</span>{" "}
-                  and{" "}
-                  <span className="text-indigo-300 font-bold">
-                    Internal Dashboards
-                  </span>
-                  .
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-semibold text-gh-text">~45h</p>
-                <p className="text-[10px] text-gh-text-secondary uppercase font-semibold">
-                  Est. Effort Saved
-                </p>
-              </div>
-            </section>
+            {renderTabContent()}
           </div>
 
           <div className="space-y-8">
@@ -494,10 +755,30 @@ const LibraryDetail = ({
   );
 };
 
+
 const LibraryView = () => {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { id: urlId } = useParams<{ id: string }>();
+  const [selectedId, setSelectedId] = useState<string | null>(urlId || null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Sync state with URL
+  useEffect(() => {
+    if (urlId) {
+      setSelectedId(urlId);
+    } else {
+      setSelectedId(null);
+    }
+  }, [urlId]);
+
+  const handleSelect = (id: string) => {
+    navigate(`/library/${id}`);
+  };
+
+  const handleBack = () => {
+    navigate("/library");
+  };
 
   const filteredResources = useMemo(() => {
     return MOCK_LIBRARY_RESOURCES.filter((r) => {
@@ -522,7 +803,7 @@ const LibraryView = () => {
     return (
       <LibraryDetail
         resource={selectedResource}
-        onBack={() => setSelectedId(null)}
+        onBack={handleBack}
       />
     );
   }
@@ -652,7 +933,10 @@ const LibraryView = () => {
                 </span>
                 Filter
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20">
+              <button 
+                onClick={() => navigate("/library/new")}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-medium uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:brightness-110"
+              >
                 <span className="material-symbols-outlined !text-[18px]">
                   add
                 </span>
@@ -731,7 +1015,7 @@ const LibraryView = () => {
                 <LibraryCard
                   key={resource.id}
                   resource={resource}
-                  onClick={() => setSelectedId(resource.id)}
+                  onClick={() => handleSelect(resource.id)}
                 />
               ))
             ) : (

@@ -6,7 +6,7 @@ const RedirectAfterAuth = () => {
 
   useEffect(() => {
     // Read the intended destination or default to home
-    const rawPath = localStorage.getItem("redirect_after_login") || "/dashboard/home";
+    const rawPath = localStorage.getItem("redirect_after_login") || "/home";
     localStorage.removeItem("redirect_after_login");
 
     // Safety check: ensure we don't redirect back to auth related pages
@@ -15,7 +15,7 @@ const RedirectAfterAuth = () => {
       rawPath.startsWith("/logout") ||
       rawPath.startsWith("/auth");
 
-    const redirectPath = isAuthPath ? "/dashboard/home" : rawPath;
+    const redirectPath = isAuthPath ? "/home" : rawPath;
 
     // Redirect safely replacing the auth URL in history
     navigate(redirectPath, { replace: true });

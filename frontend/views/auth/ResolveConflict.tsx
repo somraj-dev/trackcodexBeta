@@ -38,7 +38,7 @@ const ResolveConflict = () => {
             // or we could have passed the pending credential if it was serializable.
             // Simplified workflow: Sign in with the right one, then we can link later in settings.
 
-            navigate("/dashboard/home");
+            navigate("/home");
         } catch (err: any) {
             console.error("Conflict resolution failed:", err);
             setError(err.message || "Failed to link accounts. Please try again.");

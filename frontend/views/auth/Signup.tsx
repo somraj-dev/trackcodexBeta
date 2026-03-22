@@ -170,7 +170,7 @@ const Signup = () => {
 
       // 3. Redirect to onboarding after a short delay
       setTimeout(() => {
-        navigate("/onboarding");
+        navigate("/home");
       }, 2000);
     } catch (error: unknown) {
       console.error("Signup validation error:", error);
@@ -190,7 +190,7 @@ const Signup = () => {
   };
 
   const handleContinue = () => {
-    navigate("/dashboard/home");
+    navigate("/home");
   };
 
   return (
@@ -295,7 +295,7 @@ const Signup = () => {
                   </p>
                 </div>
                 <button onClick={handleContinue} className="w-full bg-[#24292f] hover:bg-[#1f2328] text-white font-bold py-3 rounded-lg transition-all shadow-sm">
-                  Continue to Dashboard
+                  Continue to Home
                 </button>
                 <button onClick={() => setVerificationSent(false)} className="text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors">
                   Edit signup details

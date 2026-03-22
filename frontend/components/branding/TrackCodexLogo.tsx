@@ -29,7 +29,7 @@ const TrackCodexLogo: React.FC<TrackCodexLogoProps> = ({
   const logoElement = (
     <div
       className={`${sizeMap[size]} shrink-0 transition-transform active:scale-95 duration-200`}
-      onClick={() => clickable && navigate("/dashboard/home")}
+      onClick={() => clickable && navigate("/home")}
     >
       <svg
         viewBox="0 0 512 512"

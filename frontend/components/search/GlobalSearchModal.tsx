@@ -29,7 +29,7 @@ interface RecentRepo {
 }
 
 const STATIC_PAGES: SearchResult[] = [
-  { id: "page-dashboard", type: "page", label: "Dashboard", subLabel: "Personalized home area", icon: "dashboard", group: "Pages", url: "/dashboard/home" },
+  { id: "page-dashboard", type: "page", label: "Dashboard", subLabel: "Personalized home area", icon: "dashboard", group: "Pages", url: "/home" },
   { id: "page-community", type: "page", label: "Community Workspace", subLabel: "Discussions, issues, and collaboration", icon: "forum", group: "Pages", url: "/community" },
   { id: "page-workspaces", type: "page", label: "IDE Workspaces", subLabel: "Cloud development environments", icon: "computer", group: "Pages", url: "/workspaces" },
   { id: "page-repositories", type: "page", label: "Repositories", subLabel: "Your codebase and git projects", icon: "book", group: "Pages", url: "/repositories" },

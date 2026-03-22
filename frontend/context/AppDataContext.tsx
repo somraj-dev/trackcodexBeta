@@ -50,12 +50,21 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
     const [goals, setGoals] = useState<Goal[]>(INITIAL_GOALS);
 
-    const addProject = (p: Project) => setProjects(prev => [p, ...prev]);
-    const addTask = (t: Task) => setTasks(prev => [t, ...prev]);
-    const addGoal = (g: Goal) => setGoals(prev => [g, ...prev]);
+    const addProject = React.useCallback((p: Project) => setProjects(prev => [p, ...prev]), []);
+    const addTask = React.useCallback((t: Task) => setTasks(prev => [t, ...prev]), []);
+    const addGoal = React.useCallback((g: Goal) => setGoals(prev => [g, ...prev]), []);
+
+    const value = React.useMemo(() => ({ 
+        projects, 
+        tasks, 
+        goals, 
+        addProject, 
+        addTask, 
+        addGoal 
+    }), [projects, tasks, goals]);
 
     return (
-        <AppDataContext.Provider value={{ projects, tasks, goals, addProject, addTask, addGoal }}>
+        <AppDataContext.Provider value={value}>
             {children}
         </AppDataContext.Provider>
     );

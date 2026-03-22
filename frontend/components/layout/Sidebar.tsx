@@ -142,7 +142,7 @@ const Sidebar = () => {
 
       <div className="flex-1 overflow-y-auto custom-scrollbar py-4 space-y-1">
         <SidebarItem
-          to="/dashboard/home"
+          to="/home"
           icon="home"
           label="Home"
           isExpanded={isExpanded}
@@ -172,7 +172,7 @@ const Sidebar = () => {
           isExpanded={isExpanded}
         />
         <SidebarItem
-          to="/dashboard/library"
+          to="/library"
           icon="auto_stories"
           label="Library"
           isExpanded={isExpanded}
@@ -196,7 +196,7 @@ const Sidebar = () => {
           isExpanded={isExpanded}
         />
         <SidebarItem
-          to="/profile"
+          to={`/profile/${user?.username || "me"}`}
           icon="account_circle"
           label="Profile"
           isExpanded={isExpanded}

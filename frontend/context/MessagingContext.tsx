@@ -142,19 +142,21 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return unsubscribe;
     }, [refreshConversations]);
 
+    const value = React.useMemo(() => ({
+        conversations,
+        activeConvId,
+        isPanelOpen,
+        isTyping,
+        totalUnreadCount,
+        setIsPanelOpen,
+        setActiveConvId,
+        sendMessage,
+        refreshConversations,
+        checkConversation
+    }), [conversations, activeConvId, isPanelOpen, isTyping, totalUnreadCount, sendMessage, refreshConversations, checkConversation]);
+
     return (
-        <MessagingContext.Provider value={{
-            conversations,
-            activeConvId,
-            isPanelOpen,
-            isTyping,
-            totalUnreadCount,
-            setIsPanelOpen,
-            setActiveConvId,
-            sendMessage,
-            refreshConversations,
-            checkConversation
-        }}>
+        <MessagingContext.Provider value={value}>
             {children}
         </MessagingContext.Provider>
     );

@@ -110,7 +110,7 @@ const UserLibraryTab: React.FC<UserLibraryTabProps> = ({ userId }) => {
                                 </span>
                                 <div className="flex-1 min-w-0">
                                     <Link
-                                        to={`/dashboard/library/${resource.id}`}
+                                        to={`/library/${resource.id}`}
                                         className="font-semibold text-primary hover:underline block truncate"
                                     >
                                         {resource.title}

@@ -68,7 +68,7 @@ const ActivityBar = () => {
       </div>
 
       <ActivityIcon
-        to="/dashboard/home"
+        to="/home"
         icon="home"
         label="Home"
         roles={["guest", "developer", "admin"]}
@@ -111,7 +111,7 @@ const ActivityBar = () => {
         userTier={userTier}
       />
       <ActivityIcon
-        to="/dashboard/jobs"
+        to="/marketplace/missions"
         icon="work"
         label="Mission Marketplace"
         roles={["guest", "developer", "admin"]}
@@ -120,7 +120,7 @@ const ActivityBar = () => {
 
       <div className="mt-auto w-full flex flex-col items-center">
         <ActivityIcon
-          to="/profile"
+          to={`/profile/${profile.username}`}
           icon="account_circle"
           label="Account"
           roles={["guest", "developer", "admin"]}

@@ -53,7 +53,7 @@ const DesktopBridge = () => {
           <h2 className="text-[20px] font-medium text-[#e6edf3] mb-2">Handoff Failed</h2>
           <p className="text-[14px] text-[#8b949e] max-w-sm text-center mb-6">{errorMsg}</p>
           <button
-            onClick={() => navigate("/dashboard/home")}
+            onClick={() => navigate("/home")}
             className="text-[#2f81f7] hover:underline text-[13px]"
           >
             Go to dashboard instead
@@ -79,10 +79,10 @@ const DesktopBridge = () => {
           </p>
           <div className="mt-8">
             <button
-              onClick={() => navigate("/dashboard/home")}
+              onClick={() => navigate("/home")}
               className="text-[#2f81f7] hover:underline text-[13px]"
             >
-              Cancel and go to dashboard
+              Cancel and go home
             </button>
           </div>
         </div>

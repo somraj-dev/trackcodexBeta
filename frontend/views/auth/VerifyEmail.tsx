@@ -30,7 +30,7 @@ const VerifyEmail = () => {
                 
                 // Auto-redirect after 3 seconds
                 setTimeout(() => {
-                    navigate("/dashboard/home");
+                    navigate("/home");
                 }, 3000);
             } catch (err: any) {
                 console.error("Verification failed:", err);
@@ -61,7 +61,7 @@ const VerifyEmail = () => {
 
                 {status === "success" && (
                     <Link 
-                        to="/dashboard/home" 
+                        to="/home" 
                         className="inline-block bg-primary text-white px-6 py-2 rounded-md font-medium hover:bg-primary-hover transition-colors"
                     >
                         Go to Dashboard

@@ -337,7 +337,7 @@ const PlatformMatrix = () => {
                 title="Mission Marketplace"
                 desc="Monetize expertise through high-value missions sourced directly from active repos."
                 icon="work"
-                to="/dashboard/jobs"
+                to="/marketplace/missions"
                 color="amber-500"
                 count={MOCK_JOBS.filter((j) => j.status === "Open").length}
                 label="Missions Open"
@@ -355,7 +355,7 @@ const PlatformMatrix = () => {
                 title="Engineering Library"
                 desc="Curated technical research, templates, and pre-audited security modules."
                 icon="auto_stories"
-                to="/dashboard/library"
+                to="/library"
                 color="cyan-500"
                 count="850+"
                 label="Certified Assets"

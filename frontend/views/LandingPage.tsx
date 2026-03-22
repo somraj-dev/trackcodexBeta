@@ -9,7 +9,7 @@ const LandingPage = () => {
 
   // Redirect authenticated users to dashboard
   if (user) {
-    return <Navigate to="/dashboard/home" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return (

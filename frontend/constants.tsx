@@ -306,6 +306,58 @@ export const MOCK_LIBRARY_RESOURCES: LibraryResource[] = [
     tags: ["JWT", "OAuth2", "Express"],
     version: "v2.4.1",
     snippetPreview: `import express from 'express';\nimport { rateLimit } from 'express-rate-limit';\n\nconst limiter = rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 100\n});\n\napp.use(limiter);`,
+    installationCommand: "npx trackcodex@latest add https://21st.dev/r/easemize/ai-prompt-box",
+    dependencies: ["lucide-react", "framer-motion", "@radix-ui/react-dialog", "@radix-ui/react-tooltip"],
+    fileStructure: [
+      {
+        id: "src",
+        name: "src",
+        type: "folder",
+        children: [
+          {
+            id: "components",
+            name: "components",
+            type: "folder",
+            children: [
+              {
+                id: "ui",
+                name: "ui",
+                type: "folder",
+                children: [{ 
+                  id: "component.tsx", 
+                  name: "component.tsx", 
+                  type: "file",
+                  content: `// This is a file with a demo for your component\n// That's what users will see in the preview\n// Create new files in this directory to add more demos\n\nimport { Component } from "@/components/ui/component";\n\n// ONLY DEFAULT EXPORT WILL BE TREATED AS A DEMO\nexport default function DemoOne() {\n  return <Component />;\n}`
+                }]
+              }
+            ]
+          },
+          {
+            id: "demos",
+            name: "demos",
+            type: "folder",
+            children: [{ 
+              id: "default.tsx", 
+              name: "default.tsx", 
+              type: "file",
+              content: `import React from 'react';\n\nexport const DefaultDemo = () => {\n  return (\n    <div className="p-4 bg-gh-bg-secondary rounded-xl border border-gh-border">\n      <h2 className="text-lg font-bold text-gh-text mb-4">Default Demo</h2>\n      <p className="text-sm text-gh-text-secondary">This is a sample demo for the functional file structure.</p>\n    </div>\n  );\n};`
+            }]
+          },
+          { 
+            id: "index.css", 
+            name: "index.css", 
+            type: "file",
+            content: `/* Global styles */\n:root {\n  --primary: #3b82f6;\n  --gh-bg: #0d1117;\n}\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: 'Inter', sans-serif;\n  background: var(--gh-bg);\n}`
+          }
+        ]
+      }
+    ],
+    changelog: [
+      { id: "v2.4.1", version: "v2.4.1", date: "29s", changes: "Fix mission visibility in Marketplace and switch to AWS RDS producti...", status: "Ready", branch: "main", commit: "21366ff" },
+      { id: "v2.4.0", version: "v2.4.0", date: "30s", changes: "theme: Improve theme resolution fallback", status: "Ready", branch: "main", commit: "3fdbf1a" },
+      { id: "v2.3.9", version: "v2.3.9", date: "28s", changes: "s2", status: "Ready", branch: "main", commit: "c92bb34" },
+      { id: "v2.3.8", version: "v2.3.8", date: "30s", changes: "s", status: "Ready", branch: "main", commit: "8878bb4" }
+    ]
   },
   {
     id: "dashboard-pro-kit",

@@ -20,7 +20,7 @@ interface ProfileRepositoriesProps {
   error: string;
 }
 
-const ProfileRepositories: React.FC<ProfileRepositoriesProps> = ({ repos, loading, error }) => {
+const ProfileRepositories: React.FC<Omit<ProfileRepositoriesProps, 'error'>> = ({ repos, loading }) => {
   const navigate = useNavigate();
 
 
@@ -140,7 +140,7 @@ const ProfileRepositories: React.FC<ProfileRepositoriesProps> = ({ repos, loadin
                     <span className="material-symbols-outlined !text-[14px]">
                       adjust
                     </span>
-                    {repo.open_issues || 0}
+                    {repo.open_issues_count || 0}
                   </span>
                 </div>
                 <span className="text-[10px] text-gh-text-secondary font-medium uppercase tracking-wider">
@@ -160,39 +160,39 @@ const ProfileView = () => {
     profileService.getProfile(),
   );
   const [activeTab, setActiveTab] = useState("Overview");
-  const [isSyncing, setIsSyncing] = useState(false);
   const [repos, setRepos] = useState<Repository[]>([]);
   const [loadingRepos, setLoadingRepos] = useState(true);
-  const [repoError, setRepoError] = useState("");
+  const [, setRepoError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     // Sync with backend on mount
     const syncProfile = async () => {
-      setIsSyncing(true);
       try {
-        const me = await api.auth.getMe() as any;
+        const me = await api.auth.getMe() as unknown as { user: any };
         const backendProfile = me?.user;
         if (backendProfile) {
-          // Step 1: Update basic identity fields
-          profileService.updateProfile({
-            id: backendProfile.id,
-            name: backendProfile.name || backendProfile.username,
-            username: backendProfile.username,
-            avatar: backendProfile.avatar,
-            role: backendProfile.role,
-          });
+          // Use a key to determine if update is actually needed
+          const currentProfile = profileService.getProfile();
+          if (currentProfile.username !== backendProfile.username || !currentProfile.id) {
+            profileService.updateProfile({
+              id: backendProfile.id,
+              name: backendProfile.name || backendProfile.username,
+              username: backendProfile.username,
+              avatar: backendProfile.avatar,
+              role: backendProfile.role,
+            });
+          }
 
-          // Step 2: Fetch enriched profile with unique metrics (skillMetrics, skillScore, freelancerProfile)
+          // Fetch enriched profile only if needed
           try {
             const enriched = await profileService.getProfileByIdOrUsername(backendProfile.id);
-            if (enriched) {
+            if (enriched && (!currentProfile.skillScore || enriched.skillScore?.lastCalculatedAt !== currentProfile.skillScore?.lastCalculatedAt)) {
               profileService.updateProfile({
                 skillMetrics: enriched.skillMetrics,
                 skillScore: enriched.skillScore,
                 freelancerProfile: enriched.freelancerProfile,
               });
-              // Also update local state directly so cards re-render immediately
               setProfile((prev) => ({
                 ...prev,
                 skillMetrics: enriched.skillMetrics,
@@ -206,8 +206,6 @@ const ProfileView = () => {
         }
       } catch (err) {
         console.error("Profile sync failed", err);
-      } finally {
-        setIsSyncing(false);
       }
     };
 
@@ -324,7 +322,7 @@ const ProfileView = () => {
             )}
 
             {activeTab === "Code & Repos" && (
-              <ProfileRepositories repos={repos} loading={loadingRepos} error={repoError} />
+              <ProfileRepositories repos={repos} loading={loadingRepos} />
             )}
 
             {activeTab === "Security" && (
@@ -521,7 +519,7 @@ const ProfileView = () => {
                     Recent Missions
                   </h2>
                   <button
-                    onClick={() => navigate("/dashboard/jobs")}
+                    onClick={() => navigate("/marketplace/missions")}
                     className="text-xs font-bold text-primary uppercase tracking-widest"
                   >
                     Browse All

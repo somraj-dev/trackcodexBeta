@@ -25,7 +25,7 @@ const CommandPalette = ({
       label: "Go to Home",
       icon: "home",
       group: "Navigation",
-      url: "/dashboard/home",
+      url: "/home",
     },
     {
       id: "nav-settings",
@@ -81,7 +81,7 @@ const CommandPalette = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, navCommands, navigate]);
 
   // Grouping for render
   const groupedResults = results.reduce(

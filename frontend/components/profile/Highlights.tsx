@@ -112,7 +112,7 @@ const Highlights: React.FC<Props> = ({ profile }) => {
         {/* Freelance Highlight */}
         {hasFreelanceActivity ? (
           <div
-            onClick={() => navigate("/dashboard/jobs")}
+            onClick={() => navigate("/marketplace/missions")}
             className="p-8 bg-gh-bg-secondary border border-gh-border rounded-2xl group hover:border-amber-500/50 transition-all cursor-pointer shadow-lg"
           >
             <div className="flex justify-between items-start mb-6">
@@ -138,7 +138,7 @@ const Highlights: React.FC<Props> = ({ profile }) => {
             icon="work"
             label="Browse jobs"
             hint="Your completed gigs and ratings will appear here."
-            onClick={() => navigate("/dashboard/jobs")}
+            onClick={() => navigate("/marketplace/missions")}
           />
         )}
       </div>
