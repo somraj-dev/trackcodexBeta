@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { socialService, Post, Community } from "../../services/social/socialService";
 import { profileService, UserProfile } from "../../services/activity/profile";
+import { realtimeService } from "../../services/infra/realtime-service";
 import PostCard from "../../components/community/PostCard";
 import { CreateCommunityModal } from "../../components/community/CreateCommunityModal";
 import CommunityLeftSidebar from "../../components/community/CommunityLeftSidebar";
@@ -50,7 +51,30 @@ const CommunityView = () => {
       setCurrentUser(updatedProfile);
     });
 
-    return () => unsubscribe();
+    const unsubscribeRealtime = realtimeService.subscribe((event) => {
+      if (event.type === "NEW_POST" && event.data) {
+        setPosts((prev) => [event.data, ...prev]);
+      } else if (event.type === "NEW_COMMENT" && event.data) {
+        setPosts((prev) => prev.map(p => {
+          if (p.id === event.data.postId) {
+            return { ...p, comments: [...(p.comments || []), event.data] };
+          }
+          return p;
+        }));
+      } else if (event.type === "POST_LIKED" && event.data) {
+        setPosts((prev) => prev.map(p => {
+          if (p.id === event.data.postId) {
+            return { ...p, likes: Math.max(0, (p.likes || 0) + (event.data.action === "LIKE" ? 1 : -1)) };
+          }
+          return p;
+        }));
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeRealtime();
+    };
   }, [location.search, navigate]); // Add location.search and navigate to dependencies
 
   const loadFeed = async () => {

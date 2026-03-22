@@ -1,6 +1,7 @@
 import { prisma } from "../../services/infra/prisma";
 import { requireAuth } from "../../middleware/auth";
 import { NotificationService } from "../../services/infra/notification";
+import { RealtimeService } from "../../services/infra/realtime";
 import { FastifyInstance } from "fastify";
 
 // Shared prisma instance
@@ -342,6 +343,11 @@ export async function userRoutes(fastify: FastifyInstance) {
         { followerId: currentUser.userId }
       ).catch(e => console.error("Follow notification failed:", e));
 
+      RealtimeService.broadcastGlobal({
+        type: "USER_FOLLOW",
+        data: { targetUserId, followerId: currentUser.userId, action: "FOLLOW" }
+      });
+
       return { success: true, message: "Successfully followed user" };
     } catch (error) {
       console.error("Follow error:", error);
@@ -392,6 +398,11 @@ export async function userRoutes(fastify: FastifyInstance) {
           data: { followingCount: { decrement: 1 } },
         }),
       ]);
+
+      RealtimeService.broadcastGlobal({
+        type: "USER_FOLLOW",
+        data: { targetUserId, followerId: currentUser.userId, action: "UNFOLLOW" }
+      });
 
       return { success: true, message: "Successfully unfollowed user" };
     } catch (error) {

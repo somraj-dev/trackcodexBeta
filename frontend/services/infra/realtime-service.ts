@@ -59,6 +59,9 @@ class RealtimeService {
     const forwardEvent = (type: string) => {
       this.socket?.on(type, (data) => {
         this.notify({ ...data, type });
+        if (type === "NOTIFICATION") {
+           window.dispatchEvent(new CustomEvent("trackcodex-notification", { detail: data.data || data }));
+        }
       });
     };
 
@@ -69,6 +72,12 @@ class RealtimeService {
     forwardEvent("CURSOR_MOVE");
     forwardEvent("BUFFER_SYNC");
     forwardEvent("TERMINAL_OUTPUT");
+    forwardEvent("NOTIFICATION");
+    forwardEvent("USER_FOLLOW");
+    forwardEvent("PR_UPDATED");
+    forwardEvent("NEW_POST");
+    forwardEvent("NEW_COMMENT");
+    forwardEvent("POST_LIKED");
   }
 
   send(event: RealtimeEvent) {

@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { requireAuth } from "../../middleware/auth";
 import { GitStorageService } from "../../services/git/gitStorageService";
+import { RealtimeService } from "../../services/infra/realtime";
 import path from "path";
 
 export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
@@ -34,6 +35,12 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
             });
 
             triggerWebhooks(id, "pull_request_opened", pullRequest).catch(console.error);
+            
+            RealtimeService.broadcastGlobal({
+                type: "PR_UPDATED",
+                data: pullRequest
+            });
+
             return reply.code(201).send(pullRequest);
         } catch (err: any) {
             server.log.error(err);
@@ -121,6 +128,12 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
             });
 
             triggerWebhooks(pr.repoId, "pull_request_merged", updatedPr).catch(console.error);
+
+            RealtimeService.broadcastGlobal({
+                type: "PR_UPDATED",
+                data: updatedPr
+            });
+
             return { success: true, pr: updatedPr };
         } catch (err: any) {
             server.log.error(err);

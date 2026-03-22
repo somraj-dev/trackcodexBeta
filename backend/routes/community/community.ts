@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { requireAuth } from "../../middleware/auth";
+import { RealtimeService } from "../../services/infra/realtime";
 
 // Shared prisma instance
 
@@ -266,6 +267,11 @@ export async function communityRoutes(fastify: FastifyInstance) {
           },
         });
 
+        RealtimeService.broadcastGlobal({
+          type: "NEW_POST",
+          data: post
+        });
+
         return post;
       } catch (error) {
         console.error("Create post error:", error);
@@ -293,6 +299,11 @@ export async function communityRoutes(fastify: FastifyInstance) {
           include: {
             author: { select: { id: true, name: true, avatar: true } },
           },
+        });
+
+        RealtimeService.broadcastGlobal({
+          type: "NEW_COMMENT",
+          data: comment
         });
 
         return comment;
@@ -331,6 +342,10 @@ export async function communityRoutes(fastify: FastifyInstance) {
             where: { id },
             data: { likes: { decrement: 1 } },
           });
+          RealtimeService.broadcastGlobal({
+            type: "POST_LIKED",
+            data: { postId: id, userId: currentUser.id, action: "UNLIKE" }
+          });
           return { liked: false };
         } else {
           // Like
@@ -343,6 +358,10 @@ export async function communityRoutes(fastify: FastifyInstance) {
           await prisma.communityPost.update({
             where: { id },
             data: { likes: { increment: 1 } },
+          });
+          RealtimeService.broadcastGlobal({
+            type: "POST_LIKED",
+            data: { postId: id, userId: currentUser.id, action: "LIKE" }
           });
           return { liked: true };
         }

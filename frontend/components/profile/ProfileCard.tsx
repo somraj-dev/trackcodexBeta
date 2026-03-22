@@ -5,6 +5,7 @@ import OfferJobModal from "../jobs/offer/OfferJobModal";
 import { directMessageBus } from "../../services/social/directMessageBus";
 import FollowListModal from "./FollowListModal";
 import { useAuth } from "../../context/AuthContext";
+import { realtimeService } from "../../services/infra/realtime-service";
 
 import ProofProfileModal from "./ProofProfileModal";
 import EditStatusModal from "./EditStatusModal";
@@ -45,6 +46,36 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
       return unsubscribe;
     }
   }, [propProfile]);
+
+  useEffect(() => {
+    const unsubscribe = realtimeService.subscribe((event) => {
+      if (event.type === "USER_FOLLOW" && event.data) {
+        const { targetUserId, followerId, action } = event.data;
+        const currentUserId = currentUser?.id;
+
+        // If the profile we are viewing is the target user
+        if (profile.id === targetUserId) {
+          setProfile(prev => ({
+            ...prev,
+            followers: Math.max(0, (prev.followers || 0) + (action === "FOLLOW" ? 1 : -1))
+          }));
+          
+          if (followerId === currentUserId) {
+            setIsFollowing(action === "FOLLOW");
+          }
+        }
+        
+        // If the profile we are viewing is the person who just followed someone
+        if (profile.id === followerId) {
+          setProfile(prev => ({
+            ...prev,
+            following: Math.max(0, (prev.following || 0) + (action === "FOLLOW" ? 1 : -1))
+          }));
+        }
+      }
+    });
+    return () => { unsubscribe(); };
+  }, [profile.id, currentUser?.id]);
 
   const handleFollow = async () => {
     const targetId = profile.id;

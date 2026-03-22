@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { GitPullRequest, GitMerge, Check, AlertTriangle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { realtimeService } from '../../services/infra/realtime-service';
 
 export function PullRequestDetail() {
     const { repoId, prId } = useParams();
@@ -28,6 +29,17 @@ export function PullRequestDetail() {
         };
         fetchPR();
     }, [prId]);
+
+    useEffect(() => {
+        const unsubscribe = realtimeService.subscribe((event) => {
+            if (event.type === "PR_UPDATED" && event.data) {
+                if (event.data.id === pr?.id || event.data.id === prId) {
+                    setPr((prev: any) => ({ ...prev, ...event.data }));
+                }
+            }
+        });
+        return () => { unsubscribe(); };
+    }, [pr?.id, prId]);
 
     const handleMerge = async () => {
         setMerging(true);

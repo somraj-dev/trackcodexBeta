@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Search, TrendingUp, UserPlus, Star, Terminal, Globe, Lock } from "lucide-react";
 import { api } from "../services/infra/api";
 import { profileService } from "../services/activity/profile";
+import { realtimeService } from "../services/infra/realtime-service";
+import { useAuth } from "../context/AuthContext";
 import { Workspace } from "../types";
 import "../styles/Explore.css";
 
@@ -25,7 +27,41 @@ export const Explore: React.FC = () => {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const unsubscribe = realtimeService.subscribe((event) => {
+      if (event.type === "USER_FOLLOW" && event.data) {
+        const { targetUserId, followerId, action } = event.data;
+        const currentUserId = user?.id;
+        
+        const updateUsers = (users: User[]) => users.map(u => {
+          if (u.id === targetUserId) {
+            return {
+              ...u,
+              followersCount: Math.max(0, (u.followersCount || 0) + (action === "FOLLOW" ? 1 : -1)),
+              isFollowing: followerId === currentUserId ? (action === "FOLLOW") : u.isFollowing
+            };
+          }
+          if (u.id === followerId) {
+            return {
+              ...u,
+              followingCount: Math.max(0, (u.followingCount || 0) + (action === "FOLLOW" ? 1 : -1))
+            };
+          }
+          return u;
+        });
+
+        setTrendingUsers(updateUsers);
+        setSuggestedUsers(updateUsers);
+        setSearchResults(updateUsers);
+      }
+    });
+
+    return () => { unsubscribe(); };
+  }, [user?.id]);
 
   useEffect(() => {
     loadDiscoveryData();
@@ -51,17 +87,24 @@ export const Explore: React.FC = () => {
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
     if (query.trim().length < 2) {
       setSearchResults([]);
       return;
     }
 
-    try {
-      const results = await api.get<User[]>("/users/search", { q: query });
-      setSearchResults(results);
-    } catch (error) {
-      console.error("Error searching users:", error);
-    }
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const data = await api.get<{ users: User[] }>("/search/users", { q: query, limit: 12 });
+        setSearchResults(data.users || []);
+      } catch (error) {
+        console.error("Error searching users:", error);
+      }
+    }, 300);
   };
 
   const handleFollow = async (userId: string) => {

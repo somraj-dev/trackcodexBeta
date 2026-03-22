@@ -194,12 +194,15 @@ export class RealtimeService {
    */
   static broadcastToRoom(room: string, event: any) {
     if (!this.io) return;
-    // Note: Socket.io handles event type as the first argument in emit,
-    // but we can preserve our existing structure by emitting a generic 'event'
-    // or better, use the event.type as the event name.
-    // For compatibility with previous frontend, we'll emit 'message' or similar.
-    // Actually, it's cleaner to emit the event.type as the name.
     this.io.to(room).emit(event.type, event);
+  }
+
+  /**
+   * Broadcasts an event to ALL connected clients
+   */
+  static broadcastGlobal(event: any) {
+    if (!this.io) return;
+    this.io.emit(event.type, event);
   }
 
   /**
