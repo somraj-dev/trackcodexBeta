@@ -144,7 +144,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   // 2. Preferences
   const [activeThemeId, setActiveThemeId] = useState<ThemeId>(() => {
     return (
-      (localStorage.getItem("tc_active_theme") as ThemeId) || "dark_default"
+      (localStorage.getItem("tc_active_theme") as ThemeId) || "light_default"
     );
   });
   const [preferredLightThemeId, setPreferredLightThemeId] = useState<ThemeId>(
@@ -215,7 +215,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const resolvedThemeId = getResolvedThemeId();
   const resolvedTheme =
     AVAILABLE_THEMES.find((t) => t.id === resolvedThemeId) ||
-    AVAILABLE_THEMES[2];
+    AVAILABLE_THEMES[0];
 
   // 6. Apply to DOM
   useEffect(() => {
