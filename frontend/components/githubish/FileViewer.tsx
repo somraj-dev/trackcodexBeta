@@ -18,17 +18,16 @@ export function FileViewer() {
     const { repoId, branch = 'master', '*': filePath } = useParams();
     const [content, setContent] = useState<string>('');
     const [loading, setLoading] = useState(true);
-    const { getSessionToken } = useAuth();
+    const { getIdToken } = useAuth();
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchFile = async () => {
             setLoading(true);
             try {
-                const token = getSessionToken();
-                const res = await fetch(`/api/v1/github/${repoId}/blob?branch=${encodeURIComponent(branch)}&filepath=${encodeURIComponent(filePath || '')}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const token = await getIdToken();
+                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`/api/v1/github/${repoId}/blob?branch=${encodeURIComponent(branch)}&filepath=${encodeURIComponent(filePath || '')}`, { headers });
                 
                 if (res.ok) {
                     const text = await res.text();

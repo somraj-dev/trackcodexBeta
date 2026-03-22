@@ -7,16 +7,15 @@ export function IssueList() {
     const { repoId } = useParams();
     const [issues, setIssues] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const { getSessionToken } = useAuth();
+    const { getIdToken } = useAuth();
 
     useEffect(() => {
         const fetchIssues = async () => {
             setLoading(true);
             try {
-                const token = getSessionToken();
-                const res = await fetch(`/api/v1/github/${repoId}/issues`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const token = await getIdToken();
+                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`/api/v1/github/${repoId}/issues`, { headers });
                 if (res.ok) setIssues(await res.json());
             } catch (err) {
                 console.error("Failed to fetch issues", err);

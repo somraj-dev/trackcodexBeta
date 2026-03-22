@@ -16,26 +16,24 @@ function RepoTree() {
     const [tree, setTree] = useState<TreeEntry[]>([]);
     const [branch, setBranch] = useState("master");
     const [branches, setBranches] = useState<string[]>([]);
-    const { getSessionToken } = useAuth();
+    const { getIdToken } = useAuth();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const token = getSessionToken();
-                const branchRes = await fetch(`/api/v1/github/${repoId}/branches`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const token = await getIdToken();
+                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+                const branchRes = await fetch(`/api/v1/github/${repoId}/branches`, { headers });
                 
                 if (branchRes.ok) {
                     const branchData = await branchRes.json();
                     setBranches(branchData.branches || ["master"]);
                 }
 
-                const treeRes = await fetch(`/api/v1/github/${repoId}/tree?branch=${branch}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const treeRes = await fetch(`/api/v1/github/${repoId}/tree?branch=${branch}`, { headers });
                 if (treeRes.ok) {
                     const treeData = await treeRes.json();
                     setTree(treeData.tree || []);

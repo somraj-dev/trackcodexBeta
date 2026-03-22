@@ -9,16 +9,15 @@ export function PullRequestDetail() {
     const [loading, setLoading] = useState(true);
     const [merging, setMerging] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { getSessionToken } = useAuth();
+    const { getIdToken } = useAuth();
 
     useEffect(() => {
         const fetchPR = async () => {
             setLoading(true);
             try {
-                const token = getSessionToken();
-                const res = await fetch(`/api/v1/github/pull-requests/${prId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const token = await getIdToken();
+                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`/api/v1/github/pulls/${prId}`, { headers });
                 if (res.ok) setPr(await res.json());
                 else setError("Failed to load PR details.");
             } catch (err) {
@@ -34,10 +33,11 @@ export function PullRequestDetail() {
         setMerging(true);
         setError(null);
         try {
-            const token = getSessionToken();
-            const res = await fetch(`/api/v1/github/pull-requests/${prId}/merge`, {
+            const token = await getIdToken();
+            const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+            const res = await fetch(`/api/v1/github/pulls/${prId}/merge`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers,
             });
             const data = await res.json();
             

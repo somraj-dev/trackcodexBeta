@@ -208,6 +208,7 @@ const AppRoutes = () => {
             <Route path="/github/:repoId" element={<RepoTree />} />
             <Route path="/github/:repoId/blob/:branch/*" element={<FileViewer />} />
             <Route path="/github/:repoId/issues" element={<IssueList />} />
+            <Route path="/github/:repoId/issues/:number" element={<IssueDetail />} />
             <Route path="/github/:repoId/pulls/:prId" element={<PullRequestDetail />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
             <Route path="/dashboard/library" element={<LibraryView />} />

@@ -282,6 +282,16 @@ async function bootstrap() {
     // 7. WebSocket Support (for Terminal PTY)
     await server.register(websocket);
 
+    // Health Check Endpoint for AWS ALB/ECS
+    server.get("/health", async (request, reply) => {
+        return {
+            status: "ok",
+            db: dbConnected,
+            uptime: process.uptime(),
+            timestamp: new Date().toISOString()
+        };
+    });
+
     // Initialize RealtimeService with the IO instance
     RealtimeService.init((server as any).io);
 

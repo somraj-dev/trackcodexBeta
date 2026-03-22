@@ -35,6 +35,7 @@ interface AuthContextType {
   login: (userData: User, csrfToken: string) => void;
   logout: () => void;
   csrfToken: string | null;
+  getIdToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -197,6 +198,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
 
+  const getIdToken = async (): Promise<string | null> => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        return await currentUser.getIdToken();
+      }
+      // Fallback: try to get from localStorage token (session-based auth)
+      return localStorage.getItem("trackcodex_auth_token") || null;
+    } catch (err) {
+      console.error("[AuthContext] Failed to get ID token:", err);
+      return null;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -206,6 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         login,
         logout,
         csrfToken,
+        getIdToken,
       }}
     >
       {children}

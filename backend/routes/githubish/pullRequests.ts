@@ -5,9 +5,8 @@ import { GitStorageService } from "../../services/git/gitStorageService";
 import path from "path";
 
 export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
-    server.addHook("preHandler", requireAuth);
-
-    server.post("/repos/:id/pull-requests", async (request, reply) => {
+    // POST /github/:id/pulls — create a PR
+    server.post("/:id/pulls", { preHandler: requireAuth }, async (request, reply) => {
         const { id } = request.params as { id: string };
         const { title, body, source_branch, target_branch } = request.body as { 
             title: string; body?: string; source_branch: string; target_branch: string;
@@ -15,7 +14,6 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
         const user = (request as any).user;
 
         try {
-            // Find highest PR number
             const lastPr = await prisma.pullRequest.findFirst({
                 where: { repoId: id },
                 orderBy: { number: 'desc' }
@@ -35,9 +33,7 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
                 }
             });
 
-            // Trigger webhooks asynchronously
             triggerWebhooks(id, "pull_request_opened", pullRequest).catch(console.error);
-
             return reply.code(201).send(pullRequest);
         } catch (err: any) {
             server.log.error(err);
@@ -45,7 +41,24 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
         }
     });
 
-    server.get("/pull-requests/:prId", async (request, reply) => {
+    // GET /github/:id/pulls — list PRs for a repo
+    server.get("/:id/pulls", { preHandler: requireAuth }, async (request, reply) => {
+        const { id } = request.params as { id: string };
+        const { status } = request.query as { status?: string };
+        try {
+            const prs = await prisma.pullRequest.findMany({
+                where: { repoId: id, ...(status ? { status: status.toUpperCase() } : {}) },
+                include: { author: { select: { username: true, name: true, avatar: true } } },
+                orderBy: { createdAt: 'desc' }
+            });
+            return prs;
+        } catch (err) {
+            return reply.code(500).send({ error: "Internal Server Error" });
+        }
+    });
+
+    // GET /github/pulls/:prId — get a single PR with diff
+    server.get("/pulls/:prId", async (request, reply) => {
         const { prId } = request.params as { prId: string };
         
         try {
@@ -58,18 +71,19 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
             const { GIT_ROOT } = await import("../../services/git/gitStorageService");
             const repoPath = path.join(GIT_ROOT, String(repo.ownerId), `${repo.name}.git`);
             
-            const diffStr = await GitStorageService.compareBranches(repoPath, pr.base, pr.head);
+            let diffStr = "";
+            try {
+                diffStr = await GitStorageService.compareBranches(repoPath, pr.base, pr.head);
+            } catch { /* empty repo or no commits — diff is empty */ }
             
-            return {
-                ...pr,
-                diff: diffStr
-            };
+            return { ...pr, diff: diffStr };
         } catch (err) {
             return reply.code(500).send({ error: "Internal Server Error" });
         }
     });
 
-    server.post("/pull-requests/:prId/merge", async (request, reply) => {
+    // POST /github/pulls/:prId/merge — merge a PR
+    server.post("/pulls/:prId/merge", { preHandler: requireAuth }, async (request, reply) => {
         const { prId } = request.params as { prId: string };
         const user = (request as any).user;
 
@@ -107,7 +121,6 @@ export const githubPullRequestsRoutes: FastifyPluginAsync = async (server) => {
             });
 
             triggerWebhooks(pr.repoId, "pull_request_merged", updatedPr).catch(console.error);
-
             return { success: true, pr: updatedPr };
         } catch (err: any) {
             server.log.error(err);
