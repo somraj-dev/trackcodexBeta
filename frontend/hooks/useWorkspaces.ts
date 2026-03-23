@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { api } from "../services/infra/api";
 import { Workspace } from "../types";
 
@@ -32,7 +32,7 @@ export const useWorkspaces = () => {
     fetchWorkspaces();
   }, [fetchWorkspaces]);
 
-  return {
+  return useMemo(() => ({
     workspaces,
     loading,
     error,
@@ -41,6 +41,6 @@ export const useWorkspaces = () => {
       return fetchWorkspaces();
     },
     createWorkspace,
-  };
+  }), [workspaces, loading, error, fetchWorkspaces]);
 };
 

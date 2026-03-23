@@ -28,7 +28,7 @@ const RealtimeContext = createContext<RealtimeContextType | undefined>(
 
 export const RealtimeProvider: React.FC<{
   children: React.ReactNode;
-  userId: string;
+  userId: string | null;
   workspaceId?: string;
 }> = ({ children, userId, workspaceId }) => {
   const [isConnected, setIsConnected] = useState(false);

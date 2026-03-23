@@ -10,24 +10,13 @@ import ChatWidget from "../social/ChatWidget";
 import UserProfileDropdown from "../profile/UserProfileDropdown";
 import ResumePreviewModal from "../profile/ResumePreviewModal";
 import TrackCodexLogo from "../branding/TrackCodexLogo";
+import { LoggedInProviders } from "../auth/LoggedInProviders";
 
 // Contexts & Services
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
 import { useMessaging } from "../../context/MessagingContext";
-import { profileService, UserProfile } from "../../services/activity/profile";
-
-interface NotificationItem {
-  id: string;
-  type: "job" | "comment" | "community" | "system" | "info";
-  title: string;
-  message: string;
-  createdAt: string;
-  read: boolean;
-  hasActions?: boolean;
-  time?: string;
-  skipToast?: boolean;
-}
+import { useProfile } from "../../context/ProfileContext";
 
 const MainLayout: React.FC = () => {
   const mainScrollRef = useRef<HTMLDivElement>(null);
@@ -46,16 +35,13 @@ const MainLayout: React.FC = () => {
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const lastScrollTopRef = useRef(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [profile, setProfile] = useState<UserProfile>(profileService.getProfile());
+  const { profile } = useProfile();
 
   useEffect(() => {
     if (mainScrollRef.current) mainScrollRef.current.scrollTop = 0;
     ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
   }, [location.pathname, location.search]);
 
-  useEffect(() => {
-    return profileService.subscribe(setProfile);
-  }, []);
 
   useEffect(() => {
     const handleOpenResume = () => setIsResumeModalOpen(true);
@@ -145,9 +131,7 @@ const MainLayout: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isAddMenuOpen, isNotificationsOpen, isProfileDropdownOpen]);
 
-  const displayNotifications = notifications.length > 0 ? notifications : [
-    { id: "mock1", type: "system", title: "Welcome", message: "No new notifications yet.", createdAt: new Date().toISOString(), read: true }
-  ];
+  const displayNotifications = notifications.length > 0 ? notifications : [];
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden text-gh-text font-display bg-gh-bg transition-colors duration-300">

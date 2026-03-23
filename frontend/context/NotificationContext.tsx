@@ -129,14 +129,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       );
   }, []);
 
-  // INTELLIGENT SKILL MATCHING LOGIC
+  // INTELLIGENT SKILL MATCHING LOGIC - DISABLED TO PREVENT RENDER LOOPS
+  /*
   useEffect(() => {
     let lastCheckedProfileId = "";
     
-    // Subscribe to profile updates to trigger check when skills change
     const unsubscribe = profileService.subscribe((profile) => {
-      // Basic check to avoid redundant calls if profile ID/username hasn't changed meaningfully
-      // (Deep comparison would be better, but ID is a good start)
       const currentId = profile.id + (profile.skills?.length || 0);
       if (currentId !== lastCheckedProfileId) {
         lastCheckedProfileId = currentId;
@@ -144,13 +142,13 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    // Initial check
     const initialProfile = profileService.getProfile();
     lastCheckedProfileId = initialProfile.id + (initialProfile.skills?.length || 0);
     checkJobMatches(initialProfile);
 
     return () => unsubscribe();
   }, []);
+  */
 
 
   const addNotification = React.useCallback((

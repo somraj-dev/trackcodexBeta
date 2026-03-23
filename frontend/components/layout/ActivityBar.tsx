@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import TrackCodexLogo from "../branding/TrackCodexLogo";
 import { profileService, UserProfile } from "../../services/activity/profile";
+import { useProfile } from "../../context/ProfileContext";
 import { SystemRole } from "../../types";
 
 // Consistent role normalization
@@ -52,14 +53,8 @@ const ActivityIcon = ({
 };
 
 const ActivityBar = () => {
-  const [profile, setProfile] = useState<UserProfile>(
-    profileService.getProfile(),
-  );
+  const { profile } = useProfile();
   const userTier = getAccessTier(profile.systemRole);
-
-  useEffect(() => {
-    return profileService.subscribe((updated) => setProfile(updated));
-  }, []);
 
   return (
     <aside className="w-12 bg-gh-bg-secondary flex flex-col items-center shrink-0 z-50 border-r border-gh-border">

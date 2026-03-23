@@ -1,11 +1,12 @@
 import React from "react";
-import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import RedirectToLogin from "./components/auth/RedirectToLogin";
 import RedirectAfterAuth from "./components/auth/RedirectAfterAuth";
 import SettingsLayout from "./components/settings/SettingsLayout";
 import { useAuth } from "./context/AuthContext";
+import SplashScreen from "./components/branding/SplashScreen";
 
 const ComingSoon = React.lazy(() => import("./views/ComingSoon"));
 
@@ -149,7 +150,25 @@ const ProfileWrapper = () => {
   return <PublicProfile />;
 };
 
-const AppRoutes = () => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, hasSettled } = useAuth();
+  
+  if (!hasSettled) return <SplashScreen />;
+  if (!isAuthenticated) return <RedirectToLogin />;
+  
+  return <>{children}</>;
+};
+
+const PublicOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, hasSettled } = useAuth();
+  
+  if (!hasSettled) return <SplashScreen />;
+  if (isAuthenticated) return <Navigate to="/home" replace />;
+  
+  return <>{children}</>;
+};
+
+const AppRoutes = React.memo(() => {
   const { isAuthenticated, user } = useAuth();
 
   return (
@@ -164,34 +183,28 @@ const AppRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
+        <Route path="/team" element={<TeamPage />} />
 
-        {!isAuthenticated && (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/auth/resolve-conflict" element={<ResolveConflict />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="*" element={<RedirectToLogin />} />
-          </>
-        )}
+        {/* Auth specific public pages */}
+        <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+        <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+        <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+        <Route path="/reset-password" element={<PublicOnlyRoute><ResetPassword /></PublicOnlyRoute>} />
+        <Route path="/verify-email" element={<PublicOnlyRoute><VerifyEmail /></PublicOnlyRoute>} />
+        <Route path="/auth/resolve-conflict" element={<PublicOnlyRoute><ResolveConflict /></PublicOnlyRoute>} />
+        <Route path="/" element={<PublicOnlyRoute><LandingPage /></PublicOnlyRoute>} />
       </Route>
 
       {/* Protected Pages */}
-      {isAuthenticated && (
-        <>
-          <Route path="/logout" element={<SignOut />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/login" element={<RedirectAfterAuth />} />
-          <Route path="/signup" element={<RedirectAfterAuth />} />
-          <Route path="/forgot-password" element={<RedirectAfterAuth />} />
-          <Route path="/reset-password" element={<RedirectAfterAuth />} />
-          
-          <Route element={<MainLayout />}>
-            <Route path="/taskvault" element={<TaskVault />} />
+      <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route path="/logout" element={<SignOut />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/login" element={<RedirectAfterAuth />} />
+        <Route path="/signup" element={<RedirectAfterAuth />} />
+        <Route path="/forgot-password" element={<RedirectAfterAuth />} />
+        <Route path="/reset-password" element={<RedirectAfterAuth />} />
+        
+        <Route path="/taskvault" element={<TaskVault />} />
             <Route path="/home" element={<HomeView />} />
             <Route path="/dashboard" element={<ProjectDashboard />} />
             <Route path="/project/:projectId" element={<ProjectDetailView />} />
@@ -222,9 +235,9 @@ const AppRoutes = () => {
             <Route path="/github/:repoId/issues/:number" element={<IssueDetail />} />
             <Route path="/github/:repoId/pulls/:prId" element={<PullRequestDetail />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
-            <Route path="/library" element={<LibraryView />} />
-            <Route path="/library/:id" element={<LibraryView />} />
+            <Route path="/library" element={<LibraryView key="library-list" />} />
             <Route path="/library/new" element={<CreateLibraryResourceView />} />
+            <Route path="/library/:id" element={<LibraryView key="library-detail" />} />
             <Route path="/editor" element={<EditorView />} />
             <Route path="/profile" element={<Navigate to={`/profile/${user?.username || "me"}`} replace />} />
             <Route path="/profile/:username" element={<ProfileWrapper />} />
@@ -314,15 +327,15 @@ const AppRoutes = () => {
             <Route path="/dashboard/jobs" element={<Navigate to="/marketplace/missions" replace />} />
             <Route path="/dashboard/project/:projectId" element={<Navigate to="/project/:projectId" replace />} />
 
-            {/* Catch-alls */}
+            {/* Catch-alls for Protected Area */}
             <Route path="/:owner/:repo/*" element={<RepoDetailView />} />
-            <Route path="*" element={<Navigate to="/home" replace />} />
           </Route>
-        </>
-      )}
+
+          {/* Global Catch-all */}
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />} />
     </Routes>
   );
-};
+});
 
 export default AppRoutes;
 

@@ -117,10 +117,8 @@ class ErrorBoundary extends React.Component<
 }
 
 root.render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>,
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>,
 );
 

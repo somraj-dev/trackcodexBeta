@@ -193,8 +193,13 @@ export const profileService = {
         `https://ui-avatars.com/api/?name=${encodeURIComponent(authUser.name || authUser.username || "U")}&background=random&size=128`,
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    window.dispatchEvent(new CustomEvent(UPDATE_EVENT, { detail: seeded }));
+    const current = localStorage.getItem(STORAGE_KEY);
+    const hasChange = current !== JSON.stringify(seeded);
+
+    if (hasChange) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+      window.dispatchEvent(new CustomEvent(UPDATE_EVENT, { detail: seeded }));
+    }
   },
 
   /** Clear profile data on logout */
@@ -242,6 +247,14 @@ export const profileService = {
 
   updateProfile(updates: Partial<UserProfile>) {
     const current = this.getProfile();
+    
+    // Simple equality check to prevent infinite loops from redundant updates
+    const hasChange = Object.entries(updates).some(([key, value]) => {
+      return JSON.stringify(current[key as keyof UserProfile]) !== JSON.stringify(value);
+    });
+
+    if (!hasChange) return;
+
     const updated = { ...current, ...updates };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent(UPDATE_EVENT, { detail: updated }));

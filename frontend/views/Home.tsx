@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ContinueWorkspaces from "../components/home/ContinueWorkspaces";
 import { api } from "../services/infra/api";
@@ -90,21 +90,27 @@ const HomeView = () => {
     return visitCount < 5; 
   });
 
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     const fetchRepos = async () => {
       setLoadingRepos(true);
       try {
         const data = await api.repositories.list();
         setRepos(data);
       } catch (err) {
-        console.error("Failed to fetch repos", err);
+        console.warn("[HomeView] Failed to fetch repos", err);
       } finally {
         setLoadingRepos(false);
       }
     };
     fetchRepos();
 
-    const visitCount = parseInt(localStorage.getItem("homeVisitCount") || "0");
+    const visitCountStr = localStorage.getItem("homeVisitCount") || "0";
+    const visitCount = parseInt(visitCountStr);
     localStorage.setItem("homeVisitCount", (visitCount + 1).toString());
   }, []);
 

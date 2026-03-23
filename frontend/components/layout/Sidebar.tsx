@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSidebarState } from "../../hooks/useSidebarState";
-import { profileService, UserProfile } from "../../services/activity/profile";
 import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
+import { UserProfile } from "../../services/activity/profile";
 import SidebarItem from "./SidebarItem";
 import { isAdmin as checkIsAdmin } from "../auth/AccessMatrix";
 
@@ -87,16 +88,8 @@ const OrgSwitcher = ({
 const Sidebar = () => {
   const { isExpanded, toggleSidebar, setIsExpanded } = useSidebarState();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<UserProfile>(
-    profileService.getProfile(),
-  );
-
-  // Hooks
+  const { profile } = useProfile();
   const isAdmin = checkIsAdmin(profile.systemRole);
-
-  useEffect(() => {
-    return profileService.subscribe(setProfile);
-  }, []);
 
   // Listen for hamburger click from the top nav
   useEffect(() => {

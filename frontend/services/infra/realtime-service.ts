@@ -16,20 +16,21 @@ class RealtimeService {
   private workspaceId: string | null = null;
 
   connect(userId: string, workspaceId?: string) {
-    if (this.socket?.connected && this.userId === userId) return;
+    if (this.socket && this.userId === userId && this.workspaceId === (workspaceId || null)) return;
 
     this.userId = userId;
     this.workspaceId = workspaceId || null;
 
-    // Use centralized API_URL, fallback to location.origin for relative calls, 
-    // Fallback to production API URL if API_URL env is missing
-    const host = API_URL || "https://api.trackcodex.com";
+    if (this.socket) {
+      this.socket.disconnect();
+    }
 
-    console.log(`🔌 Connecting to Realtime via Socket.io: ${host}`);
+    const host = API_URL || "https://api.trackcodex.com";
+    console.log(`🔌 Connecting to Realtime: ${host}`);
 
     this.socket = io(host, {
       query: { userId, workspaceId },
-      transports: ["polling", "websocket"], // Allow polling fallback if websocket fails
+      transports: ["polling", "websocket"],
       withCredentials: true,
       reconnectionAttempts: 3,
       reconnectionDelay: 3000,
@@ -37,7 +38,7 @@ class RealtimeService {
     });
 
     this.socket.on("connect", () => {
-      console.log("✅ Realtime connection established via Socket.io");
+      console.log("✅ Realtime connection established");
       this.notify({ type: "CONNECTION_OPEN" });
     });
 
@@ -47,14 +48,8 @@ class RealtimeService {
     });
 
     this.socket.on("connect_error", (err) => {
-      // Silently handle connection errors to prevent console spam
-      console.warn("⚠️ Realtime connection error (will retry):", err.message);
+      console.warn("⚠️ Realtime connection error:", err.message);
     });
-
-    // Handle generic events from backend
-    // Since our backend emits events by their 'type', we need to capture those.
-    // However, Socket.io usually expects specific listeners.
-    // For our specific use cases, we'll listen for known types and forward them.
 
     const forwardEvent = (type: string) => {
       this.socket?.on(type, (data) => {

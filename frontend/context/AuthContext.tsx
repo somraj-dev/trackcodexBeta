@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../services/activity/profile";
 import { auth, isFirebaseConfigured } from "../lib/firebase";
@@ -31,6 +31,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  hasSettled: boolean;
   login: (userData: User, csrfToken: string) => void;
   logout: () => void;
   csrfToken: string | null;
@@ -44,22 +45,34 @@ export const api = apiInstance;
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    // Restore from localStorage on first render (needed when Firebase is not configured)
+  const [authState, setAuthState] = useState<{
+    user: User | null;
+    isLoading: boolean;
+    hasSettled: boolean;
+  }>(() => {
+    // Restore from localStorage on first render
     try {
       const stored = localStorage.getItem("trackcodex_user");
-      return stored ? (JSON.parse(stored) as User) : null;
+      const user = stored ? (JSON.parse(stored) as User) : null;
+      return {
+        user,
+        isLoading: true,
+        hasSettled: false
+      };
     } catch {
-      return null;
+      return { user: null, isLoading: true, hasSettled: false };
     }
   });
+
   const [csrfToken, setCsrfToken] = useState<string | null>(
     () => localStorage.getItem("trackcodex_csrf_token") || null
   );
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Sync CSRF token to localStorage for the axios interceptor in api.ts
+  const { user, isLoading, hasSettled } = authState;
+  
+
+  // Sync CSRF token to localStorage
   useEffect(() => {
     if (csrfToken) {
       localStorage.setItem("trackcodex_csrf_token", csrfToken);
@@ -68,25 +81,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [csrfToken]);
 
-  // Firebase Auth Listener
+  console.log("[DEBUG] AuthProvider render", { 
+    userId: user?.id, 
+    isLoading, 
+    hasSettled,
+    isFirebaseConfigured
+  });
+
+  const hasInitializedAuth = useRef(false);
+
   useEffect(() => {
+    if (hasInitializedAuth.current) return;
+    hasInitializedAuth.current = true;
+
     let isMounted = true;
 
     // Safety net: Force loading to false after 10 seconds
     const loadingTimeout = setTimeout(() => {
-      if (isMounted && isLoading) {
+      if (isMounted && authState.isLoading) {
         console.warn("[AuthContext] Auth initialization timed out after 10s");
-        setIsLoading(false);
+        setAuthState(prev => ({ ...prev, isLoading: false, hasSettled: true }));
       }
     }, 10000);
 
-    // If Firebase isn't configured (no env keys), bypass the listener entirely
     if (!isFirebaseConfigured) {
       console.warn("Bypassing Firebase Auth Context listener - Missing API Keys");
 
-      // DEV-ONLY: Auto-login with a mock user when running locally
       const isDev = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      if (isDev && !user) {
+      if (isDev && !authState.user) {
         const devUser: User = {
           id: "dev-user-001",
           email: "dev@trackcodex.com",
@@ -96,25 +118,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           role: "admin",
         };
         console.info("[AuthContext] DEV MODE: Auto-logging in as mock user");
-        setUser(devUser);
+        setAuthState({ user: devUser, isLoading: false, hasSettled: true });
         try {
           localStorage.setItem("trackcodex_user", JSON.stringify(devUser));
         } catch { /* ignore */ }
         profileService.initFromAuth(devUser);
+      } else {
+        setAuthState(prev => ({ ...prev, isLoading: false, hasSettled: true }));
       }
-
-      // User already restored from localStorage in useState initializer above
-      if (isMounted) setIsLoading(false);
       clearTimeout(loadingTimeout);
       return;
     }
 
-    // Listen for Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (!isMounted) return;
 
       if (firebaseUser) {
-        // Map Firebase user to our User interface
         const mappedUser: User = {
           id: firebaseUser.uid,
           email: firebaseUser.email || "",
@@ -123,36 +142,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           avatar: firebaseUser.photoURL || "",
           role: "user",
         };
-        setUser(mappedUser);
+        
+        setAuthState(prev => {
+          const isSameUser = prev.user?.id === mappedUser.id;
+          if (isSameUser && !prev.isLoading && prev.hasSettled) return prev;
+          return {
+            user: isSameUser ? prev.user : mappedUser,
+            isLoading: false,
+            hasSettled: true
+          };
+        });
         profileService.initFromAuth(mappedUser);
 
-        // Sync user to PostgreSQL backend immediately (using apiInstance for auto-token)
-        try {
-          apiInstance.post("/auth/sync").then((res) => {
-            if (res.data?.csrfToken && isMounted) {
-              setCsrfToken(res.data.csrfToken);
-            }
-          }).catch((err) => console.error("Failed to sync user to database:", err));
-
-          // Check provider data for GitHub/Google
-          for (const providerData of firebaseUser.providerData) {
-            if (providerData.providerId === "github.com") {
-              const ghUsername = providerData.displayName || "";
-              if (ghUsername) {
-                localStorage.setItem("trackcodex_github_username", ghUsername);
-              }
-              // Persist to backend
-              apiInstance.post("/integrations/connect", { provider: "github", providerUsername: ghUsername }).catch(() => { });
-            }
+        apiInstance.post("/auth/sync").then((res) => {
+          if (res.data?.csrfToken && isMounted) {
+            setCsrfToken(res.data.csrfToken);
           }
-        } catch {
-          // Non-critical
-        }
+        }).catch(() => {});
       } else {
-        setUser(null);
+        setAuthState(prev => (prev.user === null && !prev.isLoading && prev.hasSettled ? prev : { 
+          user: null, 
+          isLoading: false, 
+          hasSettled: true 
+        }));
         profileService.clearProfile();
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -163,39 +177,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = React.useCallback((userData: User, token: string) => {
-    setUser(userData);
+    setAuthState({ user: userData, isLoading: false, hasSettled: true });
     setCsrfToken(token);
-    // Persist so isAuthenticated survives navigation without Firebase
     try {
       localStorage.setItem("trackcodex_user", JSON.stringify(userData));
-    } catch { /* ignore quota errors */ }
+    } catch { /* ignore */ }
     profileService.initFromAuth(userData);
   }, []);
 
   const logout = React.useCallback(async () => {
     try {
-      // Best effort backend session termination
       await api.post("/auth/logout");
     } catch (err) {
       console.error("Backend logout failed", err);
     } finally {
-      // Guarantee local Firebase session is destroyed NO MATTER WHAT
       try {
         await firebaseSignOut(auth);
       } catch (fbErr) {
         console.error("Firebase logout failed", fbErr);
       }
 
-      setUser(null);
+      setAuthState({ user: null, isLoading: false, hasSettled: true });
       setCsrfToken(null);
       localStorage.removeItem("trackcodex_user");
       localStorage.removeItem("trackcodex_github_username");
       localStorage.removeItem("redirect_after_login");
       profileService.clearProfile();
-      navigate("/", { replace: true }); // Changed from window.location.href to navigate
+      navigate("/", { replace: true });
     }
   }, [navigate]);
-
 
   const getIdToken = React.useCallback(async (): Promise<string | null> => {
     try {
@@ -203,7 +213,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (currentUser) {
         return await currentUser.getIdToken();
       }
-      // Fallback: try to get from localStorage token (session-based auth)
       return localStorage.getItem("trackcodex_auth_token") || null;
     } catch (err) {
       console.error("[AuthContext] Failed to get ID token:", err);
@@ -215,11 +224,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     user,
     isAuthenticated: !!user,
     isLoading,
+    hasSettled,
     login,
     logout,
     csrfToken,
     getIdToken,
-  }), [user, isLoading, csrfToken, login, logout, getIdToken]);
+  }), [user, isLoading, hasSettled, csrfToken, login, logout, getIdToken]);
 
   return (
     <AuthContext.Provider value={value}>

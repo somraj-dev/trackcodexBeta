@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
+import { LoggedInProviders } from "./components/auth/LoggedInProviders";
 import { BrowserRouter, HashRouter } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import { NotificationProvider } from "./context/NotificationContext";
-import { RealtimeProvider } from "./contexts/RealtimeContext";
-import { MessagingProvider } from "./context/MessagingContext";
 import { CookieConsent } from "./components/legal/CookieConsent";
 import SplashScreen from "./components/branding/SplashScreen";
 import AppRoutes from "./AppRoutes";
 
 // Root-level Error Boundary for deployment updates
 class ChunkErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  state = { hasError: false };
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
   static getDerivedStateFromError(error: Error) {
     if (error.message.includes("imported module") || error.message.includes("Importing a module script failed")) return { hasError: true };
     throw error;
@@ -37,8 +38,10 @@ class ChunkErrorBoundary extends React.Component<{ children: React.ReactNode }, 
   }
 }
 
+
+
 const AppContent = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { hasSettled, isLoading, user } = useAuth();
 
   useEffect(() => {
     if (typeof (window as any).electron?.onAuthToken === "function") {
@@ -50,56 +53,46 @@ const AppContent = () => {
     }
   }, []);
 
-  if (isLoading) return <SplashScreen />;
+  // Only show initial splash if we haven't settled yet
+  if (!hasSettled || isLoading) return <SplashScreen />;
 
-  return (
+  const content = (
     <ChunkErrorBoundary>
-      <React.Suspense fallback={<SplashScreen />}>
+      <Suspense fallback={null}>
         <AppRoutes />
         <CookieConsent />
-      </React.Suspense>
+      </Suspense>
     </ChunkErrorBoundary>
   );
+
+  return user ? <LoggedInProviders>{content}</LoggedInProviders> : content;
 };
 
-import { AppDataProvider } from "./context/AppDataContext";
-
-const AppWithProviders = () => {
-  const { user, isAuthenticated } = useAuth();
-  return (
-    <NotificationProvider>
-      <AppDataProvider>
-        {isAuthenticated && user ? (
-          <RealtimeProvider userId={user.id}>
-            <MessagingProvider><AppContent /></MessagingProvider>
-          </RealtimeProvider>
-        ) : (
-          <AppContent />
-        )}
-      </AppDataProvider>
-    </NotificationProvider>
-  );
+const ROUTER_FUTURE_CONFIG = {
+  v7_startTransition: false,
+  v7_relativeSplatPath: true,
 };
+
+const isElectron = typeof window !== 'undefined' && (window.navigator.userAgent.toLowerCase().includes('electron') || window.location.protocol === 'file:');
+const Router = isElectron ? HashRouter : BrowserRouter;
 
 const App = () => {
-  const isElectron = window.navigator.userAgent.toLowerCase().includes('electron') || window.location.protocol === 'file:';
-  const Router = isElectron ? HashRouter : BrowserRouter;
-
   useEffect(() => {
     if (!isElectron && window.location.hash.startsWith('#/')) {
       const cleanPath = window.location.hash.substring(2);
       window.history.replaceState(null, '', `/${cleanPath}`);
     }
-  }, [isElectron]);
+  }, []);
 
   return (
     <ThemeProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AuthProvider><AppWithProviders /></AuthProvider>
+      <Router future={ROUTER_FUTURE_CONFIG}>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );
 };
 
 export default App;
-
