@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { profileService, UserProfile } from "../../services/activity/profile";
+import { useAppData } from "../../context/AppDataContext";
 import SkillRadarChart from "../../components/radar/SkillRadarChart";
 import SkillBreakdown from "../../components/radar/SkillBreakdown";
 
 
 const Portfolio = () => {
+    const navigate = useNavigate();
     const [profile] = useState<UserProfile | null>(() => profileService.getProfile());
     const [activeTab, setActiveTab] = useState<"featured" | "all">("featured");
     const [skills] = useState([
@@ -16,9 +19,11 @@ const Portfolio = () => {
         { name: "Python", icon: "code", category: "language" },
     ]);
 
+    const { projects: dashboardProjects } = useAppData();
+
     const [projects] = useState([
         {
-            id: 1,
+            id: 'local1',
             title: "Discord's Coaching",
             description: "A Notion session for team management in Notion.",
             category: "Coaching",
@@ -26,7 +31,7 @@ const Portfolio = () => {
             featured: true,
         },
         {
-            id: 2,
+            id: 'local2',
             title: "Ali Abdaal's Workspace",
             description: "A Notion workspace for business and content management.",
             category: "Notion Workspace",
@@ -34,6 +39,20 @@ const Portfolio = () => {
             featured: true,
         },
     ]);
+
+    const displayedProjects = activeTab === "featured"
+        ? projects.filter(p => p.featured)
+        : [
+            ...projects,
+            ...dashboardProjects.map(p => ({
+                id: p.id,
+                title: p.name,
+                description: p.commitMsg || `TrackCodex Dashboard Project - ${p.repoUrl}`,
+                category: "Dashboard Project",
+                image: "/api/placeholder/400/300",
+                featured: false,
+            }))
+        ];
 
     return (
         <div className="flex-1 w-full bg-gh-bg text-gh-text p-8">
@@ -111,7 +130,10 @@ const Portfolio = () => {
                         ))}
                     </div>
 
-                    <button className="flex items-center gap-2 px-4 py-2 text-sm text-gh-text-secondary hover:text-gh-text transition-colors">
+                    <button 
+                        onClick={() => navigate("/portfolio/new")}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gh-text-secondary hover:text-gh-text transition-colors"
+                    >
                         <span className="material-symbols-outlined !text-[16px]">add</span>
                         New
                     </button>
@@ -212,35 +234,35 @@ const Portfolio = () => {
 
                     {/* Projects Grid */}
                     <div className="grid grid-cols-2 gap-6 mb-4">
-                        {projects.map((project) => (
+                        {displayedProjects.map((project) => (
                             <div
                                 key={project.id}
-                                className="bg-gh-bg-secondary border border-gh-border rounded-lg overflow-hidden hover:border-blue-500 transition-colors cursor-pointer group"
+                                className="bg-gh-bg-secondary border border-gh-border rounded-lg overflow-hidden hover:border-blue-500 transition-colors cursor-pointer group flex flex-col"
                             >
                                 {/* Project Image */}
-                                <div className="aspect-video bg-gh-bg-tertiary flex items-center justify-center relative overflow-hidden">
+                                <div className="aspect-video bg-[#F3F4F6] dark:bg-gh-bg-tertiary flex items-center justify-center relative overflow-hidden">
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <svg className="w-24 h-24 text-gh-border" fill="currentColor" viewBox="0 0 100 100">
+                                        <svg className="w-24 h-24 text-gray-200 dark:text-gh-border" fill="currentColor" viewBox="0 0 100 100">
                                             <text x="50" y="50" textAnchor="middle" dominantBaseline="middle" fontSize="48" fontWeight="bold">
                                                 N
                                             </text>
                                         </svg>
                                     </div>
-                                    <span className="text-6xl font-bold text-gh-border relative z-10">Notion</span>
+                                    <span className="text-6xl font-bold text-gray-200 dark:text-gh-border relative z-10">Notion</span>
                                 </div>
 
                                 {/* Project Info */}
-                                <div className="p-4">
+                                <div className="p-4 bg-white dark:bg-gh-bg-secondary flex-1">
                                     <div className="flex items-start gap-2 mb-2">
-                                        <span className="material-symbols-outlined !text-[16px] text-gh-text-secondary mt-0.5">
+                                        <span className="material-symbols-outlined !text-[16px] text-gray-500 dark:text-gh-text-secondary mt-0.5">
                                             folder
                                         </span>
                                         <div className="flex-1">
-                                            <h3 className="font-semibold text-gh-text group-hover:text-blue-500 transition-colors">
+                                            <h3 className="font-semibold text-gray-900 dark:text-gh-text group-hover:text-blue-500 transition-colors">
                                                 {project.title}
                                             </h3>
-                                            <p className="text-sm text-gh-text-secondary mt-1">{project.description}</p>
-                                            <p className="text-xs text-gh-text-secondary mt-2">{project.category}</p>
+                                            <p className="text-sm text-gray-600 dark:text-gh-text-secondary mt-1">{project.description}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gh-text-secondary mt-2">{project.category}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -248,7 +270,10 @@ const Portfolio = () => {
                         ))}
                     </div>
 
-                    <button className="flex items-center gap-2 px-4 py-2 text-sm text-gh-text-secondary hover:text-gh-text transition-colors">
+                    <button 
+                        onClick={() => navigate("/portfolio/new")}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gh-text-secondary hover:text-gh-text transition-colors"
+                    >
                         <span className="material-symbols-outlined !text-[16px]">add</span>
                         New
                     </button>

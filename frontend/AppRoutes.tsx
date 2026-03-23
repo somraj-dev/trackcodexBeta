@@ -35,6 +35,7 @@ const WorkspacesView = React.lazy(() => import("./views/workspace/Workspaces"));
 const CreateWorkspaceView = React.lazy(() => import("./views/workspace/CreateWorkspace"));
 const PublicProfile = React.lazy(() => import("./views/profile/PublicProfile"));
 const Portfolio = React.lazy(() => import("./views/profile/Portfolio"));
+const PortfolioNew = React.lazy(() => import("./views/profile/PortfolioNew"));
 const ReviewMode = React.lazy(() => import("./views/editor/ReviewMode"));
 const VSCodeWorkspaceView = React.lazy(() => import("./views/ide/VSCodeWorkspaceView"));
 const HomeView = React.lazy(() => import("./views/Home"));
@@ -118,6 +119,15 @@ const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDe
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
 const CreateEventView = React.lazy(() => import("./views/marketplace/CreateEventView"));
 const MissionRegistrationView = React.lazy(() => import("./views/marketplace/MissionRegistrationView"));
+const HackathonsView = React.lazy(() => import("./views/marketplace/HackathonsView"));
+const TestAssessmentView = React.lazy(() => import("./views/marketplace/TestAssessmentView"));
+const TestResultView = React.lazy(() => import("./views/marketplace/TestResultView"));
+const CreateHackathonView = React.lazy(() => import("./views/marketplace/CreateHackathonView"));
+
+// Events (Marketplace)
+const EventsView = React.lazy(() => import("./views/marketplace/EventsView"));
+const EventDetailView = React.lazy(() => import("./views/marketplace/EventDetailView"));
+const EventRegistrationView = React.lazy(() => import("./views/marketplace/EventRegistrationView"));
 
 // Onboarding
 const WelcomeView = React.lazy(() => import("./views/onboarding/WelcomeView"));
@@ -242,6 +252,7 @@ const AppRoutes = React.memo(() => {
             <Route path="/profile" element={<Navigate to={`/profile/${user?.username || "me"}`} replace />} />
             <Route path="/profile/:username" element={<ProfileWrapper />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/new" element={<PortfolioNew />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/notifications" element={<NotificationsView />} />
             <Route path="/messages" element={<MessagesView />} />
@@ -267,12 +278,19 @@ const AppRoutes = React.memo(() => {
             <Route path="/marketplace/missions/new/event" element={<CreateEventView />} />
             <Route path="/marketplace/missions/:id" element={<MissionDetailView />} />
             <Route path="/marketplace/missions/:id/register" element={<MissionRegistrationView />} />
+            <Route path="/marketplace/hackathons/new" element={<CreateHackathonView />} />
+            <Route path="/marketplace/hackathons/:id/test" element={<TestAssessmentView />} />
+            <Route path="/marketplace/hackathons/:id/results" element={<TestResultView />} />
+            <Route path="/marketplace/events/:id" element={<EventDetailView />} />
+            <Route path="/marketplace/events/:id/register" element={<EventRegistrationView />} />
 
             {/* Marketplace */}
             <Route path="/marketplace" element={<MarketplaceLayout />}>
               <Route index element={<Navigate to="missions" replace />} />
 
               <Route path="missions" element={<MissionsView />} />
+              <Route path="hackathons" element={<HackathonsView />} />
+              <Route path="events" element={<EventsView />} />
               <Route path="applications" element={<MyApplicationsView />} />
             </Route>
 
