@@ -16,7 +16,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "build:backend": "npx prisma generate --schema=backend/schema.prisma && node scripts/build-backend.js",
-    "start:backend": "node dist-backend/index.js",
+    "start:backend": "npx prisma db push --schema=backend/schema.prisma --accept-data-loss && node dist-backend/index.js",
     "build:electron": "esbuild electron/main.ts electron/preload.ts --bundle --platform=node --format=esm --outdir=dist-electron --external:electron",
     "electron:dev": "npm run build:electron && electron dist-electron/main.js",
     "build:vscode": "node scripts/build-vscode-web.js",
