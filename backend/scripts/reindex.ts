@@ -1,67 +1,47 @@
 import { prisma } from "../services/infra/prisma";
-import { ensureIndexExists, indexDocument } from "../services/infra/elasticsearch";
+import { meilisearchClient, ensureIndexExists, indexDocuments } from "../services/infra/meilisearch";
 
 /**
- * Migration script to perform a full sync from RDS to OpenSearch.
+ * Migration script to perform a full sync from Postgres to Meilisearch.
  * Handles Users, Repositories, Jobs, and Workspaces.
  */
 async function reindexAll() {
-    console.warn("🚀 [Reindex] Starting full OpenSearch synchronization...");
+    console.warn("🚀 [Reindex] Starting full Meilisearch synchronization...");
 
-    const entities = [
-        {
-            name: "users",
-            model: prisma.user,
-            index: "trackcodex.users",
-            fields: { id: true, email: true, username: true, name: true, bio: true, avatar: true, location: true }
-        },
-        {
-            name: "repositories",
-            model: prisma.repository,
-            index: "trackcodex.repositories",
-            fields: { id: true, name: true, description: true, language: true, stars: true }
-        },
-        {
-            name: "jobs",
-            model: prisma.job,
-            index: "trackcodex.jobs",
-            fields: { id: true, title: true, description: true, type: true, budget: true }
-        },
-        {
-            name: "workspaces",
-            model: prisma.workspace,
-            index: "trackcodex.workspaces",
-            fields: { id: true, name: true, description: true, status: true }
-        }
-    ];
+    // ── Sync Users ──
+    console.log(`⏳ [Reindex] Syncing Users...`);
+    await ensureIndexExists("trackcodex.users", "id");
+    const users = await prisma.user.findMany({
+        where: { deletedAt: null, accountLocked: false, isPrivate: false, username: { not: null } },
+        select: { id: true, email: true, username: true, name: true, avatar: true, role: true }
+    });
+    // Configure searchable attributes
+    await meilisearchClient.index("trackcodex.users").updateSearchableAttributes(["username", "name", "bio"]);
+    await indexDocuments("trackcodex.users", users);
+    console.log(`✅ [Reindex] Completed Users (${users.length} indexed).`);
 
-    for (const entity of entities) {
-        console.log(`⏳ [Reindex] Syncing ${entity.name}...`);
+    // ── Sync Repositories ──
+    console.log(`⏳ [Reindex] Syncing Repositories...`);
+    await ensureIndexExists("trackcodex.repositories", "id");
+    const repos = await prisma.repository.findMany({
+        select: { id: true, name: true, description: true, language: true, stars: true, visibility: true, owner: { select: { username: true } } }
+    });
+    await meilisearchClient.index("trackcodex.repositories").updateSearchableAttributes(["name", "description", "owner.username", "language"]);
+    await meilisearchClient.index("trackcodex.repositories").updateFilterableAttributes(["visibility"]);
+    await indexDocuments("trackcodex.repositories", repos);
+    console.log(`✅ [Reindex] Completed Repositories (${repos.length} indexed).`);
 
-        // 1. Ensure index exists
-        await ensureIndexExists(entity.index);
+    // ── Sync Workspaces ──
+    console.log(`⏳ [Reindex] Syncing Workspaces...`);
+    await ensureIndexExists("trackcodex.workspaces", "id");
+    const workspaces = await prisma.workspace.findMany({
+        select: { id: true, name: true, description: true, status: true }
+    });
+    await meilisearchClient.index("trackcodex.workspaces").updateSearchableAttributes(["name", "description"]);
+    await indexDocuments("trackcodex.workspaces", workspaces);
+    console.log(`✅ [Reindex] Completed Workspaces (${workspaces.length} indexed).`);
 
-        // 2. Fetch all from DB
-        const records = await (entity.model as any).findMany({
-            select: entity.fields
-        });
-
-        console.log(`📦 [Reindex] Found ${records.length} ${entity.name}. Indexing...`);
-
-        // 3. Index in batches
-        for (const record of records) {
-            try {
-                // We wrap in a 'payload' object to match the Debezium format expected by searchRoutes.ts
-                await indexDocument(entity.index, record.id, { payload: record });
-            } catch (err: any) {
-                console.error(`❌ [Reindex] Failed to index ${entity.name} ID: ${record.id}`, err.message);
-            }
-        }
-
-        console.log(`✅ [Reindex] Completed ${entity.name}.`);
-    }
-
-    console.log("🏁 [Reindex] Full synchronization complete!");
+    console.log("🏁 [Reindex] Full Meilisearch synchronization complete!");
 }
 
 reindexAll()

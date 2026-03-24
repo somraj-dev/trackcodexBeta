@@ -1,14 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import { indexDocuments } from '../services/infra/meilisearch';
 
 const prisma = new PrismaClient();
-const ELASTICSEARCH_URL = process.env.ELASTICSEARCH_URL || 'https://bumpy-snakes-guess.loca.lt';
 
 /**
  * The Outbox Worker polls the OutboxEvent table for unprocessed events,
- * and inserts them directly into Elasticsearch.
+ * and inserts them into Meilisearch for real-time search indexing.
  */
 export async function startOutboxWorker() {
-    console.log(`[Outbox Worker] Starting ES-only outbox worker. Target: ${ELASTICSEARCH_URL}`);
+    console.log(`[Outbox Worker] Starting Meilisearch outbox worker.`);
 
     // Poll every 5 seconds
     setInterval(async () => {
@@ -34,43 +34,13 @@ async function processOutboxEvents() {
 
     for (const event of events) {
         try {
-            // 1. Send to Elasticsearch directly
+            // 1. Send to Meilisearch
             if (event.topic !== "UPDATE_USER_COUNTERS") {
                 const indexName = event.topic;
                 const payload = event.payload as any;
-                const esHeaders = {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Bypass-Tunnel-Reminder': 'true',
-                    'User-Agent': 'trackcodex-backend'
-                };
 
-                let esRes;
                 if (payload && payload.id) {
-                    esRes = await fetch(`${ELASTICSEARCH_URL}/${indexName}/_doc/${payload.id.toString()}`, {
-                        method: 'PUT',
-                        headers: esHeaders,
-                        body: JSON.stringify({
-                            payload: payload,
-                            eventType: event.topic,
-                            timestamp: event.createdAt
-                        })
-                    });
-                } else {
-                    esRes = await fetch(`${ELASTICSEARCH_URL}/${indexName}/_doc`, {
-                        method: 'POST',
-                        headers: esHeaders,
-                        body: JSON.stringify({
-                            payload: payload,
-                            eventType: event.topic,
-                            timestamp: event.createdAt
-                        })
-                    });
-                }
-
-                if (!esRes.ok) {
-                    const text = await esRes.text();
-                    throw new Error(`Elasticsearch error ${esRes.status}: ${text}`);
+                    await indexDocuments(indexName, payload);
                 }
             } else {
                 // 1b. Handle User Counter Updates
@@ -100,7 +70,7 @@ async function processOutboxEvents() {
             await prisma.outboxEvent.update({
                 where: { id: event.id },
                 data: { 
-                    error: err.message || 'Unknown error during ES publish',
+                    error: err.message || 'Unknown error during Meilisearch publish',
                     // Set processed to true so we don't infinitely block the queue on one poisoned event
                     processed: true 
                 }
@@ -108,6 +78,3 @@ async function processOutboxEvents() {
         }
     }
 }
-
-
-

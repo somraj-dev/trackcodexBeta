@@ -1,4 +1,5 @@
 import { prisma } from "../infra/prisma";
+import { meilisearchClient } from "./meilisearch";
 
 // Shared prisma instance
 
@@ -31,7 +32,7 @@ interface SearchResult {
 
 export const searchService = {
   /**
-   * Global search across users and repositories
+   * Global search across users and repositories using Meilisearch
    */
   async globalSearch(
     query: string,
@@ -52,78 +53,37 @@ export const searchService = {
       };
     }
 
-    // Search users/organizations
-    const owners = await prisma.user.findMany({
-      where: {
-        AND: [
-          { deletedAt: null },
-          { accountLocked: false },
-          { isPrivate: false },
-          { username: { not: null } }
-        ],
-        OR: [
-          { username: { contains: trimmedQuery, mode: "insensitive" } },
-          { name: { contains: trimmedQuery, mode: "insensitive" } },
-        ],
-      },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        avatar: true,
-        role: true,
-      },
-      take: limit,
-    });
+    try {
+      // Search users and repositories concurrently in Meilisearch
+      const [ownersResult, reposResult] = await Promise.all([
+        meilisearchClient.index('trackcodex.users').search(trimmedQuery, { limit }),
+        meilisearchClient.index('trackcodex.repositories').search(trimmedQuery, { limit, filter: "visibility = 'public'" })
+      ]);
 
-    // Search repositories
-    const repositories = await prisma.repository.findMany({
-      where: {
-        OR: [
-          { name: { contains: trimmedQuery, mode: "insensitive" } },
-          { description: { contains: trimmedQuery, mode: "insensitive" } },
-        ],
-        visibility: "public", // Only public repos in global search
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        visibility: true,
-        stars: true,
-        language: true,
-        owner: {
-          select: {
-            username: true,
-          },
-        },
-      },
-      take: limit,
-      orderBy: {
-        stars: "desc",
-      },
-    });
-
-    return {
-      owners: owners.map((user) => ({
-        id: user.id,
-        username: user.username || "",
-        name: user.name || "",
-        avatar: user.avatar,
-        type: user.role === "organization" ? "organization" : "user",
-      })),
-      repositories: repositories.map((repo) => ({
-        id: repo.id,
-        name: repo.name,
-        fullName: `${repo.owner?.username || "unknown"}/${repo.name}`,
-        owner: repo.owner?.username || "unknown",
-        description: repo.description,
-        visibility: repo.visibility,
-        stars: repo.stars,
-        language: repo.language,
-      })),
-      recent: [],
-    };
+      return {
+        owners: ownersResult.hits.map((hit: any) => ({
+          id: hit.id,
+          username: hit.username || "",
+          name: hit.name || "",
+          avatar: hit.avatar,
+          type: hit.role === "organization" ? "organization" : "user",
+        })),
+        repositories: reposResult.hits.map((hit: any) => ({
+          id: hit.id,
+          name: hit.name,
+          fullName: `${hit.owner?.username || "unknown"}/${hit.name}`,
+          owner: hit.owner?.username || "unknown",
+          description: hit.description,
+          visibility: hit.visibility || "public",
+          stars: hit.stars || 0,
+          language: hit.language,
+        })),
+        recent: [],
+      };
+    } catch (error) {
+      console.error("[Meilisearch] Global search failed, falling back to empty:", error);
+      return { owners: [], repositories: [], recent: [] };
+    }
   },
 
   /**

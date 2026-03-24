@@ -640,7 +640,7 @@ async function bootstrap() {
             console.warn("---------------------------------------");
         }
 
-        // 14. Start the Background Outbox Poller for Elasticsearch Sync
+        // 14. Start the Background Outbox Poller for Meilisearch Sync
         startOutboxWorker();
         console.warn("📨 [Worker] Outbox daemon started for Kafka synchronization.");
 

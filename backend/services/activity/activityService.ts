@@ -29,7 +29,7 @@ export class ActivityService {
         },
       });
 
-      // 2. Queue it for Elasticsearch mapping via the Outbox Worker
+      // 2. Queue it for Meilisearch mapping via the Outbox Worker
       await tx.outboxEvent.create({
         data: {
           topic: "activity", // Matches the indexName the ES Service expects

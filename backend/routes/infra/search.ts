@@ -2,121 +2,61 @@ import { FastifyInstance } from "fastify";
 import { prisma } from "../../services/infra/prisma";
 import { requireAuth } from "../../middleware/auth";
 import { searchService } from "../../services/infra/searchService";
-
-// Only use ES when explicitly configured (not the placeholder/tunnel URL)
-const ELASTICSEARCH_URL = (() => {
-  const url = process.env.ELASTICSEARCH_URL || "";
-  if (!url || url.includes("loca.lt") || url.includes("placeholder")) return null;
-  return url;
-})();
+import { meilisearchClient } from "../../services/infra/meilisearch";
 
 /**
- * Try to search via ElasticSearch. Returns results array or throws on failure.
- * Uses a 3-second timeout so we don't block the user if ES is down.
+ * Try to search via Meilisearch. Returns results array or throws on failure.
  */
-async function tryElasticSearch(query: string): Promise<any[]> {
-  if (!ELASTICSEARCH_URL) throw new Error("ES not configured");
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+async function tryMeilisearch(query: string): Promise<any[]> {
+  const [usersRes, reposRes, workspacesRes] = await Promise.all([
+    meilisearchClient.index('trackcodex.users').search(query, { limit: 5 }),
+    meilisearchClient.index('trackcodex.repositories').search(query, { limit: 5, filter: "visibility = 'public'" }),
+    meilisearchClient.index('trackcodex.workspaces').search(query, { limit: 3 }),
+  ]);
 
-  try {
-    const indicesString = "*users,*repositories,*jobs,*workspaces";
-    const esRes = await fetch(`${ELASTICSEARCH_URL}/${indicesString}/_search`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Bypass-Tunnel-Reminder": "true",
-        "User-Agent": "trackcodex-backend",
+  const results: any[] = [];
+
+  usersRes.hits.forEach((hit: any) => {
+    results.push({
+      id: `user-${hit.id}`,
+      type: "user",
+      label: hit.name || hit.username || "User",
+      subLabel: hit.username ? `@${hit.username}` : undefined,
+      icon: "person",
+      group: "People",
+      url: `/profile/${hit.username}`,
+      metadata: {
+        avatar: hit.avatar,
+        username: hit.username,
       },
-      signal: controller.signal,
-      body: JSON.stringify({
-        query: {
-          multi_match: {
-            query,
-            fields: [
-              "payload.name^3",
-              "payload.username^2",
-              "payload.email^2",
-              "payload.title^3",
-              "payload.description",
-            ],
-            fuzziness: "AUTO",
-          },
-        },
-        size: 20,
-      }),
     });
+  });
 
-    if (!esRes.ok) {
-      throw new Error(`ES error ${esRes.status}`);
-    }
-
-    const result = await esRes.json();
-    const hits = result.hits?.hits || [];
-
-    if (hits.length === 0) return [];
-
-    const results: any[] = [];
-
-    hits.forEach((hit: any) => {
-      const source = hit._source?.payload || hit._source;
-      const indexName = hit._index;
-
-      if (indexName.includes("users")) {
-        results.push({
-          id: `user-${source.id}`,
-          type: "user",
-          label: source.name || source.username || "User",
-          subLabel: source.username ? `@${source.username}` : undefined,
-          icon: "person",
-          group: "People",
-          url: `/profile/${source.username}`,
-          metadata: {
-            avatar: source.avatar,
-            bio: source.bio,
-            location: source.location,
-            followersCount: source.followersCount || 0,
-            username: source.username,
-          },
-        });
-      } else if (indexName.includes("repositories")) {
-        results.push({
-          id: `repo-${source.id}`,
-          type: "repo",
-          label: source.name,
-          subLabel: source.description,
-          icon: "book",
-          group: "Repositories",
-          url: `/repo/${source.id}`,
-        });
-      } else if (indexName.includes("jobs")) {
-        results.push({
-          id: `job-${source.id}`,
-          type: "job",
-          label: source.title,
-          subLabel: `${source.type || "Job"} - ${source.budget || ""}`,
-          icon: "work",
-          group: "Jobs",
-          url: `/jobs/${source.id}`,
-        });
-      } else if (indexName.includes("workspaces")) {
-        results.push({
-          id: `ws-${source.id}`,
-          type: "workspace",
-          label: source.name,
-          subLabel: source.status,
-          icon: "terminal",
-          group: "Workspaces",
-          url: `/workspace/${source.id}`,
-        });
-      }
+  reposRes.hits.forEach((hit: any) => {
+    results.push({
+      id: `repo-${hit.id}`,
+      type: "repo",
+      label: hit.name,
+      subLabel: hit.description,
+      icon: "book",
+      group: "Repositories",
+      url: `/repo/${hit.id}`,
     });
+  });
 
-    return results;
-  } finally {
-    clearTimeout(timeout);
-  }
+  workspacesRes.hits.forEach((hit: any) => {
+    results.push({
+      id: `ws-${hit.id}`,
+      type: "workspace",
+      label: hit.name,
+      subLabel: hit.status,
+      icon: "terminal",
+      group: "Workspaces",
+      url: `/workspace/${hit.id}`,
+    });
+  });
+
+  return results;
 }
 
 // Shared prisma instance
@@ -138,21 +78,17 @@ export async function searchRoutes(fastify: FastifyInstance) {
       const query = q; // Prisma mode: "insensitive" handles the original case
 
       try {
-        // ── Strategy: Try ElasticSearch first, fallback to Prisma ──
-        if (ELASTICSEARCH_URL) {
-          try {
-            let esResults = await tryElasticSearch(q);
-            if (type) {
-              esResults = esResults.filter(
-                r => r.type === type || (type === "repositories" && r.type === "repo")
-              );
-            }
-            if (esResults.length > 0) return { results: esResults };
-          } catch (esError: any) {
-            request.log.warn({ error: esError.message }, "ElasticSearch fetch failed, falling back to Prisma");
+        // ── Strategy: Try Meilisearch first, fallback to Prisma ──
+        try {
+          let msResults = await tryMeilisearch(q);
+          if (type) {
+            msResults = msResults.filter(
+              r => r.type === type || (type === "repositories" && r.type === "repo")
+            );
           }
-        } else {
-          request.log.info("Skipping ElasticSearch (not configured or local tunnel), using Prisma");
+          if (msResults.length > 0) return { results: msResults };
+        } catch (msError: any) {
+          request.log.warn({ error: msError.message }, "Meilisearch fetch failed, falling back to Prisma");
         }
 
 
@@ -308,7 +244,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
     },
   );
 
-  // ── Dedicated User Search with Elasticsearch + Prisma fallback ──
+  // ── Dedicated User Search with Meilisearch + Prisma fallback ──
   // GET /api/v1/search/users?q=query&page=1&limit=20
   fastify.get(
     "/search/users",
@@ -330,61 +266,25 @@ export async function searchRoutes(fastify: FastifyInstance) {
       const q_lower = q.toLowerCase();
 
       try {
-        // ── 1. Try Elasticsearch first ──
-        if (ELASTICSEARCH_URL) {
-          try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 3000);
-            const esRes = await fetch(
-              `${ELASTICSEARCH_URL}/trackcodex.users/_search`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                  "Bypass-Tunnel-Reminder": "true",
-                  "User-Agent": "trackcodex-backend",
-                },
-                signal: controller.signal,
-                body: JSON.stringify({
-                  from: skip,
-                  size: limit,
-                  query: {
-                    multi_match: {
-                      query: q,
-                      fields: ["payload.name^3", "payload.username^2", "payload.bio", "payload.location"],
-                      fuzziness: "AUTO",
-                    },
-                  },
-                }),
-              }
-            );
-            clearTimeout(timeout);
+        // ── 1. Try Meilisearch first ──
+        try {
+          const msRes = await meilisearchClient.index('trackcodex.users').search(q, {
+            limit,
+            offset: skip,
+          });
 
-            if (esRes.ok) {
-              const result = await esRes.json();
-              const hits = result.hits?.hits || [];
-              const total = result.hits?.total?.value ?? hits.length;
-              if (hits.length > 0) {
-                const users = hits.map((hit: any) => {
-                  const src = hit._source?.payload || hit._source;
-                  return {
-                    id: src.id,
-                    name: src.name || src.username || "User",
-                    username: src.username,
-                    avatar: src.avatar,
-                    bio: src.bio,
-                    location: src.location,
-                    followersCount: src.followersCount || 0,
-                    url: `/profile/${src.username}`,
-                  };
-                });
-                return { users, total, source: "elasticsearch" };
-              }
-            }
-          } catch (esErr: any) {
-            request.log.warn({ error: esErr.message }, "[search/users] Elasticsearch failed, using Prisma fallback");
+          if (msRes.hits.length > 0) {
+            const users = msRes.hits.map((hit: any) => ({
+              id: hit.id,
+              name: hit.name || hit.username || "User",
+              username: hit.username,
+              avatar: hit.avatar,
+              url: `/profile/${hit.username}`,
+            }));
+            return { users, total: msRes.estimatedTotalHits || msRes.hits.length, source: "meilisearch" };
           }
+        } catch (msErr: any) {
+          request.log.warn({ error: msErr.message }, "[search/users] Meilisearch failed, using Prisma fallback");
         }
 
         // ── 2. Optimised Prisma fallback (Instagram-style) ──

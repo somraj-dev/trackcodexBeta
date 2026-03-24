@@ -47,10 +47,9 @@ const envSchema = z.object({
   // Frontend
   FRONTEND_URL: z.string().url().default("https://trackcodex.com"),
 
-  // OpenSearch (Elasticsearch)
-  ELASTICSEARCH_URL: z.string().url().optional(),
-  OPENSEARCH_USERNAME: z.string().optional(),
-  OPENSEARCH_PASSWORD: z.string().optional(),
+  // Meilisearch
+  MEILISEARCH_HOST: z.string().url().default("http://localhost:7700"),
+  MEILISEARCH_ADMIN_KEY: z.string().default("masterKey"),
 });
 
 // Parse and validate
