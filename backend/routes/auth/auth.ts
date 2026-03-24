@@ -1280,23 +1280,56 @@ export async function authRoutes(fastify: FastifyInstance) {
   );
 
   // Synchronize Firebase User with PostgreSQL
+  // NOTE: This does NOT use requireAuth because the user may not exist in the DB yet
+  // (chicken-and-egg: sync is what CREATES the DB record).
+  // Instead, we verify the Firebase JWT directly.
   fastify.post(
     "/auth/sync",
-    { preHandler: requireAuth },
     async (request, reply) => {
-      const user = (request as any).user;
       const ip = request.ip;
       const userAgent = request.headers["user-agent"] || "unknown";
 
       try {
-        // Use the robust sync service
+        // 1. Extract and verify Firebase JWT from Authorization header
+        const authHeader = request.headers.authorization;
+        if (!authHeader?.startsWith("Bearer ")) {
+          return reply.code(401).send({ error: "Unauthorized", message: "Missing Firebase token" });
+        }
+
+        const token = authHeader.substring(7);
+        if (!isFirebaseConfigured) {
+          return reply.code(503).send({ error: "Service Unavailable", message: "Firebase not configured" });
+        }
+
+        let decodedToken;
+        try {
+          decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+        } catch (verifyErr: any) {
+          console.error("[AUTH/SYNC] Firebase token verification failed:", verifyErr.message);
+          return reply.code(401).send({ error: "Unauthorized", message: "Invalid Firebase token" });
+        }
+
+        const firebaseUid = decodedToken.uid;
+
+        // 2. Get full Firebase user data for sync
+        let firebaseUser;
+        try {
+          firebaseUser = await firebaseAdmin.auth().getUser(firebaseUid);
+        } catch (getUserErr: any) {
+          console.error("[AUTH/SYNC] Failed to get Firebase user:", getUserErr.message);
+          return reply.code(500).send({ error: "Failed to fetch user from Firebase" });
+        }
+
+        // 3. Sync/create user in PostgreSQL
         const dbUser = await syncUserWithPostgres({
-          uid: user.userId,
-          email: user.email,
-          displayName: user.name, // Usually comes from Token if present
+          uid: firebaseUid,
+          email: firebaseUser.email || decodedToken.email,
+          displayName: firebaseUser.displayName || decodedToken.name,
+          avatarUrl: firebaseUser.photoURL,
+          emailVerified: firebaseUser.emailVerified,
         });
 
-        // 2. Create the Backend Session identical to Login flow
+        // 4. Create the Backend Session identical to Login flow
         const sessionId = crypto.randomUUID();
         const { csrfToken } = await createSession(
           sessionId,
@@ -1311,7 +1344,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           { ipAddress: ip, userAgent },
         );
 
-        // 3. Set the Cookie
+        // 5. Set the Cookie
         const isProduction = process.env.NODE_ENV === "production";
         reply.cookie("session_id", sessionId, {
           path: "/",
