@@ -15,7 +15,7 @@ const OrgEnvironments = () => {
         { key: 'STRIPE_SECRET_KEY', value: 'sk_test_****************', environment: 'Production', updated: '2m ago', isSecret: true },
         { key: 'NEXT_PUBLIC_API_URL', value: 'https://api.dev.trackcodex.com', environment: 'Staging', updated: '1d ago', isSecret: false },
         { key: 'REDIS_CACHE_URL', value: 'redis://****************', environment: 'Production', updated: '5d ago', isSecret: true },
-        { key: 'AWS_ACCESS_KEY_ID', value: 'AKIA****************', environment: 'Development', updated: '1w ago', isSecret: true },
+        { key: 'RAILWAY_TOKEN', value: 'rwy-****************', environment: 'Development', updated: '1w ago', isSecret: true },
     ]);
 
     const handleAddVariable = (newVar: Omit<EnvVar, 'updated'>) => {

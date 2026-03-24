@@ -33,7 +33,7 @@ The server-side logic and API routes.
 
 ### 📁 `infrastructure/`
 
-- DevOps configurations (Docker, Terraform, AWS).
+- DevOps configurations (Docker, Terraform, Railway).
 
 ---
 

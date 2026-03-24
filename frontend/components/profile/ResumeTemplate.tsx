@@ -111,7 +111,7 @@ export const ResumeTemplate: React.FC<ResumeTemplateProps> = ({ profile, isEdita
                 </span>
               ))
             ) : (
-              ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker", "AWS", "UI/UX Design", "System Architecture"].map(s => (
+              ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker", "Railway", "UI/UX Design", "System Architecture"].map(s => (
                 <span key={s} className="px-4 py-1.5 bg-white/5 rounded-full text-[11px] font-bold text-slate-400 border border-white/5">
                   {s}
                 </span>

@@ -41,7 +41,7 @@ Rust                   ████████              40%
 - **Frontend**: React, Vue.js, Next.js
 - **Backend**: Node.js, Express, Fastify
 - **Database**: PostgreSQL, MongoDB, Redis
-- **DevOps**: Docker, Kubernetes, AWS
+- **DevOps**: Docker, Kubernetes, Railway
 `,
   projects: `## 🎯 Featured Projects
 

@@ -353,7 +353,7 @@ export const MOCK_LIBRARY_RESOURCES: LibraryResource[] = [
       }
     ],
     changelog: [
-      { id: "v2.4.1", version: "v2.4.1", date: "29s", changes: "Fix mission visibility in Marketplace and switch to AWS RDS producti...", status: "Ready", branch: "main", commit: "21366ff" },
+      { id: "v2.4.1", version: "v2.4.1", date: "29s", changes: "Fix mission visibility in Marketplace and switch to Railway producti...", status: "Ready", branch: "main", commit: "21366ff" },
       { id: "v2.4.0", version: "v2.4.0", date: "30s", changes: "theme: Improve theme resolution fallback", status: "Ready", branch: "main", commit: "3fdbf1a" },
       { id: "v2.3.9", version: "v2.3.9", date: "28s", changes: "s2", status: "Ready", branch: "main", commit: "c92bb34" },
       { id: "v2.3.8", version: "v2.3.8", date: "30s", changes: "s", status: "Ready", branch: "main", commit: "8878bb4" }

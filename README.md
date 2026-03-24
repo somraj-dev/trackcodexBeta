@@ -32,14 +32,14 @@ trackcodexBeta/
 - **Frontend**: [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Monaco Editor](https://microsoft.github.io/monaco-editor/).
 - **Backend**: [Fastify](https://www.fastify.io/), [Prisma](https://www.prisma.io/), [PostgreSQL](https://www.postgresql.org/).
 - **AI**: [Google Gemini Pro](https://ai.google.dev/).
-- **Deployment**: [AWS EC2/RDS](https://aws.amazon.com/), [Vercel](https://vercel.com/), [GitHub Actions](https://github.com/features/actions).
+- **Deployment**: [Railway](https://railway.app/), [Vercel](https://vercel.com/), [GitHub Actions](https://github.com/features/actions).
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
 - Docker (for local workspace orchestration)
-- PostgreSQL (AWS RDS recommended)
+- PostgreSQL (Railway recommended)
 
 ### Installation
 ```bash
