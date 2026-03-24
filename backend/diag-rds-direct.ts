@@ -2,7 +2,7 @@ import pkg from 'pg';
 const { Client } = pkg;
 import process from 'process';
 
-const url = 'postgresql://trackcodex_user:Marcus701701@trackcodex-db.cnie88q6ughh.ap-south-1.rds.amazonaws.com:5432/trackcodex_db?sslmode=require';
+const url = process.env.DATABASE_URL || 'postgresql://localhost:5432/trackcodex_db';
 
 async function test() {
     console.log("Testing connection to RDS...");

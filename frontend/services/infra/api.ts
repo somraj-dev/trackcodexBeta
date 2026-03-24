@@ -48,6 +48,12 @@ apiInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) 
     } catch (error) {
       console.warn("[API] Failed to get Firebase ID token", error);
     }
+  } else {
+    // Fix 2: Fallback — use stored token when Firebase hasn't initialized yet
+    const storedToken = localStorage.getItem("trackcodex_auth_token");
+    if (storedToken) {
+      config.headers.Authorization = `Bearer ${storedToken}`;
+    }
   }
 
   // Inject CSRF token if available in storage or state
@@ -61,14 +67,42 @@ apiInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) 
   return Promise.reject(error);
 });
 
-// Response Interceptor: Global error handling
+// Response Interceptor: Fix 1 (force re-login) + Fix 5 (token refresh retry)
 apiInstance.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized (session expired)
-      console.warn("[API] 401 Unauthorized - Session may have expired");
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // Fix 5: Try force-refreshing the Firebase token and retry once
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        try {
+          const freshToken = await currentUser.getIdToken(/* forceRefresh */ true);
+          originalRequest.headers.Authorization = `Bearer ${freshToken}`;
+          return apiInstance(originalRequest);
+        } catch (refreshError) {
+          console.warn("[API] Token refresh failed, forcing re-login", refreshError);
+        }
+      }
+
+      // Fix 1: Force re-login — clear everything and redirect
+      console.warn("[API] 401 Unauthorized - Forcing re-login");
+      localStorage.removeItem("trackcodex_user");
+      localStorage.removeItem("trackcodex_csrf_token");
+      localStorage.removeItem("trackcodex_auth_token");
+
+      // Dispatch event so AuthContext can clean up its state
+      window.dispatchEvent(new CustomEvent("trackcodex-force-logout"));
+
+      // Redirect to home/login page (avoid redirect loops)
+      if (!window.location.pathname.includes("/login") && window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
     }
+
     return Promise.reject(error);
   }
 );

@@ -7,7 +7,7 @@ services:
     ports:
       - "4000:4000" # Maps container 4000 to host 4000 (VITE_API_URL)
     environment:
-      - DATABASE_URL=postgresql://trackcodex_user:Marcus701701@trackcodex-db.cnie88q6ughh.ap-south-1.rds.amazonaws.com:5432/trackcodex_db?sslmode=require
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password@db:5432/trackcodex_db}
       - NODE_ENV=production
       - ENCRYPTION_KEY=e0f54592-d6c4-4b47-8178-5e5898394236
       - COOKIE_SECRET=cookie-secret-change-this-min-32-chars

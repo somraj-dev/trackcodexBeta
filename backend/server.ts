@@ -189,9 +189,6 @@ async function bootstrap() {
             "X-Requested-With",
             "x-user-id",
             "Cache-Control",
-            "X-Amz-Date",
-            "X-Api-Key",
-            "X-Amz-Security-Token",
             "If-Modified-Since"
         ],
         exposedHeaders: ["set-cookie"],
@@ -282,7 +279,7 @@ async function bootstrap() {
     // 7. WebSocket Support (for Terminal PTY)
     await server.register(websocket);
 
-    // Health Check Endpoint for AWS ALB/ECS
+    // Health Check Endpoint for Railway
     server.get("/health", async (request, reply) => {
         return {
             status: "ok",
@@ -604,15 +601,15 @@ async function bootstrap() {
                 const ok = await attemptDbConnect();
 
                 if (ok) {
-                    console.warn("✅ Connected to PostgreSQL database (AWS RDS) successfully.");
+                    console.warn("✅ Connected to PostgreSQL database (Railway) successfully.");
                     break;
                 }
 
                 console.error(`❌ Connection failed [${retryCount}/${MAX_RETRIES}]: ${dbLastError}`);
 
                 if (dbLastError.includes("timeout") || dbLastError.includes("ETIMEDOUT")) {
-                    console.warn("🛡️  Detecting TIMEOUT: This often indicates a Security Group (SG) block.");
-                    console.warn("👉 Check if your ECS Task SG is allowed in the RDS SG inbound rules on port 5432.");
+                    console.warn("🛡️  Detecting TIMEOUT: This often indicates a networking/firewall block.");
+                    console.warn("👉 Check if your IP is allowed to access the database.");
                 }
 
                 if (retryCount >= MAX_RETRIES) {

@@ -96,13 +96,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     let isMounted = true;
 
-    // Safety net: Force loading to false after 10 seconds
+    // Safety net: Force loading to false after 30 seconds (increased from 10s
+    // to handle slow networks, cold-start latency, and Firebase SDK init delays)
     const loadingTimeout = setTimeout(() => {
       if (isMounted && authState.isLoading) {
-        console.warn("[AuthContext] Auth initialization timed out after 10s");
+        console.warn("[AuthContext] Auth initialization timed out after 30s");
         setAuthState(prev => ({ ...prev, isLoading: false, hasSettled: true }));
       }
-    }, 10000);
+    }, 30000);
 
     if (!isFirebaseConfigured) {
       console.warn("Bypassing Firebase Auth Context listener - Missing API Keys");
@@ -174,6 +175,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       clearTimeout(loadingTimeout);
       unsubscribe();
     };
+  }, []);
+
+  // Fix 1: Listen for force-logout events dispatched by the API interceptor on 401
+  useEffect(() => {
+    const handleForceLogout = () => {
+      console.warn("[AuthContext] Force logout triggered by API interceptor");
+      setAuthState({ user: null, isLoading: false, hasSettled: true });
+      setCsrfToken(null);
+      localStorage.removeItem("trackcodex_user");
+      localStorage.removeItem("trackcodex_github_username");
+      localStorage.removeItem("redirect_after_login");
+      profileService.clearProfile();
+    };
+
+    window.addEventListener("trackcodex-force-logout", handleForceLogout);
+    return () => window.removeEventListener("trackcodex-force-logout", handleForceLogout);
   }, []);
 
   const login = React.useCallback((userData: User, token: string) => {

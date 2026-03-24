@@ -13,7 +13,7 @@ const REPO_NAME_SUGGESTIONS = [
 
 const CreateRepo: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, hasSettled, isLoading } = useAuth();
   const [repoName, setRepoName] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState<"PUBLIC" | "PRIVATE">("PUBLIC");
@@ -28,9 +28,16 @@ const CreateRepo: React.FC = () => {
     );
   }, []);
 
+  // Fix 3: Redirect to login if auth has settled but user is not logged in
+  useEffect(() => {
+    if (hasSettled && !user) {
+      navigate("/", { replace: true });
+    }
+  }, [hasSettled, user, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!repoName) return;
+    if (!repoName || !hasSettled || !user) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -70,6 +77,18 @@ const CreateRepo: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Fix 3: Show loading state while auth is initializing
+  if (!hasSettled || isLoading) {
+    return (
+      <div className="bg-gh-bg flex-1 w-full flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 border-3 border-gh-border border-t-primary rounded-full animate-spin" />
+          <p className="text-sm text-gh-text-secondary">Initializing authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gh-bg flex-1 w-full flex flex-col font-sans selection:bg-primary/30">

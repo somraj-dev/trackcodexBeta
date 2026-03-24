@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../../services/infra/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { Repository } from "../../types";
 import EmptyState from "../../components/common/EmptyState";
 
@@ -112,12 +113,16 @@ const RepoRow = ({ repo }: RepoRowProps) => {
 
 const Repositories = () => {
   const navigate = useNavigate();
+  const { user, hasSettled } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
   const [repos, setRepos] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Fix 3: Only load repos after auth has settled AND user is present
   useEffect(() => {
+    if (!hasSettled || !user) return;
+
     const loadRepos = async () => {
       setLoading(true);
       try {
@@ -171,7 +176,7 @@ const Repositories = () => {
       }
     };
     loadRepos();
-  }, []);
+  }, [hasSettled, user]);
 
   if (loading) {
     return (
