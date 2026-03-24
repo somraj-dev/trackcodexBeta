@@ -19,9 +19,13 @@ export async function ensureIndexExists(indexUid: string, primaryKey: string = '
   try {
     await meilisearchClient.getIndex(indexUid);
   } catch (error: any) {
-    if (error.code === 'index_not_found') {
-      console.log(`[Meilisearch] Creating index: ${indexUid}`);
+    // MeiliSearch SDK wraps the error code in error.cause.code or error.code
+    const code = error?.cause?.code || error?.code;
+    if (code === 'index_not_found' || error?.httpStatus === 404 || error?.response?.status === 404) {
+      console.warn(`[Meilisearch] Creating index: ${indexUid}`);
       await meilisearchClient.createIndex(indexUid, { primaryKey });
+      // Wait briefly for the async task to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } else {
       throw error;
     }

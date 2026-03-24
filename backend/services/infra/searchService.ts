@@ -56,8 +56,8 @@ export const searchService = {
     try {
       // Search users and repositories concurrently in Meilisearch
       const [ownersResult, reposResult] = await Promise.all([
-        meilisearchClient.index('trackcodex.users').search(trimmedQuery, { limit }),
-        meilisearchClient.index('trackcodex.repositories').search(trimmedQuery, { limit, filter: "visibility = 'public'" })
+        meilisearchClient.index('trackcodex_users').search(trimmedQuery, { limit }),
+        meilisearchClient.index('trackcodex_repositories').search(trimmedQuery, { limit, filter: "visibility = 'public'" })
       ]);
 
       return {

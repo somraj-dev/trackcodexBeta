@@ -10,35 +10,35 @@ async function reindexAll() {
 
     // ── Sync Users ──
     console.log(`⏳ [Reindex] Syncing Users...`);
-    await ensureIndexExists("trackcodex.users", "id");
+    await ensureIndexExists("trackcodex_users", "id");
     const users = await prisma.user.findMany({
         where: { deletedAt: null, accountLocked: false, isPrivate: false, username: { not: null } },
         select: { id: true, email: true, username: true, name: true, avatar: true, role: true }
     });
     // Configure searchable attributes
-    await meilisearchClient.index("trackcodex.users").updateSearchableAttributes(["username", "name", "bio"]);
-    await indexDocuments("trackcodex.users", users);
+    await meilisearchClient.index("trackcodex_users").updateSearchableAttributes(["username", "name", "bio"]);
+    await indexDocuments("trackcodex_users", users);
     console.log(`✅ [Reindex] Completed Users (${users.length} indexed).`);
 
     // ── Sync Repositories ──
     console.log(`⏳ [Reindex] Syncing Repositories...`);
-    await ensureIndexExists("trackcodex.repositories", "id");
+    await ensureIndexExists("trackcodex_repositories", "id");
     const repos = await prisma.repository.findMany({
         select: { id: true, name: true, description: true, language: true, stars: true, visibility: true, owner: { select: { username: true } } }
     });
-    await meilisearchClient.index("trackcodex.repositories").updateSearchableAttributes(["name", "description", "owner.username", "language"]);
-    await meilisearchClient.index("trackcodex.repositories").updateFilterableAttributes(["visibility"]);
-    await indexDocuments("trackcodex.repositories", repos);
+    await meilisearchClient.index("trackcodex_repositories").updateSearchableAttributes(["name", "description", "owner.username", "language"]);
+    await meilisearchClient.index("trackcodex_repositories").updateFilterableAttributes(["visibility"]);
+    await indexDocuments("trackcodex_repositories", repos);
     console.log(`✅ [Reindex] Completed Repositories (${repos.length} indexed).`);
 
     // ── Sync Workspaces ──
     console.log(`⏳ [Reindex] Syncing Workspaces...`);
-    await ensureIndexExists("trackcodex.workspaces", "id");
+    await ensureIndexExists("trackcodex_workspaces", "id");
     const workspaces = await prisma.workspace.findMany({
         select: { id: true, name: true, description: true, status: true }
     });
-    await meilisearchClient.index("trackcodex.workspaces").updateSearchableAttributes(["name", "description"]);
-    await indexDocuments("trackcodex.workspaces", workspaces);
+    await meilisearchClient.index("trackcodex_workspaces").updateSearchableAttributes(["name", "description"]);
+    await indexDocuments("trackcodex_workspaces", workspaces);
     console.log(`✅ [Reindex] Completed Workspaces (${workspaces.length} indexed).`);
 
     console.log("🏁 [Reindex] Full Meilisearch synchronization complete!");

@@ -9,9 +9,9 @@ import { meilisearchClient } from "../../services/infra/meilisearch";
  */
 async function tryMeilisearch(query: string): Promise<any[]> {
   const [usersRes, reposRes, workspacesRes] = await Promise.all([
-    meilisearchClient.index('trackcodex.users').search(query, { limit: 5 }),
-    meilisearchClient.index('trackcodex.repositories').search(query, { limit: 5, filter: "visibility = 'public'" }),
-    meilisearchClient.index('trackcodex.workspaces').search(query, { limit: 3 }),
+    meilisearchClient.index('trackcodex_users').search(query, { limit: 5 }),
+    meilisearchClient.index('trackcodex_repositories').search(query, { limit: 5, filter: "visibility = 'public'" }),
+    meilisearchClient.index('trackcodex_workspaces').search(query, { limit: 3 }),
   ]);
 
   const results: any[] = [];
@@ -268,7 +268,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
       try {
         // ── 1. Try Meilisearch first ──
         try {
-          const msRes = await meilisearchClient.index('trackcodex.users').search(q, {
+          const msRes = await meilisearchClient.index('trackcodex_users').search(q, {
             limit,
             offset: skip,
           });

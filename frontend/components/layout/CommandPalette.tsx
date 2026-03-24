@@ -28,12 +28,68 @@ const CommandPalette = ({
       url: "/home",
     },
     {
+      id: "nav-explore",
+      type: "nav",
+      label: "Explore",
+      icon: "explore",
+      group: "Navigation",
+      url: "/explore",
+    },
+    {
+      id: "nav-repositories",
+      type: "nav",
+      label: "Your Repositories",
+      icon: "book",
+      group: "Navigation",
+      url: "/repositories",
+    },
+    {
+      id: "nav-jobs",
+      type: "nav",
+      label: "Jobs",
+      icon: "work",
+      group: "Navigation",
+      url: "/jobs",
+    },
+    {
+      id: "nav-marketplace",
+      type: "nav",
+      label: "Marketplace",
+      icon: "storefront",
+      group: "Navigation",
+      url: "/marketplace",
+    },
+    {
+      id: "nav-notifications",
+      type: "nav",
+      label: "Notifications",
+      icon: "notifications",
+      group: "Navigation",
+      url: "/notifications",
+    },
+    {
+      id: "nav-profile",
+      type: "nav",
+      label: "Your Profile",
+      icon: "person",
+      group: "Navigation",
+      url: "/profile",
+    },
+    {
       id: "nav-settings",
       type: "nav",
       label: "Settings",
       icon: "settings",
       group: "Navigation",
       url: "/settings",
+    },
+    {
+      id: "nav-create-repo",
+      type: "nav",
+      label: "Create Repository",
+      icon: "add_circle",
+      group: "Actions",
+      url: "/new",
     },
   ];
 
@@ -86,7 +142,6 @@ const CommandPalette = ({
   // Grouping for render
   const groupedResults = results.reduce(
     (acc, item) => {
-      // Use "Repositories" "Owners" "Copilot" as standard groups
       const group = item.group || "Other";
       if (!acc[group]) acc[group] = [];
       acc[group].push(item);
@@ -139,27 +194,58 @@ const CommandPalette = ({
       {/* Subtle backdrop */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"></div>
 
-      {/* Main Palette Window */}
+      {/* Main Palette Window — uses CSS variables for theme-awareness */}
       <div
-        className="relative w-full max-w-[680px] bg-[#11141A] border border-[#1E232E] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-top-4 duration-200"
+        className="relative w-full max-w-[680px] overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in slide-in-from-top-4 duration-200 rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+        style={{
+          backgroundColor: "var(--gh-bg-secondary)",
+          border: "1px solid var(--gh-border)",
+        }}
         onClick={handleModalClick}
       >
 
-        {/* Search Header Container - Has standard GitHub blue focus ring */}
-        <div className="p-2 border-b border-[#1E232E] bg-[#11141A]">
-          <div className="flex items-center bg-[#0A0D14] border border-[#2f81f7] rounded-[6px] outline outline-1 outline-[#2f81f7] px-3 py-1.5 focus-within:shadow-[0_0_0_3px_rgba(47,129,247,0.4)] transition-shadow">
-            <Search size={16} className="text-[#7d8590] mr-2" />
+        {/* Search Header */}
+        <div
+          className="p-2"
+          style={{ borderBottom: "1px solid var(--gh-border)", backgroundColor: "var(--gh-bg-secondary)" }}
+        >
+          <div
+            className="flex items-center rounded-[6px] px-3 py-1.5 transition-shadow"
+            style={{
+              backgroundColor: "var(--gh-bg)",
+              border: "1px solid var(--gh-primary)",
+              outline: "1px solid var(--gh-primary)",
+            }}
+          >
+            <Search size={16} style={{ color: "var(--gh-text-secondary)" }} className="mr-2" />
             <input
               ref={inputRef}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search or jump to..."
-              className="flex-1 bg-transparent text-[14px] text-[#c9d1d9] placeholder-[#7d8590] border-none focus:ring-0 outline-none h-6"
+              className="flex-1 bg-transparent border-none focus:ring-0 outline-none h-6"
+              style={{
+                fontSize: "var(--tc-font-base)",
+                color: "var(--gh-text)",
+              }}
             />
             <div className="flex items-center gap-1.5">
-              <span className="text-[12px] text-[#7d8590] ml-2">Type <kbd className="font-mono bg-[#11141A] border border-[#1E232E] rounded-[4px] px-1 text-[10px]">?</kbd> for help</span>
-              <button onClick={onClose} className="p-0.5 ml-2 hover:bg-[#30363d] rounded text-[#7d8590] transition-colors flex items-center justify-center">
+              <span style={{ fontSize: "var(--tc-font-xs)", color: "var(--gh-text-secondary)" }} className="ml-2">
+                Type <kbd
+                  className="font-mono rounded-[4px] px-1"
+                  style={{
+                    fontSize: "var(--tc-font-xs)",
+                    backgroundColor: "var(--gh-bg-tertiary)",
+                    border: "1px solid var(--gh-border)",
+                  }}
+                >?</kbd> for help
+              </span>
+              <button
+                onClick={onClose}
+                className="p-0.5 ml-2 rounded transition-colors flex items-center justify-center"
+                style={{ color: "var(--gh-text-secondary)" }}
+              >
                 <span className="material-symbols-outlined !text-[16px]">close</span>
               </button>
             </div>
@@ -169,7 +255,7 @@ const CommandPalette = ({
         {/* Results Body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {loading && (
-            <div className="p-8 flex justify-center text-[#7d8590]">
+            <div className="p-8 flex justify-center" style={{ color: "var(--gh-text-secondary)" }}>
               <span className="material-symbols-outlined animate-spin text-2xl">
                 progress_activity
               </span>
@@ -180,10 +266,13 @@ const CommandPalette = ({
             <div className="py-2">
               {Object.entries(groupedResults).map(([group, items]) => (
                 <div key={group} className="mb-2">
-                  <h3 className="px-3 py-1 text-[12px] font-semibold text-[#7d8590] capitalize">
+                  <h3
+                    className="px-3 py-1 font-semibold capitalize"
+                    style={{ fontSize: "var(--tc-font-xs)", color: "var(--gh-text-secondary)" }}
+                  >
                     {group}
                   </h3>
-                  <div className="space-y-0 text-[14px]">
+                  <div className="space-y-0" style={{ fontSize: "var(--tc-font-base)" }}>
                     {items.map((item) => {
                       const isSelected = results.indexOf(item) === selectedIndex;
                       return (
@@ -191,18 +280,21 @@ const CommandPalette = ({
                           key={item.id}
                           onClick={() => handleSelect(item)}
                           onMouseEnter={() => setSelectedIndex(results.indexOf(item))}
-                          className={`
-                              flex items-center gap-3 px-4 py-2 cursor-pointer group transition-colors relative
-                              ${isSelected ? "bg-[#1f242c]" : "hover:bg-[#1f242c]"}
-                            `}
+                          className="flex items-center gap-3 px-4 py-2 cursor-pointer group transition-colors relative"
+                          style={{
+                            backgroundColor: isSelected ? "var(--bg-hover)" : undefined,
+                          }}
                         >
-                          {/* Selection Indicator bar (GitHub subtle style) */}
+                          {/* Selection Indicator bar */}
                           {isSelected && (
-                            <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#2f81f7]"></div>
+                            <div
+                              className="absolute left-0 top-0 bottom-0 w-[3px]"
+                              style={{ backgroundColor: "var(--gh-primary)" }}
+                            ></div>
                           )}
 
-                          {/* GitHub-style Icons */}
-                          <div className="flex items-center justify-center text-[#7d8590]">
+                          {/* Icons */}
+                          <div className="flex items-center justify-center" style={{ color: "var(--gh-text-secondary)" }}>
                             {item.icon === "repo" || item.type === "repo" ? (
                               <span className="material-symbols-outlined !text-[18px]">book</span>
                             ) : item.icon === "user" || item.type === "user" ? (
@@ -221,14 +313,21 @@ const CommandPalette = ({
                           </div>
 
                           <div className="flex-1 min-w-0 flex items-center">
-                            <span className={`${isSelected ? "text-white" : "text-[#c9d1d9]"} truncate`}>
+                            <span
+                              className="truncate"
+                              style={{ color: isSelected ? "var(--gh-text)" : "var(--gh-text-secondary)" }}
+                            >
                               {item.label}
                             </span>
                           </div>
 
                           {/* Jump to Hint */}
                           <span
-                            className={`text-[12px] whitespace-nowrap ${isSelected ? "text-[#7d8590]" : "text-transparent"} group-hover:text-[#7d8590]`}
+                            style={{
+                              fontSize: "var(--tc-font-xs)",
+                              color: isSelected ? "var(--gh-text-secondary)" : "transparent",
+                            }}
+                            className="whitespace-nowrap group-hover:!text-[var(--gh-text-secondary)]"
                           >
                             {item.group === "Copilot" ? "Start a new Copilot thread" : "Jump to"}
                           </span>
@@ -243,19 +342,25 @@ const CommandPalette = ({
 
           {!loading && results.length === 0 && (
             <div className="px-4 py-6 text-center flex flex-col items-center">
-              <span className="material-symbols-outlined text-4xl text-[#7d8590] mb-3">search</span>
-              <p className="text-[#c9d1d9] text-[14px]">No results matched your search.</p>
-              <p className="text-[#7d8590] text-[12px] mt-1">Try different keywords or filters.</p>
+              <span className="material-symbols-outlined text-4xl mb-3" style={{ color: "var(--gh-text-secondary)" }}>search</span>
+              <p style={{ color: "var(--gh-text)", fontSize: "var(--tc-font-base)" }}>No results matched your search.</p>
+              <p style={{ color: "var(--gh-text-secondary)", fontSize: "var(--tc-font-xs)" }} className="mt-1">Try different keywords or filters.</p>
             </div>
           )}
         </div>
 
         {/* Footer Area */}
-        <div className="px-4 py-3 border-t border-[#1E232E] bg-[#11141A] flex items-center justify-between">
-          <a href="#" className="text-[12px] text-[#2f81f7] hover:underline flex items-center gap-1">
+        <div
+          className="px-4 py-3 flex items-center justify-between"
+          style={{
+            borderTop: "1px solid var(--gh-border)",
+            backgroundColor: "var(--gh-bg-secondary)",
+          }}
+        >
+          <a href="#" style={{ fontSize: "var(--tc-font-xs)", color: "var(--gh-primary)" }} className="hover:underline flex items-center gap-1">
             Search syntax tips
           </a>
-          <a href="#" className="text-[12px] text-[#2f81f7] hover:underline">
+          <a href="#" style={{ fontSize: "var(--tc-font-xs)", color: "var(--gh-primary)" }} className="hover:underline">
             Give feedback
           </a>
         </div>
@@ -265,5 +370,3 @@ const CommandPalette = ({
 };
 
 export default CommandPalette;
-
-
