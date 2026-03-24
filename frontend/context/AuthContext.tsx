@@ -155,11 +155,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         profileService.initFromAuth(mappedUser);
 
-        apiInstance.post("/auth/sync").then((res) => {
+        // Explicitly get the token FIRST, then call sync with it
+        // This avoids the race condition where auth.currentUser isn't ready in the interceptor
+        firebaseUser.getIdToken().then((idToken) => {
+          return apiInstance.post("/auth/sync", {}, {
+            headers: { Authorization: `Bearer ${idToken}` }
+          });
+        }).then((res) => {
           if (res.data?.csrfToken && isMounted) {
             setCsrfToken(res.data.csrfToken);
           }
-        }).catch(() => {});
+          // Update user with backend data if available
+          if (res.data?.user && isMounted) {
+            const backendUser = res.data.user;
+            setAuthState(prev => ({
+              ...prev,
+              user: {
+                ...prev.user!,
+                id: backendUser.id,
+                username: backendUser.username || prev.user!.username,
+                email: backendUser.email || prev.user!.email,
+                role: backendUser.role || prev.user!.role,
+              }
+            }));
+          }
+        }).catch((err) => {
+          console.error("[AuthContext] Backend sync failed:", err?.response?.status, err?.message);
+        });
       } else {
         setAuthState(prev => (prev.user === null && !prev.isLoading && prev.hasSettled ? prev : { 
           user: null, 

@@ -73,7 +73,11 @@ apiInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    // Skip force-logout for auth sync requests — sync failure should not destroy the session
+    const requestUrl = originalRequest?.url || "";
+    const isSyncRequest = requestUrl.includes("/auth/sync");
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isSyncRequest) {
       originalRequest._retry = true;
 
       // Fix 5: Try force-refreshing the Firebase token and retry once
