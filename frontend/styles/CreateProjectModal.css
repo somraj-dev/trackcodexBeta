@@ -1,0 +1,330 @@
+.cpm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.cpm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.cpm-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.cpm-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--gh-border);
+}
+
+.cpm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cpm-header-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.cpm-header-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--gh-text);
+}
+
+.cpm-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--gh-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.cpm-close-btn:hover {
+  background: var(--bg-hover);
+}
+
+.cpm-body {
+  padding: 24px 24px 0;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+.cpm-form-group {
+  margin-bottom: 24px;
+}
+
+.cpm-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gh-text-secondary);
+  margin-bottom: 8px;
+  transition: color .2s;
+}
+
+.cpm-label.error {
+  color: #FF5555;
+}
+
+.cpm-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 10px;
+  color: var(--gh-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.cpm-input:focus {
+  border-color: var(--primary-color);
+}
+
+.cpm-flex-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cpm-select-box {
+  height: 44px;
+  padding: 0 14px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.cpm-select-box:hover {
+  border-color: var(--gh-text-secondary);
+}
+
+.cpm-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7C3AED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gh-text);
+}
+
+.cpm-icon-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cpm-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gh-text-secondary);
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.cpm-icon-btn.selected {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(var(--primary-color-rgb), 0.1);
+}
+
+.cpm-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 14px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 10px;
+  color: var(--gh-text);
+  font-size: 14px;
+  outline: none;
+  resize: none;
+}
+
+.cpm-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cpm-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.cpm-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--gh-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cpm-radio-item.selected .cpm-radio-circle {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+}
+
+.cpm-radio-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gh-bg);
+}
+
+.cpm-footer {
+  padding: 16px 24px;
+  display: flex;
+  gap: 12px;
+  background: var(--gh-bg);
+  border-top: 1px solid var(--gh-border);
+}
+
+.cpm-btn {
+  height: 44px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cpm-btn-secondary {
+  flex: 1;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  color: var(--gh-text);
+}
+
+.cpm-btn-primary {
+  flex: 2;
+  background: var(--primary-color);
+  border: none;
+  color: var(--gh-bg);
+  font-weight: 700;
+}
+
+.cpm-btn-primary:disabled {
+  background: var(--gh-border);
+  color: var(--gh-text-secondary);
+  cursor: not-allowed;
+}
+
+.cpm-btn-black {
+  flex: 2;
+  background: var(--gh-text);
+  border: none;
+  color: var(--gh-bg);
+  font-weight: 700;
+}
+
+/* Date Picker Extra Styles */
+.cpm-date-picker {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+  z-index: 4000;
+  overflow: hidden;
+}
+
+.cpm-calendar-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cpm-day-cell {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.cpm-day-cell:hover:not(.selected) {
+  background: var(--bg-hover);
+}
+
+.cpm-day-cell.selected {
+  background: var(--primary-color);
+  color: var(--gh-bg);
+}
+
+.cpm-day-cell.today {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}

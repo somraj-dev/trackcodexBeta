@@ -147,7 +147,7 @@ const OfferEditorView = () => {
                             <div className="space-y-4">
                                 <div>
                                     <label htmlFor="startDate" className="block text-sm font-medium mb-1 text-gh-text-secondary">Start Date</label>
-                                    <input type="date" id="startDate" name="startDate" title="Start Date" placeholder="YYYY-MM-DD" value={offer.startDate} onChange={handleChange} className="w-full bg-gh-bg border border-gh-border rounded-lg px-3 py-2 text-sm text-gh-text focus:ring-primary focus:border-primary" />
+                                    <input type="text" id="startDate" name="startDate" title="Start Date" placeholder="YYYY-MM-DD" value={offer.startDate} onChange={handleChange} className="w-full bg-gh-bg border border-gh-border rounded-lg px-3 py-2 text-sm text-gh-text focus:ring-primary focus:border-primary" />
                                 </div>
                                 <div>
                                     <label htmlFor="reportingManager" className="block text-sm font-medium mb-1 text-gh-text-secondary">Reporting Manager</label>

@@ -20,6 +20,7 @@ import { useProfile } from "../../context/ProfileContext";
 
 const MainLayout: React.FC = () => {
   const mainScrollRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -63,7 +64,7 @@ const MainLayout: React.FC = () => {
         !["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement).tagName)
       ) {
         e.preventDefault();
-        setIsCommandPaletteOpen(true);
+        searchInputRef.current?.focus();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -141,10 +142,10 @@ const MainLayout: React.FC = () => {
           <div className="fixed inset-0 bg-black/50 z-[70] animate-in fade-in duration-200" onClick={() => setIsSidebarOpen(false)} />
           <div className="fixed top-0 left-0 h-full w-[320px] bg-gh-bg-secondary border-r border-gh-border z-[80] animate-in slide-in-from-left duration-300 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between px-4 h-14 shrink-0">
-              <button onClick={() => { setIsSidebarOpen(false); navigate("/home"); }} className="text-gh-text">
+              <button aria-label="Go to Home" title="Home" onClick={() => { setIsSidebarOpen(false); navigate("/home"); }} className="text-gh-text">
                 <TrackCodexLogo size="sm" collapsed={true} clickable={false} />
               </button>
-              <button onClick={() => setIsSidebarOpen(false)} className="text-gh-text-secondary h-8 w-8 flex items-center justify-center">
+              <button aria-label="Close sidebar" title="Close sidebar" onClick={() => setIsSidebarOpen(false)} className="text-gh-text-secondary h-8 w-8 flex items-center justify-center">
                 <span className="material-symbols-outlined !text-[20px]">close</span>
               </button>
             </div>
@@ -188,25 +189,33 @@ const MainLayout: React.FC = () => {
               </div>
               <div className="flex-1 flex justify-center max-w-[720px] mx-auto">
                 <div 
-                  onClick={() => setIsCommandPaletteOpen(true)} 
-                  className="flex items-center gap-2 px-3 py-1 bg-gh-bg border border-gh-border rounded-md w-full max-w-[272px] cursor-pointer hover:border-primary transition-colors group"
+                  className="flex items-center gap-2 px-3 py-1 bg-gh-bg border border-gh-border rounded-md w-full max-w-[272px] transition-colors group"
                 >
-                  <span className="material-symbols-outlined !text-[14px] text-gh-text-secondary">search</span>
+                  <span 
+                    onClick={() => setIsCommandPaletteOpen(true)}
+                    className="material-symbols-outlined !text-[14px] text-gh-text-secondary cursor-pointer hover:text-primary transition-colors"
+                  >
+                    search
+                  </span>
                   <input
+                    ref={searchInputRef}
                     type="text"
                     placeholder="Search TrackCodex..."
-                    className="flex-1 bg-transparent border-none text-[13px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none h-6 cursor-pointer"
-                    onFocus={() => setIsCommandPaletteOpen(true)}
+                    className="flex-1 bg-transparent border-none text-[13px] text-gh-text placeholder-gh-text-secondary focus:ring-0 outline-none h-6"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         const q = (e.target as HTMLInputElement).value;
                         if (q.trim()) {
                           navigate(`/search?q=${encodeURIComponent(q)}`);
+                          (e.target as HTMLInputElement).blur();
                         }
                       }
                     }}
                   />
-                  <div className="hidden md:flex items-center gap-1 border border-gh-border rounded px-1.5 py-0.5 bg-gh-bg-secondary">
+                  <div 
+                    onClick={() => setIsCommandPaletteOpen(true)}
+                    className="hidden md:flex items-center gap-1 border border-gh-border rounded px-1.5 py-0.5 bg-gh-bg-secondary cursor-pointer hover:bg-gh-bg-tertiary transition-colors"
+                  >
                     <span className="text-[10px] text-gh-text-secondary font-mono">/</span>
                   </div>
                 </div>

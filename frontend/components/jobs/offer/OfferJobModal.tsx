@@ -250,8 +250,9 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
                       Start Date
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       aria-label="Start Date"
+                      placeholder="YYYY-MM-DD"
                       className="w-full bg-[#11141A] border border-[#1E232E] rounded-lg px-3 py-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500 outline-none transition-all"
                       value={formData.startDate}
                       onChange={(e) =>

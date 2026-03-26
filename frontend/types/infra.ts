@@ -12,6 +12,7 @@ export interface ChangelogEntry {
   status: string;
   date: string;
   branch: string;
+  version?: string;
   changes: string;
 }
 

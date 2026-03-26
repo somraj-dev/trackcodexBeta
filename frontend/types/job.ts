@@ -16,7 +16,7 @@ export interface Job {
   longDescription?: string;
   techStack: string[];
   budget: string;
-  type: "Contract" | "Gig" | "Full-time" | "Bounty";
+  type: "Contract" | "Gig" | "Full-time" | "Bounty" | "Hackathon";
   status: "Open" | "InProgress" | "Completed" | "Pending" | "In Progress";
   repoId: string;
   creator: {

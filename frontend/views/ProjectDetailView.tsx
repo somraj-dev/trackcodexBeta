@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { InviteModal } from '../components/modals/InviteModal';
+import "../styles/ProjectDetailView.css";
 
 /* ─── Design tokens ─── */
 const V = {
@@ -108,14 +109,13 @@ const Sparkline = () => {
   const max = Math.max(...pts);
   const w = 200, h = 44;
   const d = pts.map((p, i) => `${i === 0 ? "M" : "L"}${(i / (pts.length - 1)) * w},${h - (p / max) * h}`).join(" ");
-  return <svg viewBox={`0 0 ${w} ${h}`} style={{ width: "100%", height: 44 }}><path d={d} fill="none" stroke="#3b82f6" strokeWidth="1.5" /></svg>;
+  return <svg viewBox={`0 0 ${w} ${h}`} className="pd-sparkline"><path d={d} fill="none" stroke="#3b82f6" strokeWidth="1.5" /></svg>;
 };
 
 /* ─── Button helper ─── */
-const Btn = ({ children, onClick, href, style: extra }: { children: React.ReactNode; onClick?: () => void; href?: string; style?: React.CSSProperties }) => {
-  const base: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", fontSize: 13, fontWeight: 500, color: V.text, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, cursor: "pointer", fontFamily: V.font, textDecoration: "none", ...extra };
-  if (href) return <a href={href} target="_blank" rel="noopener noreferrer" style={base}>{children}</a>;
-  return <button onClick={onClick} style={base}>{children}</button>;
+const Btn = ({ children, onClick, href, style: extra, title }: { children: React.ReactNode; onClick?: () => void; href?: string; style?: React.CSSProperties; title?: string }) => {
+  if (href) return <a href={href} target="_blank" rel="noopener noreferrer" className="pd-btn-base" style={extra} title={title}>{children}</a>;
+  return <button onClick={onClick} className="pd-btn-base" style={extra} title={title}>{children}</button>;
 };
 
 /* ─── Search Items Builder ─── */
@@ -194,17 +194,19 @@ const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: bool
       >
         <div className="p-2 border-b border-gh-border bg-[var(--gh-bg-secondary)41A]">
           <div className="flex items-center bg-gh-bg border border-[#2f81f7] rounded-[6px] outline outline-1 outline-[#2f81f7] px-3 py-1.5 focus-within:shadow-[0_0_0_3px_rgba(47,129,247,0.4)] transition-shadow gap-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7d8590" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7d8590" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
+              id="pd-page-search"
               ref={inputRef}
               value={search}
               onChange={e => { setSearch(e.target.value); setSelectedIndex(0); }}
               onKeyDown={handleKeyDown}
               placeholder="Search project pages..."
+              aria-label="Search project pages"
               className="flex-1 bg-transparent text-[14px] text-gh-text placeholder-gh-text-secondary border-none focus:ring-0 outline-none h-6 p-0"
               style={{ fontFamily: V.font }}
             />
-            <button onClick={onClose} className="text-gh-text-secondary text-xs px-2 py-1 hover:bg-gh-bg-tertiary rounded transition-colors border border-gh-border cursor-pointer">ESC</button>
+            <button onClick={onClose} aria-label="Close search" className="text-gh-text-secondary text-xs px-2 py-1 hover:bg-gh-bg-tertiary rounded transition-colors border border-gh-border cursor-pointer">ESC</button>
           </div>
         </div>
         
@@ -368,31 +370,49 @@ const ProjectDetailView: React.FC = () => {
   };
 
   return (
-    <div style={{ flex: 1, width: "100%", background: V.bg, overflow: "hidden", fontFamily: V.font, color: V.text, display: "flex" }}>
+    <div className="pd-view">
       {/* ── Left Sidebar ── */}
-      <div className="no-scrollbar" style={{ width: 240, flexShrink: 0, borderRight: `1px solid ${V.borderLight}`, height: "100vh", position: "sticky", top: 0, overflowY: "auto", padding: "12px 0" }}>
+      <div className="pd-sidebar no-scrollbar">
         {activeTab === "Settings" ? (
           <>
             {/* Search */}
-            <div style={{ padding: "0 12px", marginBottom: 16 }}>
-              <div onClick={() => setIsSearchOpen(true)} style={{ display: "flex", alignItems: "center", height: 32, background: V.card, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 8px", gap: 8, cursor: "text" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span style={{ fontSize: 13, color: V.textSecondary, flex: 1, letterSpacing: 0.3 }}>Find...</span>
-                <span style={{ fontSize: 11, color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 4, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "monospace", paddingBottom: 1 }}>F</span>
+            <div className="pd-sidebar-search">
+              <div 
+                onClick={() => setIsSearchOpen(true)} 
+                className="pd-search-trigger"
+                role="button"
+                tabIndex={0}
+                aria-label="Search проект pages"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Find...</span>
+                <span className="pd-search-key">F</span>
               </div>
             </div>
             
             {/* Back to Project */}
-            <div style={{ padding: "0 12px", marginBottom: 8 }}>
-              <div onClick={() => setActiveTab("Overview")} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px", cursor: "pointer", color: V.textSecondary, fontSize: 14, fontWeight: 500, transition: "color .15s" }} onMouseEnter={e => e.currentTarget.style.color = V.text} onMouseLeave={e => e.currentTarget.style.color = V.textSecondary}>
+            <div className="pd-sidebar-back">
+              <div 
+                onClick={() => setActiveTab("Overview")} 
+                className="pd-back-link"
+                role="button"
+                tabIndex={0}
+              >
                 <span style={{ fontSize: 18, lineHeight: 1, position: "relative", top: -1 }}>‹</span> Settings
               </div>
             </div>
 
             {/* Settings Links */}
-            <div style={{ padding: "0 12px", display: "flex", flexDirection: "column", gap: 2 }}>
+            <div className="pd-sidebar-nav">
               {["General", "Billing", "Build and Deployment", "Invoices", "Members", "Access Groups", "Agent", "Drains", "Webhooks", "Security & Privacy", "Deployment Protection", "Microfrontends", "Connectivity", "Environment Variables", "Activity", "My Notifications", "Apps"].map(t => (
-                <div key={t} onClick={() => setSettingsTab(t)} style={{ padding: "8px 12px", fontSize: 14, color: settingsTab === t ? V.text : V.textSecondary, fontWeight: settingsTab === t ? 500 : 400, background: settingsTab === t ? V.borderLight : "transparent", borderRadius: 6, cursor: "pointer", transition: "background .15s" }} onMouseEnter={e => { if (settingsTab !== t) e.currentTarget.style.background = V.cardHover; }} onMouseLeave={e => { if (settingsTab !== t) e.currentTarget.style.background = "transparent"; }}>
+                <div 
+                  key={t} 
+                  onClick={() => setSettingsTab(t)} 
+                  className={`pd-nav-item ${settingsTab === t ? "active" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={settingsTab === t}
+                >
                   {t}
                 </div>
               ))}
@@ -401,27 +421,47 @@ const ProjectDetailView: React.FC = () => {
         ) : activeTab === "Usage" ? (
           <>
             {/* Search */}
-            <div style={{ padding: "0 12px", marginBottom: 16 }}>
-              <div onClick={() => setIsSearchOpen(true)} style={{ display: "flex", alignItems: "center", height: 32, background: V.card, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 8px", gap: 8, cursor: "text" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span style={{ fontSize: 13, color: V.textSecondary, flex: 1, letterSpacing: 0.3 }}>Find...</span>
-                <span style={{ fontSize: 11, color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 4, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "monospace", paddingBottom: 1 }}>F</span>
+            <div className="pd-sidebar-search">
+              <div 
+                onClick={() => setIsSearchOpen(true)} 
+                className="pd-search-trigger"
+                role="button"
+                tabIndex={0}
+                aria-label="Search project pages"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Find...</span>
+                <span className="pd-search-key">F</span>
               </div>
             </div>
             
             {/* Back to Project */}
-            <div style={{ padding: "0 12px", marginBottom: 8 }}>
-              <div onClick={() => setActiveTab("Overview")} style={{ display: "flex", alignItems: "center", gap: 10, padding: "6px 8px", cursor: "pointer", color: V.textSecondary, fontSize: 14, fontWeight: 500, transition: "color .15s" }} onMouseEnter={e => e.currentTarget.style.color = V.text} onMouseLeave={e => e.currentTarget.style.color = V.textSecondary}>
+            <div className="pd-sidebar-back">
+              <div 
+                onClick={() => setActiveTab("Overview")} 
+                className="pd-back-link"
+                role="button"
+                tabIndex={0}
+              >
                 <span style={{ fontSize: 18, lineHeight: 1, position: "relative", top: -1 }}>‹</span> Usage
               </div>
             </div>
 
             {/* Usage Links */}
-            <div style={{ padding: "0 12px", display: "flex", flexDirection: "column", gap: 2 }}>
+            <div className="pd-sidebar-nav">
               {["Overview", "Networking", "Incremental Static Regeneration", "Data Cache", "TrackCodex Functions", "Edge Functions", "Edge Middleware", "Edge Config", "Builds", "Artifacts", "Blob", "Queues", "Cron Jobs", "Drains", "Observability", "Image Optimization", "Flags", "BotID Requests", "Trace Spans", "Connectivity", "Sandbox"].map(t => (
-                <div key={t} onClick={() => setUsageTab(t)} style={{ padding: "8px 12px", fontSize: 14, color: usageTab === t ? V.text : V.textSecondary, fontWeight: usageTab === t ? 500 : 400, background: usageTab === t ? V.cardHover : "transparent", borderRadius: 6, cursor: "pointer", transition: "background .15s", display: "flex", alignItems: "center", gap: 12 }} onMouseEnter={e => { if (usageTab !== t) e.currentTarget.style.background = V.cardHover; }} onMouseLeave={e => { if (usageTab !== t) e.currentTarget.style.background = "transparent"; }}>
-                   <span style={{ fontSize: 12, color: V.textTertiary, width: 12, display: "flex", justifyContent: "center" }}>{t !== "Overview" && "›"}</span>
-                   {t}
+                <div 
+                  key={t} 
+                  onClick={() => setUsageTab(t)} 
+                  className={`pd-nav-item ${usageTab === t ? "active" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={usageTab === t}
+                >
+                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 12, color: V.textTertiary, width: 12, display: "flex", justifyContent: "center" }}>{t !== "Overview" && "›"}</span>
+                      {t}
+                   </div>
                 </div>
               ))}
             </div>
@@ -429,11 +469,17 @@ const ProjectDetailView: React.FC = () => {
         ) : (
           <>
             {/* Search */}
-            <div style={{ padding: "0 12px", marginBottom: 8 }}>
-              <div onClick={() => setIsSearchOpen(true)} style={{ display: "flex", alignItems: "center", height: 32, background: V.card, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 8px", gap: 8, cursor: "text" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <span style={{ fontSize: 13, color: V.textSecondary, flex: 1, letterSpacing: 0.3 }}>Find...</span>
-                <span style={{ fontSize: 11, color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 4, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "monospace", paddingBottom: 1 }}>F</span>
+            <div className="pd-sidebar-search" style={{ marginBottom: 8 }}>
+              <div 
+                onClick={() => setIsSearchOpen(true)} 
+                className="pd-search-trigger"
+                role="button"
+                tabIndex={0}
+                aria-label="Search project pages"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span>Find...</span>
+                <span className="pd-search-key">F</span>
               </div>
             </div>
 
@@ -451,26 +497,20 @@ const ProjectDetailView: React.FC = () => {
               <div
                 key={item.label}
                 onClick={() => setActiveTab(item.label)}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "8px 16px", margin: "1px 8px", borderRadius: 6, cursor: "pointer",
-                  background: activeTab === item.label ? V.cardHover : (item.highlight && activeTab !== "Speed Insights" ? "rgba(255,255,255,0.03)" : "transparent"),
-                  color: activeTab === item.label ? V.text : V.textSecondary, fontSize: 14,
-                  transition: "background .15s",
-                }}
-                onMouseEnter={e => { if (activeTab !== item.label) e.currentTarget.style.background = V.cardHover; }}
-                onMouseLeave={e => { if (activeTab !== item.label) e.currentTarget.style.background = item.highlight ? "rgba(255,255,255,0.03)" : "transparent"; }}
+                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={activeTab === item.label}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 14, width: 18, textAlign: "center", opacity: activeTab === item.label ? 1 : .7 }}>{item.icon}</span>
-                  <span style={{ fontWeight: activeTab === item.label ? 500 : 400 }}>{item.label}</span>
+                <div className="pd-nav-item-content">
+                  <span className="pd-nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
                 </div>
                 {item.chevron && <span style={{ fontSize: 11, color: V.textTertiary }}>›</span>}
               </div>
             ))}
 
-            {/* Divider */}
-            <div style={{ height: 1, background: V.borderLight, margin: "8px 16px" }}></div>
+            <div className="pd-divider"></div>
 
             {/* Nav Group 2 */}
             {[
@@ -485,26 +525,20 @@ const ProjectDetailView: React.FC = () => {
               <div
                 key={item.label}
                 onClick={() => setActiveTab(item.label)}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "8px 16px", margin: "1px 8px", borderRadius: 6, cursor: "pointer",
-                  background: activeTab === item.label ? V.cardHover : "transparent",
-                  color: activeTab === item.label ? V.text : V.textSecondary, fontSize: 14,
-                  transition: "background .15s",
-                }}
-                onMouseEnter={e => { if (activeTab !== item.label) e.currentTarget.style.background = V.cardHover; }}
-                onMouseLeave={e => { if (activeTab !== item.label) e.currentTarget.style.background = "transparent"; }}
+                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={activeTab === item.label}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 14, width: 18, textAlign: "center", opacity: activeTab === item.label ? 1 : .7 }}>{item.icon}</span>
-                  <span style={{ fontWeight: activeTab === item.label ? 500 : 400 }}>{item.label}</span>
+                <div className="pd-nav-item-content">
+                  <span className="pd-nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
                 </div>
                 {item.chevron && <span style={{ fontSize: 11, color: V.textTertiary }}>›</span>}
               </div>
             ))}
 
-            {/* Divider */}
-            <div style={{ height: 1, background: V.borderLight, margin: "8px 16px" }}></div>
+            <div className="pd-divider"></div>
 
             {/* Nav Group 3 */}
             {[
@@ -514,19 +548,14 @@ const ProjectDetailView: React.FC = () => {
               <div
                 key={item.label}
                 onClick={() => setActiveTab(item.label)}
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "8px 16px", margin: "1px 8px", borderRadius: 6, cursor: "pointer",
-                  background: activeTab === item.label ? V.cardHover : "transparent",
-                  color: activeTab === item.label ? V.text : V.textSecondary, fontSize: 14,
-                  transition: "background .15s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = V.cardHover; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
+                role="button"
+                tabIndex={0}
+                aria-pressed={activeTab === item.label}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 14, width: 18, textAlign: "center", opacity: activeTab === item.label ? 1 : .7 }}>{item.icon}</span>
-                  <span style={{ fontWeight: activeTab === item.label ? 500 : 400 }}>{item.label}</span>
+                <div className="pd-nav-item-content">
+                  <span className="pd-nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
                 </div>
                 {item.chevron && <span style={{ fontSize: 11, color: V.textTertiary }}>›</span>}
               </div>
@@ -543,18 +572,18 @@ const ProjectDetailView: React.FC = () => {
       />
 
       {/* ── Main Content ── */}
-      <div className="no-scrollbar" style={{ flex: 1, minWidth: 0, overflowY: "auto" }}>
+      <div className="pd-main no-scrollbar">
         {/* Top bar */}
-        <div style={{ borderBottom: `1px solid ${V.borderLight}`, height: 48, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", position: "sticky", top: 0, background: V.bg, zIndex: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <button onClick={() => nav("/dashboard")} style={{ background: "transparent", border: "none", color: V.textSecondary, cursor: "pointer", fontSize: 18, padding: 0 }}>☰</button>
-            <span style={{ color: V.textTertiary }}>▸</span>
-            <span style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</span>
-            <button style={{ background: "transparent", border: "none", color: V.textSecondary, cursor: "pointer", fontSize: 14, padding: 0 }}>⟳</button>
+        <div className="pd-topbar">
+          <div className="pd-topbar-left">
+            <button onClick={() => nav("/dashboard")} className="pd-topbar-btn" title="Dashboard Menu">☰</button>
+            <span className="pd-breadcrumb-sep">▸</span>
+            <span className="pd-project-name">{p.name}</span>
+            <button className="pd-topbar-btn" title="Refresh" style={{ fontSize: 14 }}>⟳</button>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div className="pd-topbar-right">
             <span style={{ fontSize: 14, fontWeight: 500 }}>{activeTab}</span>
-            <button style={{ background: "transparent", border: "none", color: V.textSecondary, cursor: "pointer", fontSize: 18 }}>⋯</button>
+            <button className="pd-topbar-btn" title="More Options">⋯</button>
           </div>
         </div>
 
@@ -565,7 +594,7 @@ const ProjectDetailView: React.FC = () => {
   );
 };
 
-const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, onClose: () => void, p: ProjInfo }) => {
+function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, onClose: () => void, p: ProjInfo }) {
   if (!isOpen) return null;
 
   const items = [
@@ -574,21 +603,21 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
       title: "Connect Git Repository", 
       desc: "Get preview deployments for every push, and go live on your domain by merging to the production branch.", 
       done: true,
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
     },
     { 
       id: "domain", 
       title: "Add Custom Domain", 
       desc: "Buy a new domain or add an existing one to your project to serve production traffic from your own URL.", 
       done: true,
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
     },
     { 
       id: "preview", 
       title: "Preview Deployment", 
       desc: "Create and push to a new branch to create a preview deployment that allows you to see your changes before going to production.", 
       done: true,
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
     },
     { 
       id: "analytics", 
@@ -596,47 +625,29 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
       desc: "Gain insights into your website's visitors with privacy-friendly tracking and real-time data.", 
       done: false, 
       action: "Enable",
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
     },
     { 
       id: "speed", 
       title: "Enable Speed Insights", 
       desc: "Monitor performance and Core Web Vitals to keep your site fast and optimized for search engines.", 
       done: true,
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
     },
   ];
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 2000, display: "flex", justifyContent: "flex-end" }}>
-      <div 
-        onClick={onClose} 
-        style={{ 
-          position: "absolute", inset: 0, 
-          background: "rgba(0,0,0,0.4)", 
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)", 
-          transition: "opacity 0.3s ease" 
-        }} 
-      />
-      <div style={{ 
-        position: "relative", width: "100%", maxWidth: 640, height: "100%", background: V.bg, 
-        borderLeft: `1px solid ${V.border}`, display: "flex", flexDirection: "column", 
-        boxShadow: "-20px 0 50px rgba(0,0,0,0.5)", animation: "slideIn .4s cubic-bezier(0.16, 1, 0.3, 1)" 
-      }}>
+    <div className="pd-checklist-overlay">
+      <div className="pd-checklist-backdrop" onClick={onClose} />
+      <div className="pd-checklist-content">
         {/* Header Close Button */}
         <div style={{ padding: "16px 24px", display: "flex", justifyContent: "flex-end" }}>
           <button 
             onClick={onClose} 
-            style={{ 
-              background: "transparent", border: "none", cursor: "pointer", 
-              color: V.textTertiary, padding: 8, borderRadius: 8, transition: "background .15s",
-              display: "flex", alignItems: "center", justifyContent: "center"
-            }} 
-            onMouseEnter={e => e.currentTarget.style.background = "var(--gh-bg-secondary)"} 
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            className="pd-topbar-btn"
+            aria-label="Close checklist"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg>
           </button>
         </div>
 
@@ -649,7 +660,7 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
               justifyContent: "center", margin: "0 auto 24px", color: V.accent,
               boxShadow: `0 0 20px rgba(0,112,243,0.15)`
             }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 12px", color: V.text, letterSpacing: "-0.02em" }}>Production Checklist</h2>
             <p style={{ fontSize: 14, color: V.textSecondary, lineHeight: 1.6, maxWidth: 460, margin: "0 auto" }}>
@@ -686,7 +697,7 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
                           width: 20, height: 20, borderRadius: "50%", background: V.accent, 
                           display: "flex", alignItems: "center", justifyContent: "center", color: V.text
                         }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                       )}
                     </div>
@@ -694,18 +705,10 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
                     
                     {!item.done && (
                       <div style={{ display: "flex", gap: 12 }}>
-                        <button style={{ 
-                          background: "#fff", color: V.bg, border: "none", borderRadius: 8, 
-                          padding: "8px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-                          transition: "opacity .15s"
-                        }} onMouseEnter={e => e.currentTarget.style.opacity = "0.9"} onMouseLeave={e => e.currentTarget.style.opacity = "1"}>
+                        <button className="pd-btn-base" style={{ background: "#fff", color: V.bg, border: "none" }}>
                           {item.action}
                         </button>
-                        <button style={{ 
-                          background: "transparent", color: V.textSecondary, border: `1px solid ${V.border}`, 
-                          borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 500, cursor: "pointer",
-                          transition: "background .15s"
-                        }} onMouseEnter={e => e.currentTarget.style.background = "var(--gh-bg-secondary)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <button className="pd-btn-base" style={{ background: "transparent", color: V.textSecondary }}>
                           Skip
                         </button>
                       </div>
@@ -719,16 +722,11 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
           <div style={{ marginTop: 40, borderTop: `1px solid ${V.border}`, paddingTop: 32 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: V.textTertiary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>Further reading</div>
             <div 
-              style={{ 
-                border: `1px solid ${V.border}`, borderRadius: 14, padding: "16px 20px", 
-                display: "flex", gap: 16, alignItems: "center", cursor: "pointer", 
-                background: V.bg, transition: "all 0.15s" 
-              }} 
-              onMouseEnter={e => { e.currentTarget.style.background = "var(--gh-bg-secondary)"; e.currentTarget.style.borderColor = "var(--gh-border)"; }} 
-              onMouseLeave={e => { e.currentTarget.style.background = "var(--gh-bg)"; e.currentTarget.style.borderColor = "var(--gh-border)"; }}
+              className="pd-card-header"
+              style={{ borderRadius: 14, cursor: "pointer", transition: "all 0.15s" }}
             >
                <div style={{ width: 44, height: 44, borderRadius: "50%", background: V.bg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📖</div>
-               <div style={{ flex: 1 }}>
+               <div style={{ flex: 1, padding: "0 16px" }}>
                  <div style={{ fontSize: 14, fontWeight: 600, color: V.text }}>Production checklist for launch</div>
                  <div style={{ fontSize: 12, color: V.textSecondary, marginTop: 2, lineHeight: 1.4 }}>Comprehensive guidelines by the TrackCodex team to help you prepare your project.</div>
                </div>
@@ -741,9 +739,10 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
         <div style={{ padding: "20px 48px", borderTop: `1px solid ${V.border}`, display: "flex", justifyContent: "flex-end", background: V.bg }}>
           <button 
             onClick={onClose} 
+            className="pd-btn-base"
             style={{ 
-              background: "#fff", color: V.bg, border: "none", borderRadius: 8, 
-              padding: "10px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+              background: "#fff", color: V.bg, border: "none",
+              padding: "10px 32px", fontSize: 14, fontWeight: 700,
               boxShadow: "0 4px 12px rgba(255,255,255,0.1)"
             }}
           >
@@ -751,210 +750,194 @@ const ProductionChecklistSidebar = ({ isOpen, onClose, p }: { isOpen: boolean, o
           </button>
         </div>
       </div>
-      <style>{`
-        @keyframes slideIn { 
-          from { transform: translateX(100%); } 
-          to { transform: translateX(0); } 
-        }
-      `}</style>
     </div>
   );
 };
 
-const OverviewTab = ({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, onOpenChecklist: () => void }) => {
+function OverviewTab({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, onOpenChecklist: () => void }) {
   const [isQRVisible, setIsQRVisible] = useState(false);
 
   return (
-    <div style={{ padding: "24px 24px 40px" }}>
+    <div className="pd-tab-container">
       {/* Production Deployment */}
-      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 20 }}>
-        <div style={{ padding: "12px 20px", background: V.card, borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Production Deployment</span>
-          <div style={{ display: "flex", gap: 8 }}>
+      <div className="pd-section-card">
+        <div className="pd-section-header">
+          <span className="pd-section-title">Production Deployment</span>
+          <div className="pd-section-actions">
             <Btn 
               href={p.repoUrl}
-              style={{ background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, padding: "0 16px", color: V.text, display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}
+              title="View Source on GitHub"
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
               Repository
             </Btn>
-            <Btn style={{ background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, padding: "0 16px", color: V.text, display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, height: 32 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <Btn title="Revert to previous version">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
               Instant Rollback
             </Btn>
-            <div style={{ display: "flex", border: `1px solid ${V.border}`, borderRadius: 8, overflow: "hidden", position: "relative", background: "#fff", height: 32, alignItems: "center" }}>
-              <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" style={{ padding: "0 14px", fontSize: 13, fontWeight: 600, color: V.bg, background: "transparent", textDecoration: "none", fontFamily: V.font, display: "flex", alignItems: "center", height: "100%" }}>Visit</a>
+            <div className="pd-prod-visit-btn">
+              <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" className="pd-prod-visit-link">Visit</a>
               <button 
                 onClick={() => setIsQRVisible(!isQRVisible)}
-                style={{ padding: "0 8px", borderLeft: "1px solid #eaeaea", background: "transparent", border: "none", color: "#666", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}
+                className="pd-prod-qr-toggle"
                 title="Show QR Code"
               >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: isQRVisible ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: isQRVisible ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
               <VisitQRCodePopup isOpen={isQRVisible} onClose={() => setIsQRVisible(false)} domain={p.domain} />
             </div>
           </div>
         </div>
 
-            <div style={{ padding: 20, display: "flex", gap: 24 }}>
-              {/* Preview */}
-              <div style={{ width: 200, height: 130, borderRadius: 8, border: `1px solid ${V.borderLight}`, background: V.card, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 10, background: "rgba(0,112,243,.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 8px", fontSize: 22, color: V.accent }}>◆</div>
-                  <span style={{ fontSize: 10, color: V.textTertiary, fontFamily: "monospace" }}>TrackCodex</span>
+        <div className="pd-prod-details-grid">
+          {/* Preview Placeholder */}
+          <div className="pd-prod-preview">
+            <div className="pd-prod-preview-content">
+              <div className="pd-prod-preview-icon">◆</div>
+              <span className="pd-prod-preview-label">TrackCodex</span>
+            </div>
+          </div>
+
+          <div className="pd-prod-info-content">
+            <div className="pd-info-group">
+              <div className="pd-data-label">Deployment</div>
+              <div className="pd-data-value">{p.deployUrl}</div>
+            </div>
+            <div className="pd-info-group">
+              <div className="pd-data-label">Domains</div>
+              <div className="pd-domain-links">
+                <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" className="pd-domain-link">{p.domain} ↗</a>
+                {p.altDomain && <a href={`https://${p.altDomain}`} target="_blank" rel="noopener noreferrer" className="pd-domain-link">{p.altDomain} ↗</a>}
+                <button className="pd-add-domain-btn" title="Add Domain">⊕</button>
+              </div>
+            </div>
+            <div className="pd-info-row">
+              <div className="pd-info-group">
+                <div className="pd-data-label">Status</div>
+                <div className="pd-status-pill">
+                  <div className="pd-status-dot pd-status-ready"></div>
+                  <span className="pd-status-text">{p.status}</span>
                 </div>
               </div>
-
-              {/* Details */}
-              <div style={{ flex: 1 }}>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Deployment</div>
-                  <div style={{ fontSize: 13, color: V.text, marginTop: 2 }}>{p.deployUrl}</div>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1, display: "flex", alignItems: "center", gap: 4 }}>Domains <span style={{ cursor: "pointer" }}>⊕</span></div>
-                  <div style={{ display: "flex", gap: 16, marginTop: 2 }}>
-                    <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: V.text, textDecoration: "none" }}>{p.domain} ↗</a>
-                    {p.altDomain && <a href={`https://${p.altDomain}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: V.text, textDecoration: "none" }}>{p.altDomain} ↗</a>}
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 40, marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Status</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#0a0" }}></div>
-                      <span style={{ fontSize: 13, fontWeight: 500 }}>{p.status}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Created</div>
-                    <div style={{ fontSize: 13, marginTop: 2 }}>{p.createdAgo} by {p.createdBy} <span style={{ color: V.textTertiary, cursor: "pointer" }}>⇕</span></div>
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Source</div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ color: V.text }}><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25z"/></svg>
-                    <span style={{ fontSize: 13, fontFamily: "monospace", fontWeight: 600 }}>{p.branch}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 13, color: V.textSecondary }}>
-                    <span>⊙</span>
-                    <span style={{ fontFamily: "monospace" }}>{p.commitHash}</span>
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.commitMsg}</span>
-                  </div>
+              <div className="pd-info-group">
+                <div className="pd-data-label">Created</div>
+                <div className="pd-data-value">
+                  {p.createdAgo} by {p.createdBy} 
+                  <button className="pd-creator-toggle" title="Change Creator">⇕</button>
                 </div>
               </div>
-
-              {/* TrackCodex icon */}
-              <div style={{ flexShrink: 0 }}>
-                <div style={{ width: 32, height: 32, borderRadius: "50%", background: V.card, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 }}>▲</div>
+            </div>
+            <div className="pd-info-group">
+              <div className="pd-data-label">Source</div>
+              <div className="pd-source-info">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25z"/></svg>
+                <span className="pd-source-branch">{p.branch}</span>
+              </div>
+              <div className="pd-commit-info">
+                <span className="pd-commit-hash">⊙ {p.commitHash.substring(0, 7)}</span>
+                <span className="pd-commit-msg">{p.commitMsg}</span>
               </div>
             </div>
           </div>
 
-          {/* Deployment Settings */}
-          <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 20 }}>
-            <div style={{ padding: "12px 20px", display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ color: V.textSecondary, fontSize: 14 }}>▸</span>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>Deployment Settings</span>
-              <span style={{ padding: "2px 10px", fontSize: 11, fontWeight: 600, color: V.accent, background: "rgba(0,112,243,.1)", borderRadius: 20, border: "1px solid rgba(0,112,243,.2)" }}>3 Recommendations</span>
+          <div className="pd-tab-indicator-icon">▲</div>
+        </div>
+      </div>
+
+      {/* Deployment Settings */}
+      <div className="pd-section-card">
+        <div className="pd-section-header">
+          <div className="pd-section-title-group">
+            <span className="pd-section-icon">▸</span>
+            <span className="pd-section-title">Deployment Settings</span>
+            <span className="pd-recommendation-badge">3 Recommendations</span>
+          </div>
+        </div>
+        <div className="pd-section-footer">
+          <span className="pd-footer-text">
+            To update your Production Deployment, push to the <code className="pd-branch-code">{p.branch}</code> branch.
+          </span>
+          <div className="pd-footer-actions">
+            <Btn>Deployments</Btn>
+            <Btn className="pd-icon-btn">⊞</Btn>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom 3 cards */}
+      <div className="pd-bottom-grid">
+        {/* Checklist */}
+        <div className="pd-section-card pd-checklist-card">
+          <div className="pd-section-header">
+            <div className="pd-section-title-group">
+              <span className="pd-section-title">Production Checklist</span>
+              <span className="pd-count-badge">{done}/{p.checklist.length}</span>
             </div>
-            <div style={{ borderTop: `1px solid ${V.borderLight}`, padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 13, color: V.textSecondary }}>
-                To update your Production Deployment, push to the <code style={{ fontFamily: "monospace", fontWeight: 600, color: V.text, background: V.cardHover, padding: "2px 6px", borderRadius: 4 }}>{p.branch}</code> branch.
-              </span>
-              <div style={{ display: "flex", gap: 8 }}>
-                <Btn>Deployments</Btn>
-                <Btn style={{ padding: "6px 10px" }}>⊞</Btn>
-              </div>
+            <div className="pd-section-actions">
+              <button onClick={onOpenChecklist} className="pd-icon-btn-circle" title="Edit Checklist">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button className="pd-icon-btn-circle" title="More Actions">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
             </div>
           </div>
+          <div className="pd-checklist-items">
+            {p.checklist.map((c, i) => (
+              <div key={i} className={`pd-checklist-item ${c.done ? 'pd-item-done' : ''}`}>
+                <span className="pd-item-label">{c.label}</span>
+                {c.done && <span className="pd-item-check" aria-hidden="true">✓</span>}
+              </div>
+            ))}
+          </div>
+        </div>
 
-          {/* Bottom 3 cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-            {/* Checklist */}
-            <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ padding: "12px 16px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>Production Checklist</span>
-                  <span style={{ fontSize: 12, color: V.textSecondary }}>{done}/{p.checklist.length}</span>
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button 
-                    onClick={onOpenChecklist} 
-                    title="Edit"
-                    style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "background .15s", background: "transparent", padding: 0 }} 
-                    onMouseEnter={e => e.currentTarget.style.background = V.cardHover} 
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </button>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "background .15s" }} onMouseEnter={e => e.currentTarget.style.background = V.cardHover} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: 8 }}>
-                {p.checklist.map((c, i) => (
-                  <div key={i} style={{
-                    padding: "10px 12px", borderRadius: 8, marginBottom: 2, fontSize: 13, cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    background: c.done ? "rgba(0,112,243,.08)" : "transparent",
-                    color: c.done ? V.accent : V.text,
-                  }}>
-                    <span style={{ textDecoration: c.done ? "line-through" : "none", opacity: c.done ? .8 : 1 }}>{c.label}</span>
-                    {c.done && <span style={{ fontSize: 14 }}>✓</span>}
-                  </div>
-                ))}
-              </div>
+        {/* Observability */}
+        <div className="pd-section-card">
+          <div className="pd-section-header">
+            <div className="pd-section-title-group">
+              <span className="pd-section-title">Observability</span>
+              <span className="pd-time-badge">6h</span>
             </div>
-
-            {/* Observability */}
-            <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ padding: "12px 16px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>Observability</span>
-                  <span style={{ fontSize: 12, color: V.textSecondary }}>6h</span>
-                </div>
-                <span style={{ color: V.textSecondary, fontSize: 14, cursor: "pointer" }}>›</span>
-              </div>
-              <div style={{ padding: 16 }}>
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Edge Requests</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4 }}>{p.edgeReqs}</div>
-                  <Sparkline />
-                </div>
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Function Invocations</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4 }}>{p.fnInvocations}</div>
-                  <div style={{ height: 2, background: V.borderLight, borderRadius: 2, marginTop: 8 }}></div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: V.textTertiary, textTransform: "uppercase", letterSpacing: 1 }}>Error Rate</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4 }}>{p.errorRate}</div>
-                  <div style={{ height: 2, background: V.borderLight, borderRadius: 2, marginTop: 8 }}></div>
-                </div>
-              </div>
+            <button className="pd-more-btn" aria-label="View more observability details">›</button>
+          </div>
+          <div className="pd-observability-content">
+            <div className="pd-metric-group">
+              <div className="pd-data-label">Edge Requests</div>
+              <div className="pd-metric-value">{p.edgeReqs}</div>
+              <Sparkline />
             </div>
-
-            {/* Analytics */}
-            <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
-              <div style={{ padding: "12px 16px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 13, fontWeight: 600 }}>Analytics</span>
-                <span style={{ color: V.textSecondary, fontSize: 14, cursor: "pointer" }}>›</span>
-              </div>
-              <div style={{ padding: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 200 }}>
-                <div style={{ fontSize: 28, color: V.textTertiary, marginBottom: 12 }}>📊</div>
-                <div style={{ fontSize: 13, color: V.textSecondary, marginBottom: 16 }}>Track visitors and page views</div>
-                <button style={{ padding: "8px 20px", fontSize: 13, fontWeight: 500, color: V.text, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 8, cursor: "pointer", fontFamily: V.font }}>Enable</button>
-              </div>
+            <div className="pd-metric-group">
+              <div className="pd-data-label">Function Invocations</div>
+              <div className="pd-metric-value">{p.fnInvocations}</div>
+              <div className="pd-metric-bar"></div>
+            </div>
+            <div className="pd-metric-group">
+              <div className="pd-data-label">Error Rate</div>
+              <div className="pd-metric-value">{p.errorRate}</div>
+              <div className="pd-metric-bar"></div>
             </div>
           </div>
-  </div>
+        </div>
+
+        {/* Analytics */}
+        <div className="pd-section-card">
+          <div className="pd-section-header">
+            <span className="pd-section-title">Analytics</span>
+            <button className="pd-more-btn" aria-label="View more analytics details">›</button>
+          </div>
+          <div className="pd-analytics-empty">
+            <div className="pd-analytics-icon" aria-hidden="true">📊</div>
+            <div className="pd-analytics-text">Track visitors and page views</div>
+            <button className="pd-enable-btn">Enable</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-const DeploymentsTab = ({ p }: { p: ProjInfo }) => {
+function DeploymentsTab({ p }: { p: ProjInfo }) {
   const [tab, setTab] = useState("All");
   return (
   <div style={{ padding: "32px 24px 60px" }}>
@@ -1001,9 +984,10 @@ const DeploymentsTab = ({ p }: { p: ProjInfo }) => {
     </div>
   </div>
   );
-};
+}
 
-const LogsTab = ({ p }: { p: ProjInfo }) => (
+function LogsTab({ p }: { p: ProjInfo }) {
+  return (
   <div style={{ height: "calc(100vh - 48px)", display: "flex", flexDirection: "column" }}>
     <div style={{ padding: "16px 24px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", gap: 12, background: V.bg }}>
       <div style={{ display: "flex", alignItems: "center", height: 32, background: V.card, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", gap: 8, width: 300 }}>
@@ -1018,12 +1002,12 @@ const LogsTab = ({ p }: { p: ProjInfo }) => (
       <div style={{ marginBottom: 8 }}><span style={{ color: V.textTertiary, marginRight: 16 }}>14:32:01.295</span> <span style={{ color: V.accent }}>INFO</span> Server listening on port 3000</div>
       <div style={{ marginBottom: 8 }}><span style={{ color: V.textTertiary, marginRight: 16 }}>14:32:05.882</span> <span style={{ color: V.accent }}>INFO</span> GET /api/user 200 45ms</div>
       <div style={{ marginBottom: 8 }}><span style={{ color: V.textTertiary, marginRight: 16 }}>14:35:12.109</span> <span style={{ color: V.accent }}>INFO</span> GET /dashboard 200 120ms</div>
-      <div style={{ marginBottom: 8, color: "#f87171" }}><span style={{ color: V.textTertiary, marginRight: 16 }}>14:41:03.444</span> ERR  Failed to load resource: net::ERR_CONNECTION_REFUSED</div>
     </div>
   </div>
-);
+  );
+}
 
-const AnalyticsTab = () => {
+function AnalyticsTab() {
   const [tab, setTab] = useState("Visitors");
   return (
    <div style={{ padding: "32px 24px 60px" }}>
@@ -1053,9 +1037,10 @@ const AnalyticsTab = () => {
     )}
   </div>
   );
-};
+}
 
-const SpeedInsightsTab = () => (
+function SpeedInsightsTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>Speed Insights</div>
     <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 40, textAlign: "center", background: V.card }}>
@@ -1067,9 +1052,11 @@ const SpeedInsightsTab = () => (
       <Btn style={{ background: V.text, color: V.bg, border: "none" }}>Enable</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const ChartCard = ({ title, children, hasChevron = true }: { title: string, children: React.ReactNode, hasChevron?: boolean }) => (
+function ChartCard({ title, children, hasChevron = true }: { title: string, children: React.ReactNode, hasChevron?: boolean }) {
+  return (
   <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: "16px 20px", background: V.bg, display: "flex", flexDirection: "column", gap: 16 }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <span style={{ fontSize: 13, fontWeight: 500, color: V.text }}>{title}</span>
@@ -1077,10 +1064,10 @@ const ChartCard = ({ title, children, hasChevron = true }: { title: string, chil
     </div>
     {children}
   </div>
-);
+  );
+}
 
-const ObservabilityOverview = () => {
-
+function ObservabilityOverview() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, marginTop: 8 }}>
       {/* Filters */}
@@ -1193,7 +1180,7 @@ const ObservabilityOverview = () => {
   );
 };
 
-const ObservabilityTab = ({ p, tab }: { p: ProjInfo, tab: string }) => {
+function ObservabilityTab({ p, tab }: { p: ProjInfo, tab: string }) {
   return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -1209,9 +1196,10 @@ const ObservabilityTab = ({ p, tab }: { p: ProjInfo, tab: string }) => {
     )}
   </div>
   );
-};
+}
 
-const FirewallTab = () => (
+function FirewallTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Firewall</div>
@@ -1226,9 +1214,11 @@ const FirewallTab = () => (
       <Btn>Configure</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const CDNTab = () => (
+function CDNTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Edge Network</div>
@@ -1242,9 +1232,11 @@ const CDNTab = () => (
       <Btn>View Cache Settings</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const DomainsTab = ({ p }: { p: ProjInfo }) => (
+function DomainsTab({ p }: { p: ProjInfo }) {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Domains</div>
@@ -1271,9 +1263,11 @@ const DomainsTab = ({ p }: { p: ProjInfo }) => (
       </div>
     </div>
   </div>
-);
+  );
+}
 
-const IntegrationsTab = () => (
+function IntegrationsTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Integrations</div>
@@ -1298,9 +1292,10 @@ const IntegrationsTab = () => (
       ))}
     </div>
   </div>
-);
+  );
+}
 
-const StorageTab = () => {
+function StorageTab() {
   const [tab, setTab] = useState("Postgres");
   return (
    <div style={{ padding: "32px 24px 60px" }}>
@@ -1362,9 +1357,10 @@ const StorageTab = () => {
     )}
   </div>
   );
-};
+}
 
-const FlagsTab = () => (
+function FlagsTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Feature Flags</div>
@@ -1379,9 +1375,11 @@ const FlagsTab = () => (
       <Btn>Get Started</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const AgentTab = () => (
+function AgentTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>AI Agent</div>
@@ -1395,9 +1393,11 @@ const AgentTab = () => (
       <Btn>Explore SDK</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const AIGatewayTab = () => (
+function AIGatewayTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>AI Gateway</div>
@@ -1412,9 +1412,11 @@ const AIGatewayTab = () => (
       <Btn>Learn More</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const SandboxesTab = () => (
+function SandboxesTab() {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Sandboxes</div>
@@ -1429,9 +1431,11 @@ const SandboxesTab = () => (
       <Btn>Create Environment</Btn>
     </div>
   </div>
-);
+  );
+}
 
-const UsageTab = ({ usageTab }: { usageTab: string }) => (
+function UsageTab({ usageTab }: { usageTab: string }) {
+  return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>Usage — {usageTab}</div>
     {usageTab === "Overview" ? (
@@ -1459,9 +1463,10 @@ const UsageTab = ({ usageTab }: { usageTab: string }) => (
       </div>
     )}
   </div>
-);
+  );
+}
 
-const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClose: () => void; domain: string }) => {
+function VisitQRCodePopup({ isOpen, onClose, domain }: { isOpen: boolean; onClose: () => void; domain: string }) {
   if (!isOpen) return null;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://trackcodex.com/auth-redirect?url=${encodeURIComponent(`https://${domain}`)}`)}`;
 
@@ -1579,10 +1584,10 @@ const VisitQRCodePopup = ({ isOpen, onClose, domain }: { isOpen: boolean; onClos
       </div>
     </div>
   );
-};
+}
 
 
-const ProjectMembersSettings = () => {
+function ProjectMembersSettings() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   return (
@@ -1692,9 +1697,9 @@ const ProjectMembersSettings = () => {
     </div>
     </>
   );
-};
+}
 
-const ProjectDeploymentProtectionSettings = () => {
+function ProjectDeploymentProtectionSettings() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       {/* Top Tabs */}
@@ -1783,9 +1788,9 @@ const ProjectDeploymentProtectionSettings = () => {
       </div>
     </div>
   );
-};
+}
 
-const ProjectActivitySettings = () => {
+function ProjectActivitySettings() {
   const activities = [
     { type: "alias", user: "somraj-dev", target: "trackcodex-3fn77kbdi-quantaforze.trackcodex.app", destination: "quantaforze.com", time: "8h" },
     { type: "alias", user: "somraj-dev", target: "trackcodex-3fn77kbdi-quantaforze.trackcodex.app", destination: "trackcodex.com", time: "8h" },
@@ -1866,9 +1871,9 @@ const ProjectActivitySettings = () => {
       </div>
     </div>
   );
-};
+}
 
-const ProjectNotificationsSettings = () => {
+function ProjectNotificationsSettings() {
   const sections = [
     { title: "Team", rows: ["Team join and role change requests"] },
     { title: "Deployments", rows: ["Deployment Access Requests", "Deployment Failures", "Deployment Promotions"] },
@@ -1877,17 +1882,23 @@ const ProjectNotificationsSettings = () => {
     { title: "Edge Config", rows: ["Schema Validation Errors", "Size Limit Alerts"] },
   ];
 
-  const Gear = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="2" style={{ cursor: "pointer" }}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
-  const Toggle = ({ on }: { on?: boolean }) => (
+  function Gear() { 
+    return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textSecondary} strokeWidth="2" style={{ cursor: "pointer" }}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+  }
+  function Toggle({ on }: { on?: boolean }) {
+    return (
     <div style={{ width: 32, height: 18, background: on ? V.accent : V.cardHover, border: `1px solid ${on ? V.accent : V.border}`, borderRadius: 9, padding: 1, display: "flex", alignItems: "center", justifyContent: on ? "flex-end" : "flex-start", cursor: "pointer" }}>
       <div style={{ width: 14, height: 14, background: "#fff", borderRadius: "50%", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}></div>
     </div>
-  );
-  const Check = ({ on }: { on?: boolean }) => (
+    );
+  }
+  function Check({ on }: { on?: boolean }) {
+    return (
     <div style={{ width: 14, height: 14, border: `1px solid ${on ? V.accent : V.border}`, background: on ? V.accent : "transparent", borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
       {on && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4"><polyline points="20 6 9 17 4 12"></polyline></svg>}
     </div>
-  );
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -1965,9 +1976,9 @@ const ProjectNotificationsSettings = () => {
       </div>
     </div>
   );
-};
+}
 
-const SettingsTab = ({ p, tab }: { p: ProjInfo, tab: string }) => {
+function SettingsTab({ p, tab }: { p: ProjInfo, tab: string }) {
   return (
    <div style={{ padding: "32px 24px 60px" }}>
       <div style={{ fontSize: 24, fontWeight: 700, marginBottom: ["Members", "Deployment Protection", "Activity", "My Notifications"].includes(tab) ? 8 : 24 }}>
@@ -2208,6 +2219,6 @@ const SettingsTab = ({ p, tab }: { p: ProjInfo, tab: string }) => {
       )}
    </div>
   );
-};
+}
 
 export default ProjectDetailView;

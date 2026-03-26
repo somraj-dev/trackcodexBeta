@@ -1,33 +1,38 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import "../styles/SearchResults.css";
+import { Star, Heart, Bookmark, MoreHorizontal, ChevronDown, Code, Book, MessageSquare, Users, Globe, Info } from "lucide-react";
 import { api } from "../services/infra/api";
-import { profileService } from "../services/activity/profile";
+import "../styles/SearchResults.css";
 
-interface SearchFilter {
-  name: string;
-  icon: string;
-  type: string;
-}
-
-interface UserResult {
+interface RepoResult {
   id: string;
   name: string;
-  username: string;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  followersCount?: number;
-  isFollowing?: boolean;
-  url: string;
+  owner: string;
+  ownerAvatar?: string;
+  description: string;
+  stargazers_count: number;
+  language?: string;
+  updated_at?: string;
+  topics?: string[];
+  html_url: string;
 }
 
-const FILTERS: SearchFilter[] = [
-  { name: "Repositories", icon: "book", type: "repositories" },
-  { name: "Code", icon: "code", type: "code" },
-  { name: "Users", icon: "person", type: "users" },
-  { name: "Organizations", icon: "domain", type: "organizations" },
-];
+interface SearchApiResponse {
+  results: {
+    id: string;
+    label: string;
+    subLabel?: string;
+    url?: string;
+    metadata?: {
+      owner?: string;
+      avatar?: string;
+      stars?: number;
+      language?: string;
+      updatedAt?: string;
+      topics?: string[];
+    };
+  }[];
+}
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -35,348 +40,230 @@ const SearchResultsPage: React.FC = () => {
   const query = searchParams.get("q") || "";
   const type = searchParams.get("type") || "repositories";
 
-  // Generic results (repos, code, orgs)
-  const [results, setResults] = useState<any[]>([]);
-  // User-specific results (dedicated endpoint)
-  const [userResults, setUserResults] = useState<UserResult[]>([]);
-  const [userTotal, setUserTotal] = useState(0);
-  const [followingMap, setFollowingMap] = useState<Record<string, boolean>>({});
-
-  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<RepoResult[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [searchTime, setSearchTime] = useState(0);
+  
+  const searchRequestId = useRef(0);
+  const lastSearchRef = useRef("");
 
-  useEffect(() => {
-    if (query) {
-      if (type === "users") {
-        performUserSearch();
-      } else {
-        performSearch();
+  const performSearch = useCallback(async (q: string, t: string) => {
+    // Prevent redundant searches if the query and type haven't changed
+    const searchKey = `${q}:${t}`;
+    if (lastSearchRef.current === searchKey) return;
+    lastSearchRef.current = searchKey;
+
+    const currentId = ++searchRequestId.current;
+    
+    // Defer setLoading to avoid cascading render warning in useEffect
+    setTimeout(() => {
+      if (currentId === searchRequestId.current) {
+        setLoading(true);
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, type]);
+    }, 0);
 
-  const performSearch = async () => {
-    setLoading(true);
     const startTime = performance.now();
+    
     try {
-      const data = await api.get<any>(
-        `/search?q=${encodeURIComponent(query)}&type=${type}`
+      const backendType = t === "repositories" ? "repo" : t;
+      const response = await api.get<SearchApiResponse>(
+        `/search?q=${encodeURIComponent(q)}&type=${backendType}`
       );
-      setResults(data.results || []);
+
+      if (currentId === searchRequestId.current) {
+        const mappedResults: RepoResult[] = (response.results || []).map((r) => ({
+          id: r.id,
+          name: r.label,
+          owner: r.metadata?.owner || "unknown",
+          ownerAvatar: r.metadata?.avatar || `https://github.com/${r.metadata?.owner}.png`,
+          description: r.subLabel || "",
+          stargazers_count: r.metadata?.stars || 0,
+          language: r.metadata?.language || "",
+          updated_at: r.metadata?.updatedAt || new Date().toISOString(),
+          topics: r.metadata?.topics || [],
+          html_url: r.url || `/repo/${r.id}`
+        }));
+
+        setResults(mappedResults);
+        setTotalCount(mappedResults.length);
+        setSearchTime(Math.round(performance.now() - startTime));
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Search error:", error);
-    } finally {
-      setSearchTime(Math.round(performance.now() - startTime));
-      setLoading(false);
-    }
-  };
-
-  const performUserSearch = async () => {
-    setLoading(true);
-    const startTime = performance.now();
-    try {
-      const data = await api.get<any>(
-        `/search/users?q=${encodeURIComponent(query)}&limit=30`
-      );
-      const users: UserResult[] = data.users || [];
-      setUserResults(users);
-      setUserTotal(data.total || 0);
-      // Initialise follow state from backend data
-      const initialFollowMap: Record<string, boolean> = {};
-      users.forEach((u) => {
-        if (u.isFollowing !== undefined) {
-          initialFollowMap[u.id] = u.isFollowing;
-        }
-      });
-      setFollowingMap(initialFollowMap);
-    } catch (error) {
-      console.error("User search error:", error);
-      // Fall back to generic search endpoint
-      try {
-        const fallback = await api.get<any>(
-          `/search?q=${encodeURIComponent(query)}&type=users`
-        );
-        const users: UserResult[] = (fallback.results || [])
-          .filter((r: any) => r.type === "user")
-          .map((r: any) => ({
-            id: r.id.replace("user-", ""),
-            name: r.label,
-            username: r.subLabel?.replace("@", "") || "",
-            avatar: r.metadata?.avatar,
-            bio: r.metadata?.bio,
-            location: r.metadata?.location,
-            followersCount: r.metadata?.followersCount,
-            url: r.url,
-          }));
-        setUserResults(users);
-        setUserTotal(users.length);
-      } catch (_) {
-        /* silently ignore */
+      if (currentId === searchRequestId.current) {
+        setLoading(false);
+        setResults([]);
       }
-    } finally {
-      setSearchTime(Math.round(performance.now() - startTime));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (query && query.trim().length >= 2) {
+      performSearch(query, type);
+    } else {
+      setResults([]);
+      setTotalCount(0);
       setLoading(false);
+      lastSearchRef.current = "";
     }
+  }, [query, type, performSearch]);
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "recently";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
-  const handleSync = async () => {
-    try {
-      setLoading(true);
-      await api.post("/auth/sync");
-      await performSearch(); // Re-run search after sync
-    } catch (err) {
-      console.error("Manual sync failed:", err);
-    } finally {
-      setLoading(false);
-    }
+  const handleTypeChange = (newType: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("type", newType);
+    navigate(`/search?${params.toString()}`);
   };
-
-  const handleFollow = useCallback(
-    async (userId: string) => {
-      const isNowFollowing = !followingMap[userId];
-      // Optimistic UI: toggle follow + update follower count immediately
-      setFollowingMap((prev) => ({ ...prev, [userId]: isNowFollowing }));
-      setUserResults((prev) =>
-        prev.map((u) =>
-          u.id === userId
-            ? {
-                ...u,
-                followersCount: Math.max(0, (u.followersCount || 0) + (isNowFollowing ? 1 : -1)),
-              }
-            : u
-        )
-      );
-      try {
-        if (isNowFollowing) {
-          await profileService.followUser(userId);
-        } else {
-          await profileService.unfollowUser(userId);
-        }
-      } catch (error) {
-        // Revert both on error
-        setFollowingMap((prev) => ({ ...prev, [userId]: !isNowFollowing }));
-        setUserResults((prev) =>
-          prev.map((u) =>
-            u.id === userId
-              ? {
-                  ...u,
-                  followersCount: Math.max(0, (u.followersCount || 0) + (isNowFollowing ? -1 : 1)),
-                }
-              : u
-          )
-        );
-        console.error("Follow/unfollow error:", error);
-      }
-    },
-    [followingMap]
-  );
-
-  // ── User card renderer ──────────────────────────────────────────
-  const renderUserCard = (user: UserResult) => {
-    const isFollowing = !!followingMap[user.id];
-    const profileUrl = user.url || `/profile/${user.username}`;
-
-    return (
-      <div key={user.id} className="user-result-card animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <div className="user-result-left">
-          <Link to={profileUrl}>
-            <img
-              src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
-              alt={user.name}
-              className="user-result-avatar"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`;
-              }}
-            />
-          </Link>
-        </div>
-
-        <div className="user-result-content">
-          <div className="user-result-header">
-            <Link to={profileUrl} className="user-result-name">
-              {user.name}
-            </Link>
-            {user.username && (
-              <span className="user-result-username">@{user.username}</span>
-            )}
-          </div>
-          {user.bio && (
-            <p className="user-result-bio">{user.bio}</p>
-          )}
-          <div className="user-result-meta">
-            {user.location && (
-              <span className="meta-item">
-                <span className="material-symbols-outlined">location_on</span>
-                {user.location}
-              </span>
-            )}
-            {user.followersCount !== undefined && (
-              <span className="meta-item">
-                <span className="material-symbols-outlined">group</span>
-                {user.followersCount.toLocaleString()} follower{user.followersCount !== 1 ? "s" : ""}
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="user-result-actions">
-          <button
-            onClick={() => handleFollow(user.id)}
-            className={`follow-btn ${isFollowing ? "follow-btn--following" : ""}`}
-          >
-            {isFollowing ? (
-              <>
-                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>check</span>
-                Following
-              </>
-            ) : (
-              <>
-                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>person_add</span>
-                Follow
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // ── Generic result renderer (repo / org / code) ──────────────────
-  const renderResult = (result: any) => {
-    if (result.type === "user") {
-      // Convert generic user result to UserResult shape
-      const u: UserResult = {
-        id: result.id.replace("user-", ""),
-        name: result.label,
-        username: result.subLabel?.replace("@", "") || result.metadata?.username || "",
-        avatar: result.metadata?.avatar,
-        bio: result.metadata?.bio,
-        location: result.metadata?.location,
-        followersCount: result.metadata?.followersCount,
-        url: result.url,
-      };
-      return renderUserCard(u);
-    }
-
-    if (result.type === "repo") {
-      return (
-        <div key={result.id} className="repo-result-card">
-          <div className="repo-result-header">
-            <span className="material-symbols-outlined repo-icon">book</span>
-            <Link to={result.url} className="repo-result-title">
-              <span className="repo-owner">{result.metadata?.owner}/</span>
-              <span className="repo-name">{result.label}</span>
-            </Link>
-            <span className="repo-visibility">Public</span>
-          </div>
-          <p className="repo-result-description">{result.subLabel}</p>
-          <div className="repo-result-meta">
-            {result.metadata?.language && (
-              <span className="meta-item">
-                <span className="repo-lang-dot" style={{ backgroundColor: "#f1e05a" }} />
-                {result.metadata.language}
-              </span>
-            )}
-            <span className="meta-item">
-              <span className="material-symbols-outlined">star</span>
-              {result.metadata?.stars || 0}
-            </span>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div key={result.id} className="generic-result-card">
-        <div className="result-header">
-          <span className="material-symbols-outlined result-icon">{result.icon}</span>
-          <Link to={result.url} className="result-title">{result.label}</Link>
-        </div>
-        <p className="result-description">{result.subLabel}</p>
-      </div>
-    );
-  };
-
-  const isUsersTab = type === "users";
-  const displayResults = isUsersTab ? userResults : results;
-  const resultCount = isUsersTab ? userTotal : results.length;
 
   return (
-    <div className="search-results-page-v2">
-      <div className="search-container">
-        {/* Sidebar */}
-        <aside className="search-sidebar-v2">
-          <div className="sidebar-section">
-            <h3 className="sidebar-label">Filter by</h3>
-            <div className="filter-list">
-              {FILTERS.map((f) => (
+    <div className="search-page-container bg-gh-bg min-h-screen text-gh-text">
+      <div className="w-full px-6 py-8 flex gap-8">
+        
+        {/* Left Sidebar: Filters */}
+        <aside className="w-[240px] flex-shrink-0">
+          <div className="mb-0">
+            <h3 className="text-[12px] font-semibold text-gh-text-secondary uppercase mb-3 px-2 tracking-wider">Filter by</h3>
+            <nav className="space-y-0.5">
+              {[
+                { name: "Code", type: "code", icon: <Code size={18} /> },
+                { name: "Repositories", type: "repositories", icon: <Book size={18} /> },
+                { name: "Issues", type: "issues", icon: <Info size={18} /> },
+                { name: "Pull requests", type: "pulls", icon: <Globe size={18} /> },
+                { name: "Discussions", type: "discussions", icon: <MessageSquare size={18} /> },
+                { name: "Users", type: "users", icon: <Users size={18} /> },
+              ].map((item) => (
                 <button
-                  key={f.type}
-                  className={`filter-btn ${type === f.type ? "active" : ""}`}
-                  onClick={() =>
-                    navigate(`/search?q=${encodeURIComponent(query)}&type=${f.type}`)
-                  }
+                  key={item.type}
+                  onClick={() => handleTypeChange(item.type)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-[14px] transition-all duration-200 ${
+                    type === item.type 
+                      ? "bg-gh-bg-secondary font-semibold border-l-2 border-primary text-gh-text" 
+                      : "text-gh-text-secondary hover:bg-gh-bg-tertiary hover:text-gh-text"
+                  }`}
                 >
-                  <span className="material-symbols-outlined">{f.icon}</span>
-                  <span className="filter-label">{f.name}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-gh-text-secondary">{item.icon}</span>
+                    <span>{item.name}</span>
+                  </div>
+                  <span className="text-[11px] font-medium text-gh-text-secondary bg-gh-bg-tertiary px-2 py-0.5 rounded-full">
+                    {item.type === "repositories" ? "7.4k" : "2k"}
+                  </span>
                 </button>
               ))}
-            </div>
+              <button className="w-full flex items-center gap-2 px-3 py-2 text-[14px] text-gh-text-secondary hover:text-gh-text transition-colors">
+                <ChevronDown size={16} />
+                <span>More</span>
+              </button>
+            </nav>
           </div>
         </aside>
 
-        {/* Main */}
-        <main className="search-main-v2">
-          <div className="results-info-bar">
-            <h1 className="results-heading">
-              {loading ? (
-                <span>Searching for "{query}"…</span>
-              ) : (
-                <>
-                  {isUsersTab
-                    ? `${resultCount.toLocaleString()} user${resultCount !== 1 ? "s" : ""} matching "${query}"`
-                    : `${resultCount} ${type} results`}
-                </>
-              )}
-            </h1>
-            {!loading && searchTime > 0 && (
-              <span style={{ fontSize: 12, color: "#7d8590" }}>
-                {searchTime.toLocaleString()} ms
-              </span>
-            )}
+        {/* Main Content: Results */}
+        <main className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-gh-border">
+            <div className="flex items-center gap-3">
+              <h2 className="text-[20px] font-semibold tracking-tight">
+                {loading ? "Searching..." : `${totalCount.toLocaleString()} results`} 
+                {!loading && <span className="text-[13px] font-normal text-gh-text-secondary ml-2 tracking-normal opacity-80">({searchTime} ms)</span>}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-gh-bg-secondary border border-gh-border rounded-md px-3 py-1.5 text-[13px] cursor-pointer hover:bg-gh-bg-tertiary transition-all">
+                <span className="text-gh-text-secondary mr-1">Sort by:</span>
+                <span className="font-semibold">Best match</span>
+                <ChevronDown size={14} className="ml-1.5" />
+              </div>
+              <button title="Save Search" className="flex items-center gap-2 px-3 py-1.5 bg-gh-bg-secondary border border-gh-border rounded-md text-[13px] font-semibold hover:bg-gh-bg-tertiary transition-all shadow-sm">
+                <Bookmark size={14} />
+                Save
+              </button>
+              <button title="More Options" className="p-1 px-2 bg-gh-bg-secondary border border-gh-border rounded-md hover:bg-gh-bg-tertiary transition-all shadow-sm">
+                <MoreHorizontal size={16} />
+              </button>
+            </div>
           </div>
 
-          {loading ? (
-            <div className="search-fetching">
-              <div className="gh-spinner" />
-              <p>Searching for <strong>{query}</strong>…</p>
-            </div>
-          ) : displayResults.length === 0 ? (
-            <div className="empty-search">
-              <span className="material-symbols-outlined" style={{ fontSize: 48, color: "#30363d" }}>
-                {isUsersTab ? "person_search" : "search_off"}
-              </span>
-              <h2>No results found for "{query}"</h2>
-              <p>Try different keywords or check your spelling.</p>
-              
-              <div className="empty-actions">
-                <button onClick={handleSync} className="sync-btn-v2">
-                  <span className="material-symbols-outlined">sync</span>
-                  Sync my profile
-                </button>
-                <p className="sync-note">Can't find yourself? Triggering a manual sync might help.</p>
+          <div className="space-y-6">
+            {loading ? (
+              <div className="py-20 flex flex-col items-center justify-center text-gh-text-secondary">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-6 shadow-blue-500/20 shadow-lg"></div>
+                <p className="text-[14px] animate-pulse">Searching through TrackCodex...</p>
               </div>
-            </div>
-          ) : (
-            <div className="results-stack">
-              {isUsersTab
-                ? (displayResults as UserResult[]).map(renderUserCard)
-                : (displayResults as any[]).map(renderResult)}
-            </div>
-          )}
+            ) : results.length === 0 ? (
+              <div className="py-20 text-center">
+                <div className="mb-4 flex justify-center text-gh-text-secondary">
+                  <Info size={48} />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No results found</h3>
+                <p className="text-gh-text-secondary">Try adjusting your search or filters to find what you're looking for.</p>
+              </div>
+            ) : results.map((repo) => (
+              <div key={repo.id} className="p-5 border border-gh-border rounded-xl bg-gh-bg hover:border-gh-border-active hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all relative group">
+                <div className="flex items-start justify-between mb-1.5">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={repo.ownerAvatar || `https://api.dicebear.com/7.x/initials/svg?seed=${repo.owner}`} 
+                      className="w-6 h-6 rounded-md shadow-sm border border-gh-border" 
+                      alt="" 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${repo.owner}`;
+                        (e.currentTarget as HTMLImageElement).onerror = null; // Prevent infinite loop
+                      }}
+                    />
+                    <Link to={repo.html_url} className="text-[16px] text-primary hover:underline font-semibold flex items-center transition-colors">
+                      <span className="font-normal mr-0.5 opacity-70">{repo.owner}/</span>
+                      {repo.name}
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                    <button className="flex items-center gap-1.5 px-3 py-1 bg-gh-bg-secondary border border-gh-border rounded-md text-[12px] font-bold hover:bg-gh-bg-tertiary transition-all active:scale-95 shadow-sm">
+                      <Star size={14} />
+                      Star
+                    </button>
+                    <button className="flex items-center gap-1.5 px-3 py-1 bg-gh-bg-secondary border border-gh-border rounded-md text-[12px] font-bold hover:bg-gh-bg-tertiary transition-all active:scale-95 shadow-sm">
+                      <Heart size={14} className="text-pink-500 fill-pink-500/10" />
+                      Sponsor
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-[14px] text-gh-text mb-3 leading-relaxed opacity-90">{repo.description}</p>
+
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {(repo.topics || []).map(topic => (
+                    <Link key={topic} to={`/search?q=topic:${topic}`} className="px-2.5 py-0.5 bg-primary/10 text-primary rounded-full text-[11px] font-bold hover:bg-primary/20 transition-all border border-primary/20">
+                      {topic}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-5 text-[12px] text-gh-text-secondary font-medium">
+                  {repo.language && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-primary shadow-sm"></span>
+                      {repo.language}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5 hover:text-gh-text transition-colors cursor-pointer">
+                    <Star size={14} />
+                    {repo.stargazers_count}
+                  </div>
+                  <div className="opacity-70">Updated on {formatDate(repo.updated_at)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </main>
+
+
+
       </div>
     </div>
   );

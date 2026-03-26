@@ -514,6 +514,39 @@ export const MOCK_JOBS: Job[] = [
       maxTeamSize: 3
     }
   },
+  {
+    id: "mega-ai-hackathon",
+    title: "India's Biggest Mega AI Hackathon",
+    description: "Multi-agent environment where AI systems manage a 4-way intersection with emergency vehicle prioritization.",
+    budget: "Free Registration",
+    type: "Hackathon",
+    status: "Open",
+    techStack: ["AI", "PyTorch", "Multi-Agent Systems", "Meta"],
+    repoId: "scaler/hackathon",
+    creator: {
+      name: "Scaler School of Technology",
+      avatar: "https://www.scaler.com/favicon.ico",
+    },
+    postedDate: "Just now",
+    website: "https://www.scaler.com/school-of-technology/meta-pytorch-hackathon/register",
+    longDescription: `### India's Biggest Mega AI Hackathon
+  
+  Experience the thrill of building cutting-edge AI systems in this massive hackathon. 
+  
+  #### Tracks
+  
+  **1. Traffic Management**
+  Multi-agent environment where AI systems manage a 4-way intersection with emergency vehicle prioritization.
+  
+  **2. Support: Customer Service Agents**
+  Complex environment where agents resolve multi-step queries using external tools and APIs.
+  
+  **3. Workflow: Email Triage System**
+  Agents learn to prioritize, categorize, and route emails using contextual understanding.
+  
+  **4. Gaming: Multi-Agent Strategy**
+  Agents compete in a strategic game environment with incomplete information and evolving rules.`,
+  },
 ];
 
 export const MOCK_STRATA: Strata[] = [];

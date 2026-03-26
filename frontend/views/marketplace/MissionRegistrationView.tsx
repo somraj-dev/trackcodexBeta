@@ -66,19 +66,28 @@ const InputField = ({
   badge?: React.ReactNode
 }) => (
   <div className="flex-1 min-w-[300px]">
-    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+    <label htmlFor={name} className="block text-[13px] font-bold text-slate-500 mb-2">
       {label}{required && <span className="text-red-500 ml-1">*</span>}
     </label>
     <div className="relative">
       {icon && (
-        <div 
-          className={`absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 ${onIconClick ? 'cursor-pointer hover:text-blue-500 transition-colors' : ''}`}
-          onClick={() => onIconClick?.()}
-        >
-          {icon}
-        </div>
+        onIconClick ? (
+          <button 
+            type="button"
+            className={`absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-blue-500 transition-colors border-none bg-transparent p-0 flex items-center justify-center`}
+            onClick={() => onIconClick()}
+            aria-label="Action icon"
+          >
+            {icon}
+          </button>
+        ) : (
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+            {icon}
+          </div>
+        )
       )}
       <input
+        id={name}
         type={type}
         name={name}
         value={value}
@@ -107,11 +116,12 @@ const SelectField = ({
   required?: boolean 
 }) => (
   <div className="flex-1 min-w-[300px]">
-    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+    <label htmlFor={name} className="block text-[13px] font-bold text-slate-500 mb-2">
       {label}{required && <span className="text-red-500 ml-1">*</span>}
     </label>
     <div className="relative">
       <select
+        id={name}
         name={name}
         value={value}
         onChange={onChange}
@@ -126,14 +136,34 @@ const SelectField = ({
   </div>
 );
 
+interface MissionRegistrationFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile: string;
+  gender: string;
+  location: string;
+  institute: string;
+  differentlyAbled: string;
+  userType: string;
+  domain: string;
+  course: string;
+  specialization: string;
+  specializationOther: string;
+  graduatingYear: string;
+  courseDuration: string;
+  agreeToShare: boolean;
+  stayInLoop: boolean;
+}
+
 const MissionRegistrationView = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
   const [mission, setMission] = useState<Job | null>(null);
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<MissionRegistrationFormData>({
     firstName: "Quantaforge",
     lastName: "",
     email: "quantaforge25@gmail.com",
@@ -167,7 +197,7 @@ const MissionRegistrationView = () => {
         type: "error",
         title: "Geolocation Not Supported",
         message: "Your browser does not support location services.",
-      } as any);
+      });
       return;
     }
 
@@ -192,7 +222,7 @@ const MissionRegistrationView = () => {
             type: "success",
             title: "Location Updated",
             message: `Found: ${fullAddress}`,
-          } as any);
+          });
         } catch (error) {
           console.error("Reverse geocoding error:", error);
           setFormData(prev => ({ ...prev, location: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
@@ -207,7 +237,7 @@ const MissionRegistrationView = () => {
           type: "error",
           title: "Location Access Denied",
           message: "Please enable location permissions in your browser.",
-        } as any);
+        });
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -222,7 +252,7 @@ const MissionRegistrationView = () => {
       return;
     }
     api.get(`/jobs/${id}`)
-      .then((data: any) => setMission(data))
+      .then((data) => setMission(data as Job))
       .catch((err) => console.warn("Failed to fetch mission", err));
   }, [id]);
 
@@ -248,7 +278,7 @@ const MissionRegistrationView = () => {
         type: "error",
         title: "Validation Error",
         message: `Please fill in all required fields: ${missingFields.map(f => f.replace(/([A-Z])/g, ' $1').toLowerCase()).join(", ")}`,
-      } as any);
+      });
       
       // Scroll to the first missing field's section if possible
       if (missingFields.some(f => ["firstName", "email", "mobile", "gender", "location", "institute", "differentlyAbled"].includes(f))) {
@@ -264,7 +294,7 @@ const MissionRegistrationView = () => {
         type: "error",
         title: "Agreement Required",
         message: "Please agree to the terms and conditions to proceed.",
-      } as any);
+      });
       return;
     }
     
@@ -272,7 +302,7 @@ const MissionRegistrationView = () => {
       type: "success",
       title: "Registration Success",
       message: "You have successfully registered for the mission!",
-    } as any);
+    });
 
     // If it's a team participation, show the team selection modal
     const isTeamMission = mission?.metadata?.participationType === 'Team Participation' || 
@@ -353,7 +383,7 @@ const MissionRegistrationView = () => {
                     badge={<span className="material-symbols-outlined text-green-500 text-[20px]">check_circle</span>}
                 />
                 <div className="flex-1 min-w-[300px]">
-                    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+                    <label htmlFor="mobile-input" className="block text-[13px] font-bold text-slate-500 mb-2">
                         Mobile<span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="flex gap-2">
@@ -362,12 +392,13 @@ const MissionRegistrationView = () => {
                         </div>
                         <div className="relative flex-1">
                             <input
+                            id="mobile-input"
                             type="text"
                             value={formData.mobile}
                             onChange={e => setFormData({...formData, mobile: e.target.value})}
                             className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-blue-400 outline-none text-[14px]"
                             />
-                            <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-blue-600 px-3 py-1 hover:bg-blue-50 rounded">Verify</button>
+                            <button type="button" aria-label="Verify mobile number" className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-blue-600 px-3 py-1 hover:bg-blue-50 rounded">Verify</button>
                         </div>
                     </div>
                 </div>
@@ -739,7 +770,7 @@ const TeamManagementView = ({
     onUpdate 
 }: { 
     mission: Job, 
-    formData: any, 
+    formData: MissionRegistrationFormData, 
     teamAction: "create" | "join",
     setTeamAction: (action: "create" | "join") => void,
     teamName: string,
