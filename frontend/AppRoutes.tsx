@@ -67,10 +67,6 @@ const SearchResults = React.lazy(() => import("./views/SearchResults"));
 const TrackCoinView = React.lazy(() => import("./views/TrackCoin"));
 
 // GitHub-like features
-const RepoTree = React.lazy(() => import("./components/githubish/RepoTree").then(module => ({ default: module.RepoTree })));
-const FileViewer = React.lazy(() => import("./components/githubish/FileViewer").then(module => ({ default: module.FileViewer })));
-const IssueList = React.lazy(() => import("./components/githubish/IssueList").then(module => ({ default: module.IssueList })));
-const PullRequestDetail = React.lazy(() => import("./components/githubish/PullRequestDetail").then(module => ({ default: module.PullRequestDetail })));
 
 // Strata
 const StrataIndexView = React.lazy(() => import("./views/organizations/StrataIndexView"));
@@ -239,11 +235,6 @@ const AppRoutes = React.memo(() => {
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
             <Route path="/repo/:id/issues/:number" element={<IssueDetail />} />
-            <Route path="/github/:repoId" element={<RepoTree />} />
-            <Route path="/github/:repoId/blob/:branch/*" element={<FileViewer />} />
-            <Route path="/github/:repoId/issues" element={<IssueList />} />
-            <Route path="/github/:repoId/issues/:number" element={<IssueDetail />} />
-            <Route path="/github/:repoId/pulls/:prId" element={<PullRequestDetail />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
             <Route path="/library" element={<LibraryView key="library-list" />} />
             <Route path="/library/new" element={<CreateLibraryResourceView />} />
