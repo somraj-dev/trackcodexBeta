@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { apiInstance } from '../../services/infra/api';
 
 export function IssueList() {
     const { repoId } = useParams();
     const [issues, setIssues] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const { getIdToken } = useAuth();
 
     useEffect(() => {
         const fetchIssues = async () => {
+            if (!repoId) return;
             setLoading(true);
             try {
-                const token = await getIdToken();
-                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
-                const res = await fetch(`/api/v1/github/${repoId}/issues`, { headers });
-                if (res.ok) setIssues(await res.json());
+                const { data } = await apiInstance.get(`/github/${repoId}/issues`);
+                setIssues(data);
             } catch (err) {
                 console.error("Failed to fetch issues", err);
             } finally {

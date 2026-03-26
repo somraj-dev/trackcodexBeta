@@ -99,6 +99,9 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(applicationRoutes);
   await fastify.register(workflowRoutes);
   await fastify.register(githubishRoutes, { prefix: "/github" });
+
+  const { default: gitOperationsRoutes } = await import("./git/gitOperations");
+  await fastify.register(gitOperationsRoutes, { prefix: "/git-ops" });
 }
 
 

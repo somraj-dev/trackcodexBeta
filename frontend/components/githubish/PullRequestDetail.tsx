@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { GitPullRequest, GitMerge, Check, AlertTriangle, ArrowRight } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useParams } from 'react-router-dom';
+import { GitPullRequest, GitMerge, Check, AlertTriangle } from 'lucide-react';
+import { apiInstance } from '../../services/infra/api';
 import { realtimeService } from '../../services/infra/realtime-service';
 
 export function PullRequestDetail() {
-    const { repoId, prId } = useParams();
+    const { prId } = useParams();
     const [pr, setPr] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [merging, setMerging] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { getIdToken } = useAuth();
 
     useEffect(() => {
         const fetchPR = async () => {
+            if (!prId) return;
             setLoading(true);
             try {
-                const token = await getIdToken();
-                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
-                const res = await fetch(`/api/v1/github/pulls/${prId}`, { headers });
-                if (res.ok) setPr(await res.json());
-                else setError("Failed to load PR details.");
+                const { data } = await apiInstance.get(`/github/pulls/${prId}`);
+                setPr(data);
             } catch (err) {
-                setError("Network error fetching PR.");
+                setError("Failed to load PR details or network error.");
             } finally {
                 setLoading(false);
             }
@@ -42,24 +39,19 @@ export function PullRequestDetail() {
     }, [pr?.id, prId]);
 
     const handleMerge = async () => {
+        if (!prId) return;
         setMerging(true);
         setError(null);
         try {
-            const token = await getIdToken();
-            const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
-            const res = await fetch(`/api/v1/github/pulls/${prId}/merge`, {
-                method: 'POST',
-                headers,
-            });
-            const data = await res.json();
+            const { data } = await apiInstance.post(`/github/pulls/${prId}/merge`);
             
-            if (res.ok && data.success) {
+            if (data.success) {
                 setPr({ ...pr, status: 'MERGED' });
             } else {
                 setError(data.error || "Merge failed due to conflicts.");
             }
-        } catch (err) {
-            setError("Network error during merge.");
+        } catch (err: any) {
+            setError(err.response?.data?.error || "Network error during merge.");
         } finally {
             setMerging(false);
         }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Folder, File, FileCode, Search, Menu, X, Box, GitBranch } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Folder, FileCode, Box, GitBranch } from 'lucide-react';
+import { gitOpsService } from '../../services/git/gitOperationsService';
 
 interface TreeEntry {
     type: string;
@@ -16,28 +16,26 @@ function RepoTree() {
     const [tree, setTree] = useState<TreeEntry[]>([]);
     const [branch, setBranch] = useState("master");
     const [branches, setBranches] = useState<string[]>([]);
-    const { getIdToken } = useAuth();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
+            if (!repoId) return;
             setLoading(true);
             try {
-                const token = await getIdToken();
-                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const branchData = await gitOpsService.getBranches(repoId);
+                setBranches(branchData.branches || ["master"]);
 
-                const branchRes = await fetch(`/api/v1/github/${repoId}/branches`, { headers });
+                const treeData = await gitOpsService.getTree(repoId, branch);
                 
-                if (branchRes.ok) {
-                    const branchData = await branchRes.json();
-                    setBranches(branchData.branches || ["master"]);
-                }
-
-                const treeRes = await fetch(`/api/v1/github/${repoId}/tree?branch=${branch}`, { headers });
-                if (treeRes.ok) {
-                    const treeData = await treeRes.json();
-                    setTree(treeData.tree || []);
-                }
+                // Transform native TreeEntry (type: "dir"|"file") to the component's format (type: "tree"|"blob") if needed
+                // The native service returns 'dir' and 'file'. Let's map it so the component renders it properly.
+                const formattedTree = (treeData.tree || []).map((node: any) => ({
+                    ...node,
+                    type: node.type === 'dir' ? 'tree' : 'blob'
+                }));
+                
+                setTree(formattedTree);
             } catch (err) {
                 console.error("Failed to load repo data", err);
             } finally {

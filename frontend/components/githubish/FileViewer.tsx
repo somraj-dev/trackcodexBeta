@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Download, FileCode, CheckCircle, Copy } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { ArrowLeft, Download, CheckCircle, Copy } from 'lucide-react';
+import { gitOpsService } from '../../services/git/gitOperationsService';
 // We use a simple pre tag for rendering initially, can upgrade to react-syntax-highlighter
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript';
@@ -18,26 +18,22 @@ export function FileViewer() {
     const { repoId, branch = 'master', '*': filePath } = useParams();
     const [content, setContent] = useState<string>('');
     const [loading, setLoading] = useState(true);
-    const { getIdToken } = useAuth();
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchFile = async () => {
+            if (!repoId || !filePath) return;
             setLoading(true);
             try {
-                const token = await getIdToken();
-                const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
-                const res = await fetch(`/api/v1/github/${repoId}/blob?branch=${encodeURIComponent(branch)}&filepath=${encodeURIComponent(filePath || '')}`, { headers });
-                
-                if (res.ok) {
-                    const text = await res.text();
-                    setContent(text);
-                } else {
-                    setContent(`Error fetching file: ${res.statusText}`);
-                }
-            } catch (err) {
+                const data = await gitOpsService.getFileContent(repoId, filePath, branch);
+                setContent(data.content || '');
+            } catch (err: any) {
                 console.error(err);
-                setContent("Communication Error.");
+                if (err.response?.status === 404) {
+                    setContent("Error fetching file: Not Found");
+                } else {
+                    setContent("Communication Error.");
+                }
             } finally {
                 setLoading(false);
             }
