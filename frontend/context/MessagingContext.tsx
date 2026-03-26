@@ -91,32 +91,55 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // Stop typing indicator on send
         send({ type: 'TYPING_STOP', conversationId: activeConvId });
 
+        const tempId = `temp-${Date.now()}`;
+
+        // 1. Instantly show the message in the UI (optimistic)
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConvId) {
+                return {
+                    ...c,
+                    lastMessage: text,
+                    lastTimestamp: 'Now',
+                    messages: [...(c.messages || []), {
+                        id: tempId,
+                        senderId: user.id,
+                        content: text,
+                        timestamp: new Date().toLocaleTimeString(),
+                        status: 'sent' as const
+                    }]
+                };
+            }
+            return c;
+        }));
+
+        // 2. Send to backend
         try {
             const msg: any = await api.post(`/messages/conversations/${activeConvId}/messages`, { content: text });
 
-            // Update local state optimistically if not already added by socket
+            // 3. Swap temp ID with real ID from server
             setConversations(prev => prev.map(c => {
                 if (c.id === activeConvId) {
-                    const messageExists = c.messages.some(m => m.id === msg.id);
-                    if (messageExists) return c;
-
                     return {
                         ...c,
-                        lastMessage: text,
-                        lastTimestamp: 'Now',
-                        messages: [...(c.messages || []), {
-                            id: msg.id,
-                            senderId: user.id,
-                            content: text,
-                            timestamp: new Date().toLocaleTimeString(),
-                            status: 'sent'
-                        }]
+                        messages: c.messages.map(m =>
+                            m.id === tempId ? { ...m, id: msg.id } : m
+                        )
                     };
                 }
                 return c;
             }));
         } catch (err) {
             console.error('Failed to send message', err);
+            // Remove the optimistic message on failure
+            setConversations(prev => prev.map(c => {
+                if (c.id === activeConvId) {
+                    return {
+                        ...c,
+                        messages: c.messages.filter(m => m.id !== tempId)
+                    };
+                }
+                return c;
+            }));
         }
     }, [activeConvId, send, user?.id]);
 
@@ -133,31 +156,52 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         };
         init();
 
-        const unsubscribe = directMessageBus.subscribe((event: DMEvent) => {
+        const unsubscribe = directMessageBus.subscribe(async (event: DMEvent) => {
             if (event.type === 'DM_OPEN') {
                 setIsPanelOpen(true);
-                setConversations(prev => {
-                    const existing = prev.find(c => c.participants.some(p => p.id === event.data.userId));
-                    if (existing) {
-                        setActiveConvId(existing.id);
-                        return prev;
-                    } else {
-                        const newId = `conv-${Date.now()}`;
+
+                // Check if we already have a conversation with this user loaded
+                const existingLocal = conversations.find(c => c.participants.some(p => p.id === event.data.userId));
+                if (existingLocal) {
+                    setActiveConvId(existingLocal.id);
+                    return;
+                }
+
+                // Always call backend to create/get the REAL conversation
+                try {
+                    const conv: any = await api.post('/messages/conversations', { targetUserId: event.data.userId });
+                    const realId = conv.id;
+
+                    // Now add it to local state with the real backend ID
+                    setConversations(prev => {
+                        const alreadyExists = prev.find(c => c.id === realId);
+                        if (alreadyExists) {
+                            setActiveConvId(realId);
+                            return prev;
+                        }
                         const newConv: Conversation = {
-                            id: newId,
-                            participants: [{ id: event.data.userId, name: event.data.name, avatar: event.data.avatar }],
+                            id: realId,
+                            participants: conv.participants.map((p: any) => ({
+                                id: p.user.id,
+                                name: p.user.name || p.user.username,
+                                avatar: p.user.avatar
+                            })),
                             unreadCount: 0,
-                            messages: event.data.context ? [{ id: 'ctx', senderId: 'system', content: `Discussing: ${event.data.context}`, timestamp: 'Now', status: 'seen' }] : []
+                            messages: event.data.context
+                                ? [{ id: 'ctx', senderId: 'system', content: `Discussing: ${event.data.context}`, timestamp: 'Now', status: 'seen' as const }]
+                                : []
                         };
-                        setActiveConvId(newId);
+                        setActiveConvId(realId);
                         return [newConv, ...prev];
-                    }
-                });
+                    });
+                } catch (err) {
+                    console.error('Failed to create conversation via backend', err);
+                }
             }
         });
 
         return unsubscribe;
-    }, [refreshConversations]);
+    }, [refreshConversations, conversations]);
 
     // Real-time socket integration
     useEffect(() => {
@@ -194,10 +238,11 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // 2. Subscribe to incoming messages and typing events
         const unsubscribe = subscribe((event) => {
             if (event.type === 'new_message' && event.conversationId === activeConvId) {
-                // If the message is from someone else and we are viewing the chat, mark it as read immediately
-                if (event.senderId !== user?.id) {
-                    api.put(`/messages/conversations/${activeConvId}/read`).catch(console.error);
-                }
+                // Skip our own messages — we already show them optimistically
+                if (event.senderId === user?.id) return;
+
+                // Mark as read since we're viewing this conversation
+                api.put(`/messages/conversations/${activeConvId}/read`).catch(console.error);
 
                 setConversations(prev => prev.map(c => {
                     if (c.id === activeConvId) {
@@ -213,7 +258,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                                 senderId: event.senderId,
                                 content: event.content,
                                 timestamp: new Date(event.createdAt).toLocaleTimeString(),
-                                status: event.senderId === user?.id ? 'sent' : 'seen'
+                                status: 'seen' as const
                             }]
                         };
                     }
