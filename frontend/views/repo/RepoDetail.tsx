@@ -312,12 +312,12 @@ const RepoDetailView = () => {
         return <RepoCommitsTab repo={repo} />;
       case "Issues":
         return <RepoIssuesTab repo={repo} />;
-      case "Pull Requests":
+      case "Pull requests":
         return <RepoPullRequestsTab repo={repo} />;
       case "Discussions":
         return <RepoDiscussionsTab repo={repo} />;
-      case "Actions":
-        return <RepoActionsTab />;
+      // case "Actions":
+      //   return <RepoActionsTab />;
       case "Wiki":
         return <RepoWikiTab repo={repo} />;
       case "Projects":
@@ -365,12 +365,12 @@ const RepoDetailView = () => {
               </span>
               <div className="flex items-center gap-2 text-xl">
                 <span
-                  className="text-primary cursor-pointer hover:underline"
+                  className="text-primary cursor-pointer hover:underline font-normal"
                   onClick={() => navigate("/repositories")}
                 >
                   {repo.owner?.username || repo.owner?.name || "track-codex"}
                 </span>
-                <span className="text-gh-text-secondary">/</span>
+                <span className="text-gh-text-secondary font-light">/</span>
                 <span className="font-bold text-primary cursor-pointer hover:underline">
                   {repo.name}
                 </span>
@@ -383,21 +383,6 @@ const RepoDetailView = () => {
                     forked from <span className="text-primary hover:underline cursor-pointer" onClick={() => navigate(`/repo/${repo.parent.id}`)}>{repo.parent.full_name || `${repo.parent.owner.username}/${repo.parent.name}`}</span>
                   </div>
                 )}
-
-                <button
-                  onClick={handleTogglePin}
-                  disabled={isPinning}
-                  className={`ml-2 flex items-center justify-center p-1 rounded-full transition-colors ${
-                    repo.isPinned 
-                      ? "text-primary bg-primary/10" 
-                      : "text-gh-text-secondary hover:text-gh-text hover:bg-gh-bg-tertiary"
-                  } disabled:opacity-50`}
-                  title={repo.isPinned ? "Unpin repository" : "Pin repository"}
-                >
-                  <span className="material-symbols-outlined !text-[16px]">
-                    {repo.isPinned ? "keep_public" : "keep"}
-                  </span>
-                </button>
 
                 {ciStatus && (
                   <div
@@ -418,10 +403,10 @@ const RepoDetailView = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {presence && Array.isArray(presence) && presence.length > 0 && (
                 <div className="flex -space-x-2 mr-2">
-                  {presence.map((uid) => (
+                  {presence.map((uid: string) => (
                     <div
                       key={uid}
                       className="size-7 rounded-full border-2 border-gh-bg bg-primary/20 flex items-center justify-center text-[10px] font-bold text-white uppercase"
@@ -432,6 +417,7 @@ const RepoDetailView = () => {
                   ))}
                 </div>
               )}
+              
               <div className="flex items-center bg-gh-bg-secondary border border-gh-border rounded-md overflow-hidden text-sm">
                 {repo.isTemplate && (
                   <button
@@ -444,28 +430,42 @@ const RepoDetailView = () => {
                     >
                       {isGenerating ? "sync" : "content_copy"}
                     </span>
-                    {isGenerating ? "Generating..." : "Use this template"}
                   </button>
                 )}
-                {/* Added Launch Workspace action right beside other primary actions */}
+                
                 <button
                   onClick={handleLaunchWorkspace}
                   disabled={isLaunchingWorkspace}
-                  className="px-3 py-1 bg-gh-bg-secondary text-gh-text font-bold border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-all disabled:opacity-50 group"
+                  className="px-3 py-1 bg-gh-bg-secondary text-gh-text font-bold border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-all disabled:opacity-50"
+                  title="Launch in Workspace"
                 >
                   <span
-                    className={`material-symbols-outlined !text-[16px] group-hover:text-primary transition-colors ${isLaunchingWorkspace ? "animate-spin" : ""}`}
+                    className={`material-symbols-outlined !text-[16px] ${isLaunchingWorkspace ? "animate-spin" : ""}`}
                   >
                     {isLaunchingWorkspace ? "sync" : "terminal"}
                   </span>
-                  {isLaunchingWorkspace ? "Launching..." : "Launch in Workspace"}
                 </button>
+                <button
+                  onClick={handleTogglePin}
+                  disabled={isPinning}
+                  className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50"
+                  title={repo.isPinned ? "Unpin repository" : "Pin repository"}
+                >
+                  <span className="material-symbols-outlined !text-[16px]">
+                    {repo.isPinned ? "keep_public" : "keep"}
+                  </span>
+                  {repo.isPinned ? "Unpin" : "Pin"}
+                </button>
+
                 <div className="relative group/watch">
                   <button className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50" disabled={isWatching}>
                     <span className="material-symbols-outlined !text-[16px]">
                       {repo.watchLevel ? "visibility" : "visibility_off"}
                     </span>
-                    {isWatching ? "..." : (repo.watchLevel === "ALL" ? "Watching" : repo.watchLevel === "PARTICIPATING" ? "Participating" : "Watch")}
+                    {isWatching ? "..." : "Watch"}
+                    <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs ml-1 border border-gh-border/50">
+                      {repo.watchers || 0}
+                    </span>
                     <span className="material-symbols-outlined !text-[16px] opacity-70">arrow_drop_down</span>
                   </button>
                   <div className="absolute right-0 mt-1 w-48 bg-gh-bg-secondary border border-gh-border rounded-md shadow-lg hidden group-hover/watch:block z-50 py-1">
@@ -480,6 +480,7 @@ const RepoDetailView = () => {
                     </button>
                   </div>
                 </div>
+
                 <button
                   onClick={handleFork}
                   disabled={isForking}
@@ -491,20 +492,21 @@ const RepoDetailView = () => {
                     {isForking ? "sync" : "fork_right"}
                   </span>
                   {isForking ? "Forking..." : "Fork"}
-                  <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs">
-                    {repo.forks}
+                  <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs border border-gh-border/50">
+                    {repo.forks || 0}
                   </span>
                 </button>
+
                 <button 
                   onClick={handleToggleStar}
                   disabled={isStarring}
                   className={`px-3 py-1 ${repo.isStarred ? 'text-yellow-400' : 'text-gh-text'} font-medium hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50`}
                 >
                   <span className={`material-symbols-outlined !text-[16px] ${repo.isStarred ? 'fill-current text-yellow-500' : ''}`}>
-                    star
+                    star_border
                   </span>
                   {isStarring ? "..." : (repo.isStarred ? "Starred" : "Star")}
-                  <span className="bg-gh-bg-tertiary px-1.5 border border-gh-border rounded-full text-xs ml-1 text-gh-text">
+                  <span className="bg-gh-bg-tertiary px-1.5 border border-gh-border/50 rounded-full text-xs ml-1 text-gh-text">
                     {repo.stars || 0}
                   </span>
                 </button>
@@ -516,18 +518,12 @@ const RepoDetailView = () => {
             {[
               "Code",
               "Issues",
-              "Pull Requests",
-              "Commits",
-              "Discussions",
-              "Actions",
+              "Pull requests",
+              // "Actions", // Actions tab removed as per user request, but kept for future implementation
               "Projects",
               "Wiki",
               "Security",
               "Insights",
-              "Releases",
-              "Tags",
-              "Branches",
-              "Contributors",
               "Settings",
             ].map((tab) => (
               <button

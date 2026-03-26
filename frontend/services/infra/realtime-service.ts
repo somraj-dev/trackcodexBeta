@@ -70,9 +70,12 @@ class RealtimeService {
     forwardEvent("NOTIFICATION");
     forwardEvent("USER_FOLLOW");
     forwardEvent("PR_UPDATED");
-    forwardEvent("NEW_POST");
     forwardEvent("NEW_COMMENT");
     forwardEvent("POST_LIKED");
+    forwardEvent("new_message");
+    forwardEvent("TYPING_START");
+    forwardEvent("TYPING_STOP");
+    forwardEvent("REACTION_UPDATE");
   }
 
   send(event: RealtimeEvent) {

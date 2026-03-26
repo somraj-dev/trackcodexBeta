@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { Job } from "../../../types";
 import { profileService } from "../../../services/activity/profile";
 import { jobOfferService } from "../../../services/hiring/jobOfferService";
-import JobAcceptanceModal from "./JobAcceptanceModal";
 
 interface OfferJobModalProps {
   isOpen: boolean;
   onClose: () => void;
   targetUser: {
+    id: string;
     name: string;
     username: string;
   };
@@ -37,8 +36,6 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAcceptancePreview, setShowAcceptancePreview] = useState(false);
-  const [createdJob, setCreatedJob] = useState<Job | null>(null);
 
   if (!isOpen) return null;
 
@@ -46,13 +43,13 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Create the job object with richness
     const job = jobOfferService.createOffer({
       title: formData.title,
       description: "Full-time employment offer via TrackCodex.",
       budget: `$${formData.baseSalary}`,
       techStack: ["React", "Node", "Rust"],
       targetUserId: targetUser.username,
+      targetUserGuid: targetUser.id,
       offerDetails: {
         baseSalary: `$${formData.baseSalary} USD`,
         equity: `${formData.equity} Options`,
@@ -65,20 +62,25 @@ const OfferJobModal: React.FC<OfferJobModalProps> = ({
       },
     });
 
-    setCreatedJob(job);
-
+    // Simulate API delay, then close and notify success
     setTimeout(() => {
       setIsSubmitting(false);
-      // Instead of closing, show the "Simulator" of what the candidate sees
-      setShowAcceptancePreview(true);
+      onClose(); // Close the modal immediately after "sending"
+      
+      // Optional: Trigger a success toast for the SENDER (not a recipient notification)
+      window.dispatchEvent(
+        new CustomEvent("trackcodex-notification", {
+          detail: {
+            title: "Offer Sent",
+            message: `Your job offer for "${job.title}" has been sent to ${targetUser.name}.`,
+            type: "success",
+          },
+        }),
+      );
     }, 800);
   };
 
-  if (showAcceptancePreview && createdJob) {
-    return (
-      <JobAcceptanceModal isOpen={true} onClose={onClose} offer={createdJob} />
-    );
-  }
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300 font-display">

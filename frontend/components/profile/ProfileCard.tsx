@@ -416,7 +416,7 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
         <OfferJobModal
           isOpen={isOfferModalOpen}
           onClose={() => setIsOfferModalOpen(false)}
-          targetUser={{ name: profile.name, username: profile.username }}
+          targetUser={{ id: profile.id, name: profile.name, username: profile.username }}
         />
       )}
 

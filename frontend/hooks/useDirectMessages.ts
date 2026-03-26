@@ -10,6 +10,7 @@ export const useDirectMessages = () => {
     isPanelOpen,
     setIsPanelOpen,
     sendMessage,
+    handleTyping,
     isTyping
   } = useMessaging();
 
@@ -20,6 +21,7 @@ export const useDirectMessages = () => {
     setIsPanelOpen,
     setActiveConvId,
     sendMessage,
+    handleTyping,
     isTyping
   };
 };

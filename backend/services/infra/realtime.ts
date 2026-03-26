@@ -65,6 +65,20 @@ export class RealtimeService {
         }
       });
 
+      socket.on("CONVERSATION_JOIN", (payload: { conversationId: string }) => {
+        if (payload.conversationId) {
+          socket.join(payload.conversationId);
+          console.log(`💬 User ${userId} joined conversation room: ${payload.conversationId}`);
+        }
+      });
+
+      socket.on("CONVERSATION_LEAVE", (payload: { conversationId: string }) => {
+        if (payload.conversationId) {
+          socket.leave(payload.conversationId);
+          console.log(`💬 User ${userId} left conversation room: ${payload.conversationId}`);
+        }
+      });
+
       socket.on("TERMINAL_JOIN", (payload: { workspaceId: string }) => {
         if (payload.workspaceId) {
           const terminalRoom = `terminal-${payload.workspaceId}`;

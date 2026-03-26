@@ -30,18 +30,34 @@ export const jobOfferService = {
     const updatedJobs = [newJob, ...jobs];
     localStorage.setItem(JOB_STORAGE_KEY, JSON.stringify(updatedJobs));
 
-    // Trigger global notification with functional buttons
-    window.dispatchEvent(
-      new CustomEvent("trackcodex-notification", {
-        detail: {
-          title: "New Mission Offer",
-          message: `${currentUser.name} sent you a private mission offer: "${newJob.title}"`,
-          type: "mission",
-          jobId: newJob.id,
-          hasActions: true,
-        },
-      }),
-    );
+    // Send a Direct Message to the recipient via API
+    if (jobData.targetUserGuid) {
+      import("../infra/api").then(({ api }) => {
+        api.post<{ id: string }>("/messages/conversations", { targetUserId: jobData.targetUserGuid })
+          .then(conv => {
+            const offerPayload = {
+              type: "JOB_OFFER",
+              jobId: newJob.id,
+              title: newJob.title,
+              salary: newJob.budget,
+              from: currentUser.name
+            };
+            return api.post(`/messages/conversations/${conv.id}/messages`, { 
+              content: `TRACKCODEX_OFFER_V1:${JSON.stringify(offerPayload)}` 
+            });
+          })
+          .then(() => {
+            // Also trigger backend notification (for Notification Box & Email)
+            return api.post("/jobs/offer", {
+              targetUserId: jobData.targetUserGuid,
+              jobTitle: newJob.title,
+              salary: newJob.budget,
+              fromName: currentUser.name
+            });
+          })
+          .catch(err => console.error("[JobOfferService] Failed to send notification suite", err));
+      });
+    }
 
     return newJob;
   },

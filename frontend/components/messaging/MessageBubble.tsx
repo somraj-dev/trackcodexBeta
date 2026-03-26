@@ -33,16 +33,50 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isMe, showAvatar
             ? 'bg-primary text-white rounded-br-none shadow-lg shadow-primary/10' 
             : 'bg-gh-bg-tertiary text-gh-text rounded-bl-none border border-gh-border'
         }`}>
-          {message.content}
+          {message.content.startsWith('TRACKCODEX_OFFER_V1:') ? (() => {
+            try {
+              const data = JSON.parse(message.content.replace('TRACKCODEX_OFFER_V1:', ''));
+              return (
+                <div className="py-2 space-y-3 min-w-[200px]">
+                  <div className="flex items-center gap-2 text-primary font-bold">
+                    <span className="material-symbols-outlined !text-[18px]">verified</span>
+                    <span>Official Job Offer</span>
+                  </div>
+                  <div className="p-3 bg-gh-bg-secondary rounded-xl border border-gh-border border-dashed">
+                    <div className="font-bold text-[14px]">{data.title}</div>
+                    <div className="text-emerald-500 font-bold mt-1">{data.salary}</div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      // Trigger global offer view event
+                      window.dispatchEvent(new CustomEvent('trackcodex-view-offer', { detail: { jobId: data.jobId } }));
+                    }}
+                    className="w-full py-2 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                  >
+                    View Official Offer
+                    <span className="material-symbols-outlined !text-[16px]">arrow_forward</span>
+                  </button>
+                </div>
+              );
+            } catch (_) {
+              return message.content;
+            }
+          })() : message.content}
         </div>
       </div>
       
       <div className={`flex items-center gap-2 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
-        <span className="text-[9px] text-gh-text-secondary font-bold uppercase">{message.timestamp}</span>
+        <span className="text-[9px] text-gh-text-secondary font-medium uppercase">{message.timestamp}</span>
         {isMe && (
-          <span className="text-[9px] text-primary font-bold uppercase tracking-tighter">
-            {message.status}
-          </span>
+          <div className="flex items-center">
+            {message.status === 'seen' ? (
+              <span className="material-symbols-outlined !text-[14px] text-sky-400 -mr-1">done_all</span>
+            ) : message.status === 'delivered' ? (
+              <span className="material-symbols-outlined !text-[14px] text-gh-text-secondary -mr-1">done_all</span>
+            ) : (
+              <span className="material-symbols-outlined !text-[14px] text-gh-text-secondary">done</span>
+            )}
+          </div>
         )}
       </div>
     </div>

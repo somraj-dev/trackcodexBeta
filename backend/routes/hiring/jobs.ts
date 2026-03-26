@@ -1,6 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from "../../services/infra/prisma";
 
+import { requireAuth } from '../../middleware/auth';
+import { NotificationService } from '../../services/infra/notification';
+
 // Shared prisma instance
 
 // In-memory cache for Jobs List
@@ -296,7 +299,7 @@ export async function jobRoutes(fastify: FastifyInstance) {
         // Get Job to find freelancer (or pass in body)
         // For Demo Phase 1: We accept 'freelancerId' in body, or derive from job
         const { freelancerId } = request.body as any;
-        let targetUserId = freelancerId;
+        const targetUserId = freelancerId;
 
         if (!targetUserId) {
             // Try to find from Job Applications who was hired?
@@ -339,6 +342,31 @@ export async function jobRoutes(fastify: FastifyInstance) {
         } catch (e) {
             console.error(e);
             return reply.code(500).send({ error: "Release failed." });
+        }
+    });
+
+    // Send Job Offer Notification (Triggered from Frontend)
+    fastify.post('/jobs/offer', { preHandler: requireAuth }, async (request, reply) => {
+        const { targetUserId, jobTitle, salary, fromName } = request.body as any;
+        
+        if (!targetUserId || !jobTitle) {
+            return reply.code(400).send({ message: 'Missing targetUserId or jobTitle' });
+        }
+
+        try {
+            await NotificationService.create(
+                targetUserId,
+                'JOB_OFFER',
+                'New Mission Offer',
+                `${fromName || 'Someone'} sent you a private mission offer: "${jobTitle}"`,
+                `/messages`, // Link to mailbox where they can see the offer card
+                { jobTitle, salary, fromName }
+            );
+
+            return { success: true };
+        } catch (error) {
+            console.error("[Backend] Failed to send job offer notification:", error);
+            return reply.code(500).send({ message: 'Failed to send notification' });
         }
     });
 }

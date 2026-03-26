@@ -11,6 +11,7 @@ const MessagingPanel = () => {
     setIsPanelOpen, 
     setActiveConvId,
     sendMessage,
+    handleTyping,
     isTyping 
   } = useDirectMessages();
 
@@ -59,7 +60,7 @@ const MessagingPanel = () => {
                 <div 
                   key={conv.id}
                   onClick={() => setActiveConvId(conv.id)}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all mb-1 ${
+                  className={`relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all mb-1 ${
                     isActive ? 'bg-primary/10 border border-primary/20' : 'hover:bg-gh-bg-secondary border border-transparent'
                   }`}
                 >
@@ -72,6 +73,11 @@ const MessagingPanel = () => {
                     <p className={`text-[12px] truncate ${isActive ? 'text-gh-text' : 'text-gh-text-secondary'}`}>
                       {conv.lastMessage || 'Start a conversation'}
                     </p>
+                    {conv.unreadCount > 0 && !isActive && (
+                      <div className="absolute top-3 right-3 size-5 bg-primary rounded-full flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white">{conv.unreadCount}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -151,7 +157,10 @@ const MessagingPanel = () => {
                   </button>
                   <input 
                     value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
+                    onChange={(e) => {
+                      setInputText(e.target.value);
+                      handleTyping();
+                    }}
                     placeholder="Message..."
                     className="flex-1 bg-transparent border-none focus:ring-0 text-[14px] text-gh-text placeholder:text-gh-text-secondary"
                   />

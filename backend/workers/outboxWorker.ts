@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../services/infra/prisma';
 import { indexDocuments } from '../services/infra/meilisearch';
-
-const prisma = new PrismaClient();
 
 /**
  * The Outbox Worker polls the OutboxEvent table for unprocessed events,

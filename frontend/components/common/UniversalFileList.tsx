@@ -58,8 +58,14 @@ const getFileIcon = (name: string, type: "dir" | "file") => {
       return "palette";
     case "html":
       return "html";
+    case "pdf":
+      return "picture_as_pdf";
+    case "zip":
+    case "tar":
+    case "gz":
+      return "inventory_2";
     default:
-      return "draft";
+      return "description";
   }
 };
 
@@ -72,40 +78,48 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
     <div className="border border-gh-border rounded-md overflow-hidden bg-gh-bg">
       {/* Table Header / Latest Commit Info */}
       {latestCommit && (
-        <div className="bg-gh-bg-secondary p-3 text-sm text-gh-text-secondary flex items-center gap-3 border-b border-gh-border">
-          <div className="flex items-center gap-2">
-            {latestCommit.avatar && (
-              <img
-                src={latestCommit.avatar}
-                alt="Avatar"
-                className="w-5 h-5 rounded-full"
-              />
-            )}
-            <span className="text-gh-text font-bold">
-              {latestCommit.author}
-            </span>
+        <div className="bg-[#161b22] p-3 text-sm text-gh-text-secondary flex items-center justify-between gap-3 border-b border-gh-border">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="shrink-0">
+              {latestCommit.avatar ? (
+                <img
+                  src={latestCommit.avatar}
+                  alt="Avatar"
+                  className="w-6 h-6 rounded-full border border-gh-border"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-gh-bg-tertiary border border-gh-border flex items-center justify-center">
+                  <span className="material-symbols-outlined !text-[14px]">person</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-gh-text font-bold hover:text-primary cursor-pointer hover:underline shrink-0">
+                {latestCommit.author}
+              </span>
+              <span className="truncate hover:text-primary cursor-pointer hover:underline text-gh-text">
+                {latestCommit.message}
+              </span>
+            </div>
           </div>
-          <div className="flex-1 flex items-center gap-2 min-w-0">
-            <span className="truncate hover:text-primary cursor-pointer hover:underline">
-              {latestCommit.message}
-            </span>
+
+          <div className="flex items-center gap-4 shrink-0 overflow-hidden">
             {latestCommit.sha && (
-              <span className="text-[10px] font-mono bg-gh-bg-tertiary px-1.5 py-0.5 rounded border border-gh-border text-gh-text-tertiary">
+              <span className="text-[11px] font-mono text-gh-text-tertiary hover:text-primary cursor-pointer hidden sm:block">
                 {latestCommit.sha.substring(0, 7)}
               </span>
             )}
-          </div>
-          <div className="flex items-center gap-4 shrink-0">
-            <span className="text-gh-text-secondary whitespace-nowrap">
+            <span className="text-gh-text-secondary whitespace-nowrap text-xs">
               {latestCommit.time}
             </span>
             {latestCommit.count && (
-              <div className="text-gh-text-secondary font-mono text-xs flex items-center gap-1 hover:text-primary cursor-pointer">
-                <span className="material-symbols-outlined !text-[14px]">
+              <div className="text-gh-text-secondary font-bold text-xs flex items-center gap-1 hover:text-primary cursor-pointer border-l border-gh-border pl-4 ml-2">
+                <span className="material-symbols-outlined !text-[16px]">
                   history
                 </span>
-                <span className="font-bold">{latestCommit.count}</span>
-                <span className="text-[10px] opacity-60 ml-0.5">commits</span>
+                <span>{latestCommit.count}</span>
+                <span className="font-normal opacity-60 ml-0.5 hidden md:inline">commits</span>
               </div>
             )}
           </div>
@@ -118,28 +132,33 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
           <div
             key={idx}
             onClick={() => onFileClick && onFileClick(file)}
-            className="flex items-center px-4 py-2 hover:bg-gh-bg-secondary group transition-colors cursor-pointer"
+            className="flex items-center px-4 py-[8px] hover:bg-[#161b22] group transition-colors cursor-pointer"
           >
-            <div className="w-[240px] flex items-center gap-3 min-w-[200px]">
+            {/* File Icon and Name */}
+            <div className="w-1/3 min-w-[140px] flex items-center gap-3 pr-2">
               <span
-                className={`material-symbols-outlined !text-[18px] ${
+                className={`material-symbols-outlined !text-[18px] shrink-0 ${
                   file.type === "dir"
-                    ? "text-primary"
-                    : "text-gh-text-secondary"
+                    ? "text-[#7d8590]"
+                    : "text-[#7d8590]"
                 }`}
               >
-                {file.icon || getFileIcon(file.name, file.type)}
+                {file.type === "dir" ? "folder" : getFileIcon(file.name, file.type)}
               </span>
               <span className="text-gh-text text-sm hover:text-primary hover:underline truncate">
                 {file.name}
               </span>
             </div>
-            <div className="flex-1 truncate px-4">
-              <span className="text-gh-text-secondary text-sm truncate hover:text-primary hover:underline cursor-pointer">
+
+            {/* Commit Message */}
+            <div className="flex-1 truncate px-2 hidden md:block">
+              <span className="text-[#8b949e] text-sm truncate hover:text-primary hover:underline cursor-pointer">
                 {file.commitVal}
               </span>
             </div>
-            <div className="w-[120px] text-right text-gh-text-secondary text-sm whitespace-nowrap flex items-center justify-end gap-2">
+
+            {/* Time and Actions */}
+            <div className="w-[120px] text-right text-[#8b949e] text-xs whitespace-nowrap flex items-center justify-end gap-3 shrink-0">
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={(e) => {
@@ -147,23 +166,12 @@ const UniversalFileList: React.FC<UniversalFileListProps> = ({
                     navigator.clipboard.writeText(file.path);
                   }}
                   title="Copy path"
-                  className="p-1 hover:bg-gh-bg-tertiary rounded transition-colors"
+                  className="p-1 hover:bg-gh-bg-tertiary rounded transition-colors text-gh-text-tertiary hover:text-gh-text"
                 >
-                  <span className="material-symbols-outlined !text-[16px]">content_copy</span>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const permalink = `${window.location.origin}/repo/${window.location.pathname.split('/')[2]}/blob/main/${file.path}`;
-                    navigator.clipboard.writeText(permalink);
-                  }}
-                  title="Copy permalink"
-                  className="p-1 hover:bg-gh-bg-tertiary rounded transition-colors"
-                >
-                  <span className="material-symbols-outlined !text-[16px]">link</span>
+                  <span className="material-symbols-outlined !text-[14px]">content_copy</span>
                 </button>
               </div>
-              <span>{file.time}</span>
+              <span className="shrink-0">{file.time}</span>
             </div>
           </div>
         ))}

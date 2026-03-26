@@ -3,6 +3,82 @@ import { useNavigate } from "react-router-dom";
 import { searchService, SearchResult } from "../../services/infra/searchService";
 import { Search } from "lucide-react";
 
+// Navigation Commands (Static default options)
+const navCommands: SearchResult[] = [
+  {
+    id: "nav-home",
+    type: "nav",
+    label: "Go to Home",
+    icon: "home",
+    group: "Navigation",
+    url: "/home",
+  },
+  {
+    id: "nav-explore",
+    type: "nav",
+    label: "Explore",
+    icon: "explore",
+    group: "Navigation",
+    url: "/explore",
+  },
+  {
+    id: "nav-repositories",
+    type: "nav",
+    label: "Your Repositories",
+    icon: "book",
+    group: "Navigation",
+    url: "/repositories",
+  },
+  {
+    id: "nav-jobs",
+    type: "nav",
+    label: "Jobs",
+    icon: "work",
+    group: "Navigation",
+    url: "/jobs",
+  },
+  {
+    id: "nav-marketplace",
+    type: "nav",
+    label: "Marketplace",
+    icon: "storefront",
+    group: "Navigation",
+    url: "/marketplace",
+  },
+  {
+    id: "nav-notifications",
+    type: "nav",
+    label: "Notifications",
+    icon: "notifications",
+    group: "Navigation",
+    url: "/notifications",
+  },
+  {
+    id: "nav-profile",
+    type: "nav",
+    label: "Your Profile",
+    icon: "person",
+    group: "Navigation",
+    url: "/profile",
+  },
+  {
+    id: "nav-settings",
+    type: "nav",
+    label: "Settings",
+    icon: "settings",
+    group: "Navigation",
+    url: "/settings",
+  },
+  {
+    id: "nav-create-repo",
+    type: "nav",
+    label: "Create Repository",
+    icon: "add_circle",
+    group: "Actions",
+    url: "/new",
+  },
+];
+
 const CommandPalette = ({
   isOpen,
   onClose,
@@ -16,82 +92,6 @@ const CommandPalette = ({
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Navigation Commands (Static default options)
-  const navCommands: SearchResult[] = [
-    {
-      id: "nav-home",
-      type: "nav",
-      label: "Go to Home",
-      icon: "home",
-      group: "Navigation",
-      url: "/home",
-    },
-    {
-      id: "nav-explore",
-      type: "nav",
-      label: "Explore",
-      icon: "explore",
-      group: "Navigation",
-      url: "/explore",
-    },
-    {
-      id: "nav-repositories",
-      type: "nav",
-      label: "Your Repositories",
-      icon: "book",
-      group: "Navigation",
-      url: "/repositories",
-    },
-    {
-      id: "nav-jobs",
-      type: "nav",
-      label: "Jobs",
-      icon: "work",
-      group: "Navigation",
-      url: "/jobs",
-    },
-    {
-      id: "nav-marketplace",
-      type: "nav",
-      label: "Marketplace",
-      icon: "storefront",
-      group: "Navigation",
-      url: "/marketplace",
-    },
-    {
-      id: "nav-notifications",
-      type: "nav",
-      label: "Notifications",
-      icon: "notifications",
-      group: "Navigation",
-      url: "/notifications",
-    },
-    {
-      id: "nav-profile",
-      type: "nav",
-      label: "Your Profile",
-      icon: "person",
-      group: "Navigation",
-      url: "/profile",
-    },
-    {
-      id: "nav-settings",
-      type: "nav",
-      label: "Settings",
-      icon: "settings",
-      group: "Navigation",
-      url: "/settings",
-    },
-    {
-      id: "nav-create-repo",
-      type: "nav",
-      label: "Create Repository",
-      icon: "add_circle",
-      group: "Actions",
-      url: "/new",
-    },
-  ];
 
   // Fetch Results
   useEffect(() => {
@@ -137,7 +137,7 @@ const CommandPalette = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [search, navCommands, navigate]);
+  }, [search, navigate]);
 
   // Grouping for render
   const groupedResults = results.reduce(

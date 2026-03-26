@@ -5,6 +5,7 @@ import { NotificationProvider } from "../../context/NotificationContext";
 import { AppDataProvider } from "../../context/AppDataContext";
 import { RealtimeProvider } from "../../contexts/RealtimeContext";
 import { MessagingProvider } from "../../context/MessagingContext";
+import { GlobalOffers } from "../jobs/offer/GlobalOffers";
 
 export const LoggedInProviders = React.memo(({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
@@ -13,11 +14,12 @@ export const LoggedInProviders = React.memo(({ children }: { children: React.Rea
     <AppDataProvider>
       <ProfileProvider>
         <NotificationProvider>
-          <MessagingProvider>
-            <RealtimeProvider userId={user?.id || null}>
+          <RealtimeProvider userId={user?.id || null}>
+            <MessagingProvider>
               {children}
-            </RealtimeProvider>
-          </MessagingProvider>
+              <GlobalOffers />
+            </MessagingProvider>
+          </RealtimeProvider>
         </NotificationProvider>
       </ProfileProvider>
     </AppDataProvider>

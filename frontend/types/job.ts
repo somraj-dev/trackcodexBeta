@@ -26,6 +26,7 @@ export interface Job {
   };
   postedDate: string;
   targetUserId?: string;
+  targetUserGuid?: string;
   personalNote?: string;
   offerDetails?: OfferDetails;
   applications?: any[];
