@@ -11,7 +11,12 @@ const getFirebaseConfig = () => {
 
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
         try {
-            serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+            const parsed = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+            // Fix newline escaping for Railway/Vercel/Docker env vars
+            if (parsed.private_key) {
+                parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+            }
+            serviceAccount = parsed;
         } catch {
             console.error("❌ [FIREBASE] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY JSON");
         }
