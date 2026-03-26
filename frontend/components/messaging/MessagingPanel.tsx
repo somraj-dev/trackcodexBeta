@@ -1,6 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { useDirectMessages, Conversation } from '../../hooks/useDirectMessages';
+import { useDirectMessages } from '../../hooks/useDirectMessages';
+import { useAuth } from '../../context/AuthContext';
 import MessageBubble from './MessageBubble';
 
 const MessagingPanel = () => {
@@ -14,6 +14,7 @@ const MessagingPanel = () => {
     handleTyping,
     isTyping 
   } = useDirectMessages();
+  const { user } = useAuth();
 
   const [inputText, setInputText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -54,7 +55,7 @@ const MessagingPanel = () => {
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
             {conversations.map((conv) => {
-              const other = conv.participants[0];
+              const other = conv.participants.find(p => p.id !== user?.id) || conv.participants[0];
               const isActive = activeConversation?.id === conv.id;
               return (
                 <div 
@@ -90,18 +91,21 @@ const MessagingPanel = () => {
           {activeConversation ? (
             <>
               {/* Header */}
-              <div className="h-[73px] border-b border-gh-border flex items-center justify-between px-6 shrink-0">
-                <div className="flex items-center gap-3">
-                  <img src={activeConversation.participants[0].avatar} className="size-9 rounded-full border border-gh-border" alt="Avatar" />
-                  <div>
-                    <h3 className="text-sm font-bold text-gh-text">{activeConversation.participants[0].name}</h3>
-                    <div className="flex items-center gap-1.5">
-                      <span className="size-1.5 rounded-full bg-emerald-500"></span>
-                      <span className="text-[10px] font-medium uppercase text-emerald-500 tracking-widest">Active Now</span>
+              {(() => {
+                const other = activeConversation.participants.find(p => p.id !== user?.id) || activeConversation.participants[0];
+                return (
+                  <div className="h-[73px] border-b border-gh-border flex items-center justify-between px-6 shrink-0">
+                    <div className="flex items-center gap-3">
+                      <img src={other.avatar} className="size-9 rounded-full border border-gh-border" alt="Avatar" />
+                      <div>
+                        <h3 className="text-sm font-bold text-gh-text">{other.name}</h3>
+                        <div className="flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-emerald-500"></span>
+                          <span className="text-[10px] font-medium uppercase text-emerald-500 tracking-widest">Active Now</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                   <button className="size-9 flex items-center justify-center rounded-full hover:bg-gh-bg-secondary text-gh-text-secondary">
                     <span className="material-symbols-outlined">call</span>
                   </button>
@@ -119,29 +123,42 @@ const MessagingPanel = () => {
                   </button>
                 </div>
               </div>
+            );
+          })()}
 
               {/* Messages Area */}
               <div 
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-2"
               >
-                {activeConversation.messages.map((msg, i) => (
-                  <MessageBubble 
-                    key={msg.id} 
-                    message={msg} 
-                    isMe={msg.senderId === 'current'} 
-                    showAvatar={i === activeConversation.messages.length - 1 || activeConversation.messages[i+1]?.senderId !== msg.senderId}
-                    avatar={activeConversation.participants[0].avatar}
-                  />
-                ))}
+                {activeConversation.messages.map((msg, i) => {
+                  const msgIsMe = msg.senderId === user?.id;
+                  const other = activeConversation.participants.find(p => p.id !== user?.id) || activeConversation.participants[0];
+                  return (
+                    <MessageBubble 
+                      key={msg.id} 
+                      message={msg} 
+                      isMe={msgIsMe} 
+                      showAvatar={i === activeConversation.messages.length - 1 || activeConversation.messages[i+1]?.senderId !== msg.senderId}
+                      avatar={other.avatar}
+                    />
+                  )
+                })}
                 {isTyping && (
                   <div className="flex items-center gap-2 mb-4 animate-pulse">
-                    <img src={activeConversation.participants[0].avatar} className="size-7 rounded-full border border-gh-border" alt="Typing indicator" />
-                    <div className="bg-gh-bg-tertiary px-3 py-2 rounded-2xl flex gap-1 items-center">
-                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce"></div>
-                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-100"></div>
-                       <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-200"></div>
-                    </div>
+                    {(() => {
+                      const other = activeConversation.participants.find(p => p.id !== user?.id) || activeConversation.participants[0];
+                      return (
+                        <>
+                          <img src={other.avatar} className="size-7 rounded-full border border-gh-border" alt="Typing indicator" />
+                          <div className="bg-gh-bg-tertiary px-3 py-2 rounded-2xl flex gap-1 items-center">
+                             <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce"></div>
+                             <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-100"></div>
+                             <div className="size-1 bg-gh-text-secondary rounded-full animate-bounce delay-200"></div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

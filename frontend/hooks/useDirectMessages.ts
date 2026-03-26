@@ -14,9 +14,11 @@ export const useDirectMessages = () => {
     isTyping
   } = useMessaging();
 
+  const activeConversation = conversations.find(c => c.id === activeConvId);
+
   return {
     conversations,
-    activeConversation: conversations.find(c => c.id === activeConvId),
+    activeConversation,
     isPanelOpen,
     setIsPanelOpen,
     setActiveConvId,

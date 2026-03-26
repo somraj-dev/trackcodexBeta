@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { api } from '../services/infra/api';
+import { useAuth } from './AuthContext';
 import { directMessageBus, DMEvent } from '../services/social/directMessageBus';
 import { useRealtime } from '../contexts/RealtimeContext';
 
@@ -42,6 +43,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const { user } = useAuth();
     const { subscribe, send } = useRealtime();
 
     const refreshConversations = useCallback(async () => {
@@ -57,14 +59,14 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 })),
                 lastMessage: c.messages[0]?.content,
                 lastTimestamp: new Date(c.messages[0]?.createdAt).toLocaleTimeString(),
-                unreadCount: c.participants.find((p: any) => p.userId === 'current')?.unreadCount || 0,
+                unreadCount: c.participants.find((p: any) => p.userId === user?.id)?.unreadCount || 0,
                 messages: [] // Fetch on demand
             }));
             setConversations(mapped);
         } catch (err) {
             console.error('Failed to fetch conversations', err);
         }
-    }, [api]); // Ensure api is stable or just use it directly
+    }, [api, user?.id]);
 
     const checkConversation = useCallback(async (userId: string) => {
         try {
@@ -84,24 +86,27 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, [conversations, refreshConversations]);
 
     const sendMessage = useCallback(async (text: string) => {
-        if (!activeConvId || !text.trim()) return;
+        if (!activeConvId || !text.trim() || !user?.id) return;
 
         // Stop typing indicator on send
         send({ type: 'TYPING_STOP', conversationId: activeConvId });
 
         try {
-            const msg = await api.post(`/messages/conversations/${activeConvId}/messages`, { content: text });
+            const msg: any = await api.post(`/messages/conversations/${activeConvId}/messages`, { content: text });
 
-            // Update local state optimistically or via refresh
+            // Update local state optimistically if not already added by socket
             setConversations(prev => prev.map(c => {
                 if (c.id === activeConvId) {
+                    const messageExists = c.messages.some(m => m.id === msg.id);
+                    if (messageExists) return c;
+
                     return {
                         ...c,
                         lastMessage: text,
                         lastTimestamp: 'Now',
                         messages: [...(c.messages || []), {
-                            id: (msg as any).id,
-                            senderId: 'current',
+                            id: msg.id,
+                            senderId: user.id,
                             content: text,
                             timestamp: new Date().toLocaleTimeString(),
                             status: 'sent'
@@ -113,7 +118,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         } catch (err) {
             console.error('Failed to send message', err);
         }
-    }, [activeConvId, send]);
+    }, [activeConvId, send, user?.id]);
 
     const handleTyping = useCallback(() => {
         if (!activeConvId) return;
@@ -161,11 +166,36 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // 1. Join the conversation room on the backend
         send({ type: 'CONVERSATION_JOIN', conversationId: activeConvId });
 
+        // 1.5 Fetch message history
+        const fetchHistory = async () => {
+            try {
+                const data: any[] = await api.get(`/messages/conversations/${activeConvId}/messages`) as any;
+                setConversations(prev => prev.map(c => {
+                    if (c.id === activeConvId) {
+                        return {
+                            ...c,
+                            messages: data.map((m: any) => ({
+                                id: m.id,
+                                senderId: m.senderId,
+                                content: m.content,
+                                timestamp: new Date(m.createdAt).toLocaleTimeString(),
+                                status: m.isReadByAll ? 'seen' : 'sent'
+                            }))
+                        };
+                    }
+                    return c;
+                }));
+            } catch (err) {
+                console.error('Failed to fetch message history', err);
+            }
+        };
+        fetchHistory();
+
         // 2. Subscribe to incoming messages and typing events
         const unsubscribe = subscribe((event) => {
             if (event.type === 'new_message' && event.conversationId === activeConvId) {
                 // If the message is from someone else and we are viewing the chat, mark it as read immediately
-                if (event.senderId !== 'current') {
+                if (event.senderId !== user?.id) {
                     api.put(`/messages/conversations/${activeConvId}/read`).catch(console.error);
                 }
 
@@ -183,7 +213,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                                 senderId: event.senderId,
                                 content: event.content,
                                 timestamp: new Date(event.createdAt).toLocaleTimeString(),
-                                status: event.senderId === 'current' ? 'sent' : 'seen'
+                                status: event.senderId === user?.id ? 'sent' : 'seen'
                             }]
                         };
                     }
@@ -204,7 +234,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             unsubscribe();
             send({ type: 'CONVERSATION_LEAVE', conversationId: activeConvId });
         };
-    }, [activeConvId, subscribe, send]);
+    }, [activeConvId, subscribe, send, user?.id]);
 
     const value = React.useMemo(() => ({
         conversations,

@@ -9,7 +9,7 @@ interface MessageBubbleProps {
   avatar?: string;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isMe, showAvatar, avatar }) => {
+const MessageBubble = ({ message, isMe, showAvatar, avatar }: MessageBubbleProps) => {
   if (message.senderId === 'system') {
     return (
       <div className="flex justify-center my-4">
