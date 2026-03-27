@@ -120,7 +120,6 @@ export async function requireAuth(
         };
         return; // Success with Firebase JWT
       } else {
-        // Should be unreachable due to previous check, but safer to reject
         return reply.code(401).send({
           error: "Unauthorized",
           message: "User record not found in database",
@@ -142,7 +141,22 @@ export async function requireAuth(
     }
 
     // Get and validate session from our database
-    const sessionData = await getSession(sessionId);
+    let sessionData;
+    try {
+      sessionData = await getSession(sessionId);
+    } catch (sessionErr: any) {
+      const isConnectionError = sessionErr?.message?.includes("Can't reach database") ||
+        sessionErr?.code === "P1001" || sessionErr?.code === "P1002";
+      
+      if (isConnectionError) {
+        console.error(`[AUTH] Database connection error during session lookup:`, sessionErr.message);
+        return reply.code(503).send({
+          error: "Service Unavailable",
+          message: "Database is temporarily unavailable. Please try again later.",
+        });
+      }
+      throw sessionErr;
+    }
 
     if (!sessionData) {
       reply.clearCookie("session_id");
@@ -154,10 +168,25 @@ export async function requireAuth(
 
     // Attach user info to request
     // Fix #8: Read role FRESH from DB, not cached session (prevents 7-day stale role)
-    const freshUser = await prisma.user.findUnique({
-      where: { id: sessionData.userId },
-      select: { role: true },
-    });
+    let freshUser;
+    try {
+      freshUser = await prisma.user.findUnique({
+        where: { id: sessionData.userId },
+        select: { role: true },
+      });
+    } catch (userErr: any) {
+      const isConnectionError = userErr?.message?.includes("Can't reach database") ||
+        userErr?.code === "P1001" || userErr?.code === "P1002";
+      
+      if (isConnectionError) {
+        console.error(`[AUTH] Database connection error during user refresh:`, userErr.message);
+        return reply.code(503).send({
+          error: "Service Unavailable",
+          message: "Database is temporarily unavailable. Please try again later.",
+        });
+      }
+      throw userErr;
+    }
 
     if (!freshUser) {
       // If session exists but user record is gone, reject
@@ -180,9 +209,12 @@ export async function requireAuth(
     // Attach CSRF token for response
     (request as Record<string, any>).csrfToken = sessionData.csrfToken;
   } catch (error: any) {
-    return reply.code(401).send({
-      error: "Unauthorized",
-      message: error.message || "Authentication failed",
+    const isConnectionError = error?.message?.includes("Can't reach database") ||
+      error?.code === "P1001" || error?.code === "P1002";
+
+    return reply.code(isConnectionError ? 503 : 401).send({
+      error: isConnectionError ? "Service Unavailable" : "Unauthorized",
+      message: isConnectionError ? "Database is temporarily unavailable." : (error.message || "Authentication failed"),
     });
   }
 }

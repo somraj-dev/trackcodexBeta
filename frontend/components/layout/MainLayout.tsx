@@ -110,8 +110,7 @@ const MainLayout: React.FC = () => {
   ) || isStandalone;
 
   const isFullScreenView = isIdeView || 
-    ["/messages", "/notifications"].includes(location.pathname) ||
-    location.pathname.startsWith("/project/");
+    ["/messages", "/notifications"].includes(location.pathname);
   const isFullPageAction = [
     "/repositories/new", 
     "/repositories/import", 

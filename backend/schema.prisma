@@ -110,6 +110,9 @@ model User {
   deploymentApprovals    DeploymentApproval[]
   userExtensions         UserExtension[]
 
+  // Deploy Projects (Vercel-style)
+  deployProjects          DeployProject[]       @relation("ProjectOwner")
+
   // Normalized relations (Phase 1: Additive)
   settings               UserSettings?
   verification           UserVerification?
@@ -1840,4 +1843,115 @@ model Release {
   updatedAt DateTime @updatedAt
 
   @@unique([repoId, tagName])
+}
+
+// --- Deploy Projects (Vercel-style project management) ---
+
+model DeployProject {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String?  @unique
+  domain      String?
+  logo        String?  @default("⬡")
+  logoBg      String?  @default("#111")
+  repoUrl     String?
+  repoOwner   String?
+  repoName    String?
+  framework   String?  @default("Other")
+  status      String   @default("Active")
+
+  ownerId     String
+  owner       User     @relation("ProjectOwner", fields: [ownerId], references: [id])
+
+  // Build & Deploy settings
+  buildCommand    String?  @default("npm run build")
+  outputDir       String?  @default("dist")
+  installCommand  String?  @default("npm install")
+  rootDir         String?  @default("./")
+  nodeVersion     String?  @default("18.x")
+  envVars         Json?    @default("[]")
+
+  // Cloudflare hosting integration
+  r2BucketPath    String?
+  cfWorkerId      String?
+  activeDeployId  String?
+  buildStatus     String   @default("IDLE") // IDLE | BUILDING | READY | ERROR
+  lastBuildAt     DateTime?
+  lastBuildLogs   String?  @db.Text
+
+  // Analytics toggles
+  analyticsEnabled     Boolean @default(false)
+  speedInsightsEnabled Boolean @default(false)
+
+  customDomains   ProjectDomain[]
+  deployments     ProjectDeployment[]
+  metrics         ProjectMetric[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([name])
+}
+
+model ProjectDeployment {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     DeployProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  status      String   @default("Building")
+  environment String   @default("Production")
+  branch      String   @default("main")
+  commitHash  String?
+  commitMsg   String?
+  url         String?
+  duration    Int?
+  buildLogs   String?  @db.Text
+  meta        Json?
+
+  // Artifact tracking
+  artifactUrl    String?
+  artifactSize   Int?
+  buildStartedAt DateTime?
+  buildEndedAt   DateTime?
+
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([projectId, environment])
+  @@index([projectId, createdAt])
+}
+
+model ProjectDomain {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     DeployProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  domain      String
+  verified    Boolean  @default(false)
+  redirect    String?
+  gitBranch   String?
+
+  createdAt   DateTime @default(now())
+
+  @@unique([projectId, domain])
+}
+
+model ProjectMetric {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     DeployProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  timestamp   DateTime @default(now()) // Start of the hour/period
+  requests    Int      @default(0)
+  errors      Int      @default(0)
+  bandwidth   BigInt   @default(0) // bytes
+  avgLatency  Int      @default(0) // ms
+  
+  // Breakdown of HTTP status codes: { "200": 100, "404": 5 }
+  statusCodes Json?    @default("{}")
+
+  @@unique([projectId, timestamp])
 }

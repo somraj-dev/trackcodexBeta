@@ -55,10 +55,13 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
 
         // If the profile we are viewing is the target user
         if (profile.id === targetUserId) {
-          setProfile(prev => ({
-            ...prev,
-            followers: Math.max(0, (prev.followers || 0) + (action === "FOLLOW" ? 1 : -1))
-          }));
+          // Avoid double-incrementing if the current user performed the action (optimistically handled)
+          if (followerId !== currentUserId) {
+            setProfile(prev => ({
+              ...prev,
+              followers: Math.max(0, (prev.followers || 0) + (action === "FOLLOW" ? 1 : -1))
+            }));
+          }
           
           if (followerId === currentUserId) {
             setIsFollowing(action === "FOLLOW");
@@ -67,10 +70,13 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
         
         // If the profile we are viewing is the person who just followed someone
         if (profile.id === followerId) {
-          setProfile(prev => ({
-            ...prev,
-            following: Math.max(0, (prev.following || 0) + (action === "FOLLOW" ? 1 : -1))
-          }));
+          // Avoid double-incrementing if the current user is viewing their own profile and performed the action
+          if (followerId !== currentUserId) {
+            setProfile(prev => ({
+              ...prev,
+              following: Math.max(0, (prev.following || 0) + (action === "FOLLOW" ? 1 : -1))
+            }));
+          }
         }
       }
     });

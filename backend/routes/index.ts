@@ -39,6 +39,8 @@ import integrationRoutes from "./auth/integrations";
 import { applicationRoutes } from "./hiring/applications";
 import workflowRoutes from "./infra/ci";
 import { githubishRoutes } from "./githubish";
+import { projectRoutes } from "./infra/projects";
+import { analyticsRoutes } from "./infra/analytics";
 
 export async function routes(fastify: FastifyInstance) {
   fastify.addHook("onRequest", async (request) => {
@@ -99,9 +101,14 @@ export async function routes(fastify: FastifyInstance) {
   await fastify.register(applicationRoutes);
   await fastify.register(workflowRoutes);
   await fastify.register(githubishRoutes, { prefix: "/github" });
+  await fastify.register(projectRoutes);
+
+  const { default: hostingWebhookRoutes } = await import("./infra/webhooks-hosting");
+  await fastify.register(hostingWebhookRoutes);
 
   const { default: gitOperationsRoutes } = await import("./git/gitOperations");
   await fastify.register(gitOperationsRoutes, { prefix: "/git-ops" });
+  await fastify.register(analyticsRoutes, { prefix: "/infra" });
 }
 
 

@@ -61,7 +61,11 @@ const Login = () => {
       if (!isFirebaseConfigured) {
         throw new Error("Firebase Authentication is not configured. GitHub login unavailable.");
       }
-      await signInWithPopup(auth, githubProvider);
+      const result = await signInWithPopup(auth, githubProvider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) {
+         localStorage.setItem("github_access_token", credential.accessToken);
+      }
       // Auth state change is handled by onAuthStateChanged in AuthContext
     } catch (error: any) {
       if (error.code === 'auth/account-exists-with-different-credential' || (error.message && error.message.includes('account-exists-with-different-credential'))) {

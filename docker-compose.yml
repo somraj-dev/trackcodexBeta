@@ -22,16 +22,16 @@ services:
 #      - db
 
 
-#  db:
-#    image: postgres:15-alpine
-#    ports:
-#      - "5435:5432"
-#    environment:
-#      - POSTGRES_DB=trackcodex
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=password
-#    volumes:
-#      - pgdata:/var/lib/postgresql/data
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_DB=trackcodex
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   # ── OpenVSCode Server: Self-Hosted IDE ──
   openvscode:

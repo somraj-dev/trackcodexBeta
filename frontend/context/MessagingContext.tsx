@@ -45,6 +45,12 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const { user } = useAuth();
     const { subscribe, send } = useRealtime();
+    
+    // Ref to track latest conversations for the event listener without triggering extra re-runs
+    const conversationsRef = useRef<Conversation[]>([]);
+    useEffect(() => {
+        conversationsRef.current = conversations;
+    }, [conversations]);
 
     const refreshConversations = useCallback(async () => {
         try {
@@ -150,35 +156,39 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const totalUnreadCount = conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
 
+    // Initial load
     useEffect(() => {
-        const init = async () => {
-            await refreshConversations();
-        };
-        init();
+        refreshConversations();
+    }, [refreshConversations]);
 
+    // DM Bus Subscription
+    useEffect(() => {
         const unsubscribe = directMessageBus.subscribe(async (event: DMEvent) => {
             if (event.type === 'DM_OPEN') {
+                console.log('[MessagingContext] DM_OPEN received for user:', event.data.userId);
                 setIsPanelOpen(true);
 
-                // Check if we already have a conversation with this user loaded
-                const existingLocal = conversations.find(c => c.participants.some(p => p.id === event.data.userId));
+                // Use ref to check existing to avoid stale closures
+                // Fix: Ensure we are matching the correct person (not ourselves) or just any participant with that ID
+                const existingLocal = conversationsRef.current.find(c => 
+                    c.participants.some(p => p.id === event.data.userId)
+                );
+
                 if (existingLocal) {
+                    console.log('[MessagingContext] Found existing conversation:', existingLocal.id);
                     setActiveConvId(existingLocal.id);
                     return;
                 }
 
-                // Always call backend to create/get the REAL conversation
+                console.log('[MessagingContext] Creating new conversation for user:', event.data.userId);
                 try {
                     const conv: any = await api.post('/messages/conversations', { targetUserId: event.data.userId });
                     const realId = conv.id;
 
-                    // Now add it to local state with the real backend ID
                     setConversations(prev => {
                         const alreadyExists = prev.find(c => c.id === realId);
-                        if (alreadyExists) {
-                            setActiveConvId(realId);
-                            return prev;
-                        }
+                        if (alreadyExists) return prev;
+                        
                         const newConv: Conversation = {
                             id: realId,
                             participants: conv.participants.map((p: any) => ({
@@ -191,17 +201,20 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                                 ? [{ id: 'ctx', senderId: 'system', content: `Discussing: ${event.data.context}`, timestamp: 'Now', status: 'seen' as const }]
                                 : []
                         };
-                        setActiveConvId(realId);
                         return [newConv, ...prev];
                     });
+                    
+                    setActiveConvId(realId);
                 } catch (err) {
-                    console.error('Failed to create conversation via backend', err);
+                    console.warn('[MessagingContext] Failed to create conversation via backend, backend might be down:', err);
+                    // Fallback: If backend is down, we can't really do much but we'll try to refresh again just in case
+                    refreshConversations();
                 }
             }
         });
 
         return unsubscribe;
-    }, [refreshConversations, conversations]);
+    }, [refreshConversations]); // Added refreshConversations to dependencies
 
     // Real-time socket integration
     useEffect(() => {

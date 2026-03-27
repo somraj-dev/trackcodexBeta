@@ -1,6 +1,7 @@
 import { z } from "zod";
 import dotenv from "dotenv";
 import path from "path";
+import * as fs from "fs";
 
 // Load .env explicitly if needed, though running via 'npm run dev' usually handles it
 dotenv.config({ path: path.join(process.cwd(), ".env") });
@@ -56,7 +57,6 @@ const envSchema = z.object({
 const _env = envSchema.safeParse(process.env);
 
 if (!_env.success) {
-  const fs = await import("fs");
   const errorMsg = `❌ Invalid environment variables: ${JSON.stringify(_env.error.format(), null, 2)}`;
   console.error(errorMsg);
   try {

@@ -236,8 +236,32 @@ export async function userRoutes(fastify: FastifyInstance) {
   });
 
 
+  // Helper to resolve userId (supports both UUID and username)
+  async function resolveUserId(idOrUsername: string): Promise<string | null> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrUsername);
+    if (isUuid) return idOrUsername;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: { equals: idOrUsername, mode: "insensitive" } },
+          { username: { equals: idOrUsername.replace(/^@/, ""), mode: "insensitive" } }
+        ]
+      },
+      select: { id: true }
+    });
+    return user?.id || null;
+  }
+
+
   fastify.post("/users/:userId/follow", { preHandler: requireAuth }, async (request, reply) => {
-    const { userId: targetUserId } = request.params as { userId: string };
+    const { userId: rawUserId } = request.params as { userId: string };
+    const targetUserId = await resolveUserId(rawUserId);
+
+    if (!targetUserId) {
+      return reply.code(404).send({ message: "User not found" });
+    }
+
     const currentUser = (request as any).user;
 
     if (!currentUser) {
@@ -362,7 +386,12 @@ export async function userRoutes(fastify: FastifyInstance) {
       return reply.code(401).send({ message: "Unauthorized" });
     }
 
-    const { userId: targetUserId } = request.params as { userId: string };
+    const { userId: rawUserId } = request.params as { userId: string };
+    const targetUserId = await resolveUserId(rawUserId);
+
+    if (!targetUserId) {
+      return reply.code(404).send({ message: "User not found" });
+    }
 
     try {
       // Find the existing follow
@@ -413,7 +442,11 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // Get user followers
   fastify.get("/users/:userId/followers", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    const { userId: rawUserId } = request.params as { userId: string };
+    const userId = await resolveUserId(rawUserId);
+    if (!userId) {
+      return reply.code(404).send({ message: "User not found" });
+    }
     try {
       const followers = await prisma.follow.findMany({
         where: { followingId: userId },
@@ -452,7 +485,11 @@ export async function userRoutes(fastify: FastifyInstance) {
 
   // Get users followed by user
   fastify.get("/users/:userId/following", async (request, reply) => {
-    const { userId } = request.params as { userId: string };
+    const { userId: rawUserId } = request.params as { userId: string };
+    const userId = await resolveUserId(rawUserId);
+    if (!userId) {
+      return reply.code(404).send({ message: "User not found" });
+    }
     try {
       const following = await prisma.follow.findMany({
         where: { followerId: userId },

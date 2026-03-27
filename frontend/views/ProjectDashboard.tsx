@@ -87,9 +87,16 @@ const ProjectCard = ({ p }: { p: Project }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Derived fields for UI consistency with redesign
+  const logo = p.name ? p.name.charAt(0).toUpperCase() : "P";
+  const logoBg = p.status === "READY" ? "#0070f3" : "#333";
+  const primaryDomain = p.domains?.[0]?.name || p.slug + ".trackcodex.com";
+  const latestDeployment = p.deployments?.[0];
+  const dateStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString() : "Just now";
+
   return (
     <div
-      onClick={() => nav(`/project/${p.id}`, { state: { projectData: p } })}
+      onClick={() => nav(`/project/${p.slug}`, { state: { projectData: p } })}
       style={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, padding: 20, cursor: "pointer", fontFamily: V.font, transition: "all .15s", position: "relative" }}
       onMouseEnter={e => (e.currentTarget.style.borderColor = "#555")}
       onMouseLeave={e => (e.currentTarget.style.borderColor = V.border)}
@@ -97,19 +104,19 @@ const ProjectCard = ({ p }: { p: Project }) => {
       {/* Head */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div style={{ width: 36, height: 36, borderRadius: "50%", background: p.logoBg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", color: V.text, fontSize: 16, fontWeight: 700 }}>
-            {p.logo}
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: logoBg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", color: V.text, fontSize: 16, fontWeight: 700 }}>
+            {logo}
           </div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 600, color: V.text, lineHeight: 1.3 }}>{p.name}</div>
-            <div style={{ fontSize: 12, color: V.textSecondary, lineHeight: 1.3, marginTop: 2 }}>{p.domain}</div>
+            <div style={{ fontSize: 12, color: V.textSecondary, lineHeight: 1.3, marginTop: 2 }}>{primaryDomain}</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 6, position: "relative" }}>
           <button 
             onClick={e => {
               e.stopPropagation();
-              nav(`/project/${p.id}?openChecklist=true`, { state: { projectData: p } });
+              nav(`/project/${p.slug}?openChecklist=true`, { state: { projectData: p } });
             }} 
             style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${V.border}`, background: "transparent", color: V.textSecondary, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }} 
             title="Edit"
@@ -128,18 +135,24 @@ const ProjectCard = ({ p }: { p: Project }) => {
         </div>
       </div>
       {/* Repo */}
-      <a href={p.repoUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: V.textSecondary, textDecoration: "none", marginBottom: 8 }}>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: V.textSecondary, textDecoration: "none", marginBottom: 8 }}>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        <span>{p.repoOwner}/{p.repoName}</span>
-      </a>
+        <span>{p.repoUrl || "No repository linked"}</span>
+      </div>
       {/* Commit */}
-      <div style={{ fontSize: 13, color: V.textSecondary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 8 }}>{p.commitMsg}</div>
+      <div style={{ fontSize: 13, color: V.textSecondary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 8 }}>
+        {latestDeployment?.commitMsg || (p.status === "INITIALIZING" ? "Initializing project..." : "No deployments yet")}
+      </div>
       {/* Date */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: V.textTertiary }}>
-        <span style={{ color: V.text }}>{p.deployDate}</span>
+        <span style={{ color: V.text }}>{dateStr}</span>
         <span>on</span>
         <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style={{ opacity: .7 }}><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25z"/></svg>
-        <span>{p.branch}</span>
+        <span>{p.branch || "main"}</span>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
+           <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.status === "READY" ? "#00c354" : p.status === "INITIALIZING" || p.status === "BUILDING" ? "#f5a623" : "#333" }}></div>
+           <span style={{ fontSize: 11, fontWeight: 600, color: V.textSecondary }}>{p.status}</span>
+        </div>
       </div>
     </div>
   );
@@ -147,21 +160,27 @@ const ProjectCard = ({ p }: { p: Project }) => {
 
 /* ─── Main ─── */
 const ProjectDashboard: React.FC = () => {
-  const { projects, addProject, addTask } = useAppData();
+  const { projects, addProject, addTask, isLoading } = useAppData();
   const [q, setQ] = useState("");
   const [view, setView] = useState<"grid"|"list">("grid");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'project' | 'goal' | 'task'>('project');
 
-  const handleCreate = (newItem: any) => {
+  const handleCreate = async (newItem: any) => {
     if (modalMode === 'task') {
-        addTask({...newItem, status: 'To-do', people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium', type: 'Dashboard', estimation: '3 days'});
+        const task = {...newItem, id: Date.now().toString(), status: 'To-do' as const, people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium' as const, type: 'Dashboard', estimation: '3 days'};
+        addTask(task);
+        return task;
     } else {
-        addProject(newItem);
+        return await addProject(newItem);
     }
   };
 
-  const filtered = projects.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.domain.toLowerCase().includes(q.toLowerCase()));
+  const filtered = projects.filter(p => 
+    p.name.toLowerCase().includes(q.toLowerCase()) || 
+    (p.slug && p.slug.toLowerCase().includes(q.toLowerCase())) ||
+    (p.domains && p.domains.some(d => d.name.toLowerCase().includes(q.toLowerCase())))
+  );
 
   return (
     <div style={{ flex: 1, width: "100%", background: V.bg, overflowY: "auto", fontFamily: V.font, color: V.text }}>
@@ -205,7 +224,13 @@ const ProjectDashboard: React.FC = () => {
         {/* Projects */}
         <div>
           <div style={{ fontSize: 13, fontWeight: 500, color: V.text, marginBottom: 12 }}>Projects</div>
-          {filtered.length > 0 ? (
+          {isLoading && filtered.length === 0 ? (
+            <div style={{ display: "grid", gridTemplateColumns: view === "grid" ? "1fr 1fr" : "1fr", gap: 12 }}>
+              {[1, 2].map(i => (
+                <div key={i} style={{ height: 160, background: V.card, border: `1px solid ${V.border}`, borderRadius: 12, opacity: 0.5, animation: "pulse 1.5s infinite" }} />
+              ))}
+            </div>
+          ) : filtered.length > 0 ? (
             <div style={{ display: "grid", gridTemplateColumns: view === "grid" ? "1fr 1fr" : "1fr", gap: 12 }}>
               {filtered.map(p => <ProjectCard key={p.id} p={p} />)}
             </div>

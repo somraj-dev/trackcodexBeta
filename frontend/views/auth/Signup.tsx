@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, googleProvider, githubProvider } from "../../lib/firebase";
 import { api } from "../../services/infra/api";
 import {
-  signInWithPopup
+  signInWithPopup, GithubAuthProvider
 } from "firebase/auth";
 
 const Signup = () => {
@@ -118,7 +118,11 @@ const Signup = () => {
     setIsLoading(true);
     setError("");
     try {
-      await signInWithPopup(auth, githubProvider);
+      const result = await signInWithPopup(auth, githubProvider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) {
+         localStorage.setItem("github_access_token", credential.accessToken);
+      }
     } catch (err: unknown) {
       const firebaseError = err as { code?: string; message?: string };
       if (firebaseError.code === 'auth/account-exists-with-different-credential') {

@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { InviteModal } from '../components/modals/InviteModal';
+import { projectService, EnvVar, DeploymentItem, DomainItem, ProjectMetric, AnalyticsSummary } from '../services/infra/projectService';
+import { 
+  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, BarChart, Bar 
+} from 'recharts';
 import "../styles/ProjectDetailView.css";
 
 /* ─── Design tokens ─── */
@@ -34,74 +39,8 @@ interface ProjInfo {
   edgeReqs: number;
   fnInvocations: number;
   errorRate: string;
+  customDomains: DomainItem[];
 }
-
-const DATA: Record<string, ProjInfo> = {
-  trackcodex: {
-    name: "trackcodex", domain: "trackcodex.com", altDomain: "quantaforze.com",
-    repoUrl: "https://github.com/somraj-dev/trackcodexBeta",
-    deployUrl: "trackcodex-1w1wza9ui-quantaforze.trackcodex.app",
-    status: "Ready", createdAgo: "7m ago", createdBy: "somraj-dev",
-    branch: "main", commitHash: "0bcbc93",
-    commitMsg: "feat: add Project Dashboard with TrackCodex-style layout for /dashboard ro...",
-    checklist: [
-      { label: "Connect Git Repository", done: true },
-      { label: "Add Custom Domain", done: true },
-      { label: "Preview Deployment", done: true },
-      { label: "Enable Web Analytics", done: false },
-      { label: "Enable Speed Insights", done: false },
-    ],
-    edgeReqs: 423, fnInvocations: 0, errorRate: "0%",
-  },
-  docs: {
-    name: "docs", domain: "docs.trackcodex.com",
-    repoUrl: "https://github.com/somraj-dev/docs",
-    deployUrl: "docs-trackcodex.trackcodex.app",
-    status: "Ready", createdAgo: "5d ago", createdBy: "somraj-dev",
-    branch: "main", commitHash: "a4e21f1",
-    commitMsg: "feat: update links to open in the same tab",
-    checklist: [
-      { label: "Connect Git Repository", done: true },
-      { label: "Add Custom Domain", done: true },
-      { label: "Preview Deployment", done: true },
-      { label: "Enable Web Analytics", done: false },
-      { label: "Enable Speed Insights", done: false },
-    ],
-    edgeReqs: 156, fnInvocations: 0, errorRate: "0%",
-  },
-  support: {
-    name: "support", domain: "support.trackcodex.com",
-    repoUrl: "https://github.com/somraj-dev/support",
-    deployUrl: "support-trackcodex.trackcodex.app",
-    status: "Ready", createdAgo: "5d ago", createdBy: "somraj-dev",
-    branch: "main", commitHash: "bc12e4a",
-    commitMsg: "fix: resolve build failures by removing unused-vars and converti...",
-    checklist: [
-      { label: "Connect Git Repository", done: true },
-      { label: "Add Custom Domain", done: true },
-      { label: "Preview Deployment", done: true },
-      { label: "Enable Web Analytics", done: false },
-      { label: "Enable Speed Insights", done: false },
-    ],
-    edgeReqs: 89, fnInvocations: 0, errorRate: "0%",
-  },
-  browser: {
-    name: "browser", domain: "blog.trackcodex.com",
-    repoUrl: "https://github.com/Quantaforge/trackcodex",
-    deployUrl: "browser-trackcodex.trackcodex.app",
-    status: "Ready", createdAgo: "17d ago", createdBy: "somraj-dev",
-    branch: "main", commitHash: "f1a8c2b",
-    commitMsg: "feat: Initialize ForgeBrowser IDE project",
-    checklist: [
-      { label: "Connect Git Repository", done: true },
-      { label: "Add Custom Domain", done: true },
-      { label: "Preview Deployment", done: false },
-      { label: "Enable Web Analytics", done: false },
-      { label: "Enable Speed Insights", done: false },
-    ],
-    edgeReqs: 12, fnInvocations: 0, errorRate: "0%",
-  },
-};
 
 /* ─── Sparkline ─── */
 const Sparkline = () => {
@@ -113,9 +52,9 @@ const Sparkline = () => {
 };
 
 /* ─── Button helper ─── */
-const Btn = ({ children, onClick, href, style: extra, title }: { children: React.ReactNode; onClick?: () => void; href?: string; style?: React.CSSProperties; title?: string }) => {
-  if (href) return <a href={href} target="_blank" rel="noopener noreferrer" className="pd-btn-base" style={extra} title={title}>{children}</a>;
-  return <button onClick={onClick} className="pd-btn-base" style={extra} title={title}>{children}</button>;
+const Btn = ({ children, onClick, href, style: extra, title, className }: { children: React.ReactNode; onClick?: () => void; href?: string; style?: React.CSSProperties; title?: string; className?: string }) => {
+  if (href) return <a href={href} target="_blank" rel="noopener noreferrer" className={`pd-btn-base ${className || ""}`} style={extra} title={title}>{children}</a>;
+  return <button onClick={onClick} className={`pd-btn-base ${className || ""}`} style={extra} title={title}>{children}</button>;
 };
 
 /* ─── Search Items Builder ─── */
@@ -159,9 +98,11 @@ const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: bool
 
   useEffect(() => {
     if (isOpen) {
-      setSearch("");
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      setTimeout(() => {
+        setSearch("");
+        setSelectedIndex(0);
+        inputRef.current?.focus();
+      }, 50);
     }
   }, [isOpen]);
 
@@ -269,8 +210,52 @@ const ProjectDetailView: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Try hardcoded DATA first, then build from route state
-  let p = DATA[projectId || ""];
+  // Initialize project state
+  const [fetchedProject, setFetchedProject] = useState<ProjInfo | null>(null);
+  let p: any = fetchedProject;
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
+
+  // Try to fetch from API
+  useEffect(() => {
+    if (!projectId) return;
+    
+    const fetchProject = async () => {
+      setIsProjectLoading(true);
+      try {
+        const detail = await projectService.getProject(projectId);
+        setFetchedProject({
+          name: detail.name,
+          domain: (detail as any).domains?.[0]?.name || (detail as any).slug + ".trackcodex.com",
+          altDomain: (detail as any).altDomain || undefined,
+          repoUrl: detail.repoUrl || `https://github.com/${detail.repoOwner || 'user'}/${detail.repoName || detail.name}`,
+          deployUrl: (detail as any).deployUrl || `${detail.name}.trackcodex.com`,
+          status: detail.latestStatus || 'Ready',
+          createdAgo: detail.createdAgo ? new Date(detail.createdAgo as any).toLocaleDateString() : 'Just now',
+          createdBy: detail.createdBy || 'somraj-dev',
+          branch: detail.latestBranch || 'main',
+          commitHash: detail.commitHash || '0000000',
+          commitMsg: detail.commitMsg || 'No deployments yet',
+          checklist: (detail as any).checklist || [],
+          edgeReqs: (detail as any).edgeReqs || 0,
+          fnInvocations: (detail as any).fnInvocations || 0,
+          errorRate: (detail as any).errorRate || '0%',
+          customDomains: detail.customDomains || [],
+        });
+      } catch (err) {
+        console.warn('[ProjectDetailView] API fetch failed, using fallback:', err);
+      } finally {
+        setIsProjectLoading(false);
+      }
+    };
+    fetchProject();
+  }, [projectId]);
+
+  // The useEffect block for fetching deployments and domains was removed as per instructions.
+
+  // Use fetched data if available, otherwise fallback
+  if (!p && fetchedProject) {
+    p = fetchedProject;
+  }
   
   if (!p) {
     const stateData = (location.state as any)?.projectData;
@@ -279,7 +264,7 @@ const ProjectDetailView: React.FC = () => {
         name: stateData.name || projectId || "Unknown",
         domain: stateData.domain || `${projectId}.trackcodex.com`,
         repoUrl: stateData.repoUrl || `https://github.com/somraj-dev/${projectId}`,
-        deployUrl: `${(stateData.name || projectId || "project").toLowerCase().replace(/\s+/g, '-')}-quantaforze.trackcodex.app`,
+        deployUrl: `${(stateData.name || projectId || "project").toLowerCase().replace(/\s+/g, '-')}.trackcodex.com`,
         status: "Ready",
         createdAgo: stateData.deployDate || "Just now",
         createdBy: stateData.repoOwner || "somraj-dev",
@@ -326,18 +311,19 @@ const ProjectDetailView: React.FC = () => {
     </div>
   );
   
-  const done = p.checklist.filter(c => c.done).length;
+  const doneCount = p.checklist.filter((c: any) => c.done).length;
+  const uiData = p; // Use p as uiData for consistency with new tab props
 
   const renderContent = () => {
     switch (activeTab) {
       case "Overview":
-        return <OverviewTab p={p} done={done} onOpenChecklist={() => { console.log("Opening checklist..."); setIsChecklistOpen(true); }} />;
+        return <OverviewTab p={p} done={doneCount} onOpenChecklist={() => setIsChecklistOpen(true)} />;
       case "Deployments":
         return <DeploymentsTab p={p} />;
       case "Logs":
         return <LogsTab p={p} />;
       case "Analytics":
-        return <AnalyticsTab />;
+        return <AnalyticsTab projectId={projectId || ""} />;
       case "Speed Insights":
         return <SpeedInsightsTab />;
       case "Observability":
@@ -646,6 +632,7 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
             onClick={onClose} 
             className="pd-topbar-btn"
             aria-label="Close checklist"
+            style={{ color: "var(--gh-text-secondary)" }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg>
           </button>
@@ -705,7 +692,7 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
                     
                     {!item.done && (
                       <div style={{ display: "flex", gap: 12 }}>
-                        <button className="pd-btn-base" style={{ background: "#fff", color: V.bg, border: "none" }}>
+                        <button className="pd-btn-base" style={{ background: "var(--gh-text)", color: "var(--gh-bg)", border: "none" }}>
                           {item.action}
                         </button>
                         <button className="pd-btn-base" style={{ background: "transparent", color: V.textSecondary }}>
@@ -741,9 +728,9 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
             onClick={onClose} 
             className="pd-btn-base"
             style={{ 
-              background: "#fff", color: V.bg, border: "none",
+              background: "var(--gh-text)", color: "var(--gh-bg)", border: "none",
               padding: "10px 32px", fontSize: 14, fontWeight: 700,
-              boxShadow: "0 4px 12px rgba(255,255,255,0.1)"
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
             }}
           >
             Done
@@ -754,198 +741,325 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
   );
 };
 
-function OverviewTab({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, onOpenChecklist: () => void }) {
+function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpenChecklist: () => void }) {
   const [isQRVisible, setIsQRVisible] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
-    <div className="pd-tab-container">
-      {/* Production Deployment */}
-      <div className="pd-section-card">
-        <div className="pd-section-header">
-          <span className="pd-section-title">Production Deployment</span>
-          <div className="pd-section-actions">
-            <Btn 
-              href={p.repoUrl}
-              title="View Source on GitHub"
+    <div className="pd-tab-container" style={{ maxWidth: 1200, margin: "0 auto" }}>
+      {/* 1. Production Deployment Header */}
+      <div className="pd-overview-header">
+        <h2 className="pd-overview-title" style={{ fontSize: 16 }}>Production Deployment</h2>
+        <div className="pd-overview-actions">
+          <button className="pd-vercel-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            Repository
+          </button>
+          <button className="pd-vercel-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Instant Rollback
+          </button>
+          <div style={{ display: "flex", borderRadius: 8, overflow: "hidden", border: "1px solid var(--gh-border)" }}>
+             <a href={`https://${p.deployUrl}`} target="_blank" rel="noopener noreferrer" className="pd-vercel-btn pd-vercel-btn-primary" style={{ border: "none", borderRadius: 0, height: 38 }}>Visit</a>
+             <button className="pd-vercel-btn pd-vercel-btn-primary" style={{ border: "none", borderLeft: "1px solid var(--gh-bg)", borderRadius: 0, padding: "0 8px", width: 32 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="6 9 12 15 18 9"></polyline></svg>
+             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Production Card High Fidelity */}
+      <div className="pd-prod-card-vercel">
+        <div className="pd-prod-card-main">
+          {/* Site Preview Mock */}
+          <div className="pd-prod-preview-vercel" style={{ background: "var(--gh-bg-secondary)", padding: 0 }}>
+             <div style={{ position: "relative", width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                <div style={{ textAlign: "center", padding: 40, zIndex: 2 }}>
+                   <div style={{ color: "var(--gh-text)", fontWeight: 900, fontSize: 36, marginBottom: 16, lineHeight: 1.1, letterSpacing: "-0.05em" }}>Accelerate your<br/>Development<br/>with TrackCodex</div>
+                   <div style={{ fontSize: 11, color: "var(--gh-text-secondary)", maxWidth: 220, margin: "0 auto", lineHeight: 1.5 }}>Build, Collaborate, Ship with Confidence. TrackCodex is your ultimate project nursery.</div>
+                </div>
+                {/* Floating Mock Code Window */}
+                <div style={{ position: "absolute", bottom: 24, right: 24, width: 180, height: 130, background: "var(--gh-bg)", borderRadius: 10, boxShadow: "0 20px 50px rgba(0,0,0,0.3)", padding: 12, border: "1px solid var(--gh-border)", transform: "rotate(-2deg)" }}>
+                   <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ff5f56" }}></div>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ffbd2e" }}></div>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#27c93f" }}></div>
+                   </div>
+                   <div style={{ fontSize: 8, color: "var(--gh-text)", fontFamily: "JetBrains Mono, monospace" }}>
+                     <span style={{ color: "var(--primary-color)" }}>export default function</span> <span style={{ color: "var(--gh-text-secondary)" }}>App</span>() &#123;<br/>
+                     &nbsp;&nbsp;<span style={{ color: "var(--primary-color)" }}>return</span> (<br/>
+                     &nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: "var(--gh-text)" }}>&lt;div&gt;New Project&lt;/div&gt;</span><br/>
+                     &nbsp;&nbsp;);<br/>
+                     &#125;
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          {/* Deployment Info Polished */}
+          <div className="pd-prod-info-vercel">
+            <div className="pd-info-item">
+              <div className="pd-info-label">Deployment</div>
+              <div className="pd-info-value" style={{ fontSize: 13, fontWeight: 700 }}>{p.deployUrl}</div>
+            </div>
+            <div className="pd-info-item">
+              <div className="pd-info-label" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                 Domains <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+              </div>
+              <div className="pd-info-value" style={{ gap: 16 }}>
+                <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer">{p.domain} <span style={{ opacity: 0.5 }}>↗</span></a>
+                {p.altDomain && <a href={`https://${p.altDomain}`} target="_blank" rel="noopener noreferrer">{p.altDomain} <span style={{ opacity: 0.5 }}>↗</span></a>}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 48 }}>
+              <div className="pd-info-item">
+                <div className="pd-info-label">Status</div>
+                <div className="pd-status-pill-vercel">
+                  <div className="pd-status-dot-vercel" style={{ background: "#50e3c2", boxShadow: "0 0 10px rgba(80,227,194,0.4)" }}></div>
+                  <span style={{ color: "#fff" }}>Ready</span>
+                </div>
+              </div>
+              <div className="pd-info-item">
+                <div className="pd-info-label">Created</div>
+                <div className="pd-info-value" style={{ fontWeight: 400 }}>
+                  {p.createdAgo} by {p.createdBy}
+                  <button style={{ background: "transparent", border: "none", color: "#888", padding: 0, display: "flex", cursor: "pointer" }}>
+                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="7 10 12 15 17 10"></polyline></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="pd-info-item">
+              <div className="pd-info-label">Source</div>
+              <div className="pd-info-value" style={{ color: "#fff", fontWeight: 600 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 0 0 1-9 9"/></svg>
+                {p.branch}
+              </div>
+              <div className="pd-info-value" style={{ fontSize: 13, gap: 12 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M3 12h5"/><path d="M16 12h5"/></svg>
+                   {p.commitHash.substring(0, 7)}
+                </span>
+                <span style={{ color: "#888", fontWeight: 400 }}>{p.commitMsg}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Integration Bar */}
+        <div style={{ padding: "0 32px 24px" }}>
+            <div 
+              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              style={{ display: "flex", alignItems: "center", gap: 12, color: "#0070f3", fontSize: 14, cursor: "pointer", fontWeight: 500 }}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-              Repository
-            </Btn>
-            <Btn title="Revert to previous version">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-              Instant Rollback
-            </Btn>
-            <div className="pd-prod-visit-btn">
-              <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" className="pd-prod-visit-link">Visit</a>
-              <button 
-                onClick={() => setIsQRVisible(!isQRVisible)}
-                className="pd-prod-qr-toggle"
-                title="Show QR Code"
-              >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: isQRVisible ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <VisitQRCodePopup isOpen={isQRVisible} onClose={() => setIsQRVisible(false)} domain={p.domain} />
+               <svg 
+                 width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
+                 style={{ transform: isSettingsOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}
+               >
+                 <polyline points="9 18 15 12 9 6"></polyline>
+               </svg>
+               Deployment Settings
             </div>
-          </div>
         </div>
 
-        <div className="pd-prod-details-grid">
-          {/* Preview Placeholder */}
-          <div className="pd-prod-preview">
-            <div className="pd-prod-preview-content">
-              <div className="pd-prod-preview-icon">◆</div>
-              <span className="pd-prod-preview-label">TrackCodex</span>
-            </div>
-          </div>
+        {isSettingsOpen && (
+          <div className="pd-expanded-settings">
 
-          <div className="pd-prod-info-content">
-            <div className="pd-info-group">
-              <div className="pd-data-label">Deployment</div>
-              <div className="pd-data-value">{p.deployUrl}</div>
-            </div>
-            <div className="pd-info-group">
-              <div className="pd-data-label">Domains</div>
-              <div className="pd-domain-links">
-                <a href={`https://${p.domain}`} target="_blank" rel="noopener noreferrer" className="pd-domain-link">{p.domain} ↗</a>
-                {p.altDomain && <a href={`https://${p.altDomain}`} target="_blank" rel="noopener noreferrer" className="pd-domain-link">{p.altDomain} ↗</a>}
-                <button className="pd-add-domain-btn" title="Add Domain">⊕</button>
-              </div>
-            </div>
-            <div className="pd-info-row">
-              <div className="pd-info-group">
-                <div className="pd-data-label">Status</div>
-                <div className="pd-status-pill">
-                  <div className="pd-status-dot pd-status-ready"></div>
-                  <span className="pd-status-text">{p.status}</span>
+            {/* Build Settings */}
+            <div className="pd-settings-section">
+              <div className="pd-settings-section-title">Build Settings</div>
+              <div className="pd-settings-dashboard">
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">On-Demand Concurrent Builds</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon disabled">✕</div>
+                     Disabled
+                  </div>
                 </div>
-              </div>
-              <div className="pd-info-group">
-                <div className="pd-data-label">Created</div>
-                <div className="pd-data-value">
-                  {p.createdAgo} by {p.createdBy} 
-                  <button className="pd-creator-toggle" title="Change Creator">⇕</button>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Build Machine</div>
+                  <div className="pd-setting-value">
+                     Standard 
+                     <span className="pd-setting-pill">4 vCPUs</span>
+                     <span className="pd-setting-pill">8 GB Memory</span>
+                  </div>
+                </div>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Prioritize Production Builds</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon enabled">✓</div>
+                     Enabled
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="pd-info-group">
-              <div className="pd-data-label">Source</div>
-              <div className="pd-source-info">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25z"/></svg>
-                <span className="pd-source-branch">{p.branch}</span>
-              </div>
-              <div className="pd-commit-info">
-                <span className="pd-commit-hash">⊙ {p.commitHash.substring(0, 7)}</span>
-                <span className="pd-commit-msg">{p.commitMsg}</span>
+
+            {/* Runtime Settings */}
+            <div className="pd-settings-section">
+              <div className="pd-settings-section-title">Runtime Settings</div>
+              <div className="pd-settings-dashboard" style={{ gridTemplateRows: "repeat(3, auto)" }}>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Fluid Compute</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon enabled">✓</div>
+                     Enabled
+                  </div>
+                </div>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Function CPU</div>
+                  <div className="pd-setting-value">
+                     Standard
+                     <span className="pd-setting-pill">1 vCPU</span>
+                     <span className="pd-setting-pill">2 GB Memory</span>
+                  </div>
+                </div>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Node.js Version</div>
+                  <div className="pd-setting-value">24.x</div>
+                </div>
+                
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Deployment Protection</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon enabled">✓</div>
+                     Standard Protection
+                  </div>
+                </div>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Skew Protection</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon disabled">✕</div>
+                     Disabled
+                  </div>
+                </div>
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Cold Start Prevention</div>
+                  <div className="pd-setting-value">
+                     <div className="pd-status-icon disabled">✕</div>
+                     Disabled
+                  </div>
+                </div>
+                
+                <div className="pd-setting-item">
+                  <div className="pd-setting-label">Function Region</div>
+                  <div className="pd-setting-value">
+                     <span className="pd-setting-badge">iad1</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        )}
 
-          <div className="pd-tab-indicator-icon">▲</div>
-        </div>
-      </div>
-
-      {/* Deployment Settings */}
-      <div className="pd-section-card">
-        <div className="pd-section-header">
-          <div className="pd-section-title-group">
-            <span className="pd-section-icon">▸</span>
-            <span className="pd-section-title">Deployment Settings</span>
-            <span className="pd-recommendation-badge">3 Recommendations</span>
+        <div className="pd-prod-card-footer">
+          <div className="pd-footer-note">
+            To update your Production Deployment, push to the <code style={{ color: "#fff", fontWeight: 600 }}>main</code> branch.
           </div>
-        </div>
-        <div className="pd-section-footer">
-          <span className="pd-footer-text">
-            To update your Production Deployment, push to the <code className="pd-branch-code">{p.branch}</code> branch.
-          </span>
           <div className="pd-footer-actions">
-            <Btn>Deployments</Btn>
-            <Btn className="pd-icon-btn">⊞</Btn>
+            <button className="pd-vercel-btn" style={{ height: 34 }}>
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 21v-7a5 4 0 1 1 5 4v3"/><path d="M12 21v-3a5 4 0 1 1 5 4v2"/></svg>
+               Deployments
+            </button>
+            <button className="pd-vercel-btn" style={{ height: 34, width: 34, padding: 0, justifyContent: "center" }}>
+               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom 3 cards */}
-      <div className="pd-bottom-grid">
+      {/* 3. Metrics Grid */}
+      <div className="pd-overview-grid-vercel">
         {/* Checklist */}
-        <div className="pd-section-card pd-checklist-card">
-          <div className="pd-section-header">
-            <div className="pd-section-title-group">
-              <span className="pd-section-title">Production Checklist</span>
-              <span className="pd-count-badge">{done}/{p.checklist.length}</span>
+        <div className="pd-vercel-card">
+          <div className="pd-vercel-card-header">
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+               <span className="pd-vercel-card-title">Production Checklist</span>
+               <span style={{ fontSize: 12, color: "#888" }}>4/5</span>
             </div>
-            <div className="pd-section-actions">
-              <button onClick={onOpenChecklist} className="pd-icon-btn-circle" title="Edit Checklist">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
-              <button className="pd-icon-btn-circle" title="More Actions">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-              </button>
-            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
           </div>
-          <div className="pd-checklist-items">
-            {p.checklist.map((c, i) => (
-              <div key={i} className={`pd-checklist-item ${c.done ? 'pd-item-done' : ''}`}>
-                <span className="pd-item-label">{c.label}</span>
-                {c.done && <span className="pd-item-check" aria-hidden="true">✓</span>}
-              </div>
-            ))}
+          <div className="pd-vercel-card-content" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+             {[
+               { id: "repo", title: "Connect Git Repository", done: true, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/></svg> },
+               { id: "domain", title: "Add Custom Domain", done: true, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
+               { id: "preview", title: "Preview Deployment", done: true, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> },
+               { id: "analytics", title: "Enable Web Analytics", done: false, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> },
+               { id: "speed", title: "Enable Speed Insights", done: true, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> }
+             ].map((item, idx) => (
+                <div key={idx} style={{ 
+                   display: "flex", alignItems: "center", justifyContent: "space-between", 
+                   padding: "10px 14px", borderRadius: 6, border: "1px solid #333",
+                   background: item.done ? "rgba(0,112,243,0.15)" : "#0a0a0a",
+                   color: item.done ? "#0070f3" : "#888",
+                   fontSize: 13, fontWeight: 500
+                }}>
+                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ opacity: 0.8 }}>{item.icon}</span>
+                      {item.title}
+                   </div>
+                   {item.done && <span>✓</span>}
+                </div>
+             ))}
           </div>
         </div>
 
         {/* Observability */}
-        <div className="pd-section-card">
-          <div className="pd-section-header">
-            <div className="pd-section-title-group">
-              <span className="pd-section-title">Observability</span>
-              <span className="pd-time-badge">6h</span>
-            </div>
-            <button className="pd-more-btn" aria-label="View more observability details">›</button>
+        <div className="pd-vercel-card">
+          <div className="pd-vercel-card-header">
+             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+               <span className="pd-vercel-card-title">Observability</span>
+               <span style={{ fontSize: 12, color: "#888" }}>6h</span>
+             </div>
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
           </div>
-          <div className="pd-observability-content">
-            <div className="pd-metric-group">
-              <div className="pd-data-label">Edge Requests</div>
-              <div className="pd-metric-value">{p.edgeReqs}</div>
-              <Sparkline />
-            </div>
-            <div className="pd-metric-group">
-              <div className="pd-data-label">Function Invocations</div>
-              <div className="pd-metric-value">{p.fnInvocations}</div>
-              <div className="pd-metric-bar"></div>
-            </div>
-            <div className="pd-metric-group">
-              <div className="pd-data-label">Error Rate</div>
-              <div className="pd-metric-value">{p.errorRate}</div>
-              <div className="pd-metric-bar"></div>
-            </div>
+          <div className="pd-vercel-card-content">
+             <div className="pd-metric-item">
+                <div className="pd-metric-header">
+                   <div className="pd-info-label">Edge Requests</div>
+                   <div style={{ fontSize: 16, fontWeight: 700 }}>178</div>
+                </div>
+                <div style={{ height: 40, marginTop: 12 }}>
+                   <Sparkline />
+                </div>
+             </div>
+             <div className="pd-metric-item">
+                <div className="pd-metric-header">
+                   <div className="pd-info-label">Function Invocations</div>
+                   <div style={{ fontSize: 16, fontWeight: 700 }}>0</div>
+                </div>
+                <div className="pd-metric-bar-bg"><div className="pd-metric-bar-fill" style={{ width: 0 }}></div></div>
+             </div>
+             <div className="pd-metric-item">
+                <div className="pd-metric-header">
+                   <div className="pd-info-label">Error Rate</div>
+                   <div style={{ fontSize: 16, fontWeight: 700 }}>0%</div>
+                </div>
+                <div className="pd-metric-bar-bg"><div className="pd-metric-bar-fill" style={{ width: 0 }}></div></div>
+             </div>
           </div>
         </div>
 
         {/* Analytics */}
-        <div className="pd-section-card">
-          <div className="pd-section-header">
-            <span className="pd-section-title">Analytics</span>
-            <button className="pd-more-btn" aria-label="View more analytics details">›</button>
-          </div>
-          <div className="pd-analytics-empty">
-            <div className="pd-analytics-icon" aria-hidden="true">📊</div>
-            <div className="pd-analytics-text">Track visitors and page views</div>
-            <button className="pd-enable-btn">Enable</button>
-          </div>
-        </div>
       </div>
     </div>
   );
 };
 
-function DeploymentsTab({ p }: { p: ProjInfo }) {
+function DeploymentsTab({ p }: { p: any }) {
+  const deployments = p.deployments || [];
   const [tab, setTab] = useState("All");
+
   return (
-  <div style={{ padding: "32px 24px 60px" }}>
+   <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Deployments</div>
+      <div style={{ display: "flex", gap: 12 }}>
+         <Btn style={{ padding: "0 12px", height: 32 }}>All Branches ▾</Btn>
+         <Btn style={{ padding: "0 12px", height: 32 }}>All Environments ▾</Btn>
+      </div>
     </div>
     
-    <div style={{ display: "flex", gap: 32, borderBottom: `1px solid ${V.borderLight}`, marginBottom: 32 }}>
+    <div style={{ display: "flex", gap: 32, borderBottom: `1px solid ${V.borderLight}`, marginBottom: 24 }}>
       {["All", "Production", "Preview"].map((t) => (
         <div key={t} onClick={() => setTab(t)} style={{ paddingBottom: 12, fontWeight: tab === t ? 500 : 400, color: tab === t ? V.text : V.textSecondary, borderBottom: tab === t ? `2px solid ${V.text}` : "2px solid transparent", cursor: "pointer", fontSize: 14 }}>
           {t}
@@ -954,39 +1068,41 @@ function DeploymentsTab({ p }: { p: ProjInfo }) {
     </div>
 
     <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
-      <div style={{ padding: "16px 20px", borderBottom: `1px solid ${V.borderLight}`, background: V.card, display: "flex", alignItems: "center", gap: 16 }}>
-        <span style={{ fontSize: 13, color: V.textSecondary }}>Filter by branch...</span>
-      </div>
-      {(tab === "All" || tab === "Production") ? [0, 1, 2].map((i) => (
-        <div key={i} style={{ padding: "20px", borderBottom: i < 2 ? `1px solid ${V.borderLight}` : "none", display: "flex", justifyContent: "space-between" }}>
+      {deployments.length > 0 ? deployments.map((d: any, i: number) => (
+        <div key={d.id} style={{ padding: "20px", borderBottom: i < deployments.length - 1 ? `1px solid ${V.borderLight}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center", background: V.card }}>
           <div style={{ display: "flex", gap: 16 }}>
-            <div style={{ width: 120, height: 75, background: V.card, border: `1px solid ${V.borderLight}`, borderRadius: 6 }}></div>
+            <div style={{ width: 48, height: 48, borderRadius: 8, background: "#111", border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+               {/* Mock icon */}
+               <div style={{ width: 24, height: 24, border: "2px solid #333", borderRadius: 4 }}></div>
+            </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{p.deployUrl}</span>
-                {i === 0 && <span style={{ padding: "2px 8px", background: V.text, color: V.bg, fontSize: 11, fontWeight: 600, borderRadius: 12 }}>Current</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>{d.url}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary, marginBottom: 8 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a0" }}></div> Ready</span>
-                <span>• {i === 0 ? "7m" : i === 1 ? "2d" : "5d"} ago by {p.createdBy}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary, marginBottom: 4 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.status === 'READY' ? "#0a0" : "#f5a623" }}></div> 
+                  {d.status}
+                </span>
+                <span>• {new Date(d.createdAt).toLocaleString()}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontFamily: "monospace" }}>
                 <span>{p.branch}</span>
-                <span style={{ color: V.textSecondary }}>- {p.commitHash}</span>
+                <span style={{ color: V.textSecondary }}>- {d.commitHash?.substring(0, 7)}</span>
               </div>
             </div>
           </div>
-          <button style={{ background: "transparent", border: "none", color: V.textSecondary, cursor: "pointer", fontSize: 20 }}>⋮</button>
+          <Btn style={{ height: 32, padding: "0 12px" }}>View logs</Btn>
         </div>
       )) : (
-        <div style={{ padding: 60, textAlign: "center", color: V.textSecondary }}>No preview deployments found.</div>
+        <div style={{ padding: 60, textAlign: "center", color: V.textSecondary, background: V.card }}>No deployments found.</div>
       )}
     </div>
-  </div>
+   </div>
   );
 }
 
-function LogsTab({ p }: { p: ProjInfo }) {
+function LogsTab({ p }: { p: any }) {
   return (
   <div style={{ height: "calc(100vh - 48px)", display: "flex", flexDirection: "column" }}>
     <div style={{ padding: "16px 24px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", gap: 12, background: V.bg }}>
@@ -1007,33 +1123,157 @@ function LogsTab({ p }: { p: ProjInfo }) {
   );
 }
 
-function AnalyticsTab() {
-  const [tab, setTab] = useState("Visitors");
+function AnalyticsTab({ projectId }: { projectId: string }) {
+  const [activeSubTab, setActiveSubTab] = useState("Overview");
+  const [metrics, setMetrics] = useState<ProjectMetric[]>([]);
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!projectId) return;
+    
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [m, s] = await Promise.all([
+          projectService.getAnalytics(projectId),
+          projectService.getAnalyticsSummary(projectId)
+        ]);
+        setMetrics(m || []);
+        setSummary(s || null);
+      } catch (err) {
+        console.error("Failed to fetch analytics:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [projectId]);
+
+  const chartData = metrics.map(m => ({
+    time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    requests: m.requests,
+    latency: m.avgLatency,
+    bandwidth: Math.round(Number(m.bandwidth) / 1024 / 1024 * 100) / 100 // MB
+  }));
+
+  if (isLoading) {
+    return <div style={{ padding: 40, textAlign: "center", color: V.textSecondary }}>Loading analytics...</div>;
+  }
+
   return (
    <div style={{ padding: "32px 24px 60px" }}>
-    <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>Web Analytics</div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div style={{ fontSize: 24, fontWeight: 700 }}>Web Analytics</div>
+      <div style={{ display: "flex", gap: 12 }}>
+         <Btn style={{ padding: "0 12px", height: 32 }}>Last 24 Hours ▾</Btn>
+      </div>
+    </div>
     
+    {/* Summary Stats */}
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20, marginBottom: 32 }}>
+       <div className="pd-vercel-card" style={{ padding: 20 }}>
+          <div className="pd-info-label">Total Requests</div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8 }}>{summary?.totalRequests.toLocaleString() || 0}</div>
+       </div>
+       <div className="pd-vercel-card" style={{ padding: 20 }}>
+          <div className="pd-info-label">Avg Latency</div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8 }}>{summary?.avgLatency || 0} ms</div>
+       </div>
+       <div className="pd-vercel-card" style={{ padding: 20 }}>
+          <div className="pd-info-label">Error Rate</div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8, color: Number(summary?.errorRate) > 5 ? "#e74c3c" : "inherit" }}>
+            {summary?.errorRate || "0.00"}%
+          </div>
+       </div>
+       <div className="pd-vercel-card" style={{ padding: 20 }}>
+          <div className="pd-info-label">Bandwidth</div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 8 }}>
+            {summary ? (Number(summary.totalBandwidth) / 1024 / 1024).toFixed(2) : 0} MB
+          </div>
+       </div>
+    </div>
+
     <div style={{ display: "flex", gap: 32, borderBottom: `1px solid ${V.borderLight}`, marginBottom: 32 }}>
-      {["Visitors", "Pageviews", "Custom Events", "Referrers", "Countries", "OS", "Browsers"].map((t) => (
-        <div key={t} onClick={() => setTab(t)} style={{ paddingBottom: 12, fontWeight: tab === t ? 500 : 400, color: tab === t ? V.text : V.textSecondary, borderBottom: tab === t ? `2px solid ${V.text}` : "2px solid transparent", cursor: "pointer", fontSize: 14 }}>
+      {["Overview", "Real-time", "Visitors", "Performance"].map((t) => (
+        <div key={t} onClick={() => setActiveSubTab(t)} style={{ paddingBottom: 12, fontWeight: activeSubTab === t ? 500 : 400, color: activeSubTab === t ? V.text : V.textSecondary, borderBottom: activeSubTab === t ? `2px solid ${V.text}` : "2px solid transparent", cursor: "pointer", fontSize: 14 }}>
           {t}
         </div>
       ))}
     </div>
 
-    {tab === "Visitors" && (
-      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 40, textAlign: "center", background: V.card }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-        <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Enable Web Analytics</div>
-        <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
-          Get insights into your website's traffic, visitors, and performance with TrackCodex Web Analytics.
+    {activeSubTab === "Overview" && (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <ChartCard title="Requests" hasChevron={false}>
+          <div style={{ height: 200, width: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="time" hide />
+                <Tooltip 
+                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
+                  itemStyle={{ color: V.text }}
+                />
+                <Area type="monotone" dataKey="requests" stroke="#3b82f6" fillOpacity={1} fill="url(#colorRequests)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </ChartCard>
+
+        <ChartCard title="Average Latency (ms)" hasChevron={false}>
+          <div style={{ height: 200, width: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <XAxis dataKey="time" hide />
+                <Tooltip 
+                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
+                  itemStyle={{ color: V.text }}
+                />
+                <Line type="monotone" dataKey="latency" stroke="#10b981" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </ChartCard>
+
+        <ChartCard title="Bandwidth (MB)" hasChevron={false}>
+          <div style={{ height: 200, width: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="time" hide />
+                <Tooltip 
+                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
+                  itemStyle={{ color: "#fff" }}
+                />
+                <Bar dataKey="bandwidth" fill="#8884d8" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </ChartCard>
+
+        <div className="pd-vercel-card" style={{ padding: 24, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+          <div style={{ fontSize: 32, marginBottom: 16 }}>🚀</div>
+          <div style={{ fontWeight: 600, marginBottom: 8 }}>Edge Performance</div>
+          <div style={{ fontSize: 13, color: V.textSecondary }}>
+            Your site is being served globally from {metrics.length} distinct edge locations.
+          </div>
         </div>
-        <Btn style={{ background: V.text, color: V.bg, border: "none" }}>Enable</Btn>
       </div>
     )}
-    
-    {tab !== "Visitors" && (
-      <div style={{ padding: 40, textAlign: "center", color: V.textSecondary }}>Analytics data for {tab} is not available yet.</div>
+
+    {activeSubTab !== "Overview" && (
+      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 60, textAlign: "center", background: V.card }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>📈</div>
+        <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>{activeSubTab} Data</div>
+        <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24 }}>
+          This data is currently being aggregated. Please check back in a few minutes.
+        </div>
+      </div>
     )}
   </div>
   );
@@ -1235,34 +1475,134 @@ function CDNTab() {
   );
 }
 
-function DomainsTab({ p }: { p: ProjInfo }) {
+function DomainsTab({ p }: { p: any }) {
+  const { projectId } = useParams<{ projectId: string }>();
+  const [domains, setDomains] = useState<DomainItem[]>(p.customDomains || []);
+  const [newDomain, setNewDomain] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const fetchDomains = async () => {
+    if (!projectId) return;
+    try {
+      const list = await projectService.listDomains(projectId);
+      setDomains(list);
+    } catch (err) {
+      console.error("Failed to fetch domains:", err);
+    }
+  };
+
+  const handleAdd = async () => {
+    if (!projectId || !newDomain) return;
+    setLoading(true);
+    try {
+      await projectService.addDomain(projectId, { domain: newDomain });
+      setNewDomain("");
+      setIsAdding(false);
+      await fetchDomains();
+    } catch (err) {
+      alert("Failed to add domain. Make sure it's valid.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemove = async (did: string) => {
+    if (!projectId || !window.confirm("Are you sure you want to remove this domain?")) return;
+    try {
+      await projectService.removeDomain(projectId, did);
+      await fetchDomains();
+    } catch (err) {
+      alert("Failed to remove domain.");
+    }
+  };
+
   return (
-   <div style={{ padding: "32px 24px 60px" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-      <div style={{ fontSize: 24, fontWeight: 700 }}>Domains</div>
-      <Btn style={{ background: V.text, color: V.bg, border: "none" }}>Add Domain</Btn>
-    </div>
-    <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
-      <div style={{ padding: "20px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ padding: "32px 24px 60px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <span style={{ fontWeight: 600, fontSize: 16 }}>{p.deployUrl}</span>
-            <span style={{ padding: "2px 8px", background: V.cardHover, border: `1px solid ${V.border}`, color: V.textSecondary, fontSize: 11, fontWeight: 600, borderRadius: 12 }}>Production</span>
+          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Domains</div>
+          <div style={{ fontSize: 13, color: V.textSecondary }}>Manage the domains that point to your production deployment.</div>
+        </div>
+        {!isAdding && (
+          <Btn onClick={() => setIsAdding(true)} style={{ background: V.text, color: V.bg, border: "none", padding: "0 16px", height: 36 }}>Add Domain</Btn>
+        )}
+      </div>
+
+      {isAdding && (
+        <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 24, background: V.card, marginBottom: 32, animation: "slide-down 0.2s" }}>
+          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>New Domain</div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <input 
+              type="text" 
+              placeholder="example.com"
+              value={newDomain}
+              onChange={e => setNewDomain(e.target.value)}
+              style={{ flex: 1, height: 38, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", color: V.text, fontSize: 13, outline: "none" }}
+            />
+            <Btn onClick={handleAdd} style={{ background: V.accent, color: "#fff", border: "none", minWidth: 80 }} disabled={loading}>
+              {loading ? "Adding..." : "Add"}
+            </Btn>
+            <Btn onClick={() => setIsAdding(false)} style={{ background: "transparent", color: V.textSecondary }}>Cancel</Btn>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: V.textSecondary }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 4 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a0" }}></div> Valid Configuration</span>
-            <span>•</span>
-            <span>Assigned to main branch</span>
+          <div style={{ fontSize: 12, color: V.textSecondary, marginTop: 12 }}>
+            Once added, you'll need to configure your DNS records to point to TrackCodex.
           </div>
         </div>
-        <button style={{ background: "transparent", border: "none", color: V.textSecondary, cursor: "pointer", fontSize: 20 }}>⋮</button>
+      )}
+
+      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden" }}>
+        {/* Always show the TrackCodex default domain first */}
+        <div style={{ padding: "24px", borderBottom: domains.length > 0 ? `1px solid ${V.borderLight}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center", background: V.card }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+              <span style={{ fontWeight: 600, fontSize: 16 }}>{p.deployUrl}</span>
+              <span className="pd-setting-pill" style={{ background: "#0070f3", color: "#fff", border: "none" }}>Production</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#0a0" }}></div> Valid Configuration</span>
+              <span>•</span>
+              <span>Assigned to main branch</span>
+            </div>
+          </div>
+          <Btn style={{ opacity: 0.5, cursor: "not-allowed" }} title="Default domain cannot be removed">⋮</Btn>
+        </div>
+
+        {domains.map((d, i) => (
+          <div key={d.id} style={{ borderTop: `1px solid ${V.borderLight}` }}>
+            <div style={{ padding: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", background: V.bg }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                  <span style={{ fontWeight: 600, fontSize: 16 }}>{d.domain}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: d.verified ? "#0a0" : "#f5a623" }}></div> 
+                    {d.verified ? 'Valid Configuration' : 'Invalid Configuration'}
+                  </span>
+                  <span>•</span>
+                  <span>Assigned to {d.gitBranch || 'main'} branch</span>
+                </div>
+              </div>
+              <Btn onClick={() => handleRemove(d.id)} style={{ color: "#ff4d4f" }}>Remove</Btn>
+            </div>
+            {!d.verified && (
+              <div style={{ padding: "16px 24px", background: "rgba(245,166,35,0.05)", borderTop: `1px solid rgba(245,166,35,0.2)`, fontSize: 13, color: "#f5a623" }}>
+                DNS configuration required. Point a CNAME record for <strong>{d.domain}</strong> to <strong>{p.deployUrl}</strong>.
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-      <div style={{ padding: "16px 20px", background: V.card, fontSize: 13, color: V.textSecondary, display: "flex", justifyContent: "space-between" }}>
-        <span>Nameservers are correctly configured.</span>
-        <span style={{ color: V.textTertiary }}>Refreshed 2m ago</span>
+
+      <div style={{ marginTop: 40, border: `1px solid ${V.border}`, borderRadius: 12, padding: "24px 32px", background: "linear-gradient(to right, rgba(0,112,243,0.05), transparent)" }}>
+        <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Add custom domain names</div>
+        <div style={{ fontSize: 13, color: V.textSecondary, lineHeight: 1.6, maxWidth: 600 }}>
+          Your project already has a built-in domain, but you can add your own names as well.
+          TrackCodex will automatically manage SSL certificates and routing for all added domains.
+        </div>
       </div>
     </div>
-  </div>
   );
 }
 
@@ -1907,9 +2247,9 @@ function ProjectNotificationsSettings() {
         {[
           { icon: "🔔", title: "Web", sub: "Receive notifications in the TrackCodex dashboard.", on: true },
           { icon: "@", title: "Email", sub: "quantaforge25@gmail.com", on: true, settings: true },
-          { icon: "📱", title: "Push", sub: "Receive notifications on desktop or mobile.", on: true, settings: true, badge: "Notifications Blocked" },
+          { icon: "📱", title: "Push", sub: "No phone number.", on: true, settings: true, badge: "Notifications Blocked" },
           { icon: "📞", title: "SMS", sub: "No phone number.", on: false, settings: true },
-        ].map((item, i) => (
+        ].map((item) => (
           <div key={item.title} style={{ padding: "16px 20px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", border: `1px solid ${V.borderLight}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: V.textSecondary }}>{item.icon}</div>
@@ -1978,6 +2318,126 @@ function ProjectNotificationsSettings() {
   );
 }
 
+function EnvironmentVariablesTab({ projectId }: { projectId: string }) {
+  const [vars, setVars] = useState<EnvVar[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [newKey, setNewKey] = useState("");
+  const [newValue, setNewValue] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchEnv = async () => {
+      setLoading(true);
+      try {
+        const data = await projectService.getEnvVars(projectId);
+        setVars(data || []);
+      } catch (err) {
+        console.error('Failed to fetch env vars:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEnv();
+  }, [projectId]);
+
+  const handleAdd = () => {
+    if (!newKey || !newValue) return;
+    setVars([...vars, { key: newKey, value: newValue, target: ['production', 'preview', 'development'] }]);
+    setNewKey("");
+    setNewValue("");
+  };
+
+  const handleRemove = (key: string) => {
+    setVars(vars.filter(v => v.key !== key));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await projectService.updateEnvVars(projectId, vars);
+      alert('Environment variables saved successfully!');
+    } catch (err) {
+      console.error('Failed to save env vars:', err);
+      alert('Failed to save environment variables.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden", background: V.bg }}>
+        <div style={{ padding: 24 }}>
+          <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>Environment Variables</div>
+          <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24 }}>
+            In order to provide your Deployment with Environment Variables at build and runtime, you may enter them here.
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+             <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: V.textSecondary, marginBottom: 4 }}>Key</div>
+                  <input 
+                    type="text" 
+                    value={newKey}
+                    onChange={e => setNewKey(e.target.value)}
+                    placeholder="EXAMPLE_KEY" 
+                    style={{ width: "100%", height: 36, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", color: V.text, fontSize: 13, fontFamily: "monospace" }} 
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: V.textSecondary, marginBottom: 4 }}>Value</div>
+                  <input 
+                    type="password" 
+                    value={newValue}
+                    onChange={e => setNewValue(e.target.value)}
+                    placeholder="••••••••" 
+                    style={{ width: "100%", height: 36, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", color: V.text, fontSize: 13, fontFamily: "monospace" }} 
+                  />
+                </div>
+                <div style={{ display: "flex", alignItems: "flex-end" }}>
+                  <Btn onClick={handleAdd} style={{ height: 36, background: V.text, color: V.bg, border: "none" }}>Add</Btn>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden", background: V.bg }}>
+        <div style={{ padding: "12px 24px", background: V.card, borderBottom: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>Active Variables</span>
+          <span style={{ fontSize: 12, color: V.textSecondary }}>{vars.length} variables</span>
+        </div>
+        <div>
+          {loading ? (
+            <div style={{ padding: 40, textAlign: "center", color: V.textSecondary }}>Loading...</div>
+          ) : vars.length === 0 ? (
+            <div style={{ padding: 40, textAlign: "center", color: V.textSecondary }}>No environment variables defined yet.</div>
+          ) : vars.map((v, i) => (
+            <div key={v.key} style={{ padding: "16px 24px", borderBottom: i < vars.length - 1 ? `1px solid ${V.borderLight}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                 <div style={{ fontFamily: "monospace", fontSize: 14, fontWeight: 600 }}>{v.key}</div>
+                 <div style={{ fontSize: 12, color: V.textSecondary }}>••••••••</div>
+                 <div style={{ display: "flex", gap: 4 }}>
+                    {['production', 'preview', 'development'].map(env => (
+                      <span key={env} style={{ fontSize: 10, background: V.cardHover, color: V.textSecondary, padding: "1px 6px", borderRadius: 4, textTransform: "capitalize" }}>{env}</span>
+                    ))}
+                 </div>
+              </div>
+              <button onClick={() => handleRemove(v.key)} style={{ background: "transparent", border: "none", color: "#ff4d4f", cursor: "pointer", fontSize: 12 }}>Remove</button>
+            </div>
+          ))}
+        </div>
+        {vars.length > 0 && (
+          <div style={{ padding: "16px 24px", background: V.card, borderTop: `1px solid ${V.borderLight}`, display: "flex", justifyContent: "flex-end" }}>
+            <Btn onClick={handleSave} style={{ background: V.text, color: V.bg, border: "none", opacity: saving ? 0.7 : 1 }}>{saving ? "Saving..." : "Save Changes"}</Btn>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SettingsTab({ p, tab }: { p: ProjInfo, tab: string }) {
   return (
    <div style={{ padding: "32px 24px 60px" }}>
@@ -1993,6 +2453,7 @@ function SettingsTab({ p, tab }: { p: ProjInfo, tab: string }) {
       {tab === "Deployment Protection" && <ProjectDeploymentProtectionSettings />}
       {tab === "Activity" && <ProjectActivitySettings />}
       {tab === "My Notifications" && <ProjectNotificationsSettings />}
+      {tab === "Environment Variables" && <EnvironmentVariablesTab projectId={p.name} />}
       
       {tab === "General" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -2188,29 +2649,7 @@ function SettingsTab({ p, tab }: { p: ProjInfo, tab: string }) {
         </div>
       )}
 
-      {tab === "Environment Variables" && (
-        <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32 }}>
-          <div style={{ padding: 24 }}>
-            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>Environment Variables</div>
-            <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 20 }}>Securely store secrets and configuration for your deployments.</div>
-            
-            <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-              <input type="text" placeholder="Key" style={{ flex: 1, height: 40, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", color: V.text, fontSize: 14, fontFamily: V.font }} />
-              <input type="text" placeholder="Value" style={{ flex: 1, height: 40, background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, padding: "0 12px", color: V.text, fontSize: 14, fontFamily: V.font }} />
-              <Btn style={{ background: V.text, color: V.bg, border: "none" }}>Add</Btn>
-            </div>
-
-            <div style={{ border: `1px solid ${V.borderLight}`, borderRadius: 8 }}>
-              <div style={{ padding: "12px 16px", borderBottom: `1px solid ${V.borderLight}`, display: "flex", fontSize: 13, color: V.textSecondary, fontWeight: 500 }}>
-                <div style={{ flex: 1 }}>Key</div>
-                <div style={{ flex: 1 }}>Value</div>
-                <div style={{ width: 100 }}>Environments</div>
-              </div>
-              <div style={{ padding: 40, textAlign: "center", fontSize: 14, color: V.textSecondary }}>No environment variables added.</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {tab === "Environment Variables" && <EnvironmentVariablesTab projectId={p.name} />}
 
       {!["General", "Build and Deployment", "Environment Variables", "Members"].includes(tab) && (
         <div style={{ padding: 40, textAlign: "center", color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 12, background: V.card }}>

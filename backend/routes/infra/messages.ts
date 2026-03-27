@@ -188,8 +188,8 @@ export async function messageRoutes(fastify: FastifyInstance) {
     try {
       // Broadcast to specific conversation room
       RealtimeService.broadcastToRoom(id, {
-        type: "new_message",
         ...message,
+        type: "new_message",
       });
     } catch (e: any) {
       request.log.warn(e, "Failed to broadcast message via socket");
