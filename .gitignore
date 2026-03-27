@@ -66,4 +66,10 @@ snapshots_complete.json
 .vscode_engine/
 vscode-engine/
 test-results/
-playwright-report/
+playwright-report/
+# Cleanup
+tmp/
+*.log
+env_error.log
+prisma_out.txt
+all_files.txt
