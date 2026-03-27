@@ -19,7 +19,7 @@ export const directMessageBus = {
   },
 
   openChat(user: { id: string, name: string, avatar: string, context?: string }) {
-    this.publish({ type: 'DM_OPEN', data: user });
+    this.publish({ type: 'DM_OPEN', data: { userId: user.id, name: user.name, avatar: user.avatar, context: user.context } });
   }
 };
 

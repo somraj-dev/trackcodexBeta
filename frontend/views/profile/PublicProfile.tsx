@@ -3,9 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { profileService, UserProfile } from "../../services/activity/profile";
 import ProfileCard from "../../components/profile/ProfileCard";
 import Highlights from "../../components/profile/Highlights";
-import CodingSnapshot from "../../components/profile/CodingSnapshot";
-import SecurityImpact from "../../components/profile/SecurityImpact";
-import ForgeAIUsage from "../../components/profile/ForgeAIUsage";
 import ContributionHeatmap from "../../components/profile/ContributionHeatmap";
 import PinnedRepos from "../../components/profile/PinnedRepos";
 import ActivityFeed from "../../components/profile/ActivityFeed";
@@ -129,12 +126,6 @@ export const PublicProfile: React.FC = () => {
                 <Highlights profile={profile} />
 
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <CodingSnapshot profile={profile} />
-                  <SecurityImpact profile={profile} />
-                </div>
-
-
                 <div className="grid grid-cols-1 xl:grid-cols-[1fr_350px] gap-8">
                   <div className="space-y-8">
                     <PinnedRepos />
@@ -142,8 +133,6 @@ export const PublicProfile: React.FC = () => {
 
                   </div>
                   <div className="space-y-8">
-                    <ForgeAIUsage profile={profile} />
-
                     <ActivityFeed profile={profile} />
 
                   </div>

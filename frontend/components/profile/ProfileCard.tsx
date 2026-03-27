@@ -113,7 +113,7 @@ const ProfileCard = ({ profile: propProfile }: { profile?: UserProfile }) => {
 
   const handleMessage = () => {
     directMessageBus.openChat({
-      id: profile.username,
+      id: profile.id,
       name: profile.name,
       avatar: profile.avatar,
       context: "From their profile",

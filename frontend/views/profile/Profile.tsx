@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProfileCard from "../../components/profile/ProfileCard";
 import Highlights from "../../components/profile/Highlights";
-import CodingSnapshot from "../../components/profile/CodingSnapshot";
-import ForgeAIUsage from "../../components/profile/ForgeAIUsage";
-import SecurityImpact from "../../components/profile/SecurityImpact";
 import FreelanceCard from "../../components/profile/FreelanceCard";
 import PinnedRepos from "../../components/profile/PinnedRepos";
 import ContributionHeatmap from "../../components/profile/ContributionHeatmap";
@@ -286,10 +283,6 @@ const ProfileView = () => {
               <div className="space-y-12">
                 <Highlights profile={profile} />
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-                  <CodingSnapshot profile={profile} />
-                  <SecurityImpact profile={profile} />
-                  <ForgeAIUsage profile={profile} />
                   <FreelanceCard profile={profile} />
                 </div>
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">

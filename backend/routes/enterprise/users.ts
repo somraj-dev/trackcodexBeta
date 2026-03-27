@@ -236,7 +236,7 @@ export async function userRoutes(fastify: FastifyInstance) {
   });
 
 
-  fastify.post("/users/:userId/follow", async (request, reply) => {
+  fastify.post("/users/:userId/follow", { preHandler: requireAuth }, async (request, reply) => {
     const { userId: targetUserId } = request.params as { userId: string };
     const currentUser = (request as any).user;
 
@@ -356,7 +356,7 @@ export async function userRoutes(fastify: FastifyInstance) {
   });
 
   // Unfollow a user
-  fastify.delete("/users/:userId/follow", async (request, reply) => {
+  fastify.delete("/users/:userId/follow", { preHandler: requireAuth }, async (request, reply) => {
     const currentUser = (request as any).user;
     if (!currentUser) {
       return reply.code(401).send({ message: "Unauthorized" });
