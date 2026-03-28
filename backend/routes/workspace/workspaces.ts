@@ -19,16 +19,24 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
   });
 
   // List Workspaces
-  fastify.get("/workspaces", async (request, reply) => {
-    try {
+  fastify.get(
+    "/workspaces",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const user = (request as any).user;
+      if (!user) throw Unauthorized("Unauthorized");
+      const currentUserId = user.userId;
+
       const { userId } = request.query as { userId?: string };
-      // In real app: use request.user.id to filter efficiently based on session
-      // For now, if userId is provided, return their public workspaces
 
       const whereClause: any = {};
-      if (userId) {
+      
+      // Filter by specified userId (public only) OR default to current user's private/public workspaces
+      if (userId && userId !== currentUserId) {
         whereClause.ownerId = userId;
-        whereClause.visibility = "public"; // only public workspaces for user directory
+        whereClause.visibility = "public";
+      } else {
+        whereClause.ownerId = currentUserId;
       }
 
       const workspaces = await prisma.workspace.findMany({
@@ -37,10 +45,8 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
         orderBy: { updatedAt: "desc" },
       });
       return workspaces;
-    } catch (error) {
-      throw error; // Let global handler catch
     }
-  });
+  );
 
   // Create Workspace
   fastify.post(

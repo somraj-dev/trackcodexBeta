@@ -17,6 +17,7 @@ export interface Workspace {
   visibility?: "Public" | "Private" | "public" | "private";
   description?: string;
   members?: any;
+  repositoryId?: string;
 }
 
 export interface LiveSession {

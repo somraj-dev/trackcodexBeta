@@ -362,3 +362,388 @@
     transform: translateY(0) scale(1);
   }
 }
+
+.cpm-assign-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cpm-assign-item {
+  flex: 1;
+  position: relative;
+}
+
+.cpm-calendar-header-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--gh-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+
+.cpm-calendar-header-btn:hover {
+  background: var(--bg-hover);
+}
+
+.cpm-calendar-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gh-text);
+}
+
+.cpm-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cpm-calendar-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gh-text-secondary);
+  padding: 4px 0;
+}
+
+.cpm-calendar-day-prev {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--gh-text-secondary);
+}
+
+.cpm-date-picker-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--gh-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cpm-upload-area {
+  border: 2px dashed var(--gh-border);
+  border-radius: 16px;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cpm-upload-area:hover {
+  border-color: var(--primary-color);
+  background: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.cpm-upload-item {
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.cpm-upload-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--gh-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--gh-text-secondary);
+}
+
+.cpm-upload-info {
+  flex: 1;
+}
+
+.cpm-upload-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gh-text);
+}
+
+.cpm-upload-meta {
+  font-size: 12px;
+  color: var(--gh-text-secondary);
+  margin-top: 2px;
+}
+
+.cpm-upload-progress-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--gh-border);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.cpm-upload-progress-fill {
+  height: 100%;
+  background: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.cpm-upload-remove-btn {
+  background: transparent;
+  border: none;
+  color: var(--gh-text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.cpm-upload-remove-btn:hover {
+  background: var(--bg-hover);
+  color: #FF5555;
+}
+
+.cpm-git-provider-header {
+  border: 1px solid var(--gh-border);
+  border-radius: 12px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--gh-bg-secondary);
+}
+
+.cpm-git-provider-desc {
+  color: var(--gh-text-secondary);
+  font-size: 15px;
+  margin-bottom: 32px;
+  text-align: center;
+  font-weight: 400;
+}
+
+.cpm-git-provider-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.cpm-git-provider-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.cpm-git-provider-btn:hover {
+  opacity: 0.9;
+}
+
+.cpm-git-provider-btn.github { background: #24292e; color: #fff; }
+.cpm-git-provider-btn.gitlab { background: #6b4fbb; color: #fff; }
+.cpm-git-provider-btn.bitbucket { background: #0052cc; color: #fff; }
+
+.cpm-git-manage-links {
+  margin-top: 28px;
+}
+
+.cpm-git-manage-link {
+  color: var(--gh-text);
+  font-size: 13px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.cpm-git-manage-link:hover {
+  text-decoration: underline;
+}
+
+.cpm-git-header-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.cpm-git-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 6px;
+  color: var(--gh-text);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cpm-git-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  width: 240px;
+  background: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.cpm-git-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--gh-text);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.cpm-git-dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.cpm-git-dropdown-item.active {
+  font-weight: 600;
+}
+
+.cpm-git-search-container {
+  flex: 1;
+  position: relative;
+}
+
+.cpm-git-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gh-text-secondary);
+  pointer-events: none;
+}
+
+.cpm-git-search-input {
+  width: 100%;
+  background: var(--gh-bg);
+  border: 1px solid var(--gh-border);
+  border-radius: 6px;
+  color: var(--gh-text);
+  padding: 8px 12px 8px 36px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cpm-git-search-input:focus {
+  border-color: var(--primary-color);
+}
+
+.cpm-repo-list {
+  border: 1px solid var(--gh-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.cpm-repo-item {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gh-border);
+  background: var(--gh-bg-secondary);
+}
+
+.cpm-repo-item:last-child {
+  border-bottom: none;
+}
+
+.cpm-repo-owner-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #24292e;
+  border: 1px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cpm-repo-status-pill {
+  font-size: 12px;
+  color: var(--gh-text-secondary);
+  background: transparent;
+  border: 1px solid var(--gh-border);
+  padding: 0 6px;
+  border-radius: 12px;
+}
+
+.cpm-repo-summary {
+  background: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.cpm-repo-summary-label {
+  font-size: 13px;
+  color: var(--gh-text-secondary);
+  margin-bottom: 8px;
+}
+
+.cpm-repo-summary-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cpm-repo-branch-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gh-text-secondary);
+  margin-left: 8px;
+}
+
+.cpm-step3-intro {
+  font-size: 14px;
+  color: var(--gh-text);
+  margin-bottom: 24px;
+  font-weight: 500;
+}

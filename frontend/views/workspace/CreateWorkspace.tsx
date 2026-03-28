@@ -1,571 +1,271 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const ToggleSwitch = ({
-  enabled,
-  onChange,
-}: {
-  enabled: boolean;
-  onChange: () => void;
-}) => (
-  <button
-    type="button"
-    aria-label="Toggle setting"
-    onClick={onChange}
-    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${enabled ? "bg-primary" : "bg-gh-bg-tertiary"
-      }`}
-  >
-    <span
-      className={`pointer-events-none inline-block size-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${enabled ? "translate-x-5" : "translate-x-0"
-        }`}
-    />
-  </button>
-);
+import { api } from "../../services/infra/api";
+import { Workspace, Repository } from "../../types";
+import "../../styles/CreateWorkspaceNew.css";
 
 const CreateWorkspaceView = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(3); // Defaulting to last step for view context matching
-  const [type, setType] = useState("team");
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [selectedRepoId, setSelectedRepoId] = useState<string>("");
+  const [projectName, setProjectName] = useState("");
+  const [isPrivate, setIsPrivate] = useState(true);
+  const [includeReadme, setIncludeReadme] = useState("Yes, with a tutorial (for beginners)");
+  const [defaultBranch, setDefaultBranch] = useState("main");
+  const [includeGitignore, setIncludeGitignore] = useState("Yes (recommended)");
+  const [description, setDescription] = useState("");
+  const [forking, setForking] = useState("Allow only private forks");
+  const [language, setLanguage] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [repoUrl, setRepoUrl] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState<
-    "github" | "gitlab" | "other"
-  >("github");
-  const [setupMode, setSetupMode] = useState<"empty" | "import">("import");
+  const [isLoadingRepos, setIsLoadingRepos] = useState(true);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Workspace details
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceDescription, setWorkspaceDescription] = useState("");
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
-  const [accessPassword, setAccessPassword] = useState("");
-
-  // Settings state for Section 4
-  const [settings, setSettings] = useState({
-    defaultEnvs: true,
-    forgeAI: true,
-    css: true,
-    collaboration: true,
-  });
-
-  const toggleSetting = (key: keyof typeof settings) => {
-    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  // Detect Git provider from URL
-  const detectGitProvider = (url: string): "github" | "gitlab" | "other" => {
-    if (url.includes("github.com")) return "github";
-    if (url.includes("gitlab.com")) return "gitlab";
-    return "other";
-  };
-
-  // Handle repository URL change
-  const handleRepoUrlChange = (url: string) => {
-    setRepoUrl(url);
-    if (url) {
-      setSelectedProvider(detectGitProvider(url));
-    }
-  };
-
-  const steps = ["Type", "Details", "Setup", "Defaults"];
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoadingRepos(true);
+      try {
+        const repoList = await api.repositories.list();
+        setRepositories(repoList);
+        if (repoList.length > 0) {
+          setSelectedRepoId(repoList[0].id);
+          setProjectName(repoList[0].name); // Default workspace name to repo name
+        }
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      } finally {
+        setIsLoadingRepos(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleCreate = async () => {
-    // Validation
-    if (!workspaceName.trim()) {
+    if (!projectName || !selectedRepoId) {
       window.dispatchEvent(
         new CustomEvent("trackcodex-notification", {
           detail: {
             title: "Validation Error",
-            message: "Workspace name is required",
+            message: "Workspace name and Repository are required",
             type: "error",
           },
-        }),
-      );
-      return;
-    }
-
-    if (visibility === "private" && !accessPassword.trim()) {
-      window.dispatchEvent(
-        new CustomEvent("trackcodex-notification", {
-          detail: {
-            title: "Validation Error",
-            message: "Password is required for private workspaces",
-            type: "error",
-          },
-        }),
+        })
       );
       return;
     }
 
     setIsCreating(true);
     try {
-      // Import API dynamically to avoid circular dependencies if any, or just use global
-      const { api } = await import("../../services/infra/api");
-
-      // Get current user ID
-      let ownerId: string | undefined;
-      try {
-        const me = await api.auth.getMe() as any;
-        ownerId = me?.user?.id || me?.user?.userId;
-      } catch {
-        // If not logged in, backend will use first user as fallback
-      }
-      // Extract repository name from URL
-      const getRepoNameFromUrl = (url: string): string => {
-        try {
-          const parts = url.split("/");
-          const lastPart = parts[parts.length - 1];
-          return lastPart.replace(".git", "") || "New Workspace";
-        } catch {
-          return "New Workspace";
-        }
+      // Create a Workspace linked to the existing repository
+      const payload: Partial<Workspace> = {
+        name: projectName,
+        description,
+        visibility: isPrivate ? "private" : "public",
+        repo: selectedRepoId,
       };
 
-      // Create workspace payload
-      const payload = {
-        name:
-          workspaceName.trim() ||
-          (setupMode === "import" && repoUrl
-            ? getRepoNameFromUrl(repoUrl)
-            : "New Workspace"),
-        description:
-          workspaceDescription.trim() ||
-          (setupMode === "import" && repoUrl
-            ? `Imported from ${selectedProvider}: ${repoUrl}`
-            : "Created via TrackCodex Dashboard"),
-        ownerId,
-        repositoryUrl: setupMode === "import" ? repoUrl : undefined,
-        gitProvider: setupMode === "import" ? selectedProvider : undefined,
-        setupMode,
-        visibility,
-        accessPassword: visibility === "private" ? accessPassword : undefined,
-      };
+      const newWorkspace = await api.workspaces.create(payload);
 
-      const newWs = await api.workspaces.create(payload);
-
-      // Show success notification
       window.dispatchEvent(
         new CustomEvent("trackcodex-notification", {
           detail: {
-            title:
-              setupMode === "import"
-                ? "Repository Cloned"
-                : "Workspace Created",
-            message:
-              setupMode === "import"
-                ? `Successfully cloned repository from ${selectedProvider}. Workspace #${(newWs as any).workspaceNumber || newWs.id.substring(0, 6)}`
-                : `Your workspace is ready! Workspace #${(newWs as any).workspaceNumber || newWs.id.substring(0, 6)}`,
+            title: "Success",
+            message: `Workspace "${projectName}" created successfully!`,
             type: "success",
           },
-        }),
+        })
       );
 
-      // Wait a small moment for UI effect then navigate
-      setTimeout(() => {
-        navigate(`/workspace/${newWs.id}`);
-      }, 500);
-    } catch (e) {
-      console.error("Failed to create workspace", e);
-      setIsCreating(false);
-
-      // Show error notification
+      navigate(`/workspace/${newWorkspace.id}`);
+    } catch (error) {
+      console.error("Failed to create workspace", error);
       window.dispatchEvent(
         new CustomEvent("trackcodex-notification", {
           detail: {
-            title: "Creation Failed",
-            message:
-              e instanceof Error ? e.message : "Failed to create workspace",
+            title: "Error",
+            message: error instanceof Error ? error.message : "Failed to create repository",
             type: "error",
           },
-        }),
+        })
       );
+    } finally {
+      setIsCreating(false);
     }
   };
 
   return (
-    <div className="bg-gh-bg p-10 font-display">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-2xl font-semibold text-gh-text mb-2 tracking-tight">
-            Create New Workspace
-          </h1>
-          <p className="text-gh-text-secondary font-medium">
-            Set up your development command center with enterprise-grade
-            defaults.
-          </p>
+    <div className="create-repo-container">
+      <header className="create-repo-header">
+        <h1>Create a new workspace</h1>
+        <a href="/workspace/import" className="import-link">Connect workspace</a>
+      </header>
+
+
+      <div className="form-row">
+        <div className="form-group flex-1">
+          <label className="form-label" htmlFor="project-name">Workspace name<span className="required">*</span></label>
+          <input 
+            id="project-name" 
+            type="text" 
+            className="input-field" 
+            value={projectName}
+            placeholder="e.g., 'Phoenix Core'"
+            onChange={(e) => setProjectName(e.target.value)}
+          />
         </div>
-
-
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-12">
-            {/* Section 1 */}
-            <section
-              className={
-                step >= 0 ? "opacity-100" : "opacity-30 pointer-events-none"
-              }
-            >
-              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
-                1: Workspace Type Selection
-              </h2>
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  {
-                    id: "personal",
-                    label: "Personal Workspace",
-                    icon: "person",
-                    desc: "Solo developers. Private.",
-                  },
-                  {
-                    id: "team",
-                    label: "Team Workspace",
-                    icon: "groups",
-                    desc: "Organizations. RBAC enabled.",
-                  },
-                  {
-                    id: "community",
-                    label: "Community Workspace",
-                    icon: "public",
-                    desc: "Public learning sessions.",
-                  },
-                ].map((t) => (
-                  <div
-                    key={t.id}
-                    onClick={() => setType(t.id)}
-                    className={`p-5 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center group relative h-full ${type === t.id
-                      ? "border-primary bg-primary/5 shadow-[0_0_20px_rgba(19,91,236,0.05)]"
-                      : "border-gh-border bg-gh-bg-secondary hover:border-gh-text-secondary"
-                      }`}
-                  >
-                    <div
-                      className={`size-10 rounded-full flex items-center justify-center mb-4 transition-colors ${type === t.id ? "bg-primary text-white" : "bg-gh-bg-tertiary text-gh-text-secondary"}`}
-                    >
-                      <span className="material-symbols-outlined !text-[20px]">
-                        {t.icon}
-                      </span>
-                    </div>
-                    <h3 className="text-xs font-bold text-gh-text mb-2">
-                      {t.label}
-                    </h3>
-                    <p className="text-[10px] text-gh-text-secondary leading-relaxed">
-                      {t.desc}
-                    </p>
-                    {type === t.id && (
-                      <div className="absolute top-2 right-2 size-4 bg-primary rounded-full flex items-center justify-center animate-in zoom-in duration-200">
-                        <span className="material-symbols-outlined text-[10px] text-white font-semibold">
-                          check
-                        </span>
-                      </div>
-                    )}
-                  </div>
+        <div className="form-group flex-1">
+          <label className="form-label" htmlFor="repo-select">Select Repository<span className="required">*</span></label>
+          <select 
+            id="repo-select" 
+            className="select-field full-width"
+            value={selectedRepoId}
+            onChange={(e) => {
+              const repoId = e.target.value;
+              setSelectedRepoId(repoId);
+              const repo = repositories.find(r => r.id === repoId);
+              if (repo && !projectName) setProjectName(repo.name);
+            }}
+            disabled={isLoadingRepos}
+          >
+            {isLoadingRepos ? (
+              <option value="" disabled>Loading repositories...</option>
+            ) : repositories.length === 0 ? (
+              <option value="" disabled>No repositories found</option>
+            ) : (
+              <>
+                <option value="" disabled>Choose a repository...</option>
+                {repositories.map(repo => (
+                  <option key={repo.id} value={repo.id}>{repo.name}</option>
                 ))}
-              </div>
-            </section>
+              </>
+            )}
+          </select>
+        </div>
+      </div>
 
-            {/* Section 2 */}
-            <section
-              className={
-                step >= 1 ? "opacity-100" : "opacity-30 pointer-events-none"
-              }
-            >
-              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
-                2: Workspace Details
-              </h2>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="col-span-1">
-                  <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
-                    Workspace Name *
-                  </label>
-                  <input
-                    value={workspaceName}
-                    onChange={(e) => setWorkspaceName(e.target.value)}
-                    className="w-full bg-gh-bg-secondary border border-gh-border rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary text-gh-text outline-none transition-all"
-                    placeholder='e.g., "Phoenix Core"'
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label
-                    htmlFor="ws-visibility"
-                    className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest"
-                  >
-                    Workspace Visibility
-                  </label>
-                  <select
-                    id="ws-visibility"
-                    value={visibility}
-                    onChange={(e) =>
-                      setVisibility(e.target.value as "public" | "private")
-                    }
-                    className="w-full bg-gh-bg-secondary border border-gh-border rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary text-gh-text outline-none appearance-none"
-                  >
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                  </select>
-                </div>
+      <div className="form-group mt-4">
+        <label className="form-label">Access level</label>
+        <div className="access-level-group">
+          <input 
+            type="checkbox" 
+            id="private-repo" 
+            checked={isPrivate}
+            onChange={(e) => setIsPrivate(e.target.checked)}
+          />
+          <label htmlFor="private-repo" className="checkbox-label">Private workspace</label>
+        </div>
+        <p className="field-description mt-2">
+          Uncheck to make this workspace public. Public workspaces typically contain open-source code and can be viewed by anyone.
+        </p>
+      </div>
 
-                {/* Conditional Password Field for Private Workspaces */}
-                {visibility === "private" && (
-                  <div className="col-span-2">
-                    <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
-                      Access Password *
-                    </label>
-                    <input
-                      type="password"
-                      value={accessPassword}
-                      onChange={(e) => setAccessPassword(e.target.value)}
-                      className="w-full bg-gh-bg-secondary border border-gh-border rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary text-gh-text outline-none transition-all"
-                      placeholder="Enter a password to protect this workspace"
-                    />
-                    <p className="text-[10px] text-gh-text-secondary mt-2">
-                      🔒 Other users will need this password to access your
-                      workspace
-                    </p>
-                  </div>
-                )}
+      <div className="form-group mt-6">
+        <label className="form-label" htmlFor="readme-select">Include a README?</label>
+        <select 
+          id="readme-select" 
+          className="select-field full-width"
+          value={includeReadme}
+          onChange={(e) => setIncludeReadme(e.target.value)}
+        >
+          <option>Yes, with a tutorial (for beginners)</option>
+          <option>Yes, but empty</option>
+          <option>No</option>
+        </select>
+      </div>
 
-                <div className="col-span-2">
-                  <label className="text-[10px] font-bold text-gh-text-secondary uppercase block mb-2 tracking-widest">
-                    Optional Description
-                  </label>
-                  <textarea
-                    value={workspaceDescription}
-                    onChange={(e) => setWorkspaceDescription(e.target.value)}
-                    className="w-full bg-gh-bg-secondary border border-gh-border rounded-lg p-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary text-gh-text h-20 resize-none outline-none"
-                    placeholder="Context for contributors..."
-                  />
-                </div>
-              </div>
-            </section>
+      <div className="form-group mt-4">
+        <label className="form-label" htmlFor="default-branch">Default branch name</label>
+        <input 
+          id="default-branch" 
+          type="text" 
+          className="input-field full-width" 
+          placeholder="e.g., 'main'" 
+          value={defaultBranch}
+          onChange={(e) => setDefaultBranch(e.target.value)}
+        />
+      </div>
 
-            {/* Section 3 */}
-            <section
-              className={
-                step >= 2 ? "opacity-100" : "opacity-30 pointer-events-none"
-              }
-            >
-              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
-                3: Project & Repository Setup
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div
-                  onClick={() => setSetupMode("empty")}
-                  className={`p-6 rounded-xl border-2 cursor-pointer flex flex-col items-center justify-center group transition-all h-full ${setupMode === "empty"
-                    ? "border-primary bg-primary/5"
-                    : "border-gh-border bg-gh-bg-secondary hover:border-primary"
-                    }`}
-                >
-                  <span
-                    className={`material-symbols-outlined !text-[32px] mb-4 ${setupMode === "empty"
-                      ? "text-primary"
-                      : "text-gh-text-secondary group-hover:text-primary"
-                      }`}
-                  >
-                    folder_open
-                  </span>
-                  <span className="text-[11px] font-bold text-white">
-                    Create Empty
-                  </span>
-                </div>
-                <div
-                  onClick={() => setSetupMode("import")}
-                  className={`p-5 rounded-xl border-2 flex flex-col relative h-full cursor-pointer transition-all ${setupMode === "import"
-                    ? "border-primary bg-primary/5"
-                    : "border-gh-border bg-gh-bg-secondary hover:border-primary"
-                    }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-bold text-gh-text uppercase tracking-widest">
-                      Import Git
-                    </span>
-                    <span className="material-symbols-outlined !text-[16px] text-primary">
-                      expand_more
-                    </span>
-                  </div>
-                  <div className="flex gap-2 mb-4">
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProvider("github");
-                      }}
-                      className={`size-8 rounded border flex items-center justify-center cursor-pointer transition-all ${selectedProvider === "github"
-                        ? "bg-white/20 border-white/30 shadow-lg"
-                        : "bg-white/5 border-white/10 hover:bg-white/10"
-                        }`}
-                      title="GitHub"
-                    >
-                      <span
-                        className={`material-symbols-outlined text-sm ${selectedProvider === "github"
-                          ? "text-white"
-                          : "text-green-500"
-                          }`}
-                      >
-                        terminal
-                      </span>
-                    </div>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProvider("gitlab");
-                      }}
-                      className={`size-8 rounded border flex items-center justify-center cursor-pointer transition-all ${selectedProvider === "gitlab"
-                        ? "bg-white/20 border-white/30 shadow-lg"
-                        : "bg-white/5 border-white/10 hover:bg-white/10"
-                        }`}
-                      title="GitLab"
-                    >
-                      <span
-                        className={`material-symbols-outlined text-sm ${selectedProvider === "gitlab"
-                          ? "text-white"
-                          : "text-orange-500"
-                          }`}
-                      >
-                        hub
-                      </span>
-                    </div>
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProvider("other");
-                      }}
-                      className={`size-8 rounded border flex items-center justify-center cursor-pointer transition-all ${selectedProvider === "other"
-                        ? "bg-white/20 border-white/30 shadow-lg"
-                        : "bg-white/5 border-white/10 hover:bg-white/10"
-                        }`}
-                      title="Other Git Provider"
-                    >
-                      <span
-                        className={`material-symbols-outlined text-sm ${selectedProvider === "other"
-                          ? "text-white"
-                          : "text-blue-500"
-                          }`}
-                      >
-                        rocket
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    value={repoUrl}
-                    onChange={(e) => handleRepoUrlChange(e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full bg-black/40 border border-gh-border rounded p-2 text-[10px] text-white focus:ring-1 focus:ring-primary outline-none"
-                    placeholder="https://github.com/username/repo.git"
-                  />
-                </div>
-              </div>
-            </section>
-          </div>
+      <div className="form-group mt-4">
+        <label className="form-label" htmlFor="gitignore-select">Include .gitignore?</label>
+        <select 
+          id="gitignore-select" 
+          className="select-field full-width"
+          value={includeGitignore}
+          onChange={(e) => setIncludeGitignore(e.target.value)}
+        >
+          <option>Yes (recommended)</option>
+          <option>No</option>
+        </select>
+      </div>
 
-          <div className="space-y-12">
-            {/* Section 4: Environment & Security Defaults (Matches Screenshot) */}
-            <section
-              className={
-                step >= 3 ? "opacity-100" : "opacity-30 pointer-events-none"
-              }
-            >
-              <h2 className="text-[11px] font-semibold text-gh-text-secondary uppercase tracking-widest mb-6">
-                4: ENVIRONMENT & SECURITY DEFAULTS
-              </h2>
-              <div className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-8 space-y-6 shadow-2xl">
-                <div className="flex items-center justify-between group">
-                  <span className="text-sm text-gh-text-secondary font-medium">
-                    Default environments (Dev / Staging / Prod)
-                  </span>
-                  <ToggleSwitch
-                    enabled={settings.defaultEnvs}
-                    onChange={() => toggleSetting("defaultEnvs")}
-                  />
-                </div>
-                <div className="flex items-center justify-between group">
-                  <span className="text-sm text-gh-text-secondary font-medium">
-                    Enable ForgeAI assistance
-                  </span>
-                  <ToggleSwitch
-                    enabled={settings.forgeAI}
-                    onChange={() => toggleSetting("forgeAI")}
-                  />
-                </div>
-                <div className="flex items-center justify-between group">
-                  <span className="text-sm text-gh-text-secondary font-medium">
-                    Enable CSS (Code Security System)
-                  </span>
-                  <ToggleSwitch
-                    enabled={settings.css}
-                    onChange={() => toggleSetting("css")}
-                  />
-                </div>
-                <div className="flex items-center justify-between group">
-                  <span className="text-sm text-gh-text-secondary font-medium">
-                    Enable real-time collaboration
-                  </span>
-                  <ToggleSwitch
-                    enabled={settings.collaboration}
-                    onChange={() => toggleSetting("collaboration")}
-                  />
-                </div>
+      <div className="advanced-settings mt-8">
+        <div 
+          className="advanced-toggle" 
+          onClick={() => setShowAdvanced(!showAdvanced)}
+        >
+          <span className={`transition-transform duration-300 advanced-toggle-icon ${showAdvanced ? 'rotate-180' : ''}`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </span>
+          Advanced settings
+        </div>
+        
+        <div className={`advanced-content-wrapper ${showAdvanced ? 'open' : ''}`}>
+          <div className="advanced-content">
+            <div className="form-group">
+              <label className="form-label" htmlFor="description">Description</label>
+              <textarea 
+                id="description" 
+                className="input-field description-area" 
+                value={description}
+                placeholder="Context for contributors..."
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
 
-                <div className="pt-6 border-t border-gh-border">
-                  <p className="text-[11px] text-gh-text-secondary font-medium">
-                    Encrypted at rest and in transit. Role-based access control.
-                  </p>
-                </div>
-              </div>
-            </section>
+            <div className="form-group mt-4">
+              <label className="form-label" htmlFor="forking-select">Forking</label>
+              <select 
+                id="forking-select" 
+                className="select-field full-width"
+                value={forking}
+                onChange={(e) => setForking(e.target.value)}
+              >
+                <option>Allow only private forks</option>
+                <option>Allow public and private forks</option>
+                <option>Disable forking</option>
+              </select>
+            </div>
 
-            {/* Final Action Area */}
-            <div className="flex flex-col items-center gap-6 pt-12 border-t border-gh-border">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleCreate}
-                  disabled={isCreating}
-                  className="bg-primary hover:opacity-90 text-gh-bg px-12 py-3.5 rounded-xl font-bold uppercase tracking-[0.1em] text-xs transition-all shadow-[0_10px_30px_rgba(var(--gh-primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
-                >
-                  {isCreating ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-sm">
-                        progress_activity
-                      </span>
-                      Initializing...
-                    </>
-                  ) : (
-                    "Create Workspace"
-                  )}
-                </button>
-                <button
-                  disabled={isCreating}
-                  className="bg-gh-bg-tertiary hover:bg-gh-bg-secondary text-gh-text px-8 py-3.5 rounded-xl font-bold text-xs transition-all border border-gh-border disabled:opacity-30"
-                  onClick={() => navigate("/workspaces")}
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {isCreating && (
-                <div className="flex flex-col items-center gap-2 animate-in fade-in duration-500">
-                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-primary">
-                    <span className="size-1.5 rounded-full bg-primary animate-pulse"></span>
-                    Allocating cloud resources
-                  </div>
-                  <div className="w-48 h-1 bg-gh-bg-tertiary rounded-full overflow-hidden mt-1">
-                    <div className="h-full bg-primary animate-[shimmer_2s_infinite_linear] w-[60%]"></div>
-                  </div>
-                </div>
-              )}
+            <div className="form-group mt-4">
+              <label className="form-label" htmlFor="language-select">Language</label>
+              <select 
+                id="language-select" 
+                className="select-field full-width"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="">Select language...</option>
+                <option value="javascript">JavaScript</option>
+                <option value="typescript">TypeScript</option>
+                <option value="python">Python</option>
+                <option value="go">Go</option>
+                <option value="rust">Rust</option>
+              </select>
             </div>
           </div>
         </div>
+      </div>
 
-        <footer className="mt-32 text-center pb-12">
-          <div className="flex items-center justify-center gap-2 mb-2 opacity-40">
-            <span className="material-symbols-outlined text-gh-text-secondary !text-sm">
-              hub
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gh-text-secondary">
-              TrackCodex Infrastructure
-            </span>
-          </div>
-          <p className="text-[10px] text-gh-text-secondary font-bold uppercase tracking-widest">
-            Enterprise Instance ID: QFC-9023-SEC
-          </p>
-        </footer>
+      <div className="actions mt-10 pt-6 border-t border-gh-border flex justify-end gap-4">
+        <button className="btn-cancel" onClick={() => navigate(-1)}>Cancel</button>
+        <button 
+          className="btn-submit" 
+          onClick={handleCreate}
+          disabled={isCreating || isLoadingRepos}
+        >
+          {isCreating ? "Creating..." : "Create workspace"}
+        </button>
       </div>
     </div>
   );

@@ -56,11 +56,14 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
       const take = limit ? parseInt(limit) : undefined;
 
       const where: any = {};
-      // Filter by explicit userId param, or default to logged-in user
-      if (userId) {
+      const currentUserId = (request as any).user?.userId;
+
+      // Filter by explicit userId param (public only if not owner), or default to current user
+      if (userId && userId !== currentUserId) {
         where.ownerId = userId;
-      } else if (request.user?.userId) {
-        where.ownerId = request.user.userId;
+        where.isPublic = true; // only public repos for other users
+      } else {
+        where.ownerId = currentUserId;
       }
 
       const repositories = await prisma.repository.findMany({

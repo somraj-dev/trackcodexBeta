@@ -61,7 +61,9 @@ const CookiePolicy = React.lazy(() => import("./views/legal/CookiePolicy"));
 const CommunityView = React.lazy(() => import("./views/community/Community"));
 const DiscussionDetail = React.lazy(() => import("./views/community/DiscussionDetail"));
 const CreateRepoView = React.lazy(() => import("./views/repo/CreateRepo"));
-const ImportRepoView = React.lazy(() => import("./views/repo/ImportRepo"));
+const ConnectWorkspaceView = React.lazy(() => import("./views/workspace/ConnectWorkspace"));
+const WorkspaceOverviewView = React.lazy(() => import("./views/workspace/WorkspaceOverview"));
+const RepositoryOverviewView = React.lazy(() => import("./views/repo/RepositoryOverview"));
 const IssueDetail = React.lazy(() => import("./views/repo/IssueDetail"));
 const SearchResults = React.lazy(() => import("./views/SearchResults"));
 const TrackCoinView = React.lazy(() => import("./views/TrackCoin"));
@@ -226,15 +228,16 @@ const AppRoutes = React.memo(() => {
             <Route path="/community/*" element={<CommunityView />} />
             <Route path="/trackcoin" element={<TrackCoinView />} />
             <Route path="/workspace/new" element={<CreateWorkspaceView />} />
-            <Route path="/workspace/:id" element={<VSCodeWorkspaceView />} />
+            <Route path="/workspace/:id" element={<WorkspaceOverviewView />} />
             <Route path="/workspace/:id/ide" element={<VSCodeWorkspaceView />} />
             <Route path="/repositories" element={<RepositoriesView />} />
             <Route path="/repositories/new" element={<CreateRepoView />} />
-            <Route path="/repositories/import" element={<ImportRepoView />} />
+            <Route path="/workspace/import" element={<ConnectWorkspaceView />} />
             <Route path="/repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
             <Route path="/repo/:id/issues/:number" element={<IssueDetail />} />
+            <Route path="/repo/:id" element={<RepositoryOverviewView />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
             <Route path="/library" element={<LibraryView key="library-list" />} />
             <Route path="/library/new" element={<CreateLibraryResourceView />} />

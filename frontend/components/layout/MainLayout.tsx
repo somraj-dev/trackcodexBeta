@@ -104,7 +104,7 @@ const MainLayout: React.FC = () => {
 
   const isIdeView = (
     location.pathname.startsWith("/workspace/") &&
-    location.pathname !== "/workspace/new"
+    !["/workspace/new", "/workspace/import"].includes(location.pathname)
   ) || ["/editor", "/trials/live-session"].some(
     (path) => location.pathname.includes(path),
   ) || isStandalone;
@@ -113,7 +113,7 @@ const MainLayout: React.FC = () => {
     ["/messages", "/notifications"].includes(location.pathname);
   const isFullPageAction = [
     "/repositories/new", 
-    "/repositories/import", 
+    "/workspace/import", 
     "/marketplace/missions/new", 
     "/marketplace/missions/new/event",
     "/library/new"
@@ -232,7 +232,7 @@ const MainLayout: React.FC = () => {
                         { icon: "account_tree", label: "New Repository", to: "/repositories/new" },
                         { icon: "work", label: "New Mission", to: "/marketplace/missions/new" },
                         { icon: "add_box", label: "New Post", to: "/community?action=create-post" },
-                        { icon: "upload", label: "Import Repository", to: "/repositories/import" },
+                        { icon: "upload", label: "Connect Workspace", to: "/workspace/import" },
                       ].map((item) => (
                         <button key={item.label} onClick={() => { setIsAddMenuOpen(false); navigate(item.to); }} className="w-full px-3 py-1.5 flex items-center gap-2 text-[13px] text-gh-text hover:bg-gh-bg-tertiary hover:text-primary transition-colors">
                           <span className="material-symbols-outlined !text-[16px]">{item.icon}</span>

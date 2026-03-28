@@ -69,7 +69,7 @@ export const emailService = {
       const inviteLink = `${process.env.FRONTEND_URL || "https://trackcodex.com"}/accept-invite?token=${inviteToken}`;
 
       const info = await transport.sendMail({
-        from: '"TrackCodex" <onboarding@resend.dev>', // Resend domains must be verified, fallback to onboarding@resend.dev for testing
+        from: process.env.RESEND_FROM_EMAIL || '"TrackCodex" <no-reply@trackcodex.com>', // Resend domains must be verified, fallback to onboarding@resend.dev for testing
         to,
         subject: `You've been invited to join ${workspaceName} on TrackCodex`,
         html: `
@@ -119,7 +119,7 @@ export const emailService = {
         : "";
 
       const info = await transport.sendMail({
-        from: '"TrackCodex" <onboarding@resend.dev>', // Resend testing domain
+        from: process.env.RESEND_FROM_EMAIL || '"TrackCodex" <no-reply@trackcodex.com>', // Resend testing domain
         to,
         subject: title,
         html: `
@@ -154,7 +154,7 @@ export const emailService = {
     try {
       const transport = await getTransporter();
       const info = await transport.sendMail({
-        from: '"TrackCodex" <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || '"TrackCodex" <no-reply@trackcodex.com>',
         to,
         subject: `${otp} is your TrackCodex verification code`,
         html: `
@@ -200,7 +200,7 @@ export const emailService = {
     try {
       const transport = await getTransporter();
       await transport.sendMail({
-        from: '"TrackCodex" <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || '"TrackCodex" <no-reply@trackcodex.com>',
         to,
         subject: "Verify your TrackCodex email",
         html: `
@@ -233,7 +233,7 @@ export const emailService = {
     try {
       const transport = await getTransporter();
       await transport.sendMail({
-        from: '"TrackCodex" <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || '"TrackCodex" <no-reply@trackcodex.com>',
         to,
         subject: "Reset your TrackCodex password",
         html: `
