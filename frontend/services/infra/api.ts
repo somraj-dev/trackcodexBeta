@@ -161,6 +161,14 @@ export const api = {
         data,
       }),
     getMe: () => request<UserProfile>({ url: "/auth/me" }),
+    // Personal Access Tokens (Git CLI auth)
+    tokens: {
+      list: () => request<{ tokens: any[] }>({ url: "/auth/tokens" }),
+      create: (data: { name: string; scopes?: string[]; expiresInDays?: number }) =>
+        request<any>({ url: "/auth/tokens", method: "POST", data }),
+      revoke: (id: string) =>
+        request<{ success: boolean; message: string }>({ url: `/auth/tokens/${id}`, method: "DELETE" }),
+    },
   },
   workspaces: {
     list: (params?: { userId?: string; visibility?: string }) =>

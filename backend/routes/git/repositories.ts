@@ -191,8 +191,15 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
 
       try {
         console.log(`[REPO-CREATE] Starting creation for user ${user.userId}: ${name}`);
-        const baseUrl = process.env.BACKEND_URL || "https://trackcodex.com";
-        const ownerUsername = user.username || "me";
+        const apiUrl = process.env.BACKEND_URL || "https://api.trackcodex.com";
+        const frontendUrl = process.env.FRONTEND_URL || "https://trackcodex.com";
+
+        // Fetch username for the clone URL
+        const ownerRecord = await prisma.user.findUnique({
+          where: { id: user.userId },
+          select: { username: true },
+        });
+        const ownerUsername = ownerRecord?.username || "user";
 
         const startTime = Date.now();
         const repoData = await prisma.repository.create({
@@ -205,8 +212,9 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             owner: { connect: { id: user.userId } },
             stars: 0,
             forksCount: 0,
-            cloneUrl: `${baseUrl}/git/${ownerUsername}/${name}.git`,
-            htmlUrl: `${baseUrl}/repo/${ownerUsername}/${name}`,
+            cloneUrl: `${apiUrl}/git/${ownerUsername}/${name}.git`,
+            sshUrl: `git@trackcodex.com:${ownerUsername}/${name}.git`,
+            htmlUrl: `${frontendUrl}/repo/${ownerUsername}/${name}`,
           },
         });
         console.log(`[REPO-CREATE] DB record created in ${Date.now() - startTime}ms: ${repoData.id}`);

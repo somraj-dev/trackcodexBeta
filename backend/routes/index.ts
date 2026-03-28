@@ -58,6 +58,10 @@ export async function routes(fastify: FastifyInstance) {
 
   await fastify.register(authRoutes);
   await fastify.register(authOtpRoutes);
+
+  // Personal Access Token management (Git CLI auth)
+  const { tokenRoutes } = await import("./auth/tokens");
+  await fastify.register(tokenRoutes);
   await fastify.register(notificationRoutes);
   await fastify.register(workspaceRoutes);
   await fastify.register(repositoryRoutes);

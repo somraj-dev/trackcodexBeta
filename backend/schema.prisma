@@ -109,6 +109,7 @@ model User {
   environmentReviewers   EnvironmentReviewer[]
   deploymentApprovals    DeploymentApproval[]
   userExtensions         UserExtension[]
+  personalAccessTokens   PersonalAccessToken[]
 
   // Deploy Projects (Vercel-style)
   deployProjects          DeployProject[]       @relation("ProjectOwner")
@@ -1955,3 +1956,22 @@ model ProjectMetric {
 
   @@unique([projectId, timestamp])
 }
+
+// --- Personal Access Tokens (Git CLI Auth) ---
+
+model PersonalAccessToken {
+  id          String    @id @default(cuid())
+  name        String              // e.g. "My Laptop CLI"
+  tokenHash   String    @unique   // bcrypt hash of the token
+  prefix      String              // first 8 chars for identification (e.g. "tc_abc12")
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopes      String[]  @default(["repo"]) // ["repo", "read:repo", "admin"]
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([prefix])
+}
+
