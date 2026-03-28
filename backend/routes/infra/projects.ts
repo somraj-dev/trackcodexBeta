@@ -275,52 +275,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
     return deployment;
   });
 
-  // ─── LIST domains for a project ────────────────────────────────
-  fastify.get("/projects/:id/domains", async (request) => {
-    const user = (request as any).user;
-    const { id } = request.params as { id: string };
-    if (!user) throw new AppError("Unauthorized", 401);
 
-    const project = await prisma.deployProject.findUnique({ where: { id } });
-    if (!project) throw NotFound("Project not found");
-    if (project.ownerId !== user.userId) throw new AppError("Forbidden", 403);
-
-    return prisma.projectDomain.findMany({
-      where: { projectId: id },
-      orderBy: { createdAt: "desc" },
-    });
-  });
-
-  // ─── ADD domain to a project ───────────────────────────────────
-  fastify.post("/projects/:id/domains", async (request) => {
-    const user = (request as any).user;
-    const { id } = request.params as { id: string };
-    const body = request.body as any;
-    if (!user) throw new AppError("Unauthorized", 401);
-
-    const project = await prisma.deployProject.findUnique({ where: { id } });
-    if (!project) throw NotFound("Project not found");
-    if (project.ownerId !== user.userId) throw new AppError("Forbidden", 403);
-
-    const domain = await prisma.projectDomain.create({
-      data: {
-        projectId: id,
-        domain: body.domain,
-        redirect: body.redirect || null,
-        gitBranch: body.gitBranch || null,
-      },
-    });
-
-    // Update project's primary domain if this is the first
-    if (!project.domain) {
-      await prisma.deployProject.update({
-        where: { id },
-        data: { domain: body.domain },
-      });
-    }
-
-    return domain;
-  });
 
 
 
@@ -522,9 +477,10 @@ export async function projectRoutes(fastify: FastifyInstance) {
   fastify.post("/projects/:id/domains", async (request) => {
     const user = (request as any).user;
     const { id } = request.params as { id: string };
-    const { domain } = request.body as { domain: string };
+    const body = request.body as any;
+    const domainStr = body.domain;
     if (!user) throw new AppError("Unauthorized", 401);
-    if (!domain) throw new AppError("Domain name is required", 400);
+    if (!domainStr) throw new AppError("Domain name is required", 400);
 
     const project = await prisma.deployProject.findUnique({ where: { id } });
     if (!project) throw NotFound("Project not found");
@@ -534,15 +490,25 @@ export async function projectRoutes(fastify: FastifyInstance) {
     const newDomain = await prisma.projectDomain.create({
       data: {
         projectId: id,
-        domain,
+        domain: domainStr,
+        redirect: body.redirect || null,
+        gitBranch: body.gitBranch || null,
         verified: true, // Auto-verify for now in this proof-of-concept
       },
     });
 
+    // Update project's primary domain if this is the first
+    if (!project.domain) {
+      await prisma.deployProject.update({
+        where: { id },
+        data: { domain: domainStr },
+      });
+    }
+
     // 2. Update Cloudflare KV if project is active
     if (project.activeDeployId) {
       try {
-        await CloudflareService.updateDomainRouting(domain, {
+        await CloudflareService.updateDomainRouting(domainStr, {
           projectSlug: project.name, // Use name as slug for now
           deployId: project.activeDeployId,
           projectId: project.id,
