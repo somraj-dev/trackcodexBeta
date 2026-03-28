@@ -334,10 +334,14 @@ async function bootstrap() {
         );
     });
 
-    // Register Git Routes
+    // Register Git Smart HTTP Routes
+    // Root-level = GitHub-style URLs: https://api.trackcodex.com/owner/repo.git
+    // /git prefix = backward compat:  https://api.trackcodex.com/git/owner/repo.git
     try {
         const gitModule = await import("./routes/git/git");
-        await server.register(gitModule.default || gitModule, { prefix: "/git" });
+        const gitHandler = gitModule.default || gitModule;
+        await server.register(gitHandler);           // Root: /:owner/:repo.git/...
+        await server.register(gitHandler, { prefix: "/git" }); // Legacy: /git/:owner/:repo.git/...
     } catch (err: unknown) {
         console.warn("[WARN] Git routes failed to load:", (err as Error).message);
     }

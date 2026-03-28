@@ -212,7 +212,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             owner: { connect: { id: user.userId } },
             stars: 0,
             forksCount: 0,
-            cloneUrl: `${apiUrl}/git/${ownerUsername}/${name}.git`,
+            cloneUrl: `${apiUrl}/${ownerUsername}/${name}.git`,
             sshUrl: `git@trackcodex.com:${ownerUsername}/${name}.git`,
             htmlUrl: `${frontendUrl}/repo/${ownerUsername}/${name}`,
           },
