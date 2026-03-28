@@ -234,19 +234,19 @@ const Signup = () => {
 
       {/* Right Panel - Centered Form Card */}
       <div className="flex-1 flex flex-col relative overflow-y-auto no-scrollbar py-12 px-6 lg:px-12 items-center justify-center">
-        {/* Sign in prompt */}
-        <div className="absolute top-8 right-8 text-[13px]">
-          <span className="text-gray-500">Already have an account? </span>
-          <Link to="/login" className="text-gray-900 font-semibold hover:text-blue-600 transition-all">
-            Sign in →
-          </Link>
-        </div>
-
         <div className="w-full max-w-[480px] bg-white border border-[#d0d7de] rounded-xl shadow-[0_8px_24px_rgba(140,149,159,0.12)] p-8 lg:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Sign up for TrackCodex
-            </h2>
+            <div className="space-y-1 block">
+              <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                Sign up for TrackCodex
+              </h2>
+              <p className="text-[13px] text-[#57606a]">
+                Already have an account?{" "}
+                <Link to="/login" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                  Sign in
+                </Link>
+              </p>
+            </div>
 
             {/* Social Logins */}
             <div className="grid grid-cols-1 gap-3">

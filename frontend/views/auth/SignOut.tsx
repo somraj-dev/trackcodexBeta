@@ -21,7 +21,7 @@ const SignOut: React.FC = () => {
     const displayAvatar = user?.avatar || profile.avatar;
 
     return (
-        <div className="flex-1 w-full bg-[#0A0D14] flex flex-col items-center justify-center font-display text-white selection:bg-[#1f6feb] selection:text-white">
+        <div className="min-h-[calc(100vh-48px)] w-full bg-[#0A0D14] flex flex-col items-center justify-center font-display text-white selection:bg-[#1f6feb] selection:text-white">
             {/* Main Container */}
             <div className="w-full max-w-[340px] flex flex-col gap-4 z-10">
 
