@@ -2,6 +2,10 @@
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
+      "source": "/:owner/:repo.git/:path(.*)?",
+      "destination": "https://api.trackcodex.com/:owner/:repo.git/:path"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

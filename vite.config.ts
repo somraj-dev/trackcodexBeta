@@ -21,6 +21,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        "^/[^/]+/[^/]+\\.git(/.*)?$": {
+          target: "http://127.0.0.1:4000",
+          changeOrigin: true,
+          secure: false,
+        },
       },
       // Serve the OAuth bridge page for callback paths
       // Google/GitHub redirect to /auth/callback/google (no #), this rewrites
