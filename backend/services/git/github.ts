@@ -34,6 +34,7 @@ export class GitHubService {
     // 4. Fetch Repositories (Fetch user's own repos + org repos they have access to)
     // Using per_page 100 to get a good chunk. Pagination can be added later.
     const { data: repos } = await octokit.repos.listForAuthenticatedUser({
+      affiliation: "owner",
       visibility: "all",
       sort: "updated",
       per_page: 100,
