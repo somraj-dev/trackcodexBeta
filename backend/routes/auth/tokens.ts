@@ -84,8 +84,7 @@ export async function tokenRoutes(fastify: FastifyInstance) {
         expiresAt: token.expiresAt,
         createdAt: token.createdAt,
         usage: {
-          clone: `git clone https://${userRecord?.username || "username"}:${rawToken}@api.trackcodex.com/git/<owner>/<repo>.git`,
-          note: "Save this token now — it won't be shown again.",
+          note: "Make sure to copy your personal access token now. You won't be able to see it again! Use this token as your password when performing Git CLI operations over HTTPS.",
         },
       });
     },
