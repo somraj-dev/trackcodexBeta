@@ -2,8 +2,8 @@
   max-width: 768px;
   margin: 0 auto;
   padding: 40px 24px;
-  background-color: #ffffff;
-  color: #24292f;
+  background-color: var(--gh-bg);
+  color: var(--gh-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
@@ -97,9 +97,9 @@
   padding: 5px 12px;
   font-size: 14px;
   line-height: 20px;
-  color: #24292f;
-  background-color: #ffffff;
-  border: 1px solid #d0d7de;
+  color: var(--gh-text);
+  background-color: var(--gh-bg);
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   outline: none;
   box-shadow: inset 0 1px 0 rgba(1, 4, 9, 0.075);
@@ -115,9 +115,9 @@
   padding: 5px 12px;
   font-size: 14px;
   line-height: 20px;
-  color: #24292f;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  color: var(--gh-text);
+  background-color: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   cursor: pointer;
   -webkit-appearance: none;
@@ -132,8 +132,8 @@
 .workspace-selector {
   display: flex;
   align-items: center;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background-color: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   padding: 5px 12px;
   font-size: 14px;
@@ -144,7 +144,7 @@
 .workspace-icon {
   width: 18px;
   height: 18px;
-  background-color: #0366d6;
+  background-color: var(--gh-primary);
   border-radius: 3px;
   display: flex;
   align-items: center;
@@ -171,7 +171,7 @@
 
 .advanced-settings {
   margin-top: 24px;
-  border-top: 1px solid #d0d7de;
+  border-top: 1px solid var(--gh-border);
   padding-top: 16px;
 }
 
@@ -181,7 +181,7 @@
   gap: 4px;
   font-size: 14px;
   font-weight: 600;
-  color: #0969da;
+  color: var(--gh-primary);
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
@@ -245,7 +245,7 @@
 
 .advanced-toggle:hover {
   text-decoration: underline;
-  color: #085cc1;
+  color: var(--primary-hover);
 }
 
 .actions {
@@ -254,12 +254,12 @@
   justify-content: flex-end;
   align-items: center;
   gap: 16px;
-  border-top: 1px solid #d0d7de;
+  border-top: 1px solid var(--gh-border);
   padding-top: 24px;
 }
 
 .btn-cancel {
-  color: #0969da;
+  color: var(--gh-primary);
   font-size: 14px;
   text-decoration: none;
   background: none;
@@ -276,9 +276,9 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 20px;
-  color: #ffffff;
-  background-color: #0969da;
-  border: 1px solid rgba(27, 31, 36, 0.15);
+  color: var(--gh-bg);
+  background-color: var(--gh-primary);
+  border: 1px solid var(--glass-border);
   border-radius: 6px;
   cursor: pointer;
   box-shadow: 0 1px 0 rgba(27, 31, 36, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -286,13 +286,12 @@
 }
 
 .btn-submit:hover {
-  background-color: #085cc1;
+  background-color: var(--primary-hover);
 }
 
 .btn-submit:disabled {
-  background-color: #84b9f2;
+  opacity: 0.5;
   cursor: not-allowed;
-  border-color: rgba(27, 31, 36, 0.1);
 }
 
 .import-repo-wide {

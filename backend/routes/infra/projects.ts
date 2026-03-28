@@ -152,7 +152,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     const updated = await prisma.deployProject.update({
@@ -186,7 +186,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     await prisma.deployProject.delete({ where: { id } });
@@ -322,107 +322,7 @@ export async function projectRoutes(fastify: FastifyInstance) {
     return domain;
   });
 
-  // ─── DELETE domain from a project ──────────────────────────────
-// POST /api/infra/projects - Create a new project
-router.post('/', requireAuth, async (req: any, res: any) => {
-  try {
-    const { name, repoUrl, framework = 'Next.js', branch = 'main' } = req.body;
-    
-    if (!name) return res.status(400).json({ error: 'Project name is required' });
 
-    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, '');
-    const domain = `${slug}.trackcodex.com`;
-    const deployUrl = `${slug}-${Math.random().toString(36).substring(2, 8)}.trackcodex.com`;
-
-    const project = await prisma.deployProject.create({
-      data: {
-        name,
-        slug,
-        repoUrl,
-        framework,
-        branch,
-        userId: req.user.id,
-        status: 'INITIALIZING',
-        domains: {
-          create: [{ name: domain, isPrimary: true }]
-        },
-        deployments: {
-          create: [{
-            url: deployUrl,
-            status: 'BUILDING',
-            commitHash: '0000000',
-            commitMsg: 'Initial commitment'
-          }]
-        }
-      },
-      include: {
-        domains: true,
-        deployments: true
-      }
-    });
-
-    // Simulate deployment progression
-    setTimeout(async () => {
-      try {
-        await prisma.deployProject.update({
-          where: { id: project.id },
-          data: { status: 'READY' }
-        });
-      } catch (err) {
-        console.error('Failed to update project status:', err);
-      }
-    }, 5000);
-
-    res.status(201).json(project);
-  } catch (error) {
-    console.error('Error creating project:', error);
-    res.status(500).json({ error: 'Failed to create project' });
-  }
-});
-
-// GET /api/infra/projects - List user projects
-router.get('/', requireAuth, async (req: any, res: any) => {
-  try {
-    const projects = await prisma.deployProject.findMany({
-      where: { userId: req.user.id },
-      include: {
-        domains: true,
-        deployments: {
-          orderBy: { createdAt: 'desc' },
-          take: 1
-        }
-      }
-    });
-    res.json(projects);
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    res.status(500).json({ error: 'Failed to fetch projects' });
-  }
-});
-
-// GET /api/infra/projects/:slug - Detailed project info
-router.get('/:slug', requireAuth, async (req: any, res: any) => {
-  try {
-    const project = await prisma.deployProject.findFirst({
-      where: { 
-        slug: req.params.slug,
-        userId: req.user.id
-      },
-      include: {
-        domains: true,
-        deployments: {
-          orderBy: { createdAt: 'desc' }
-        }
-      }
-    });
-
-    if (!project) return res.status(404).json({ error: 'Project not found' });
-    res.json(project);
-  } catch (error) {
-    console.error('Error fetching project detail:', error);
-    res.status(500).json({ error: 'Failed to fetch project detail' });
-  }
-});
 
   // ─── UPDATE project settings (build & deploy config) ───────────
   fastify.put("/projects/:id/settings", async (request) => {
@@ -432,7 +332,7 @@ router.get('/:slug', requireAuth, async (req: any, res: any) => {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     return prisma.deployProject.update({
@@ -455,7 +355,7 @@ router.get('/:slug', requireAuth, async (req: any, res: any) => {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     return prisma.deployProject.update({
@@ -471,7 +371,7 @@ router.get('/:slug', requireAuth, async (req: any, res: any) => {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     return prisma.deployProject.update({
@@ -500,7 +400,7 @@ router.get('/:slug', requireAuth, async (req: any, res: any) => {
     if (!user) throw new AppError("Unauthorized", 401);
 
     const existing = await prisma.deployProject.findUnique({ where: { id } });
-    if (!existing) throw new NotFound("Project not found");
+    if (!existing) throw NotFound("Project not found");
     if (existing.ownerId !== user.userId) throw new AppError("Forbidden", 403);
 
     return prisma.deployProject.update({
@@ -523,7 +423,7 @@ router.get('/:slug', requireAuth, async (req: any, res: any) => {
       where: { id: did },
     });
     if (!deployment || deployment.projectId !== id) {
-      throw new NotFound("Deployment not found");
+      throw NotFound("Deployment not found");
     }
 
     return {
