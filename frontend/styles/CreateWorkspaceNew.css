@@ -97,9 +97,9 @@
   padding: 5px 12px;
   font-size: 14px;
   line-height: 20px;
-  color: var(--gh-text);
-  background-color: var(--gh-bg);
-  border: 1px solid var(--gh-border);
+  color: var(--gh-text) !important;
+  background-color: var(--gh-bg) !important;
+  border: 1px solid var(--gh-border) !important;
   border-radius: 6px;
   outline: none;
   box-shadow: inset 0 1px 0 rgba(1, 4, 9, 0.075);
@@ -107,7 +107,7 @@
 }
 
 .input-field:focus {
-  border-color: var(--gh-primary);
+  border-color: var(--gh-primary) !important;
   box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
 }
 
@@ -115,9 +115,9 @@
   padding: 5px 12px;
   font-size: 14px;
   line-height: 20px;
-  color: var(--gh-text);
-  background-color: var(--gh-bg-secondary);
-  border: 1px solid var(--gh-border);
+  color: var(--gh-text) !important;
+  background-color: var(--gh-bg-secondary) !important;
+  border: 1px solid var(--gh-border) !important;
   border-radius: 6px;
   cursor: pointer;
   -webkit-appearance: none;
@@ -132,8 +132,8 @@
 .workspace-selector {
   display: flex;
   align-items: center;
-  background-color: var(--gh-bg-secondary);
-  border: 1px solid var(--gh-border);
+  background-color: var(--gh-bg-secondary) !important;
+  border: 1px solid var(--gh-border) !important;
   border-radius: 6px;
   padding: 5px 12px;
   font-size: 14px;

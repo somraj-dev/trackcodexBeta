@@ -160,7 +160,7 @@ const WorkspaceOverview: React.FC = () => {
                   <td className="td-message">Initial commit</td>
                 </tr>
                 <tr>
-                  <td className="td-name"><span className="material-symbols-outlined file-icon">description</span>README.md</td>
+                  <td className="td-name"><span className="material-symbols-outlined file-icon">description</span>MaterialMe.md</td>
                   <td className="td-size">2.56 KB</td>
                   <td className="td-commit">10 minutes ago</td>
                   <td className="td-message">Initial commit</td>
@@ -171,27 +171,27 @@ const WorkspaceOverview: React.FC = () => {
         </table>
       </div>
 
-      {/* README Section */}
+      {/* MaterialMe Section */}
       <div className="readme-container">
         <div className="readme-header">
-          <span className="readme-title">README.md</span>
+          <span className="readme-title">MaterialMe.md</span>
         </div>
         <div className="readme-body">
           {readme ? (
             <div dangerouslySetInnerHTML={{ __html: readme }} />
           ) : (
             <div className="readme-mock">
-              <h3>Edit a file, create a new file, and clone from Bitbucket in under 2 minutes</h3>
-              <p>When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.</p>
-              <p>We recommend that you open this README in another tab as you perform the tasks below. You can <button className="btn-inline">watch our video</button> for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.</p>
+              <h3>Edit a file, create a new file, and clone from TrackCodex in under 2 minutes</h3>
+              <p>When you're done, you can delete the content in this MaterialMe and update the file with details for others getting started with your repository.</p>
+              <p>We recommend that you open this MaterialMe in another tab as you perform the tasks below. You can <button className="btn-inline">watch our video</button> for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving TrackCodex.</p>
               
               <h4>Edit a file</h4>
-              <p>You'll start by editing this README file to learn how to edit a file in Bitbucket.</p>
+              <p>You'll start by editing this MaterialMe file to learn how to edit a file in TrackCodex.</p>
               <ol>
                 <li>Click <strong>Source</strong> on the left side.</li>
-                <li>Click the <strong>README.md</strong> link from the list of files.</li>
+                <li>Click the <strong>MaterialMe.md</strong> link from the list of files.</li>
                 <li>Click the <strong>Edit</strong> button.</li>
-                <li>Delete the following text: <em>Delete this line to make a change to the README from Bitbucket.</em></li>
+                <li>Delete the following text: <em>Delete this line to make a change to the MaterialMe from TrackCodex.</em></li>
                 <li>After making your change, click <strong>Commit</strong> and then <strong>Commit</strong> again in the dialog. The commit page will open and you'll see the change you just made.</li>
                 <li>Go back to the <strong>Source</strong> page.</li>
               </ol>

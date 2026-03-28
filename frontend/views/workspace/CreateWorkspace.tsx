@@ -159,7 +159,7 @@ const CreateWorkspaceView = () => {
       </div>
 
       <div className="form-group mt-6">
-        <label className="form-label" htmlFor="readme-select">Include a README?</label>
+        <label className="form-label" htmlFor="readme-select">Include a MaterialMe?</label>
         <select 
           id="readme-select" 
           className="select-field full-width"

@@ -2,9 +2,12 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 32px;
-  background-color: #fff;
+  background-color: var(--gh-bg);
   min-height: 100vh;
-  color: #24292f;
+  max-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  color: var(--gh-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
 }
 
@@ -22,7 +25,7 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 24px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--gh-border);
   margin-bottom: 16px;
 }
 
@@ -34,7 +37,7 @@
 }
 
 .breadcrumb-owner {
-  color: #0969da;
+  color: var(--gh-primary);
   cursor: pointer;
 }
 
@@ -44,11 +47,11 @@
 
 .breadcrumb-repo {
   font-weight: 600;
-  color: #0969da;
+  color: var(--gh-primary);
 }
 
 .breadcrumb-separator {
-  color: #57606a;
+  color: var(--gh-text-secondary);
 }
 
 .badge-public {
@@ -57,8 +60,8 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 18px;
-  color: #57606a;
-  border: 1px solid #d0d7de;
+  color: var(--gh-text-secondary);
+  border: 1px solid var(--gh-border);
   border-radius: 2em;
   margin-left: 8px;
 }
@@ -70,8 +73,8 @@
 
 .btn-primary {
   background-color: #2da44e;
-  color: #fff;
-  border: 1px solid rgba(27, 31, 35, 0.15);
+  color: var(--gh-bg); /* ensure it's themed */
+  border: 1px solid var(--glass-border);
   border-radius: 6px;
   padding: 5px 16px;
   font-size: 14px;
@@ -84,9 +87,9 @@
 }
 
 .btn-secondary {
-  background-color: #f6f8fa;
-  color: #24292f;
-  border: 1px solid #d0d7de;
+  background-color: var(--gh-bg-secondary);
+  color: var(--gh-text);
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   padding: 5px 16px;
   font-size: 14px;
@@ -95,12 +98,13 @@
 }
 
 .btn-secondary:hover {
-  background-color: #f3f4f6;
+  background-color: var(--bg-hover);
 }
 
 .btn-more {
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background-color: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
+  color: var(--gh-text);
   border-radius: 6px;
   padding: 5px 12px;
   cursor: pointer;
@@ -109,14 +113,14 @@
 /* Description Section */
 .overview-description {
   margin-bottom: 24px;
-  color: #57606a;
+  color: var(--gh-text-secondary);
   font-size: 14px;
 }
 
 .btn-inline {
   background: none;
   border: none;
-  color: #0969da;
+  color: var(--gh-primary);
   padding: 0;
   margin-left: 4px;
   cursor: pointer;
@@ -140,8 +144,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background-color: var(--gh-bg-secondary);
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   padding: 5px 12px;
   font-size: 14px;
@@ -156,7 +160,9 @@
 .file-search input {
   width: 100%;
   padding: 5px 12px 5px 32px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--gh-border) !important;
+  background-color: var(--gh-bg) !important;
+  color: var(--gh-text) !important;
   border-radius: 6px;
   font-size: 14px;
 }
@@ -167,21 +173,21 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px !important;
-  color: #57606a;
+  color: var(--gh-text-secondary);
 }
 
 /* File Table */
 .file-list-container {
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
   margin-bottom: 24px;
   overflow: hidden;
 }
 
 .file-list-header {
-  background-color: #f6f8fa;
+  background-color: var(--gh-bg-secondary);
   padding: 12px 16px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--gh-border);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -198,14 +204,14 @@
   text-align: left;
   padding: 8px 16px;
   font-size: 12px;
-  color: #57606a;
+  color: var(--gh-text-secondary);
   font-weight: 400;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--gh-border);
 }
 
 .file-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #f6f8fa;
+  border-bottom: 1px solid var(--gh-border);
   font-size: 14px;
 }
 
@@ -213,27 +219,27 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #0969da;
+  color: var(--gh-primary);
 }
 
 .file-icon {
   font-size: 20px !important;
-  color: #57606a;
+  color: var(--gh-text-secondary);
 }
 
 .td-size, .td-commit, .td-message {
-  color: #57606a;
+  color: var(--gh-text-secondary);
 }
 
 /* README Section */
 .readme-container {
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--gh-border);
   border-radius: 6px;
 }
 
 .readme-header {
   padding: 12px 16px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--gh-border);
   font-weight: 600;
   font-size: 14px;
 }
