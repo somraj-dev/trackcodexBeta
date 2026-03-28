@@ -20,30 +20,45 @@ export const contributionStatsService = {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
 
-    // Get all activities for the year (using ActivityLog model)
-    const activities = await prisma.activityLog.groupBy({
-      by: ["createdAt"],
-      where: {
-        userId: userId,
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-        action: {
-          in: ["commit", "push", "pull_request", "merge"],
-        },
-      },
-      _count: {
-        id: true,
-      },
-    });
+    // Get all activities for the year via parallel grouping across relevant models
+    const [activities, workspaces, repositories, jobs] = await Promise.all([
+      prisma.activityLog.groupBy({
+        by: ["createdAt"],
+        where: { userId: userId, createdAt: { gte: startDate, lte: endDate }, action: { in: ["commit", "push", "pull_request", "merge"] } },
+        _count: { id: true },
+      }),
+      prisma.workspace.groupBy({
+        by: ["createdAt"],
+        where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
+        _count: { id: true },
+      }),
+      prisma.repository.groupBy({
+        by: ["createdAt"],
+        where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
+        _count: { id: true },
+      }),
+      prisma.jobApplication.groupBy({
+        by: ["createdAt"],
+        where: { applicantId: userId, createdAt: { gte: startDate, lte: endDate } },
+        _count: { id: true },
+      })
+    ]);
 
     // Create a map of date -> count
     const activityMap = new Map<string, number>();
-    activities.forEach((activity: any) => {
-      const date = activity.createdAt.toISOString().split("T")[0];
-      activityMap.set(date, (activityMap.get(date) || 0) + activity._count.id);
-    });
+    
+    // Helper to merge results into activityMap
+    const mergeIntoMap = (items: any[]) => {
+      items.forEach((item: any) => {
+        const date = item.createdAt.toISOString().split("T")[0];
+        activityMap.set(date, (activityMap.get(date) || 0) + item._count.id);
+      });
+    };
+
+    mergeIntoMap(activities);
+    mergeIntoMap(workspaces);
+    mergeIntoMap(repositories);
+    mergeIntoMap(jobs);
 
     // Generate 365 days
     const contributions: ContributionDay[] = [];
@@ -78,29 +93,39 @@ export const contributionStatsService = {
   async getStreak(
     userId: string,
   ): Promise<{ current: number; longest: number }> {
-    // Get all activities ordered by date
-    const activities = await prisma.activityLog.findMany({
-      where: {
-        userId: userId,
-        action: {
-          in: ["commit", "push", "pull_request", "merge"],
-        },
-      },
-      select: {
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    // Get all activities ordered by date across multiple core event models
+    const [activities, workspaces, repositories, jobs] = await Promise.all([
+      prisma.activityLog.findMany({
+        where: { userId: userId, action: { in: ["commit", "push", "pull_request", "merge"] } },
+        select: { createdAt: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.workspace.findMany({
+        where: { ownerId: userId },
+        select: { createdAt: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.repository.findMany({
+        where: { ownerId: userId },
+        select: { createdAt: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.jobApplication.findMany({
+        where: { applicantId: userId },
+        select: { createdAt: true },
+        orderBy: { createdAt: "desc" },
+      })
+    ]);
 
-    if (activities.length === 0) {
+    const allActivities = [...activities, ...workspaces, ...repositories, ...jobs];
+
+    if (allActivities.length === 0) {
       return { current: 0, longest: 0 };
     }
 
     // Convert to unique dates
     const uniqueDates = new Set(
-      activities.map((a: any) => a.createdAt.toISOString().split("T")[0]),
+      allActivities.map((a: any) => a.createdAt.toISOString().split("T")[0]),
     );
     const sortedDates = Array.from(uniqueDates).sort().reverse();
 
@@ -162,20 +187,22 @@ export const contributionStatsService = {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
 
-    const count = await prisma.activityLog.count({
-      where: {
-        userId: userId,
-        action: {
-          in: ["commit", "push", "pull_request", "merge"],
-        },
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-    });
+    const [activityCount, workspaceCount, repoCount, jobCount] = await Promise.all([
+      prisma.activityLog.count({
+        where: { userId: userId, action: { in: ["commit", "push", "pull_request", "merge"] }, createdAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.workspace.count({
+        where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.repository.count({
+        where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.jobApplication.count({
+        where: { applicantId: userId, createdAt: { gte: startDate, lte: endDate } },
+      })
+    ]);
 
-    return count;
+    return activityCount + workspaceCount + repoCount + jobCount;
   },
 };
 

@@ -72,12 +72,11 @@ const ContributionHeatmap: React.FC<Props> = ({ userId }) => {
             showMonthLabels={true}
 
             renderBlock={(block: any, activity) => (
-              <div
-                {...block.props}
-                data-tooltip-id="activity-tooltip"
-                data-tooltip-content={`${activity.count} contribution${activity.count !== 1 ? "s" : ""} on ${activity.date}`}
-                className={`${(block.props as any).className} cursor-pointer hover:ring-1 hover:ring-white/50 transition-all`}
-              />
+              React.cloneElement(block, {
+                "data-tooltip-id": "activity-tooltip",
+                "data-tooltip-content": `${activity.count} contribution${activity.count !== 1 ? "s" : ""} on ${activity.date}`,
+                className: `${block.props.className || ""} cursor-pointer hover:ring-1 hover:ring-white/50 transition-all`
+              })
             )}
 
           />

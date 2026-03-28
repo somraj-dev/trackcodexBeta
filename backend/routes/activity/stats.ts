@@ -24,7 +24,11 @@ export default async function statsRoutes(fastify: FastifyInstance) {
         userId,
         yearNum,
       );
-      return { contributions };
+      
+      // Calculate total for the frontend
+      const total = contributions.reduce((sum, day) => sum + day.count, 0);
+      
+      return { contributions, total };
     } catch (error: any) {
       request.log.error(error);
       return reply.code(500).send({
