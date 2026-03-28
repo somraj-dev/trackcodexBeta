@@ -95,6 +95,66 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ===== Global Form Element Theming ===== */
+/* Ensures all form elements respect the active theme via CSS variables,
+   preventing the "half-light/half-dark" flash on navigation. */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+select,
+textarea {
+  color: var(--gh-text);
+  background-color: var(--gh-bg);
+  border-color: var(--gh-border);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="month"]:focus,
+input[type="week"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--gh-primary);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+  outline: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  color: var(--gh-primary);
+  background-color: var(--gh-bg);
+  border-color: var(--gh-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--gh-text-secondary);
+  opacity: 0.7;
+}
+
+/* Select option styling for dark backgrounds */
+select option {
+  background-color: var(--gh-bg);
+  color: var(--gh-text);
+}
+
 /* ===== Typography Utilities ===== */
 .tc-heading {
   font-size: var(--tc-font-lg);
