@@ -21,8 +21,8 @@ const SettingsNavItem = ({ to, label, icon }: { to: string; label: string; icon:
 
 const StrataSettingsLayout: React.FC = () => {
   const { strata } = useOutletContext<{ strata: Strata }>();
-  const { orgId } = useParams();
-  const basePath = `/strata/${orgId}/settings`;
+  const { strataId } = useParams();
+  const basePath = `/strata/${strataId}/settings`;
 
   return (
     <div className="flex-1 flex bg-gh-bg font-display">
@@ -34,7 +34,7 @@ const StrataSettingsLayout: React.FC = () => {
               currentContext="strata"
               strataName={strata.name}
               strataAvatar={strata.avatar}
-              strataId={orgId}
+              strataId={strataId || ''}
             />
           </div>
 

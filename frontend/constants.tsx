@@ -575,7 +575,23 @@ export const MOCK_JOBS: Job[] = [
   },
 ];
 
-export const MOCK_STRATA: Strata[] = [];
+export const MOCK_STRATA: Strata[] = [
+    {
+        id: "trackcodex",
+        name: "trackcodex",
+        avatar: "https://picsum.photos/seed/trackcodex/200",
+        description: "Enterprise management for QuantaForge projects.",
+        website: "trackcodex.com",
+        location: "San Francisco, CA",
+        members: [
+            { username: "alexcoder", name: "Alex Chen", avatar: "https://picsum.photos/seed/alexprofile/32", role: "OWNER", lastActive: "Just now" }
+        ],
+        teams: [
+            { id: "core", name: "Core Engineering", description: "Main platform development team", memberCount: 12, repoCount: 4 }
+        ],
+        repositories: MOCK_REPOS.slice(0, 3)
+    }
+];
 
 export const MOCK_MARKETPLACE_JOBS = [
     {

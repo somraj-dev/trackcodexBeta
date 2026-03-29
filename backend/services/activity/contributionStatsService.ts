@@ -55,12 +55,13 @@ export const contributionStatsService = {
       commComments,
       releases
     ] = await Promise.all([
-      // 1. Generic Activity Logs (Commits, Pushes, etc.)
+      // 1. Generic Activity Logs (Commits, Pushes, etc.) - Excluding Repo/Workspace creates as they are handled below
       prisma.activityLog.findMany({
         where: { 
           userId, 
           createdAt: { gte: startDate, lte: endDate }, 
-          action: { in: ["commit", "push", "merge", "REPO_CREATE", "WORKSPACE_CREATE", "JOB_COMPLETED", "HACKATHON_WIN", "MISSION_SUCCESS"] } 
+          // Note: REPO_CREATE and WORKSPACE_CREATE are sourced directly from their tables for better reliability
+          action: { in: ["commit", "push", "merge", "JOB_COMPLETED", "HACKATHON_WIN", "MISSION_SUCCESS"] } 
         },
         select: { createdAt: true },
       }),
@@ -138,20 +139,37 @@ export const contributionStatsService = {
       });
     };
 
-    [
-      activities, workspaces, repositories, jobs, 
-      issues, pullRequests, discussions, discussionComments, 
-      reviews, deployments, posts, commComments, releases
-    ].forEach((set, idx) => {
-      if (set.length > 0) {
-        console.log(`[STATS] Dataset ${idx} contributing ${set.length} items`);
-        mergeIntoMap(set);
+    const datasets = [
+      { name: "ActivityLogs", data: activities },
+      { name: "Workspaces", data: workspaces },
+      { name: "Repositories", data: repositories },
+      { name: "JobApps", data: jobs },
+      { name: "Issues", data: issues },
+      { name: "PullRequests", data: pullRequests },
+      { name: "Discussions", data: discussions },
+      { name: "DiscComments", data: discussionComments },
+      { name: "PRReviews", data: reviews },
+      { name: "Deployments", data: deployments },
+      { name: "CommunityPosts", data: posts },
+      { name: "CommComments", data: commComments },
+      { name: "Releases", data: releases }
+    ];
+
+    datasets.forEach(({ name, data }) => {
+      if (data.length > 0) {
+        console.log(`[STATS] ${name} contributing ${data.length} items for user ${userId}`);
+        mergeIntoMap(data);
       }
     });
 
-    // Generate accurate range of days
+    const totalCalculated = Array.from(activityMap.values()).reduce((sum, val) => sum + val, 0);
+    console.log(`[STATS] Total unique events aggregated for year ${year}: ${totalCalculated}`);
+
+    // Generate accurate range of days using local-aware date incrementing
     const contributions: ContributionDay[] = [];
     const iterDate = new Date(startDate);
+    
+    // Normalize iterDate and endDate to UTC midnight for consistent string comparison
     while (iterDate <= endDate) {
       const dateStr = iterDate.toISOString().split("T")[0];
       const count = activityMap.get(dateStr) || 0;
@@ -159,17 +177,18 @@ export const contributionStatsService = {
       // GitHub-style dynamic leveling
       let level = 0;
       if (count > 0) level = 1;
-      if (count >= 4) level = 2; // Slightly higher thresholds for "Bigger than github"
-      if (count >= 8) level = 3;
-      if (count >= 15) level = 4;
+      if (count >= 3) level = 2; // Adjusted thresholds to feel more "active"
+      if (count >= 6) level = 3;
+      if (count >= 10) level = 4;
 
       contributions.push({
         date: dateStr,
         count,
-        level,
+        level: level as 0 | 1 | 2 | 3 | 4,
       });
 
-      iterDate.setDate(iterDate.getDate() + 1);
+      // Increment day-by-day in a way that respects the calendar date
+      iterDate.setUTCDate(iterDate.getUTCDate() + 1);
     }
 
     return contributions;

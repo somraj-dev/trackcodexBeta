@@ -20,7 +20,7 @@ const PillGroup = ({
   required?: boolean
 }) => (
   <div className="mb-6">
-    <label className="block text-[13px] font-bold text-slate-500 mb-3">
+    <label className="block text-[13px] font-bold text-gh-text-secondary mb-3">
       {label}{required && <span className="text-red-500 ml-1">*</span>}
     </label>
     <div className="flex flex-wrap gap-3">
@@ -31,8 +31,8 @@ const PillGroup = ({
           onClick={() => onChange(opt)}
           className={`px-5 py-2.5 rounded-full text-[13px] font-medium transition-all border ${
             value === opt 
-              ? "border-blue-500 bg-blue-50 text-blue-600 shadow-sm" 
-              : "border-slate-200 border-dashed text-slate-500 hover:border-slate-300 bg-white"
+              ? "border-blue-500 bg-blue-500/10 text-blue-500 shadow-sm" 
+              : "border-gh-border border-dashed text-gh-text-secondary hover:border-gh-border-secondary bg-gh-bg"
           }`}
         >
           {opt}
@@ -66,13 +66,13 @@ const InputField = ({
   badge?: React.ReactNode
 }) => (
   <div className="flex-1 min-w-[300px]">
-    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+    <label className="block text-[13px] font-bold text-gh-text-secondary mb-2">
       {label}{required && <span className="text-red-500 ml-1">*</span>}
     </label>
     <div className="relative">
       {icon && (
         <div 
-          className={`absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 ${onIconClick ? 'cursor-pointer hover:text-blue-500 transition-colors' : ''}`}
+          className={`absolute left-3 top-1/2 -translate-y-1/2 text-gh-text-secondary ${onIconClick ? 'cursor-pointer hover:text-blue-500 transition-colors' : ''}`}
           onClick={() => onIconClick?.()}
         >
           {icon}
@@ -84,7 +84,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[14px] text-slate-700 bg-white placeholder-slate-300 ${icon ? 'pl-10' : ''} ${badge ? 'pr-12' : ''}`}
+        className={`w-full px-4 py-2.5 rounded-lg border border-gh-border focus:border-blue-400 focus:ring-4 focus:ring-blue-100/10 outline-none transition-all text-[14px] text-gh-text bg-gh-bg-tertiary placeholder-gh-text-secondary/50 ${icon ? 'pl-10' : ''} ${badge ? 'pr-12' : ''}`}
       />
       {badge && <div className="absolute right-3 top-1/2 -translate-y-1/2">{badge}</div>}
     </div>
@@ -107,7 +107,7 @@ const SelectField = ({
   required?: boolean 
 }) => (
   <div className="flex-1 min-w-[300px]">
-    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+    <label className="block text-[13px] font-bold text-gh-text-secondary mb-2">
       {label}{required && <span className="text-red-500 ml-1">*</span>}
     </label>
     <div className="relative">
@@ -115,11 +115,11 @@ const SelectField = ({
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[14px] text-slate-700 bg-white appearance-none cursor-pointer pr-10"
+        className="w-full px-4 py-2.5 rounded-lg border border-gh-border focus:border-blue-400 focus:ring-4 focus:ring-blue-100/10 outline-none transition-all text-[14px] text-gh-text bg-gh-bg-tertiary appearance-none cursor-pointer pr-10"
       >
         {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
       </select>
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gh-text-secondary">
          <span className="material-symbols-outlined text-[18px]">expand_more</span>
       </div>
     </div>
@@ -312,19 +312,19 @@ const EventRegistrationView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-6 pb-20 font-sans text-slate-800 flex flex-col items-center overflow-y-auto">
-      <div className="max-w-[850px] w-full bg-white shadow-lg border-t-4 border-t-blue-600 rounded-lg mb-10">
+    <div className="min-h-screen bg-gh-bg pt-6 pb-20 font-sans text-gh-text flex flex-col items-center overflow-y-auto">
+      <div className="max-w-[850px] w-full bg-gh-bg-secondary shadow-lg border border-gh-border border-t-4 border-t-blue-600 rounded-lg mb-10 overflow-hidden">
         
         {/* Header */}
-        <div className="px-8 py-5 border-b border-slate-100 bg-white">
-          <h1 className="text-[22px] font-bold text-slate-800">Registration Form</h1>
+        <div className="px-8 py-5 border-b border-gh-border bg-gh-bg-secondary">
+          <h1 className="text-[22px] font-bold text-gh-text">Registration Form</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-12 pb-24">
           
           {/* 1. Basic Details Section */}
           <div id="basic-details" className="scroll-mt-20">
-            <h2 className="text-[17px] font-bold text-slate-800 mb-6 flex items-center">
+            <h2 className="text-[17px] font-bold text-gh-text mb-6 flex items-center">
               Basic Details
             </h2>
             <div className="space-y-6">
@@ -355,21 +355,21 @@ const EventRegistrationView = () => {
                     badge={<span className="material-symbols-outlined text-green-500 text-[20px]">check_circle</span>}
                 />
                 <div className="flex-1 min-w-[300px]">
-                    <label className="block text-[13px] font-bold text-slate-500 mb-2">
+                    <label className="block text-[13px] font-bold text-gh-text-secondary mb-2">
                         Mobile<span className="text-red-500 ml-1">*</span>
                     </label>
                     <div className="flex gap-2">
-                        <div className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 min-w-[80px]">
-                            <span className="text-sm">🇮🇳 +91</span>
+                        <div className="flex items-center gap-2 px-3 py-2 border border-gh-border rounded-lg bg-gh-bg-tertiary min-w-[80px]">
+                            <span className="text-sm text-gh-text">🇮🇳 +91</span>
                         </div>
                         <div className="relative flex-1">
                             <input
                             type="text"
                             value={formData.mobile}
                             onChange={e => setFormData({...formData, mobile: e.target.value})}
-                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-blue-400 outline-none text-[14px]"
+                            className="w-full px-4 py-2.5 rounded-lg border border-gh-border focus:border-blue-400 outline-none text-[14px] bg-gh-bg-tertiary text-gh-text"
                             />
-                            <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-blue-600 px-3 py-1 hover:bg-blue-50 rounded">Verify</button>
+                            <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-blue-600 px-3 py-1 hover:bg-blue-500/10 rounded">Verify</button>
                         </div>
                     </div>
                 </div>
@@ -412,11 +412,11 @@ const EventRegistrationView = () => {
             </div>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-gh-border opacity-50" />
 
           {/* 2. User Details Section */}
           <div id="user-details" className="scroll-mt-20">
-            <h2 className="text-[17px] font-bold text-slate-800 mb-6 flex items-center">
+            <h2 className="text-[17px] font-bold text-gh-text mb-6 flex items-center">
               User Details
             </h2>
             <div className="space-y-8">
@@ -490,11 +490,11 @@ const EventRegistrationView = () => {
             </div>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-gh-border opacity-50" />
 
           {/* 3. Terms & Conditions Section */}
           <div id="terms-conditions" className="scroll-mt-20">
-            <h2 className="text-[17px] font-bold text-slate-800 mb-6 flex items-center">
+            <h2 className="text-[17px] font-bold text-gh-text mb-6 flex items-center">
               Terms & Conditions
             </h2>
             <div className="space-y-4 px-2">
@@ -504,11 +504,11 @@ const EventRegistrationView = () => {
                       type="checkbox" 
                       checked={formData.agreeToShare} 
                       onChange={e => setFormData({...formData, agreeToShare: e.target.checked})}
-                      className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                      className="w-5 h-5 rounded border-gh-border bg-gh-bg-tertiary text-blue-600 focus:ring-blue-500 cursor-pointer" 
                   />
                 </div>
-                <span className="text-[12px] text-slate-500 leading-relaxed font-medium">
-                  By registering for this opportunity, you agree to share the data mentioned in this form or any form henceforth on this opportunity with the organizer of this opportunity for further analysis, processing, and outreach. Your data will also be used by TrackCodex for providing you regular and constant updates on this opportunity. You also agree to the <a href="https://docs.trackcodex.com/privacy-policy" target="_blank" rel="noreferrer noopener" className="text-blue-600 hover:underline">privacy policy</a> and <a href="https://docs.trackcodex.com/terms" target="_blank" rel="noreferrer noopener" className="text-blue-600 hover:underline">terms</a> of TrackCodex.
+                <span className="text-[12px] text-gh-text-secondary leading-relaxed font-medium">
+                  By registering for this opportunity, you agree to share the data mentioned in this form or any form henceforth on this opportunity with the organizer of this opportunity for further analysis, processing, and outreach. Your data will also be used by TrackCodex for providing you regular and constant updates on this opportunity. You also agree to the <a href="https://docs.trackcodex.com/privacy-policy" target="_blank" rel="noreferrer noopener" className="text-blue-500 hover:underline">privacy policy</a> and <a href="https://docs.trackcodex.com/terms" target="_blank" rel="noreferrer noopener" className="text-blue-500 hover:underline">terms</a> of TrackCodex.
                 </span>
               </label>
 
@@ -518,10 +518,10 @@ const EventRegistrationView = () => {
                       type="checkbox" 
                       checked={formData.stayInLoop} 
                       onChange={e => setFormData({...formData, stayInLoop: e.target.checked})}
-                      className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" 
+                      className="w-5 h-5 rounded border-gh-border bg-gh-bg-tertiary text-blue-600 focus:ring-blue-500 cursor-pointer" 
                   />
                 </div>
-                <span className="text-[12px] text-slate-500 leading-relaxed font-medium">
+                <span className="text-[12px] text-gh-text-secondary leading-relaxed font-medium">
                   Stay in the loop - Get relevant updates curated just for you!
                 </span>
               </label>
@@ -545,10 +545,10 @@ const EventRegistrationView = () => {
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSuccessModal(false)} />
-          <div className="relative w-full max-w-[520px] bg-[#e6fcf5] rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+          <div className="relative w-full max-w-[520px] bg-gh-bg-secondary border border-gh-border rounded-[40px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
             <button 
               onClick={() => setShowSuccessModal(false)}
-              className="absolute right-6 top-6 text-slate-400 hover:text-slate-600 z-10"
+              className="absolute right-6 top-6 text-gh-text-secondary hover:text-gh-text z-10"
             >
               <span className="material-symbols-outlined text-[28px]">close</span>
             </button>
@@ -556,41 +556,41 @@ const EventRegistrationView = () => {
             <div className="p-8 flex flex-col items-center">
               {/* Header */}
               <div className="flex flex-col items-center text-center mb-8 pt-4">
-                <div className="w-20 h-20 bg-[#22c55e] rounded-full flex items-center justify-center shadow-lg shadow-green-200 mb-6">
+                <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-6">
                   <span className="material-symbols-outlined text-white text-[48px] font-bold">check</span>
                 </div>
-                <h3 className="text-[28px] font-bold text-slate-800 mb-2">Registration Successful</h3>
-                <p className="text-[15px] text-slate-500 font-medium leading-relaxed px-4">
+                <h3 className="text-[28px] font-bold text-gh-text mb-2">Registration Successful</h3>
+                <p className="text-[15px] text-gh-text-secondary font-medium leading-relaxed px-4">
                   Thank you for registering for this opportunity.<br />Wishing you the best of luck!
                 </p>
               </div>
 
-              {/* Mission Card */}
-              <div className="w-full bg-white rounded-[32px] shadow-sm mb-6">
+              {/* Event Card */}
+              <div className="w-full bg-gh-bg border border-gh-border rounded-[32px] shadow-sm mb-6">
                 <div className="p-6">
                   <div className="flex items-start gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center flex-shrink-0">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-gh-border bg-gh-bg-tertiary flex items-center justify-center flex-shrink-0">
                       {mission.creator?.avatar ? (
                         <img src={mission.creator.avatar} alt="Logo" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="material-symbols-outlined text-slate-300">corporate_fare</span>
+                        <span className="material-symbols-outlined text-gh-text-secondary font-bold">corporate_fare</span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0 pt-1">
-                      <h4 className="text-[18px] font-bold text-slate-900 leading-tight mb-0.5 truncate">{mission.title}</h4>
-                      <p className="text-[14px] font-bold text-slate-500 truncate">{mission.creator?.name || "Organisation"}</p>
+                      <h4 className="text-[18px] font-bold text-gh-text leading-tight mb-0.5 truncate">{mission.title}</h4>
+                      <p className="text-[14px] font-bold text-gh-text-secondary truncate">{mission.creator?.name || "Organisation"}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button className="flex items-center justify-center w-11 h-11 rounded-xl bg-slate-50 text-slate-600">
+                    <button className="flex items-center justify-center w-11 h-11 rounded-xl bg-gh-bg-tertiary border border-gh-border text-gh-text-secondary hover:text-gh-text">
                       <span className="material-symbols-outlined text-[18px]">north_east</span>
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-slate-50 text-slate-700 font-bold text-[13px]">
+                    <button className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-gh-bg-tertiary border border-gh-border text-gh-text font-bold text-[13px]">
                       <span className="material-symbols-outlined text-[18px]">calendar_today</span>
                       Add to calendar
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-slate-50 text-slate-700 font-bold text-[13px]">
+                    <button className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-gh-bg-tertiary border border-gh-border text-gh-text font-bold text-[13px]">
                       <span className="material-symbols-outlined text-[18px]">share</span>
                       Share with Friend
                     </button>
@@ -598,18 +598,18 @@ const EventRegistrationView = () => {
                 </div>
 
                 <div className="relative flex items-center px-4">
-                  <div className="absolute left-[-10px] w-5 h-5 rounded-full bg-[#e6fcf5] shadow-inner" />
-                  <div className="flex-1 border-t-2 border-dashed border-slate-50" />
-                  <div className="absolute right-[-10px] w-5 h-5 rounded-full bg-[#e6fcf5] shadow-inner" />
+                  <div className="absolute left-[-10px] w-5 h-5 rounded-full bg-gh-bg-secondary border border-gh-border" />
+                  <div className="flex-1 border-t-2 border-dashed border-gh-border opacity-50" />
+                  <div className="absolute right-[-10px] w-5 h-5 rounded-full bg-gh-bg-secondary border border-gh-border" />
                 </div>
 
                 <div className="p-2 pt-0">
                   <button 
                     onClick={() => setIsNextOpen(!isNextOpen)}
-                    className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-gh-bg-tertiary transition-colors"
                   >
-                    <span className="text-[14px] font-bold text-slate-700">What's Next in {mission.title}?</span>
-                    <span className={`material-symbols-outlined transition-transform ${isNextOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                    <span className="text-[14px] font-bold text-gh-text">What's Next in {mission.title}?</span>
+                    <span className={`material-symbols-outlined transition-transform text-gh-text-secondary ${isNextOpen ? 'rotate-180' : ''}`}>expand_more</span>
                   </button>
                 </div>
               </div>
@@ -620,15 +620,15 @@ const EventRegistrationView = () => {
                   onClick={() => setIsTipsOpen(!isTipsOpen)}
                   className="w-full flex items-center justify-between px-4 py-3 group"
                 >
-                  <span className="text-[15px] font-bold text-[#065f46]">Here are some tips to make an impact</span>
-                  <span className={`material-symbols-outlined text-[#065f46] transition-transform ${isTipsOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                  <span className="text-[15px] font-bold text-emerald-500">Here are some tips to make an impact</span>
+                  <span className={`material-symbols-outlined text-emerald-500 transition-transform ${isTipsOpen ? 'rotate-180' : ''}`}>expand_more</span>
                 </button>
                 <button 
                   onClick={() => navigate("/marketplace/applications")}
                   className="w-full flex items-center justify-between px-4 py-3 group"
                 >
-                  <span className="text-[15px] font-bold text-[#065f46]">View All Applications</span>
-                  <span className="material-symbols-outlined text-[#065f46]">north_east</span>
+                  <span className="text-[15px] font-bold text-emerald-500">View All Applications</span>
+                  <span className="material-symbols-outlined text-emerald-500">north_east</span>
                 </button>
               </div>
             </div>
@@ -670,21 +670,21 @@ const TeamSelectionModal = ({
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[700px] bg-white rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-[700px] bg-gh-bg-secondary border border-gh-border rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Create Team Card */}
             <button 
               onClick={() => onSelect("create")}
-              className="group flex flex-col items-center p-8 rounded-[24px] bg-[#f0f0ff] border-2 border-transparent hover:border-blue-200 transition-all text-center"
+              className="group flex flex-col items-center p-8 rounded-[24px] bg-gh-bg border-2 border-gh-border hover:border-blue-500/50 transition-all text-center"
             >
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                <span className="material-symbols-outlined text-[32px] text-slate-700">group_add</span>
+              <div className="w-16 h-16 bg-gh-bg-tertiary rounded-full flex items-center justify-center shadow-sm mb-4">
+                <span className="material-symbols-outlined text-[32px] text-gh-text">group_add</span>
               </div>
-              <h4 className="text-[18px] font-bold text-slate-800 mb-2">Create A Team</h4>
-              <div className="w-full border-t border-dashed border-slate-300 my-4" />
-              <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
+              <h4 className="text-[18px] font-bold text-gh-text mb-2">Create A Team</h4>
+              <div className="w-full border-t border-dashed border-gh-border my-4" />
+              <p className="text-[13px] text-gh-text-secondary font-medium leading-relaxed">
                 Form a team & invite members via email or social media.
               </p>
             </button>
@@ -692,33 +692,33 @@ const TeamSelectionModal = ({
             {/* Join Team Card */}
             <button 
               onClick={() => onSelect("join")}
-              className="group flex flex-col items-center p-8 rounded-[24px] bg-[#f0f8ff] border-2 border-transparent hover:border-blue-100 transition-all text-center"
+              className="group flex flex-col items-center p-8 rounded-[24px] bg-gh-bg border-2 border-gh-border hover:border-blue-500/50 transition-all text-center"
             >
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                <span className="material-symbols-outlined text-[32px] text-slate-700">handshake</span>
+              <div className="w-16 h-16 bg-gh-bg-tertiary rounded-full flex items-center justify-center shadow-sm mb-4">
+                <span className="material-symbols-outlined text-[32px] text-gh-text">handshake</span>
               </div>
-              <h4 className="text-[18px] font-bold text-slate-800 mb-2">Join A Team</h4>
-              <div className="w-full border-t border-dashed border-slate-200 my-4" />
-              <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
+              <h4 className="text-[18px] font-bold text-gh-text mb-2">Join A Team</h4>
+              <div className="w-full border-t border-dashed border-gh-border my-4" />
+              <p className="text-[13px] text-gh-text-secondary font-medium leading-relaxed">
                 Join teams seeking members by join request or invitation.
               </p>
             </button>
           </div>
 
           {/* Important Notes */}
-          <div className="bg-[#f0f9ff] border border-blue-200 border-dashed rounded-xl p-5">
-            <h5 className="text-[14px] font-bold text-blue-900 mb-3">Important Notes:</h5>
+          <div className="bg-blue-500/10 border border-blue-500/20 border-dashed rounded-xl p-5">
+            <h5 className="text-[14px] font-bold text-blue-500 mb-3">Important Notes:</h5>
             <ul className="space-y-2">
-              <li className="flex items-start gap-2 text-[12px] text-blue-800 font-medium leading-relaxed">
-                <div className="w-1 h-1 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+              <li className="flex items-start gap-2 text-[12px] text-gh-text-secondary font-medium leading-relaxed">
+                <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                 Your team must have at least {minSize} and no more than {maxSize} members.
               </li>
-              <li className="flex items-start gap-2 text-[12px] text-blue-800 font-medium leading-relaxed">
-                <div className="w-1 h-1 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+              <li className="flex items-start gap-2 text-[12px] text-gh-text-secondary font-medium leading-relaxed">
+                <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                 If you select "Join A Team", your registration won't be finalized until you join a team.
               </li>
-              <li className="flex items-start gap-2 text-[12px] text-blue-800 font-medium leading-relaxed">
-                <div className="w-1 h-1 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+              <li className="flex items-start gap-2 text-[12px] text-gh-text-secondary font-medium leading-relaxed">
+                <div className="w-1 h-1 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                 As one or more round(s) is live, you CANNOT delete the registration, if you select Create Team.
               </li>
             </ul>
@@ -752,26 +752,26 @@ const TeamManagementView = ({
     const [activeRightTab, setActiveRightTab] = useState<"invitations" | "requests">("invitations");
 
     return (
-        <div className="min-h-screen bg-white w-full flex flex-col pt-4">
+        <div className="min-h-screen bg-gh-bg w-full flex flex-col pt-4 overflow-hidden">
             {/* Header */}
-            <header className="px-8 pb-4 flex items-center gap-4 relative">
-                <div className="w-12 h-12 rounded-lg border border-slate-100 flex items-center justify-center p-1 bg-white shadow-sm shrink-0">
+            <header className="px-8 pb-4 flex items-center gap-4 relative bg-gh-bg-secondary">
+                <div className="w-12 h-12 rounded-lg border border-gh-border flex items-center justify-center p-1 bg-gh-bg shadow-sm shrink-0">
                     {mission.creator?.avatar ? (
                         <img src={mission.creator.avatar} alt="Logo" className="w-full h-full object-contain" />
                     ) : (
-                        <span className="material-symbols-outlined text-slate-300">corporate_fare</span>
+                        <span className="material-symbols-outlined text-gh-text-secondary">corporate_fare</span>
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <h1 className="text-[17px] font-bold text-slate-800 leading-tight truncate">{mission.title}</h1>
-                    <p className="text-[12px] text-slate-400 font-bold uppercase tracking-tight truncate">{mission.creator?.name || "Organisation Name"}</p>
+                    <h1 className="text-[17px] font-bold text-gh-text leading-tight truncate">{mission.title}</h1>
+                    <p className="text-[12px] text-gh-text-secondary font-bold uppercase tracking-tight truncate">{mission.creator?.name || "Organisation Name"}</p>
                 </div>
                 {/* Blue border-bottom line across the whole header */}
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600" />
             </header>
 
             {/* Navigation Tabs */}
-            <nav className="px-8 bg-white border-b border-slate-100">
+            <nav className="px-8 bg-gh-bg-secondary border-b border-gh-border">
                 <div className="flex gap-10">
                     {["Create a team", "Join a team"].map((tab) => {
                         const action = tab.toLowerCase().includes("create") ? "create" : "join";
@@ -781,7 +781,7 @@ const TeamManagementView = ({
                                 key={tab}
                                 onClick={() => setTeamAction(action as any)}
                                 className={`py-4 text-[13px] font-bold transition-all border-b-[3px] -mb-[1px] ${
-                                    active ? "text-blue-600 border-blue-600" : "text-slate-500 border-transparent hover:text-slate-800"
+                                    active ? "text-blue-600 border-blue-600" : "text-gh-text-secondary border-transparent hover:text-gh-text"
                                 }`}
                             >
                                 {tab}
@@ -792,14 +792,14 @@ const TeamManagementView = ({
             </nav>
 
             {/* Main Content Area */}
-            <main className="flex-1 flex bg-[#f8fafc]">
+            <main className="flex-1 flex bg-gh-bg overflow-hidden">
                 {/* Left Panel - Team Configuration */}
-                <div className="flex-1 p-10 bg-white shadow-sm border-r border-slate-200 overflow-y-auto">
+                <div className="flex-1 p-10 bg-gh-bg-secondary shadow-sm border-r border-gh-border overflow-y-auto">
                     <div className="max-w-[500px] mx-auto space-y-8">
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <label className="text-[13px] font-bold text-slate-500">Team Name</label>
-                                <button className="text-[12px] font-bold text-red-500 bg-red-50 px-3 py-1 rounded flex items-center gap-1">
+                                <label className="text-[13px] font-bold text-gh-text-secondary">Team Name</label>
+                                <button className="text-[12px] font-bold text-red-500 bg-red-500/10 px-3 py-1 rounded flex items-center gap-1 border border-red-500/20">
                                     <span className="material-symbols-outlined text-[14px]">cancel</span>
                                     Cancel Team
                                 </button>
@@ -810,8 +810,8 @@ const TeamManagementView = ({
                                     placeholder="Enter your team name"
                                     value={teamName}
                                     onChange={(e) => setTeamName(e.target.value)}
-                                    className={`w-full px-4 py-3 rounded-lg border focus:ring-4 focus:ring-blue-100 outline-none transition-all text-[15px] ${
-                                        !teamName ? 'border-red-200 focus:border-red-400' : 'border-slate-200 focus:border-blue-400'
+                                    className={`w-full px-4 py-3 rounded-lg border focus:ring-4 outline-none transition-all text-[15px] bg-gh-bg-tertiary text-gh-text ${
+                                        !teamName ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10' : 'border-gh-border focus:border-blue-500 focus:ring-blue-500/10'
                                     }`}
                                 />
                                 {!teamName && <p className="text-[11px] text-red-500 font-bold mt-1.5 ml-1">Team name is required</p>}
@@ -822,13 +822,13 @@ const TeamManagementView = ({
                         <div>
                             <div className="flex items-center justify-between mb-5">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[14px] font-bold text-slate-700">Teammates</span>
-                                    <span className="material-symbols-outlined text-[18px] text-slate-400">group</span>
-                                    <span className="text-[12px] font-bold text-slate-400">(1/{mission.metadata?.maxTeamSize || 5})</span>
+                                    <span className="text-[14px] font-bold text-gh-text">Teammates</span>
+                                    <span className="material-symbols-outlined text-[18px] text-gh-text-secondary">group</span>
+                                    <span className="text-[12px] font-bold text-gh-text-secondary">(1/{mission.metadata?.maxTeamSize || 5})</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[12px] font-bold text-slate-600">Looking for Teammates</span>
-                                    <span className="material-symbols-outlined text-blue-500">info</span>
+                                    <span className="text-[12px] font-bold text-gh-text-secondary">Looking for Teammates</span>
+                                    <span className="material-symbols-outlined text-blue-500 border border-gh-border rounded-full p-0.5">info</span>
                                     <div className="w-10 h-5 bg-blue-600 rounded-full relative cursor-pointer shadow-inner">
                                         <div className="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm" />
                                     </div>
@@ -841,26 +841,26 @@ const TeamManagementView = ({
 
                             <div className="space-y-4">
                                 {/* Leader (Current User) */}
-                                <div className="p-4 rounded-xl border border-green-500 bg-white flex items-center justify-between group shadow-sm transition-all hover:shadow-md cursor-pointer border-l-[6px]">
+                                <div className="p-4 rounded-xl border border-emerald-500/50 bg-gh-bg flex items-center justify-between group shadow-sm transition-all hover:shadow-md cursor-pointer border-l-[6px]">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-11 h-11 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                                        <div className="w-11 h-11 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-lg">
                                             {formData.firstName?.[0] || "U"}
                                         </div>
                                         <div>
-                                            <h4 className="text-[14px] font-bold text-slate-800">{formData.firstName} {formData.lastName}</h4>
-                                            <p className="text-[12px] text-slate-400 font-medium">+{formData.mobile || "N/A"}</p>
+                                            <h4 className="text-[14px] font-bold text-gh-text">{formData.firstName} {formData.lastName}</h4>
+                                            <p className="text-[12px] text-gh-text-secondary font-medium">+{formData.mobile || "N/A"}</p>
                                         </div>
                                     </div>
-                                    <button className="material-symbols-outlined text-slate-400 hover:text-blue-500 transition-colors">edit</button>
+                                    <button className="material-symbols-outlined text-gh-text-secondary hover:text-blue-500 transition-colors">edit</button>
                                 </div>
 
                                 {/* Placeholder Buttons for Members */}
                                 <div className="flex gap-4">
-                                    <button className="flex-1 h-[68px] border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition-all">
+                                    <button className="flex-1 h-[68px] border-2 border-dashed border-gh-border rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold text-gh-text-secondary hover:bg-gh-bg hover:border-gh-border-secondary transition-all">
                                         <span className="material-symbols-outlined text-[20px]">add</span>
                                         Add 2nd Member
                                     </button>
-                                    <button className="h-[68px] px-6 border border-slate-200 rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
+                                    <button className="h-[68px] px-6 border border-gh-border rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold text-gh-text hover:bg-gh-bg-tertiary transition-all shadow-sm">
                                         <span className="material-symbols-outlined text-[20px]">mail</span>
                                         Invite Friends
                                     </button>
@@ -875,7 +875,7 @@ const TeamManagementView = ({
                                     ].map((stat) => (
                                         <div key={stat.label} className="flex items-center gap-2">
                                             <div className={`w-2 h-2 rounded-full ${stat.color}`} />
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{stat.label}</span>
+                                            <span className="text-[10px] font-bold text-gh-text-secondary uppercase tracking-wider">{stat.label}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -885,12 +885,12 @@ const TeamManagementView = ({
                 </div>
 
                 {/* Right Panel - Invitations & Requests */}
-                <div className="w-full max-w-[420px] bg-white border-l border-slate-200 flex flex-col pt-6">
+                <div className="w-full max-w-[420px] bg-gh-bg-secondary border-l border-gh-border flex flex-col pt-6">
                     <div className="px-6 flex gap-3 mb-8">
                         <button 
                             onClick={() => setActiveRightTab("invitations")}
                             className={`flex-1 flex items-center justify-between px-5 py-3 rounded-xl text-[13px] font-bold transition-all ${
-                                activeRightTab === "invitations" ? "bg-[#eef2ff] text-blue-600 ring-1 ring-blue-100" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                                activeRightTab === "invitations" ? "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20" : "bg-gh-bg text-gh-text-secondary hover:bg-gh-bg-tertiary"
                             }`}
                         >
                             <div className="flex items-center gap-2.5">
@@ -898,13 +898,13 @@ const TeamManagementView = ({
                                 Invitations
                             </div>
                             <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${
-                                activeRightTab === "invitations" ? "bg-orange-600 text-white" : "bg-slate-300 text-white"
+                                activeRightTab === "invitations" ? "bg-orange-600 text-white" : "bg-gh-border text-gh-text-secondary"
                             }`}>0</span>
                         </button>
                         <button 
                             onClick={() => setActiveRightTab("requests")}
                             className={`flex-1 flex items-center justify-between px-5 py-3 rounded-xl text-[13px] font-bold transition-all ${
-                                activeRightTab === "requests" ? "bg-[#eef2ff] text-blue-600 ring-1 ring-blue-100" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                                activeRightTab === "requests" ? "bg-blue-500/10 text-blue-500 ring-1 ring-blue-500/20" : "bg-gh-bg text-gh-text-secondary hover:bg-gh-bg-tertiary"
                             }`}
                         >
                             <div className="flex items-center gap-2.5">
@@ -912,7 +912,7 @@ const TeamManagementView = ({
                                 Requests
                             </div>
                             <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${
-                                activeRightTab === "requests" ? "bg-orange-600 text-white" : "bg-slate-300 text-white"
+                                activeRightTab === "requests" ? "bg-orange-600 text-white" : "bg-gh-border text-gh-text-secondary"
                             }`}>0</span>
                         </button>
                     </div>
@@ -920,27 +920,27 @@ const TeamManagementView = ({
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in slide-in-from-bottom-4">
                         <div className="w-64 h-64 mb-8 relative flex items-center justify-center">
                              {/* Astronaut with Magnifying Glass Illustration (Abstract SVG) */}
-                             <svg viewBox="0 0 200 200" className="w-full h-full text-slate-100">
+                             <svg viewBox="0 0 200 200" className="w-full h-full text-gh-text-secondary opacity-10">
                                 <rect x="40" y="120" width="120" height="20" rx="10" fill="currentColor" opacity="0.3" />
                                 <rect x="60" y="140" width="80" height="15" rx="7" fill="currentColor" opacity="0.2" />
-                                <path d="M100 40 C 60 40 40 80 40 120 L 160 120 C 160 80 140 40 100 40" fill="white" stroke="#e2e8f0" strokeWidth="2" />
-                                <circle cx="100" cy="80" r="25" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
-                                <path d="M85 75 Q 100 65 115 75" stroke="#cbd5e1" strokeWidth="2" fill="none" />
-                                <circle cx="130" cy="70" r="15" fill="white" stroke="#64748b" strokeWidth="2" />
-                                <line x1="140" y1="80" x2="155" y2="95" stroke="#64748b" strokeWidth="4" strokeLinecap="round" />
+                                <path d="M100 40 C 60 40 40 80 40 120 L 160 120 C 160 80 140 40 100 40" fill="currentColor" stroke="currentColor" strokeWidth="2" />
+                                <circle cx="100" cy="80" r="25" fill="currentColor" stroke="currentColor" strokeWidth="2" />
+                                <path d="M85 75 Q 100 65 115 75" stroke="currentColor" strokeWidth="2" fill="none" />
+                                <circle cx="130" cy="70" r="15" fill="currentColor" stroke="currentColor" strokeWidth="2" />
+                                <line x1="140" y1="80" x2="155" y2="95" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
                              </svg>
                         </div>
-                        <h5 className="text-[15px] font-bold text-slate-700 mb-2">No friend suggestion right now.</h5>
-                        <p className="text-[13px] text-slate-400 font-medium max-w-[280px]">Explore other ways to create your team.</p>
+                        <h5 className="text-[15px] font-bold text-gh-text mb-2">No friend suggestion right now.</h5>
+                        <p className="text-[13px] text-gh-text-secondary font-medium max-w-[280px]">Explore other ways to create your team.</p>
                     </div>
                 </div>
             </main>
 
             {/* Sticky Footer */}
-            <footer className="h-[72px] border-t border-slate-100 flex items-center justify-between px-10 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.03)] z-50">
+            <footer className="h-[72px] border-t border-gh-border opacity-100 flex items-center justify-between px-10 bg-gh-bg-secondary shadow-lg z-50">
                 <button 
                     onClick={onBack}
-                    className="px-8 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-[14px] font-bold hover:bg-slate-50 transition-all border-dashed"
+                    className="px-8 py-2.5 rounded-lg border border-gh-border text-gh-text-secondary text-[14px] font-bold hover:bg-gh-bg transition-all border-dashed"
                 >
                     Back
                 </button>

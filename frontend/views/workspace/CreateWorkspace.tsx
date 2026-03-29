@@ -65,6 +65,11 @@ const CreateWorkspaceView = () => {
 
       const newWorkspace = await api.workspaces.create(payload);
 
+      // Refresh the contribution heatmap cache to show the new activity immediately
+      const { gitActivityService } = await import("../../services/git/gitActivityService");
+      // Since we don't have user object in this component's top-level yet, but it's likely the current user
+      gitActivityService.refresh(null); 
+
       window.dispatchEvent(
         new CustomEvent("trackcodex-notification", {
           detail: {

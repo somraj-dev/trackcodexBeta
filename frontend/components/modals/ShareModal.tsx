@@ -19,33 +19,33 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, job }) => {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[420px] bg-white rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-[420px] bg-gh-bg border border-gh-border rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
         <button 
           onClick={onClose}
-          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 p-1"
+          className="absolute right-4 top-4 text-gh-text-secondary hover:text-gh-text p-1 transition-colors"
         >
           <span className="material-symbols-outlined">close</span>
         </button>
 
         <div className="flex items-start gap-4 mb-8">
-          <div className="size-16 rounded-xl overflow-hidden border border-slate-100 flex-shrink-0 bg-slate-50 flex items-center justify-center">
+          <div className="size-16 rounded-xl overflow-hidden border border-gh-border flex-shrink-0 bg-gh-bg-secondary flex items-center justify-center">
             {job.creator?.avatar ? (
               <img src={job.creator.avatar} alt="Org Logo" className="w-full h-full object-cover" />
             ) : (
-              <span className="material-symbols-outlined text-slate-300 text-[32px]">corporate_fare</span>
+              <span className="material-symbols-outlined text-gh-text-secondary opacity-50 text-[32px]">corporate_fare</span>
             )}
           </div>
           <div className="flex-1 min-w-0 pr-6">
-            <h3 className="text-[20px] font-bold text-slate-900 leading-tight mb-1 truncate">
+            <h3 className="text-[20px] font-bold text-gh-text leading-tight mb-1 truncate">
               {job.title}
             </h3>
-            <p className="text-[14px] font-bold text-slate-500 uppercase tracking-wide truncate">
+            <p className="text-[14px] font-bold text-gh-text-secondary uppercase tracking-wide truncate">
               {orgName}
             </p>
           </div>
         </div>
 
-        <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-6">Share with</p>
+        <p className="text-[13px] font-bold text-gh-text-secondary uppercase tracking-wider mb-6">Share with</p>
         
         <div className="flex items-center justify-between gap-2">
           <button 
@@ -82,14 +82,14 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, job }) => {
 
           <button 
             title="Copy Link"
-            className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center hover:scale-110 transition-all shadow-md hover:bg-slate-50 group"
+            className="w-12 h-12 rounded-full bg-gh-bg-secondary border border-gh-border flex items-center justify-center hover:scale-110 transition-all shadow-md hover:bg-gh-bg-tertiary group"
             onClick={() => {
               navigator.clipboard.writeText(shareUrl);
               addNotification({ type: 'success', title: 'Link Copied', message: 'Mission link copied to clipboard!' } as any);
               onClose();
             }}
           >
-            <span className="material-symbols-outlined text-slate-700 text-[22px] group-hover:scale-110 transition-transform">content_copy</span>
+            <span className="material-symbols-outlined text-gh-text text-[22px] group-hover:scale-110 transition-transform">content_copy</span>
           </button>
         </div>
       </div>

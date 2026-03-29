@@ -1,75 +1,117 @@
 import React from 'react';
-import { Strata, PinnedRepo } from '../../types';
+import { Strata } from '../../types';
 import { useOutletContext } from 'react-router-dom';
+import '../../styles/StrataDashboard.css';
 
-// FIX: Changed component to React.FC to correctly handle the 'key' prop when used in a list.
-const PinnedRepoCard: React.FC<{ repo: PinnedRepo }> = ({ repo }) => (
-    <div className="p-4 bg-[#0A0D14] border border-[#1E232E] rounded-lg group hover:border-[#8b949e] transition-all cursor-pointer flex flex-col">
-        <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-bold text-primary group-hover:underline truncate">{repo.name}</h4>
-            <span className="px-2 py-0.5 rounded-full border border-[#1E232E] text-[9px] text-slate-500 font-medium uppercase tracking-widest">
-                {repo.isPublic ? 'Public' : 'Private'}
-            </span>
-        </div>
-        <p className="text-xs text-slate-400 leading-normal mb-4 flex-1 line-clamp-2">
-            {repo.description}
-        </p>
-        <div className="flex items-center gap-4 text-xs text-slate-500 font-bold">
-            <div className="flex items-center gap-1.5">
-                <div className="size-2.5 rounded-full" style={{ backgroundColor: repo.langColor }}></div>
-                <span>{repo.language}</span>
-            </div>
-            <div className="flex items-center gap-1 hover:text-white transition-colors">
-                <span className="material-symbols-outlined !text-base">star</span>
-                <span>{repo.stars}</span>
-            </div>
-        </div>
+const QuickActionCard: React.FC<{ icon: string; label: string }> = ({ icon, label }) => (
+  <div className="quick-action-card">
+    <span className="material-symbols-outlined !text-[20px]">{icon}</span>
+    {label}
+  </div>
+);
+
+const MonitorCard: React.FC<{ 
+  title: string; 
+  value: string; 
+  badge?: string; 
+  badgeType?: 'red' | 'green';
+  actionLabel: string;
+  charts?: React.ReactNode;
+}> = ({ title, value, badge, badgeType, actionLabel, charts }) => (
+  <div className="monitor-card">
+    <div className="monitor-card-header">
+      <h3 className="monitor-card-title">{title}</h3>
+      <button className="btn-monitor-action">{actionLabel}</button>
     </div>
+    <div className="monitor-value-container">
+      <span className="monitor-value">{value}</span>
+      {badge && (
+        <span className={`monitor-badge ${badgeType === 'red' ? 'monitor-badge-red' : ''}`}>
+          {badge}
+        </span>
+      )}
+    </div>
+    <div className="monitor-chart-placeholder">
+      {charts || (
+        <svg className="sparkline-svg" viewBox="0 0 100 40">
+          <path d="M0,35 Q20,30 40,35 T80,25 T100,30" />
+          <line x1="0" y1="38" x2="100" y2="38" className="chart-grid-libs" />
+        </svg>
+      )}
+    </div>
+  </div>
 );
 
 const StrataOverview = () => {
     const { strata } = useOutletContext<{ strata: Strata }>();
 
-    // Mock pinned repos from strata repos
-    const pinnedRepos: PinnedRepo[] = strata.repositories.slice(0, 4).map(r => ({
-        name: r.name,
-        description: r.description,
-        language: r.techStack,
-        langColor: r.techColor,
-        stars: r.stars.toString(),
-        forks: r.forks,
-        isPublic: r.isPublic,
-    }));
-
     return (
-        <div className="animate-in fade-in duration-500">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-                <div className="space-y-8">
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                        <span className="material-symbols-outlined text-slate-400">push_pin</span>
-                        Pinned
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {pinnedRepos.map(repo => <PinnedRepoCard key={repo.name} repo={repo} />)}
-                    </div>
+        <div className="strata-dashboard animate-in fade-in duration-500">
+            {/* Quick Actions */}
+            <section className="strata-dashboard-section">
+                <h2 className="strata-dashboard-section-title">Quick actions</h2>
+                <div className="quick-actions-grid">
+                    <QuickActionCard icon="person_add" label="Invite users" />
+                    <QuickActionCard icon="apps" label="Add app" />
+                    <QuickActionCard icon="language" label="Verify domain" />
                 </div>
+            </section>
 
-                <div className="space-y-8">
-                    <div>
-                        <h3 className="text-lg font-bold text-white mb-4">Top languages</h3>
-                        <div className="space-y-2">
-                            {/* Mock Language Data */}
-                            <div className="flex items-center text-xs text-slate-400"><div className="size-3 rounded-full bg-[#00add8] mr-2"></div>Go <span className="ml-auto">65%</span></div>
-                            <div className="flex items-center text-xs text-slate-400"><div className="size-3 rounded-full bg-[#3178c6] mr-2"></div>TypeScript <span className="ml-auto">25%</span></div>
-                            <div className="flex items-center text-xs text-slate-400"><div className="size-3 rounded-full bg-[#f97316] mr-2"></div>Markdown <span className="ml-auto">10%</span></div>
-                        </div>
-                    </div>
+            {/* Monitor Section */}
+            <section className="strata-dashboard-section">
+                <h2 className="strata-dashboard-section-title">Monitor</h2>
+                <div className="monitor-grid">
+                    <MonitorCard 
+                      title="Rovo credits usage" 
+                      value="0" 
+                      actionLabel="View usage" 
+                      charts={
+                        <svg className="sparkline-svg" viewBox="0 0 400 120">
+                          {/* Grid Lines */}
+                          <line x1="0" y1="20" x2="400" y2="20" className="chart-grid-libs" />
+                          <line x1="0" y1="50" x2="400" y2="50" className="chart-grid-libs" />
+                          <line x1="0" y1="80" x2="400" y2="80" className="chart-grid-libs" />
+                          <line x1="0" y1="110" x2="400" y2="110" className="chart-grid-libs" />
+                          
+                          {/* Path */}
+                          <path 
+                            d="M10,110 L80,110 L150,110 L220,110 L290,110 L360,110" 
+                            stroke="#1f6feb" 
+                            strokeWidth="3" 
+                            fill="none" 
+                          />
+                          
+                          {/* Markers */}
+                          <circle cx="10" cy="110" r="4" fill="#1f6feb" />
+                          <circle cx="80" cy="110" r="4" fill="#1f6feb" />
+                          <circle cx="150" cy="110" r="4" fill="#1f6feb" />
+                          <circle cx="220" cy="110" r="4" fill="#1f6feb" />
+                          <circle cx="290" cy="110" r="4" fill="#1f6feb" />
+                          <circle cx="360" cy="110" r="4" fill="#1f6feb" />
+                          
+                          {/* Labels */}
+                          <text x="5" y="118" className="chart-axis-label">Mar 22</text>
+                          <text x="75" y="118" className="chart-axis-label">Mar 23</text>
+                          <text x="145" y="118" className="chart-axis-label">Mar 24</text>
+                        </svg>
+                      }
+                    />
+                    <MonitorCard 
+                      title="Monthly active users" 
+                      value="0" 
+                      badge="0% MONTH TO DATE" 
+                      badgeType="red"
+                      actionLabel="Manage users" 
+                    />
+                    <MonitorCard 
+                      title="Open requests for app access" 
+                      value="0" 
+                      actionLabel="Manage requests" 
+                    />
                 </div>
-            </div>
+            </section>
         </div>
     );
 };
 
 export default StrataOverview;
-
-

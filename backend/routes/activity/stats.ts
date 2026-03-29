@@ -8,26 +8,29 @@ export default async function statsRoutes(fastify: FastifyInstance) {
     let { userId } = request.params as { userId: string };
     const { year } = request.query as { year?: string };
 
-    let userDateCreated = new Date();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
-    if (!isUuid) {
-      const user = await prisma.user.findFirst({
+    // Find user by ID or username
+    let user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, createdAt: true }
+    });
+
+    if (!user) {
+      user = await prisma.user.findFirst({
         where: { username: { equals: userId, mode: "insensitive" } },
         select: { id: true, createdAt: true }
       });
-      if (user) {
-        userId = user.id;
-        userDateCreated = user.createdAt;
-      }
-    } else {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { createdAt: true }
-      });
-      if (user) {
-        userDateCreated = user.createdAt;
-      }
     }
+
+    if (!user) {
+      console.warn(`[STATS] User not found: ${userId}`);
+      return reply.code(404).send({ 
+        error: "User not found", 
+        message: "We couldn't find a user with the provided ID or username." 
+      });
+    }
+
+    userId = user.id;
+    userDateCreated = user.createdAt;
 
     const yearNum = year ? parseInt(year) : new Date().getFullYear();
     const currentYear = new Date().getFullYear();

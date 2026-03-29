@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Job } from "../../types";
 import JobRatingModal from "../../components/jobs/JobRatingModal";
 import ShareModal from "../../components/modals/ShareModal";
+import JobActionModal from "../../components/modals/JobActionModal";
 import { directMessageBus } from "../../services/social/directMessageBus";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
@@ -12,7 +13,7 @@ import { MOCK_JOBS } from "../../constants";
 
 /* ───── Unstop-style section header with blue accent bar ───── */
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-[17px] font-bold text-slate-800 mb-4 flex items-center">
+  <h3 className="text-[17px] font-bold text-gh-text mb-4 flex items-center">
     <div className="w-[5px] h-5 bg-blue-600 rounded-lg mr-3 -ml-[1px]" />
     {children}
   </h3>
@@ -26,6 +27,8 @@ const MissionDetailView = () => {
   const navigate = useNavigate();
   const [localJob, setLocalJob] = useState<any>(null);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [complaintModalOpen, setComplaintModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const { user } = useAuth();
@@ -43,7 +46,7 @@ const MissionDetailView = () => {
 
   if (!localJob)
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400 text-lg">
+      <div className="min-h-screen bg-gh-bg flex items-center justify-center text-gh-text-secondary text-lg">
         Mission not found.
       </div>
     );
@@ -81,31 +84,31 @@ const MissionDetailView = () => {
      from top → bottom, section by section
      ══════════════════════════════════════════ */
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+    <div className="min-h-screen bg-gh-bg font-sans text-gh-text">
 
       {/* ─── breadcrumb ─── */}
-      <div className="max-w-[850px] mx-auto px-4 pt-5 pb-2 flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+      <div className="max-w-[850px] mx-auto px-4 pt-5 pb-2 flex items-center gap-2 text-[11px] text-gh-text-secondary font-medium">
         <span className="material-symbols-outlined text-[14px]">home</span>
         <span>/</span>
         <span className="cursor-pointer hover:text-blue-600 transition-colors" onClick={() => navigate("/marketplace")}>Hackathon</span>
         <span>/</span>
-        <span className="font-bold text-slate-700 truncate max-w-[200px]">{localJob.title}</span>
+        <span className="font-bold text-gh-text truncate max-w-[200px]">{localJob.title}</span>
       </div>
 
       {/* ════════════════════════════════════════════════════════════
-          HERO CARD — white card with badge, title, org, location
+          HERO CARD — theme card with badge, title, org, location
           ════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[850px] w-full mx-auto bg-white shadow-sm border border-slate-200 overflow-hidden">
+      <div className="max-w-[850px] w-full mx-auto bg-gh-bg-secondary shadow-sm border border-gh-border overflow-hidden">
 
         {/* top row: ONLINE badge + action icons */}
         <div className="flex justify-between items-center px-6 pt-5 pb-2">
-          <div className="flex items-center gap-1.5 bg-red-50 text-red-500 border border-red-100 px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase shadow-sm">
+          <div className="flex items-center gap-1.5 bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase shadow-sm">
             <span className="material-symbols-outlined text-[10px] font-bold">
               {metadata.participationType === "Offline" ? "location_off" : "wifi"}
             </span>
             {metadata.participationType === "Offline" ? "Offline" : "Online"}
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-4 text-gh-text-secondary">
             <span 
               className="material-symbols-outlined text-[18px] cursor-pointer hover:text-blue-500 transition-colors"
               onClick={() => {
@@ -138,33 +141,33 @@ const MissionDetailView = () => {
         {/* title + org + meta + logo */}
         <div className="px-6 pb-6 flex justify-between items-start gap-4">
           <div className="flex-1">
-            <h1 className="text-[28px] font-bold text-slate-900 tracking-tight leading-snug mb-0.5">
+            <h1 className="text-[28px] font-bold text-gh-text tracking-tight leading-snug mb-0.5">
               {localJob.title}
             </h1>
-            <p className="text-[14px] font-bold text-slate-500 tracking-wider uppercase mb-6">
+            <p className="text-[14px] font-bold text-gh-text-secondary tracking-wider uppercase mb-6">
               {orgName}
             </p>
 
             {/* location + team size row */}
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="w-5 flex justify-center text-slate-400 mt-0.5">
+                <div className="w-5 flex justify-center text-gh-text-secondary mt-0.5">
                   <span className="material-symbols-outlined text-[20px]">location_on</span>
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-slate-800 leading-none mb-1">Location</p>
-                  <p className="text-[13px] text-slate-500">
+                  <p className="text-[14px] font-bold text-gh-text leading-none mb-1">Location</p>
+                  <p className="text-[13px] text-gh-text-secondary">
                     {metadata.participationType === "Offline" ? "On Campus, TBD" : "Global / Remote"}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-5 flex justify-center text-slate-400 mt-0.5">
+                <div className="w-5 flex justify-center text-gh-text-secondary mt-0.5">
                   <span className="material-symbols-outlined text-[20px]">group</span>
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-slate-800 leading-none mb-1">Team Size</p>
-                  <p className="text-[13px] text-slate-500">
+                  <p className="text-[14px] font-bold text-gh-text leading-none mb-1">Team Size</p>
+                  <p className="text-[13px] text-gh-text-secondary">
                     1 - {metadata.registrationLimit || 1} Members
                   </p>
                 </div>
@@ -173,14 +176,14 @@ const MissionDetailView = () => {
 
             {/* tag */}
             <div className="mt-6">
-              <span className="inline-flex px-3 py-1 bg-slate-100 text-slate-600 text-[11px] font-bold rounded min-w-[60px] justify-center items-center">
+              <span className="inline-flex px-3 py-1 bg-gh-bg text-gh-text-secondary text-[11px] font-bold rounded min-w-[60px] justify-center items-center border border-gh-border">
                 Others
               </span>
             </div>
           </div>
 
           {/* org logo on right */}
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-slate-200 p-2 shrink-0 flex items-center justify-center bg-white shadow-sm overflow-hidden mt-2 mr-2">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-gh-border p-2 shrink-0 flex items-center justify-center bg-gh-bg shadow-sm overflow-hidden mt-2 mr-2">
             <img src={localJob.creator?.avatar || "https://github.com/shadcn.png"} alt="Logo" className="w-full h-full object-contain" />
           </div>
         </div>
@@ -189,13 +192,13 @@ const MissionDetailView = () => {
       {/* ════════════════════════════════════════════════════════════
           BODY — each section sits inside the same 850 px column
           ════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[850px] w-full mx-auto bg-white border-l border-r border-slate-200 p-8 space-y-12">
+      <div className="max-w-[850px] w-full mx-auto bg-gh-bg-secondary border-l border-r border-gh-border p-8 space-y-12">
 
         {/* ── Eligibility ── */}
         {metadata.allowedRegister && metadata.allowedRegister.length > 0 && (
           <div>
             <SectionTitle>Eligibility</SectionTitle>
-            <div className="text-[13px] text-slate-600 font-medium px-4">
+            <div className="text-[13px] text-gh-text-secondary font-medium px-4">
               {metadata.allowedRegister.join("  •  ")}
             </div>
           </div>
@@ -204,7 +207,7 @@ const MissionDetailView = () => {
         {/* ── Description ── */}
         <div>
           <SectionTitle>All that you need to know about {localJob.title}</SectionTitle>
-          <div className="text-[14px] text-slate-600 whitespace-pre-wrap leading-relaxed px-4">
+          <div className="text-[14px] text-gh-text-secondary whitespace-pre-wrap leading-relaxed px-4">
             {description}
           </div>
         </div>
@@ -215,24 +218,24 @@ const MissionDetailView = () => {
             <SectionTitle>Important dates & deadlines</SectionTitle>
             <div className="px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {metadata.startDate && (
-                <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 flex flex-col gap-1 items-start">
-                  <div className="text-blue-600 bg-blue-100 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 mb-1">
+                <div className="bg-gh-bg border border-gh-border rounded-lg p-4 flex flex-col gap-1 items-start">
+                  <div className="text-blue-500 bg-blue-500/10 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 mb-1">
                     <span className="material-symbols-outlined text-[20px]">calendar_month</span>
                   </div>
-                  <p className="text-[13px] font-black text-slate-800 leading-tight">{fmt(metadata.startDate)}</p>
-                  <p className="text-[11px] text-slate-500 font-medium">Start Date</p>
+                  <p className="text-[13px] font-black text-gh-text leading-tight">{fmt(metadata.startDate)}</p>
+                  <p className="text-[11px] text-gh-text-secondary font-medium">Start Date</p>
                 </div>
               )}
               {metadata.endDate && (
-                <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 flex flex-col gap-1 items-start">
+                <div className="bg-gh-bg border border-gh-border rounded-lg p-4 flex flex-col gap-1 items-start">
                   <div className="text-white bg-blue-600 rounded-lg w-9 h-9 flex items-center justify-center shrink-0 mb-1 shadow-sm">
                     <span className="material-symbols-outlined text-[20px]">av_timer</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded-full">1</div>
-                    <p className="text-[13px] font-black text-slate-800 leading-tight">{fmt(metadata.endDate)}</p>
+                    <p className="text-[13px] font-black text-gh-text leading-tight">{fmt(metadata.endDate)}</p>
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium ml-1">Registration Deadline</p>
+                  <p className="text-[11px] text-gh-text-secondary font-medium ml-1">Registration Deadline</p>
                 </div>
               )}
             </div>
@@ -243,13 +246,13 @@ const MissionDetailView = () => {
         <div>
           <SectionTitle>Contact the organisers</SectionTitle>
           <div className="px-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 flex items-center gap-4 hover:shadow-sm transition-shadow">
+            <div className="bg-gh-bg border border-gh-border rounded-lg p-4 flex items-center gap-4 hover:shadow-sm transition-shadow">
               <div className="w-10 h-10 bg-blue-600 text-white rounded-md flex items-center justify-center font-bold text-[13px] shrink-0">
                 {(localJob.creator?.name || "O").substring(0, 2).toUpperCase()}
               </div>
               <div className="flex-1 truncate">
-                <p className="text-[13px] font-bold text-slate-800 truncate leading-snug">{localJob.creator?.name || "Organizer"}</p>
-                <p className="text-[11px] text-slate-400 truncate mt-0.5 hover:text-blue-600 cursor-pointer transition-colors leading-snug">organizer@trackcodex.dev</p>
+                <p className="text-[13px] font-bold text-gh-text truncate leading-snug">{localJob.creator?.name || "Organizer"}</p>
+                <p className="text-[11px] text-gh-text-secondary truncate mt-0.5 hover:text-blue-600 cursor-pointer transition-colors leading-snug">organizer@trackcodex.dev</p>
               </div>
               <button
                 onClick={() => {
@@ -260,10 +263,10 @@ const MissionDetailView = () => {
                     context: `Mission: ${localJob.title}`,
                   });
                 }}
-                className="w-8 h-8 rounded-md hover:bg-slate-200 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-md hover:bg-gh-bg-secondary flex items-center justify-center transition-colors"
                 title="Message"
               >
-                <span className="material-symbols-outlined text-[18px] text-slate-500">chat_bubble_outline</span>
+                <span className="material-symbols-outlined text-[18px] text-gh-text-secondary">chat_bubble_outline</span>
               </button>
             </div>
           </div>
@@ -273,16 +276,16 @@ const MissionDetailView = () => {
         <div>
           <SectionTitle>Download attachments</SectionTitle>
           <div className="px-4">
-            <div className="inline-flex items-center justify-between min-w-[260px] bg-slate-50 border border-slate-100 rounded-lg p-3 cursor-pointer hover:bg-slate-100 transition-colors shadow-sm">
+            <div className="inline-flex items-center justify-between min-w-[260px] bg-gh-bg border border-gh-border rounded-lg p-3 cursor-pointer hover:bg-gh-bg-secondary transition-colors shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="text-blue-500 bg-blue-100/50 p-1 rounded">
+                <div className="text-blue-500 bg-blue-500/10 p-1 rounded">
                   <span className="material-symbols-outlined text-[20px]">description</span>
                 </div>
-                <span className="text-[12px] font-bold text-slate-700">
+                <span className="text-[12px] font-bold text-gh-text">
                   {localJob.title.replace(/\s+/g, "_")}_details.pdf
                 </span>
               </div>
-              <span className="material-symbols-outlined text-[18px] text-slate-400 ml-3">download</span>
+              <span className="material-symbols-outlined text-[18px] text-gh-text-secondary ml-3">download</span>
             </div>
           </div>
         </div>
@@ -291,9 +294,9 @@ const MissionDetailView = () => {
         <div>
           <SectionTitle>Rewards and Prizes</SectionTitle>
           <div className="px-4">
-            <p className="text-[13px] text-slate-600 font-medium leading-relaxed">
+            <p className="text-[13px] text-gh-text-secondary font-medium leading-relaxed">
               Winner, Achievement (Trophies) & Participation Certification & Overall Cash Prize is{" "}
-              <span className="font-bold text-slate-800">{localJob.budget}</span>
+              <span className="font-bold text-gh-text">{localJob.budget}</span>
             </p>
           </div>
         </div>
@@ -302,26 +305,26 @@ const MissionDetailView = () => {
         <div>
           <SectionTitle>Related Opportunities</SectionTitle>
           <div className="px-4 flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
-            <div className="min-w-[200px] border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white">
-              <div className="w-[45px] h-[45px] bg-slate-50 rounded border border-slate-200 flex items-center justify-center mb-4">
-                <span className="font-bold text-slate-800 text-[10px]">IIMA</span>
+            <div className="min-w-[200px] border border-gh-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-gh-bg">
+              <div className="w-[45px] h-[45px] bg-gh-bg-secondary rounded border border-gh-border flex items-center justify-center mb-4">
+                <span className="font-bold text-gh-text text-[10px]">IIMA</span>
               </div>
-              <p className="text-[13px] font-bold text-slate-800 mb-0.5 line-clamp-1">AI Summer Residency</p>
-              <p className="text-[11px] text-slate-500 truncate">IIMA Ventures</p>
+              <p className="text-[13px] font-bold text-gh-text mb-0.5 line-clamp-1">AI Summer Residency</p>
+              <p className="text-[11px] text-gh-text-secondary truncate">IIMA Ventures</p>
             </div>
-            <div className="min-w-[200px] border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white">
-              <div className="w-[45px] h-[45px] bg-slate-100 rounded border border-slate-200 flex items-center justify-center mb-4 overflow-hidden p-1">
+            <div className="min-w-[200px] border border-gh-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-gh-bg">
+              <div className="w-[45px] h-[45px] bg-gh-bg-secondary rounded border border-gh-border flex items-center justify-center mb-4 overflow-hidden p-1">
                 <img src="https://github.com/shadcn.png" className="w-full h-full opacity-50 grayscale" alt="" />
               </div>
-              <p className="text-[13px] font-bold text-slate-800 mb-0.5 line-clamp-1">Think Like a Compiler</p>
-              <p className="text-[11px] text-slate-500 truncate">Malla Reddy College...</p>
+              <p className="text-[13px] font-bold text-gh-text mb-0.5 line-clamp-1">Think Like a Compiler</p>
+              <p className="text-[11px] text-gh-text-secondary truncate">Malla Reddy College...</p>
             </div>
-            <div className="min-w-[200px] border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-white">
-              <div className="w-[45px] h-[45px] bg-slate-100 rounded border border-slate-200 flex items-center justify-center mb-4 overflow-hidden p-1">
+            <div className="min-w-[200px] border border-gh-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-gh-bg">
+              <div className="w-[45px] h-[45px] bg-gh-bg-secondary rounded border border-gh-border flex items-center justify-center mb-4 overflow-hidden p-1">
                 <img src="https://github.com/shadcn.png" className="w-full h-full opacity-50 grayscale" alt="" />
               </div>
-              <p className="text-[13px] font-bold text-slate-800 mb-0.5 line-clamp-1">Insomnia</p>
-              <p className="text-[11px] text-slate-500 truncate">Visvesvaraya National Institu...</p>
+              <p className="text-[13px] font-bold text-gh-text mb-0.5 line-clamp-1">Insomnia</p>
+              <p className="text-[11px] text-gh-text-secondary truncate">Visvesvaraya National Institu...</p>
             </div>
           </div>
         </div>
@@ -331,12 +334,12 @@ const MissionDetailView = () => {
           <SectionTitle>Feedback & Rating</SectionTitle>
           <div className="px-4">
             <div
-              className="bg-slate-50 border border-slate-100 rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-slate-100 cursor-pointer transition-colors"
+              className="bg-gh-bg border border-gh-border rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-gh-bg-secondary cursor-pointer transition-colors"
               onClick={() => setIsRatingModalOpen(true)}
             >
-              <span className="material-symbols-outlined text-slate-400 mb-2">edit_square</span>
-              <p className="text-[13px] font-bold text-slate-800">Write a review</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <span className="material-symbols-outlined text-gh-text-secondary mb-2">edit_square</span>
+              <p className="text-[13px] font-bold text-gh-text">Write a review</p>
+              <p className="text-[11px] text-gh-text-secondary mt-0.5">
                 Register for this opportunity to give your feedback and review.
               </p>
             </div>
@@ -344,7 +347,7 @@ const MissionDetailView = () => {
         </div>
 
         {/* ── TrackCodex Mission Actions ── */}
-        <div className="px-4 py-6 mt-2 flex justify-center border-t border-slate-200 pt-8">
+        <div className="px-4 py-6 mt-2 flex justify-center border-t border-gh-border pt-8">
           {localJob.status === "Open" && !isCreator && (
             <button
               onClick={() => {
@@ -365,7 +368,7 @@ const MissionDetailView = () => {
               disabled={hasApplied}
               className={`max-w-xs w-full py-3.5 rounded-lg text-[13px] font-bold uppercase tracking-wide transition-all ${
                 hasApplied
-                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                  ? "bg-gh-bg-secondary text-gh-text-secondary cursor-not-allowed border border-gh-border"
                   : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20"
               }`}
             >
@@ -414,7 +417,7 @@ const MissionDetailView = () => {
           {localJob.status !== "Completed" && isCreator && localJob.status !== "In Progress" && (
             <button
               onClick={() => setIsRatingModalOpen(true)}
-              className="max-w-xs w-full py-3 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-[13px] font-bold uppercase tracking-wide transition-all"
+              className="max-w-xs w-full py-3 bg-gh-bg border border-gh-border text-gh-text hover:bg-gh-bg-secondary rounded-lg text-[13px] font-bold uppercase tracking-wide transition-all"
             >
               Mark Complete & Rate
             </button>
@@ -423,24 +426,30 @@ const MissionDetailView = () => {
       </div>
 
       {/* ═══════ footer info ═══════ */}
-      <div className="max-w-[850px] w-full mx-auto bg-slate-50 border border-t-0 border-slate-200 p-6 pt-5 flex items-start gap-4 text-[10px] text-slate-500 font-medium md:rounded-b-2xl mb-8">
-        <span className="material-symbols-outlined text-[16px] text-slate-400 mt-0.5 shrink-0">info</span>
+      <div className="max-w-[850px] w-full mx-auto bg-gh-bg border border-t-0 border-gh-border p-6 pt-5 flex items-start gap-4 text-[10px] text-gh-text-secondary font-medium md:rounded-b-2xl mb-8">
+        <span className="material-symbols-outlined text-[16px] text-gh-text-secondary mt-0.5 shrink-0">info</span>
         <div className="leading-relaxed">
           <p>
-            Updated On: <span className="text-slate-700 font-bold">{fmt(localJob.updatedAt)}</span>
+            Updated On: <span className="text-gh-text font-bold">{fmt(localJob.updatedAt)}</span>
           </p>
           <p className="mt-1">The data on this page gets updated in every 15 minutes.</p>
-          <p className="mt-2 text-[9px] text-slate-400">
-            This opportunity has been listed by <span className="uppercase text-slate-600">{orgName}</span>.
+          <p className="mt-2 text-[9px] text-gh-text-secondary">
+            This opportunity has been listed by <span className="uppercase text-gh-text font-bold">{orgName}</span>.
             TrackCodex is not liable for any content mentioned in this opportunity or the process followed by
             the organisers for this opportunity. However, please raise a complaint if you want TrackCodex to
             look into the matter.
           </p>
           <div className="mt-4 space-y-1">
-            <p className="text-blue-500 cursor-pointer flex items-center gap-1 hover:underline">
+            <p 
+              onClick={() => setComplaintModalOpen(true)}
+              className="text-blue-500 cursor-pointer flex items-center gap-1 hover:underline"
+            >
               <span className="material-symbols-outlined text-[14px]">flag</span> Raise a Complaint
             </p>
-            <p className="text-red-500 cursor-pointer flex items-center gap-1 hover:underline">
+            <p 
+              onClick={() => setReportModalOpen(true)}
+              className="text-red-500 cursor-pointer flex items-center gap-1 hover:underline"
+            >
               <span className="material-symbols-outlined text-[14px]">warning</span> Report An Issue
             </p>
           </div>
@@ -458,9 +467,9 @@ const MissionDetailView = () => {
       {isRatingModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsRatingModalOpen(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-[20px] font-bold text-slate-900 mb-2">How was your experience?</h3>
-            <p className="text-slate-500 mb-6 text-[14px]">Please rate the organizer and provide your feedback.</p>
+          <div className="relative w-full max-w-md bg-gh-bg border border-gh-border rounded-2xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-[20px] font-bold text-gh-text mb-2">How was your experience?</h3>
+            <p className="text-gh-text-secondary mb-6 text-[14px]">Please rate the organizer and provide your feedback.</p>
             
             <div className="flex justify-center gap-2 mb-8">
               {[1, 2, 3, 4, 5].map((s) => (
@@ -470,13 +479,13 @@ const MissionDetailView = () => {
 
             <textarea 
               placeholder="Write your feedback here..."
-              className="w-full h-32 p-4 rounded-xl border border-slate-200 focus:border-blue-500 outline-none resize-none text-[14px] mb-6"
+              className="w-full h-32 p-4 rounded-xl bg-gh-bg-secondary border border-gh-border focus:border-blue-500 outline-none resize-none text-[14px] mb-6 text-gh-text"
             />
 
             <div className="flex gap-3">
               <button 
                 onClick={() => setIsRatingModalOpen(false)}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                className="flex-1 py-3 bg-gh-bg-secondary hover:bg-gh-bg-tertiary text-gh-text font-bold rounded-xl transition-colors border border-gh-border"
               >
                 Skip
               </button>
@@ -493,6 +502,31 @@ const MissionDetailView = () => {
           </div>
         </div>
       )}
+      {/* ── Modal Integration ── */}
+      <JobActionModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        title="Report an Issue"
+        subtitle="Select / describe what is the issue?"
+        options={["Page Loading", "Publish Opportunity", "Registration", "Others"]}
+        jobTitle={localJob.title}
+      />
+
+      <JobActionModal
+        isOpen={complaintModalOpen}
+        onClose={() => setComplaintModalOpen(false)}
+        title="Raise a Complaint"
+        subtitle="Please select the issue from the list below."
+        options={[
+          "Not received any update for the Job/Internship", 
+          "Charging money/fee for the Job/Internship", 
+          "Salary/Stipend reduced", 
+          "Organization/Recruiter seems suspicious", 
+          "Hiring for a different organization than mentioned", 
+          "Other unfair practice"
+        ]}
+        jobTitle={localJob.title}
+      />
     </div>
   );
 };

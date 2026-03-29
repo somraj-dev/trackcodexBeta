@@ -59,7 +59,8 @@ class GitActivityService {
     }
 
     try {
-      const response = await apiInstance.get(`/stats/contributions/${userId}?year=${year}`);
+      // Added cache-busting timestamp to ensure fresh data on explicit refresh
+      const response = await apiInstance.get(`/stats/contributions/${userId}?year=${year}&_t=${Date.now()}`);
       const data = response.data;
       const activities: Activity[] = data.contributions ?? this.buildEmptyYear();
       const total: number = data.total ?? 0;
@@ -81,17 +82,29 @@ class GitActivityService {
 
   private buildEmptyYear(): Activity[] {
     const result: Activity[] = [];
+    const now = new Date();
+    // Normalize to midnight UTC to avoid timezone shifts during iteration
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    
     for (let i = 364; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
+      const d = new Date(today);
+      d.setUTCDate(d.getUTCDate() - i);
       result.push({ date: d.toISOString().split("T")[0], count: 0, level: 0 });
     }
     return result;
   }
 
+  /** Clears the local cache for all users/years */
+  public clearCache() {
+    this.cache.clear();
+  }
+
   /** Public method to force a refresh for a userId */
   public refresh(userId: string | null, year?: number) {
-    this.fetchForUser(userId, year || new Date().getFullYear());
+    const y = year || new Date().getFullYear();
+    const key = userId ? `${userId}-${y}` : `__anonymous__-${y}`;
+    this.cache.delete(key);
+    this.fetchForUser(userId, y);
   }
 }
 

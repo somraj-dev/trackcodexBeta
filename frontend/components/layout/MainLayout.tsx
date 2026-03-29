@@ -172,11 +172,7 @@ const MainLayout: React.FC = () => {
       <div className="flex-1 flex min-h-0 relative">
         <main 
           ref={mainScrollRef} 
-          className={`flex-1 min-w-0 flex flex-col relative ${
-            location.pathname.startsWith("/marketplace/missions/") && !location.pathname.endsWith("/new") 
-            ? "bg-slate-50" 
-            : "bg-gh-bg"
-          } ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto no-scrollbar"}`}
+          className={`flex-1 min-w-0 flex flex-col relative bg-gh-bg ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto no-scrollbar"}`}
         >
           {!isIdeView && !isFocusMode && (
             <div className={`h-12 border-b border-gh-border flex items-center px-4 bg-gh-bg-secondary shrink-0 sticky top-0 z-40 gap-2 transition-transform duration-300 ${isNavbarVisible ? "translate-y-0" : "-translate-y-full"}`}>

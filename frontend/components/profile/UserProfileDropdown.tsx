@@ -134,7 +134,7 @@ const UserProfileDropdown = ({
         <MenuItem
           icon="corporate_fare"
           label="StrataHub"
-          onClick={() => handleNavigate("/strata")}
+          onClick={() => handleNavigate("/stratahub")}
         />
         <MenuItem
           icon="token"

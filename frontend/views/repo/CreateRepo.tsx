@@ -49,15 +49,9 @@ const CreateRepo: React.FC = () => {
         initReadme: initReadme,
       });
 
-      window.dispatchEvent(
-        new CustomEvent("trackcodex-notification", {
-          detail: {
-            title: "Repository Created",
-            message: `${created.name} has been created successfully.`,
-            type: "success",
-          },
-        }),
-      );
+      // Refresh the contribution heatmap cache to show the new activity immediately
+      const { gitActivityService } = await import("../../services/git/gitActivityService");
+      gitActivityService.refresh(user.userId);
 
       navigate(`/repo/${created.id}`);
     } catch (err: any) {

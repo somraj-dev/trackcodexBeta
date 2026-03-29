@@ -1,38 +1,61 @@
-import React from "react";
-import { useParams, NavLink, Outlet } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams, NavLink, Outlet, useLocation } from "react-router-dom";
 import { MOCK_STRATA } from "../../constants";
+import "../../styles/StrataDashboard.css";
 
-// FIX: Changed component to React.FC to correctly handle the 'key' prop when used in a list.
-const StrataTab: React.FC<{
+interface NavItemProps {
   to: string;
   icon: string;
   label: string;
-  badge?: number;
   end?: boolean;
-}> = ({ to, icon, label, badge, end }) => (
+}
+
+const NavItem: React.FC<NavItemProps> = ({ to, icon, label, end }) => (
   <NavLink
     to={to}
     end={end}
     className={({ isActive }) =>
-      `flex items-center gap-2 px-3 py-2 text-[13px] font-medium border-b-2 transition-all cursor-pointer shrink-0 ${isActive
-        ? "text-gh-text border-[#f78166]"
-        : "text-gh-text-secondary border-transparent hover:border-gh-border-active hover:text-gh-text"
-      }`
+      `strata-nav-item ${isActive ? "active" : ""}`
     }
   >
-    <span className="material-symbols-outlined !text-[18px]">{icon}</span>
-    {label}
-    {badge !== undefined && (
-      <span className="px-1.5 py-0.5 rounded-full bg-gh-bg-tertiary text-[10px] font-bold text-gh-text">
-        {badge}
-      </span>
-    )}
+    <span className="material-symbols-outlined strata-nav-item-icon">{icon}</span>
+    <span className="flex-1">{label}</span>
   </NavLink>
 );
 
+const CollapsibleNavItem: React.FC<{
+  icon: string;
+  label: string;
+  children: React.ReactNode;
+  isOpen: boolean;
+  onToggle: () => void;
+}> = ({ icon, label, children, isOpen, onToggle }) => {
+  return (
+    <div className="flex flex-col">
+      <div 
+        className={`strata-nav-item ${isOpen ? "active-parent" : ""}`}
+        onClick={onToggle}
+      >
+        <span className="material-symbols-outlined strata-nav-item-icon">{icon}</span>
+        <span className="flex-1">{label}</span>
+        <span className={`material-symbols-outlined strata-nav-chevron ${isOpen ? "expanded" : ""}`}>
+          expand_more
+        </span>
+      </div>
+      <div 
+        className={`strata-nav-submenu ${isOpen ? "open" : "closed"}`} 
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 const StrataDetailView = () => {
-  const { orgId } = useParams();
-  const strata = MOCK_STRATA.find((o) => o.id === orgId);
+  const { strataId } = useParams();
+  const location = useLocation();
+  const strata = MOCK_STRATA.find((o) => o.id === strataId);
+  const [isDirectoryOpen, setIsDirectoryOpen] = useState(true);
 
   if (!strata) {
     return (
@@ -42,79 +65,62 @@ const StrataDetailView = () => {
     );
   }
 
-  const tabs = [
-    {
-      to: `/strata/${orgId}`,
-      icon: "space_dashboard",
-      label: "Overview",
-      end: true,
-    },
-    {
-      to: "repositories",
-      icon: "account_tree",
-      label: "Repositories",
-      badge: strata.repositories.length,
-    },
-    { to: "people", icon: "group", label: "People", badge: strata.members.length },
-    { to: "teams", icon: "groups", label: "Teams", badge: strata.teams.length },
-    { to: "jobs", icon: "work", label: "Jobs" },
-    { to: "settings", icon: "settings", label: "Settings" },
-  ];
-
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-gh-bg font-display">
-      <header className="bg-gh-bg-secondary border-b border-gh-border pt-8">
-        <div className="max-w-[1400px] mx-auto px-8">
-          <div className="flex items-center gap-6 mb-8">
+    <div className="strata-layout-container font-display">
+      {/* Vertical Sidebar */}
+      <aside className="strata-sidebar custom-scrollbar">
+        <div className="strata-sidebar-content">
+          {/* Org Header */}
+          <div className="strata-sidebar-org">
             <img
               src={strata.avatar}
               alt={strata.name}
-              className="size-20 rounded-lg border-2 border-gh-border p-1 object-cover"
+              className="size-8 object-cover"
             />
-            <div>
-              <h1 className="text-xl font-semibold text-gh-text tracking-tight">
-                {strata.name}
-              </h1>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gh-text-secondary">
-                {strata.location && (
-                  <span className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined !text-base">
-                      location_on
-                    </span>
-                    {strata.location}
-                  </span>
-                )}
-                {strata.website && (
-                  <a
-                    href={`https://${strata.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 hover:text-primary hover:underline"
-                  >
-                    <span className="material-symbols-outlined !text-base">
-                      link
-                    </span>
-                    {strata.website}
-                  </a>
-                )}
-              </div>
-            </div>
+            <span className="strata-sidebar-org-name">{strata.name}</span>
           </div>
-          <nav className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            {tabs.map((tab) => (
-              <StrataTab key={tab.label} {...tab} />
-            ))}
+
+          {/* Navigation List */}
+          <nav className="strata-nav-list">
+            <NavItem 
+              to={`/strata/${strataId}`} 
+              icon="space_dashboard" 
+              label="Overview" 
+              end 
+            />
+
+            <CollapsibleNavItem 
+              icon="folder_shared" 
+              label="Directory" 
+              isOpen={isDirectoryOpen}
+              onToggle={() => setIsDirectoryOpen(!isDirectoryOpen)}
+            >
+              <NavLink to={`/strata/${strataId}/users`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Users</NavLink>
+              <NavLink to={`/strata/${strataId}/groups`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Groups</NavLink>
+              <NavLink to={`/strata/${strataId}/teams`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Teams</NavLink>
+              <NavLink to={`/strata/${strataId}/managed-accounts`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Managed accounts</NavLink>
+              <NavLink to={`/strata/${strataId}/service-accounts`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Service accounts</NavLink>
+              <NavLink to={`/strata/${strataId}/domains`} className={({ isActive }) => `strata-nav-submenu-item ${isActive ? "active" : ""}`}>Domains</NavLink>
+            </CollapsibleNavItem>
+
+            <NavItem to="apps" icon="apps" label="Apps" />
+            <NavItem to="security" icon="shield" label="Security" />
+            <NavItem to="data-management" icon="database" label="Data management" />
+            <NavItem to="insights" icon="insights" label="Insights" />
+            <NavItem to="billing" icon="payments" label="Billing" />
+            <NavItem to="settings" icon="settings" label="Organisation settings" />
           </nav>
         </div>
-      </header>
+      </aside>
 
-      <main className="flex-1 p-8 max-w-[1400px] mx-auto w-full">
-        <Outlet context={{ strata }} />
+      {/* Main Content Area */}
+      <main className="strata-main-content">
+        <div className="p-8 max-w-[1400px] mx-auto w-full">
+          <Outlet context={{ strata }} />
+        </div>
       </main>
     </div>
   );
 };
 
 export default StrataDetailView;
-
-

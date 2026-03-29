@@ -86,6 +86,8 @@ const StrataEnvironments = React.lazy(() => import("./views/organizations/settin
 const StrataPermissions = React.lazy(() => import("./views/organizations/settings/StrataPermissions"));
 const StrataWebhooks = React.lazy(() => import("./views/organizations/settings/StrataWebhooks"));
 
+const StrataHubSelectionView = React.lazy(() => import("./views/organizations/StrataHubSelectionView"));
+
 // Settings
 const AppearanceSettings = React.lazy(() => import("./views/settings/AppearanceSettings"));
 const EmailSettings = React.lazy(() => import("./views/settings/EmailSettings"));
@@ -256,6 +258,7 @@ const AppRoutes = React.memo(() => {
 
             {/* Strata */}
             <Route path="/strata" element={<StrataIndexView />} />
+            <Route path="/stratahub" element={<StrataHubSelectionView />} />
             <Route path="/strata/new" element={<CreateStrataView />} />
             <Route path="/strata/:strataId" element={<StrataDetailView />}>
               <Route index element={<StrataOverview />} />
