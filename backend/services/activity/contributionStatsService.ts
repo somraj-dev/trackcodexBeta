@@ -29,6 +29,10 @@ export const contributionStatsService = {
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 364);
       startDate.setHours(0, 0, 0, 0);
+      
+      // Safety buffer: include everything up to the end of today (or tomorrow)
+      // to ensure no time-zone clipping
+      endDate.setHours(23, 59, 59, 999);
     } else {
       // Fixed calendar year for historical data
       startDate = new Date(year, 0, 1);
@@ -138,7 +142,12 @@ export const contributionStatsService = {
       activities, workspaces, repositories, jobs, 
       issues, pullRequests, discussions, discussionComments, 
       reviews, deployments, posts, commComments, releases
-    ].forEach(set => mergeIntoMap(set));
+    ].forEach((set, idx) => {
+      if (set.length > 0) {
+        console.log(`[STATS] Dataset ${idx} contributing ${set.length} items`);
+        mergeIntoMap(set);
+      }
+    });
 
     // Generate accurate range of days
     const contributions: ContributionDay[] = [];

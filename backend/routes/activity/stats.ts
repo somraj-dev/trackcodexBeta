@@ -34,6 +34,8 @@ export default async function statsRoutes(fastify: FastifyInstance) {
     const joinYear = userDateCreated.getFullYear();
     const activeYears = Array.from({ length: Math.max(1, currentYear - joinYear + 1) }, (_, i) => currentYear - i);
 
+    console.log(`[STATS] Fetching contribution graph for user: ${userId}, year: ${yearNum}`);
+
     try {
       const contributions = await contributionStatsService.getContributionGraph(
         userId,

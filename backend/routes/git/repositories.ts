@@ -251,6 +251,7 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
             details: { name },
           },
         });
+        console.log(`[REPO-CREATE] ActivityLogged for user ${user.userId}`);
 
         console.log(`[REPO-CREATE] Creating notification...`);
         const { NotificationService } = await import("../../services/infra/notification");

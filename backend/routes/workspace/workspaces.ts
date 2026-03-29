@@ -128,6 +128,7 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
           details: { name: workspace.name },
         },
       });
+      console.log(`[WS-CREATE] ActivityLogged for user ${finalOwnerId}`);
 
       // If repository URL provided, trigger real cloning in background
       if (setupMode === "import" && repositoryUrl) {
