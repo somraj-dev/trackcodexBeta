@@ -118,6 +118,17 @@ export async function workspaceRoutes(fastify: FastifyInstance) {
         { workspaceId: workspace.id }
       );
 
+      // Activity Log for Contribution Heatmap
+      console.log(`[WS-CREATE] Logging activity event...`);
+      await prisma.activityLog.create({
+        data: {
+          userId: finalOwnerId,
+          action: "WORKSPACE_CREATE",
+          workspaceId: workspace.id,
+          details: { name: workspace.name },
+        },
+      });
+
       // If repository URL provided, trigger real cloning in background
       if (setupMode === "import" && repositoryUrl) {
         // Log the cloning request

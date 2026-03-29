@@ -52,82 +52,73 @@ export const contributionStatsService = {
       releases
     ] = await Promise.all([
       // 1. Generic Activity Logs (Commits, Pushes, etc.)
-      prisma.activityLog.groupBy({
-        by: ["createdAt"],
-        where: { userId, createdAt: { gte: startDate, lte: endDate }, action: { in: ["commit", "push", "merge", "JOB_COMPLETED", "HACKATHON_WIN", "MISSION_SUCCESS"] } },
-        _count: { id: true },
+      prisma.activityLog.findMany({
+        where: { 
+          userId, 
+          createdAt: { gte: startDate, lte: endDate }, 
+          action: { in: ["commit", "push", "merge", "REPO_CREATE", "WORKSPACE_CREATE", "JOB_COMPLETED", "HACKATHON_WIN", "MISSION_SUCCESS"] } 
+        },
+        select: { createdAt: true },
       }),
-      // 2. Workspaces
-      prisma.workspace.groupBy({
-        by: ["createdAt"],
+      // 2. Workspaces (Owned)
+      prisma.workspace.findMany({
         where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
-      // 3. Repositories
-      prisma.repository.groupBy({
-        by: ["createdAt"],
+      // 3. Repositories (Owned)
+      prisma.repository.findMany({
         where: { ownerId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 4. Job Applications
-      prisma.jobApplication.groupBy({
-        by: ["createdAt"],
+      prisma.jobApplication.findMany({
         where: { applicantId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 5. Issues (Authoring)
-      prisma.issue.groupBy({
-        by: ["createdAt"],
+      prisma.issue.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 6. Pull Requests (Authoring)
-      prisma.pullRequest.groupBy({
-        by: ["createdAt"],
+      prisma.pullRequest.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 7. Discussions
-      prisma.discussion.groupBy({
-        by: ["createdAt"],
+      prisma.discussion.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 8. Discussion Comments
-      prisma.discussionComment.groupBy({
-        by: ["createdAt"],
+      prisma.discussionComment.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 9. PR Reviews
-      prisma.pRReview.groupBy({
-        by: ["createdAt"],
+      prisma.pRReview.findMany({
         where: { reviewerId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 10. Project Deployments
-      prisma.projectDeployment.groupBy({
-        by: ["createdAt"],
+      prisma.projectDeployment.findMany({
         where: { createdBy: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 11. Community Posts
-      prisma.communityPost.groupBy({
-        by: ["createdAt"],
+      prisma.communityPost.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 12. Community Comments
-      prisma.communityComment.groupBy({
-        by: ["createdAt"],
+      prisma.communityComment.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       }),
       // 13. Releases
-      prisma.release.groupBy({
-        by: ["createdAt"],
+      prisma.release.findMany({
         where: { authorId: userId, createdAt: { gte: startDate, lte: endDate } },
-        _count: { id: true },
+        select: { createdAt: true },
       })
     ]);
 
@@ -137,8 +128,9 @@ export const contributionStatsService = {
     // Helper to merge results into activityMap
     const mergeIntoMap = (items: any[]) => {
       items.forEach((item: any) => {
+        if (!item.createdAt) return;
         const date = item.createdAt.toISOString().split("T")[0];
-        activityMap.set(date, (activityMap.get(date) || 0) + (item._count.id || item._count.userId || 1));
+        activityMap.set(date, (activityMap.get(date) || 0) + 1);
       });
     };
 

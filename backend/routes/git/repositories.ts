@@ -231,7 +231,6 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
         console.log(`[REPO-CREATE] Physical repo initialized in ${Date.now() - scmStartTime}ms`);
 
         // Audit Log for Repo Creation
-        console.log(`[REPO-CREATE] Logging audit event...`);
         await AuditService.log({
           enterpriseId: (request.user as any).enterpriseId || undefined,
           actorId: user.userId,
@@ -239,6 +238,18 @@ export async function repositoryRoutes(fastify: FastifyInstance) {
           resource: `repo:${repoData.id}`,
           details: { name, orgId },
           ipAddress: request.ip,
+        });
+
+        // Activity Log for Contribution Heatmap
+        console.log(`[REPO-CREATE] Logging activity event...`);
+        await prisma.activityLog.create({
+          data: {
+            userId: user.userId,
+            action: "REPO_CREATE",
+            repoId: repoData.id,
+            orgId: orgId || undefined,
+            details: { name },
+          },
         });
 
         console.log(`[REPO-CREATE] Creating notification...`);

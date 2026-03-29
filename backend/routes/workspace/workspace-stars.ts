@@ -139,7 +139,7 @@ export async function workspaceStarsRoutes(fastify: FastifyInstance) {
         id: star.user.id,
         username: star.user.username,
         name: star.user.name,
-        avatarUrl: star.user.avatarUrl,
+        avatarUrl: star.user.avatar, // Adjusted from avatarUrl to avatar
         bio: star.user.profile?.bio,
         starredAt: star.createdAt,
       }));
@@ -235,12 +235,21 @@ export async function workspaceStarsRoutes(fastify: FastifyInstance) {
         data: {
           name: `${originalWorkspace.name} (fork)`,
           description: originalWorkspace.description,
-          environment: originalWorkspace.environment,
-          runtime: originalWorkspace.runtime,
           repoUrl: originalWorkspace.repoUrl,
           ownerId: userId,
           visibility: "private",
           forkedFrom: workspaceId,
+        },
+      });
+
+      // Activity Log for Contribution Heatmap
+      console.log(`[WS-FORK] Logging activity event...`);
+      await prisma.activityLog.create({
+        data: {
+          userId,
+          action: "WORKSPACE_CREATE", // We track forks as creations for the heatmap
+          workspaceId: fork.id,
+          details: { name: fork.name, forkedFrom: workspaceId },
         },
       });
 
