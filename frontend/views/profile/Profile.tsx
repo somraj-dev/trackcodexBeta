@@ -292,8 +292,6 @@ const ProfileView = () => {
 
                   </div>
                   <div className="space-y-12">
-                    <ActivityFeed profile={profile} />
-
                     <div className="p-6 bg-gh-bg-secondary border border-gh-border rounded-xl relative overflow-hidden group">
                       <div className="flex items-center gap-2 mb-4 text-primary">
                         <span className="material-symbols-outlined filled !text-xl">

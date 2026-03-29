@@ -57,6 +57,7 @@ const StrataDetailView = () => {
     },
     { to: "people", icon: "group", label: "People", badge: strata.members.length },
     { to: "teams", icon: "groups", label: "Teams", badge: strata.teams.length },
+    { to: "jobs", icon: "work", label: "Jobs" },
     { to: "settings", icon: "settings", label: "Settings" },
   ];
 

@@ -5,6 +5,7 @@ const tabs = [
     { label: "Missions", path: "/marketplace/missions", icon: "rocket_launch" },
     { label: "Hackathons", path: "/marketplace/hackathons", icon: "quiz" },
     { label: "Events", path: "/marketplace/events", icon: "event" },
+    { label: "Jobs", path: "/marketplace/jobs", icon: "work" },
 ];
 
 const MarketplaceLayout = () => {

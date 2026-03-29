@@ -33,6 +33,7 @@ const StrataCard: React.FC<{ strata: Strata }> = ({ strata }) => {
 };
 
 const StrataIndexView = () => {
+  const navigate = useNavigate();
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar bg-gh-bg p-8 font-display">
@@ -48,9 +49,7 @@ const StrataIndexView = () => {
             </p>
           </div>
           <button
-            onClick={() => {
-              /* Logic to create new org */
-            }}
+            onClick={() => navigate("/strata/new")}
             className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
           >
             <span className="material-symbols-outlined text-lg">add</span>

@@ -56,12 +56,6 @@ const MissionsView = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <button
-            onClick={() => navigate('/marketplace/missions/new')}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-gh-bg rounded-xl font-medium uppercase tracking-widest text-xs transition-all shadow-xl shadow-primary/30"
-          >
-            Create New Mission
-          </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {loading ? (

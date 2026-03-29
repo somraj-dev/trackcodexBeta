@@ -78,6 +78,7 @@ const CreateStrataView = React.lazy(() => import("./views/organizations/CreateSt
 const StrataRepositories = React.lazy(() => import("./components/organizations/StrataRepositories"));
 const StrataPeople = React.lazy(() => import("./components/organizations/StrataPeople"));
 const StrataTeams = React.lazy(() => import("./components/organizations/StrataTeams"));
+const StrataJobs = React.lazy(() => import("./components/organizations/StrataJobs"));
 const StrataSettingsLayout = React.lazy(() => import("./components/organizations/StrataSettingsLayout"));
 const StrataGeneralSettings = React.lazy(() => import("./views/organizations/settings/StrataGeneralSettings"));
 const StrataAuthenticationSecurity = React.lazy(() => import("./views/organizations/settings/StrataAuthenticationSecurity"));
@@ -112,6 +113,7 @@ const BillingAdditional = React.lazy(() => import("./views/settings/billing/Bill
 // Marketplace
 const MarketplaceLayout = React.lazy(() => import("./views/marketplace/MarketplaceLayout"));
 const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView"));
+const MarketplaceJobsView = React.lazy(() => import("./views/marketplace/MarketplaceJobsView"));
 const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
@@ -259,6 +261,7 @@ const AppRoutes = React.memo(() => {
               <Route path="repositories" element={<StrataRepositories />} />
               <Route path="people" element={<StrataPeople />} />
               <Route path="teams" element={<StrataTeams />} />
+              <Route path="jobs" element={<StrataJobs />} />
               <Route path="settings" element={<StrataSettingsLayout />}>
                 <Route index element={<Navigate to="general" replace />} />
                 <Route path="general" element={<StrataGeneralSettings />} />
@@ -283,6 +286,7 @@ const AppRoutes = React.memo(() => {
               <Route index element={<Navigate to="missions" replace />} />
 
               <Route path="missions" element={<MissionsView />} />
+              <Route path="jobs" element={<MarketplaceJobsView />} />
               <Route path="hackathons" element={<HackathonsView />} />
               <Route path="events" element={<EventsView />} />
               <Route path="applications" element={<MyApplicationsView />} />
