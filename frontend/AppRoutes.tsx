@@ -114,6 +114,7 @@ const BillingAdditional = React.lazy(() => import("./views/settings/billing/Bill
 const MarketplaceLayout = React.lazy(() => import("./views/marketplace/MarketplaceLayout"));
 const MissionsView = React.lazy(() => import("./views/marketplace/MissionsView"));
 const MarketplaceJobsView = React.lazy(() => import("./views/marketplace/MarketplaceJobsView"));
+const JobDetailView = React.lazy(() => import("./views/marketplace/JobDetailView"));
 const CreateMissionView = React.lazy(() => import("./views/marketplace/CreateMissionView"));
 const MissionDetailView = React.lazy(() => import("./views/marketplace/MissionDetailView"));
 const MyApplicationsView = React.lazy(() => import("./views/marketplace/MyApplicationsView"));
@@ -274,6 +275,7 @@ const AppRoutes = React.memo(() => {
             <Route path="/marketplace/missions/new" element={<CreateMissionView />} />
             <Route path="/marketplace/missions/new/event" element={<CreateEventView />} />
             <Route path="/marketplace/missions/:id" element={<MissionDetailView />} />
+            <Route path="/marketplace/jobs/:id" element={<JobDetailView />} />
             <Route path="/marketplace/missions/:id/register" element={<MissionRegistrationView />} />
             <Route path="/marketplace/hackathons/new" element={<CreateHackathonView />} />
             <Route path="/marketplace/hackathons/:id/test" element={<TestAssessmentView />} />
