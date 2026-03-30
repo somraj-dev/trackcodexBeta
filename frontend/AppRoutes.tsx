@@ -65,6 +65,8 @@ const ConnectWorkspaceView = React.lazy(() => import("./views/workspace/ConnectW
 const WorkspaceOverviewView = React.lazy(() => import("./views/workspace/WorkspaceOverview"));
 const RepositoryOverviewView = React.lazy(() => import("./views/repo/RepositoryOverview"));
 const IssueDetail = React.lazy(() => import("./views/repo/IssueDetail"));
+const CreateIssueView = React.lazy(() => import("./views/repo/CreateIssueView"));
+const CreatePullRequestView = React.lazy(() => import("./views/repo/CreatePullRequestView"));
 const SearchResults = React.lazy(() => import("./views/SearchResults"));
 const TrackCoinView = React.lazy(() => import("./views/TrackCoin"));
 
@@ -238,10 +240,11 @@ const AppRoutes = React.memo(() => {
             <Route path="/repositories" element={<RepositoriesView />} />
             <Route path="/repositories/new" element={<CreateRepoView />} />
             <Route path="/workspace/import" element={<ConnectWorkspaceView />} />
-            <Route path="/repo/:owner/:repo/pull/:number" element={<ReviewMode />} />
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
+            <Route path="/:owner/:repo/pulls/new" element={<CreatePullRequestView />} />
             <Route path="/repo/:id/discussions/:number" element={<DiscussionDetail />} />
             <Route path="/repo/:id/issues/:number" element={<IssueDetail />} />
+            <Route path="/:owner/:repo/issues/new" element={<CreateIssueView />} />
             <Route path="/repo/:id" element={<RepositoryOverviewView />} />
             <Route path="/repo/:id/*" element={<RepoDetailView />} />
             <Route path="/library" element={<LibraryView key="library-list" />} />

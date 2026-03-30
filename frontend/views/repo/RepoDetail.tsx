@@ -418,98 +418,89 @@ const RepoDetailView = () => {
                 </div>
               )}
               
-              <div className="flex items-center bg-gh-bg-secondary border border-gh-border rounded-md overflow-hidden text-sm">
-                {repo.isTemplate && (
-                  <button
-                    onClick={handleUseTemplate}
-                    disabled={isGenerating}
-                    className="px-3 py-1 bg-primary text-white font-bold border-r border-gh-border hover:bg-opacity-90 flex items-center gap-2 transition-all disabled:opacity-50"
-                  >
-                    <span
-                      className={`material-symbols-outlined !text-[16px] ${isGenerating ? "animate-spin" : ""}`}
-                    >
-                      {isGenerating ? "sync" : "content_copy"}
-                    </span>
-                  </button>
-                )}
-                
-                <button
-                  onClick={handleLaunchWorkspace}
-                  disabled={isLaunchingWorkspace}
-                  className="px-3 py-1 bg-gh-bg-secondary text-gh-text font-bold border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-all disabled:opacity-50"
-                  title="Launch in Workspace"
-                >
-                  <span
-                    className={`material-symbols-outlined !text-[16px] ${isLaunchingWorkspace ? "animate-spin" : ""}`}
-                  >
-                    {isLaunchingWorkspace ? "sync" : "terminal"}
-                  </span>
-                </button>
+              <div className="flex items-center gap-2">
+                {/* Pin Button */}
                 <button
                   onClick={handleTogglePin}
                   disabled={isPinning}
-                  className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-1 bg-[#21262d] border border-[#30363d] rounded-md text-xs font-bold text-gh-text hover:bg-[#30363d] transition-colors disabled:opacity-50"
                   title={repo.isPinned ? "Unpin repository" : "Pin repository"}
                 >
                   <span className="material-symbols-outlined !text-[16px]">
                     {repo.isPinned ? "keep_public" : "keep"}
                   </span>
-                  {repo.isPinned ? "Unpin" : "Pin"}
+                  {repo.isPinned ? "Pinned" : "Pin"}
                 </button>
 
-                <div className="relative group/watch">
-                  <button className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50" disabled={isWatching}>
+                {/* Watch Dropdown */}
+                <div className="relative group/watch flex items-center bg-[#21262d] border border-[#30363d] rounded-md overflow-hidden">
+                  <button 
+                    className="pl-3 pr-2 py-1 text-gh-text text-xs font-bold hover:bg-[#30363d] flex items-center gap-2 transition-colors disabled:opacity-50" 
+                    disabled={isWatching}
+                  >
                     <span className="material-symbols-outlined !text-[16px]">
                       {repo.watchLevel ? "visibility" : "visibility_off"}
                     </span>
-                    {isWatching ? "..." : "Watch"}
-                    <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs ml-1 border border-gh-border/50">
+                    Watch
+                    <span className="bg-[#30363d] px-1.5 rounded-full text-[10px] ml-0.5 opacity-80">
                       {repo.watchers || 0}
                     </span>
-                    <span className="material-symbols-outlined !text-[16px] opacity-70">arrow_drop_down</span>
                   </button>
-                  <div className="absolute right-0 mt-1 w-48 bg-gh-bg-secondary border border-gh-border rounded-md shadow-lg hidden group-hover/watch:block z-50 py-1">
-                    <button onClick={() => handleWatchDrop("ALL")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                  <button className="px-1.5 py-1 text-gh-text hover:bg-[#30363d] border-l border-[#30363d] transition-colors">
+                    <span className="material-symbols-outlined !text-[16px]">arrow_drop_down</span>
+                  </button>
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-[#161b22] border border-[#30363d] rounded-md shadow-2xl hidden group-hover/watch:block z-50 py-1">
+                    <button onClick={() => handleWatchDrop("ALL")} className="w-full text-left px-4 py-2 text-xs text-gh-text hover:bg-[#2f81f7] hover:text-white transition-colors">
                       All Activity
                     </button>
-                    <button onClick={() => handleWatchDrop("PARTICIPATING")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                    <button onClick={() => handleWatchDrop("PARTICIPATING")} className="w-full text-left px-4 py-2 text-xs text-gh-text hover:bg-[#2f81f7] hover:text-white transition-colors">
                       Participating
                     </button>
-                    <button onClick={() => handleWatchDrop("IGNORE")} className="w-full text-left px-4 py-2 text-sm text-gh-text hover:bg-primary hover:text-white transition-colors">
+                    <button onClick={() => handleWatchDrop("IGNORE")} className="w-full text-left px-4 py-2 text-xs text-gh-text hover:bg-[#2f81f7] hover:text-white transition-colors">
                       Ignore
                     </button>
                   </div>
                 </div>
 
-                <button
-                  onClick={handleFork}
-                  disabled={isForking}
-                  className="px-3 py-1 text-gh-text font-medium border-r border-gh-border hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50"
-                >
-                  <span
-                    className={`material-symbols-outlined !text-[16px] ${isForking ? "animate-spin" : ""}`}
+                {/* Fork Button */}
+                <div className="flex items-center bg-[#21262d] border border-[#30363d] rounded-md overflow-hidden">
+                  <button
+                    onClick={handleFork}
+                    disabled={isForking}
+                    className="pl-3 pr-2 py-1 text-gh-text text-xs font-bold hover:bg-[#30363d] flex items-center gap-2 transition-colors disabled:opacity-50"
                   >
-                    {isForking ? "sync" : "fork_right"}
-                  </span>
-                  {isForking ? "Forking..." : "Fork"}
-                  <span className="bg-gh-bg-tertiary px-1.5 rounded-full text-xs border border-gh-border/50">
-                    {repo.forks || 0}
-                  </span>
-                </button>
+                    <span className={`material-symbols-outlined !text-[16px] ${isForking ? "animate-spin" : ""}`}>
+                      {isForking ? "sync" : "fork_right"}
+                    </span>
+                    Fork
+                    <span className="bg-[#30363d] px-1.5 rounded-full text-[10px] ml-0.5 opacity-80">
+                      {repo.forks || 0}
+                    </span>
+                  </button>
+                  <button className="px-1.5 py-1 text-gh-text hover:bg-[#30363d] border-l border-[#30363d] transition-colors">
+                    <span className="material-symbols-outlined !text-[16px]">arrow_drop_down</span>
+                  </button>
+                </div>
 
-                <button 
-                  onClick={handleToggleStar}
-                  disabled={isStarring}
-                  className={`px-3 py-1 ${repo.isStarred ? 'text-yellow-400' : 'text-gh-text'} font-medium hover:bg-gh-bg-tertiary flex items-center gap-2 transition-colors disabled:opacity-50`}
-                >
-                  <span className={`material-symbols-outlined !text-[16px] ${repo.isStarred ? 'fill-current text-yellow-500' : ''}`}>
-                    star_border
-                  </span>
-                  {isStarring ? "..." : (repo.isStarred ? "Starred" : "Star")}
-                  <span className="bg-gh-bg-tertiary px-1.5 border border-gh-border/50 rounded-full text-xs ml-1 text-gh-text">
-                    {repo.stars || 0}
-                  </span>
-                </button>
+                {/* Star Button */}
+                <div className="flex items-center bg-[#21262d] border border-[#30363d] rounded-md overflow-hidden">
+                  <button 
+                    onClick={handleToggleStar}
+                    disabled={isStarring}
+                    className={`pl-3 pr-2 py-1 ${repo.isStarred ? 'text-yellow-400' : 'text-gh-text'} text-xs font-bold hover:bg-[#30363d] flex items-center gap-2 transition-colors disabled:opacity-50`}
+                  >
+                    <span className={`material-symbols-outlined !text-[16px] ${repo.isStarred ? 'fill-current text-yellow-500' : ''}`}>
+                      {repo.isStarred ? 'star' : 'star_border'}
+                    </span>
+                    {repo.isStarred ? "Starred" : "Star"}
+                    <span className="bg-[#30363d] px-1.5 rounded-full text-[10px] ml-0.5 opacity-80 text-gh-text">
+                      {repo.stars || 0}
+                    </span>
+                  </button>
+                  <button className="px-1.5 py-1 text-gh-text hover:bg-[#30363d] border-l border-[#30363d] transition-colors">
+                    <span className="material-symbols-outlined !text-[16px]">arrow_drop_down</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
