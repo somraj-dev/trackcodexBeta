@@ -77,14 +77,16 @@
 .strata-card-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.125rem 0.625rem;
-  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
   font-size: 0.75rem;
-  font-weight: 500;
-  background-color: rgba(33, 38, 45, 0.7);
+  font-weight: 600;
+  background-color: var(--gh-bg-tertiary);
   border: 1px solid var(--gh-border);
-  color: var(--gh-text-secondary);
+  color: var(--gh-text);
   align-self: flex-start;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .strata-card-title {

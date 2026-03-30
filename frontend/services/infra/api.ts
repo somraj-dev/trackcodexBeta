@@ -210,7 +210,9 @@ export const api = {
       }),
     getBranches: (id: string) => request<string[]>({ url: `/repositories/${id}/branches` }),
     getCommitDiff: (id: string, sha: string) => request<{ diff: string }>({ url: `/repositories/${id}/commits/${sha}/diff` }),
+    getIssues: (id: string, filter: string = "OPEN") => request<any[]>({ url: `/repositories/${id}/issues`, params: { status: filter } }),
     getIssue: (id: string, number: string | number) => request<any>({ url: `/repositories/${id}/issues/${number}` }),
+    createIssue: (id: string, data: any) => request<any>({ url: `/repositories/${id}/issues`, method: "POST", data }),
     updateIssue: (id: string, number: string | number, data: any) =>
       request<any>({ url: `/repositories/${id}/issues/${number}`, method: "PATCH", data }),
     addIssueComment: (id: string, number: string | number, data: { body: string }) =>

@@ -111,7 +111,7 @@ const SearchResultsPage: React.FC = () => {
             id: r.id,
             name: r.label,
             owner: r.metadata?.owner || "unknown",
-            ownerAvatar: r.metadata?.avatar || `https://github.com/${r.metadata?.owner}.png`,
+            ownerAvatar: r.metadata?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${r.metadata?.owner || 'owner'}`,
             description: r.subLabel || "",
             stargazers_count: r.metadata?.stars || 0,
             language: r.metadata?.language || "",

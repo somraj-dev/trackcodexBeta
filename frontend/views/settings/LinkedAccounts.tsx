@@ -155,7 +155,7 @@ const LinkedAccounts: React.FC = () => {
               </svg>
             </div>
             <div>
-              <div className="font-medium text-gh-text">GitHub</div>
+              <div className="font-medium text-gh-text">TrackCodex</div>
               <div className="text-xs text-gh-text-secondary">
                 {connected.github ? "Connected" : "Not connected"}
               </div>

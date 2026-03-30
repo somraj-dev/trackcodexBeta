@@ -245,7 +245,7 @@ const HomeView = () => {
                     <div>
                       <h3 className="text-sm font-bold text-gh-text mb-1">Create your first repository</h3>
                       <p className="text-xs text-gh-text-secondary max-w-xl leading-relaxed">
-                        Repositories are where you add code, collaborate, and utilize premium features, like GitHub Actions and Advanced Security.
+                        Repositories are where you add code, collaborate, and utilize premium features, like TrackCodex Actions and Advanced Security.
                       </p>
                       <button
                         onClick={() => navigate("/repositories/new")}

@@ -25,7 +25,10 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 const MissionDetailView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [localJob, setLocalJob] = useState<any>(null);
+  const [localJob, setLocalJob] = useState<Job | null>(() => {
+    if (!id) return null;
+    return (MOCK_JOBS.find((j) => j.id === id) as Job) || null;
+  });
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [complaintModalOpen, setComplaintModalOpen] = useState(false);
@@ -36,13 +39,11 @@ const MissionDetailView = () => {
 
   /* ── fetch ── */
   useEffect(() => {
-    if (!id) return;
-    const localMock = MOCK_JOBS.find((j) => j.id === id);
-    if (localMock) { setLocalJob(localMock as Job); return; }
+    if (!id || localJob) return;
     api.get(`/jobs/${id}`)
-      .then((data: any) => setLocalJob(data))
+      .then((data: Job) => setLocalJob(data))
       .catch((err) => console.warn("Failed to fetch job", err));
-  }, [id]);
+  }, [id, localJob]);
 
   if (!localJob)
     return (
@@ -184,7 +185,7 @@ const MissionDetailView = () => {
 
           {/* org logo on right */}
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-gh-border p-2 shrink-0 flex items-center justify-center bg-gh-bg shadow-sm overflow-hidden mt-2 mr-2">
-            <img src={localJob.creator?.avatar || "https://github.com/shadcn.png"} alt="Logo" className="w-full h-full object-contain" />
+            <img src={localJob.creator?.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${orgName}`} alt="Logo" className="w-full h-full object-contain" />
           </div>
         </div>
       </div>
@@ -314,14 +315,14 @@ const MissionDetailView = () => {
             </div>
             <div className="min-w-[200px] border border-gh-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-gh-bg">
               <div className="w-[45px] h-[45px] bg-gh-bg-secondary rounded border border-gh-border flex items-center justify-center mb-4 overflow-hidden p-1">
-                <img src="https://github.com/shadcn.png" className="w-full h-full opacity-50 grayscale" alt="" />
+                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=Other`} className="w-full h-full opacity-50 grayscale" alt="" />
               </div>
               <p className="text-[13px] font-bold text-gh-text mb-0.5 line-clamp-1">Think Like a Compiler</p>
               <p className="text-[11px] text-gh-text-secondary truncate">Malla Reddy College...</p>
             </div>
             <div className="min-w-[200px] border border-gh-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-gh-bg">
               <div className="w-[45px] h-[45px] bg-gh-bg-secondary rounded border border-gh-border flex items-center justify-center mb-4 overflow-hidden p-1">
-                <img src="https://github.com/shadcn.png" className="w-full h-full opacity-50 grayscale" alt="" />
+                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=Other`} className="w-full h-full opacity-50 grayscale" alt="" />
               </div>
               <p className="text-[13px] font-bold text-gh-text mb-0.5 line-clamp-1">Insomnia</p>
               <p className="text-[11px] text-gh-text-secondary truncate">Visvesvaraya National Institu...</p>

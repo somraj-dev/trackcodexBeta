@@ -306,7 +306,7 @@ const CreateRepo: React.FC = () => {
           </div>
         </form>
 
-        {/* GitHub-style Page Footer */}
+        {/* Platform-style Page Footer */}
       </div>
     </div>
   );

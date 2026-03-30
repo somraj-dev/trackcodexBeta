@@ -103,7 +103,7 @@ const StrataGeneralSettings = () => {
       <header className="mb-6 border-b border-gh-border pb-4">
         <h2 className="text-xl font-bold text-gh-text mb-1">General</h2>
         <p className="text-sm text-gh-text-secondary">
-          Your enterprise URL is <a href={`https://github.com/enterprises/${org.id}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{`https://github.com/enterprises/${org.id}`}</a>
+          Your enterprise URL is <a href={`https://trackcodex.com/strata/${org.id}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{`https://trackcodex.com/strata/${org.id}`}</a>
         </p>
       </header>
 
@@ -119,7 +119,7 @@ const StrataGeneralSettings = () => {
                 onChange={(e) => setName(e.target.value)} 
                 aria-label="Enterprise display name"
               />
-              <p className="settings-form-hint">Required name used to refer to your enterprise around GitHub.</p>
+              <p className="settings-form-hint">Required name used to refer to your enterprise around TrackCodex.</p>
             </div>
 
             <div className="settings-form-group">
@@ -163,7 +163,7 @@ const StrataGeneralSettings = () => {
                 onChange={(e) => setSecurityEmail(e.target.value)} 
                 aria-label="Security contact email"
               />
-              <p className="settings-form-hint text-[11px]">Optional additional email address for security incident notifications. Notifications will also be sent to relevant technical stakeholders as determined by GitHub.</p>
+              <p className="settings-form-hint text-[11px]">Optional additional email address for security incident notifications. Notifications will also be sent to relevant technical stakeholders as determined by TrackCodex.</p>
             </div>
 
             <button className="px-3 py-1.5 bg-gh-bg-tertiary hover:bg-gh-bg-secondary text-gh-text border border-gh-border rounded-md text-[13px] font-semibold transition-all">
@@ -232,7 +232,7 @@ const StrataGeneralSettings = () => {
         <div className="settings-card space-y-6">
           <Switch 
             label="Promotions"
-            description="Get solutions and exclusive offers from GitHub about products, services, and events we think you might find interesting."
+            description="Get solutions and exclusive offers from TrackCodex about products, services, and events we think you might find interesting."
             checked={promotions}
             onChange={setPromotions}
           />

@@ -277,7 +277,7 @@ const EmailSettings = () => {
           <div>
             <p className="text-sm font-bold text-white">Backup email address</p>
             <p className="text-xs text-gh-text-secondary mt-1">
-              Your backup GitHub email address will be used as an additional
+              Your backup TrackCodex email address will be used as an additional
               destination for security-relevant account notifications.
             </p>
           </div>

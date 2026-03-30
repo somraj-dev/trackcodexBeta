@@ -6,9 +6,9 @@ const BillingSettings = () => {
     const [selectedTimeframe, setSelectedTimeframe] = useState("current-month");
 
     const usageByProducts = [
-        { name: "Actions", icon: "play_circle", billable: "$0", included: "0 min used / 2,000 min included" },
+        { name: "TrackCodex Actions", icon: "play_circle", billable: "$0", included: "0 min used / 2,000 min included" },
         { name: "Codespaces", icon: "laptop_mac", billable: "$0", included: "0 GB used / 0.5 GB included" },
-        { name: "Copilot", icon: "psychology", billable: "$0", included: "Included" },
+        { name: "AI", icon: "psychology", billable: "$0", included: "Included" },
         { name: "Git LFS", icon: "storage", billable: "$0", included: "0 GB used / 1 GB included" },
         { name: "Models", icon: "model_training", billable: "$0", included: "Included" },
         { name: "Packages", icon: "inventory_2", billable: "$0", included: "0 GB used / 0.5 GB included" },
@@ -75,13 +75,13 @@ const BillingSettings = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
-                        <h3 className="text-sm font-bold text-gh-text mb-2">GitHub Free</h3>
+                        <h3 className="text-sm font-bold text-gh-text mb-2">TrackCodex Free</h3>
                         <p className="text-lg font-semibold text-gh-text">
                             $0.00 <span className="text-sm font-normal text-gh-text-secondary">per month</span>
                         </p>
                     </div>
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
-                        <h3 className="text-sm font-bold text-gh-text mb-2">Copilot Free</h3>
+                        <h3 className="text-sm font-bold text-gh-text mb-2">AI Free</h3>
                         <p className="text-lg font-semibold text-gh-text">
                             $0.00 <span className="text-sm font-normal text-gh-text-secondary">per month</span>
                         </p>
@@ -139,9 +139,9 @@ const BillingSettings = () => {
                                         <span className="font-bold">$0.04</span> consumed usage · <span className="font-bold">$0.04</span> discounts
                                     </p>
                                     <p className="text-xs text-gh-text-secondary">
-                                        Billable spend for Actions and Actions Runners for the selected timeframe.
+                                        Billable spend for TrackCodex Actions and Actions Runners for the selected timeframe.
                                         Applicable discounts cover Actions usage in public repositories and included
-                                        usage for Actions minutes and storage.
+                                        usage for TrackCodex Actions minutes and storage.
                                     </p>
                                 </div>
 
@@ -155,7 +155,7 @@ const BillingSettings = () => {
                                     <div className="space-y-3">
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm text-gh-text">Actions minutes</span>
+                                                <span className="text-sm text-gh-text">TrackCodex Actions minutes</span>
                                                 <span className="text-xs text-gh-text-secondary">0 min used / 2,000 min included</span>
                                             </div>
                                             <div className="h-1.5 bg-gh-bg rounded-full overflow-hidden">
@@ -164,7 +164,7 @@ const BillingSettings = () => {
                                         </div>
                                         <div>
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="text-sm text-gh-text">Actions storage</span>
+                                                <span className="text-sm text-gh-text">TrackCodex Actions storage</span>
                                                 <span className="text-xs text-gh-text-secondary">0 GB used / 0.5 GB included</span>
                                             </div>
                                             <div className="h-1.5 bg-gh-bg rounded-full overflow-hidden">
@@ -187,7 +187,7 @@ const BillingSettings = () => {
                     <div className="bg-gh-bg-secondary border border-gh-border rounded-xl p-5">
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-sm text-gh-text-secondary">Top five repositories this month</p>
-                            <button className="text-gh-text-secondary hover:text-gh-text">
+                            <button className="text-gh-text-secondary hover:text-gh-text" aria-label="More options">
                                 <span className="material-symbols-outlined !text-[20px]">more_horiz</span>
                             </button>
                         </div>
@@ -231,5 +231,3 @@ const BillingSettings = () => {
 };
 
 export default BillingSettings;
-
-

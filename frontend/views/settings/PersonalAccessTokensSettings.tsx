@@ -17,7 +17,7 @@ const SCOPES = [
   {
     id: "workflow:write",
     label: "workflow:write",
-    description: "Update GitHub Action workflow files.",
+    description: "Update TrackCodex Action workflow files.",
   },
   {
     id: "user:email",

@@ -234,7 +234,7 @@ const CreateStrata: React.FC = () => {
                   required
                 />
                 <label htmlFor="agreementsAccepted" className="form-checkbox-label">
-                  If my organization does not already have a customer agreement for GitHub services, I hereby accept the <a href="#">GitHub Customer Agreement</a> and confirm that I have the authority to do so on behalf of my organization.
+                  If my organization does not already have a customer agreement for TrackCodex services, I hereby accept the <a href="#">TrackCodex Customer Agreement</a> and confirm that I have the authority to do so on behalf of my organization.
                 </label>
               </div>
             </div>
@@ -250,7 +250,7 @@ const CreateStrata: React.FC = () => {
                   onChange={handleChange}
                 />
                 <label htmlFor="communicationPreferences" className="form-checkbox-label">
-                  Yes please, I'd like GitHub and affiliates to use my information for personalized communications, targeted advertising and campaign effectiveness. See the <a href="#">GitHub Privacy Statement</a> for more details.
+                  Yes please, I'd like TrackCodex and affiliates to use my information for personalized communications, targeted advertising and campaign effectiveness. See the <a href="#">TrackCodex Privacy Statement</a> for more details.
                 </label>
               </div>
               <p className="text-xs text-gh-text-secondary mt-2 ml-7">

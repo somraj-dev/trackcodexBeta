@@ -58,6 +58,7 @@ const IntegrationCard: React.FC<{
     </div>
     <button
       onClick={onToggle}
+      aria-label={`${integration.connected ? "Disconnect" : "Connect"} ${integration.name}`}
       className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${integration.connected
         ? "bg-transparent border-gh-border text-gh-text-secondary hover:text-white hover:border-red-500/50 hover:bg-red-500/10"
         : "bg-primary border-transparent text-white hover:bg-blue-600 shadow-lg shadow-primary/20"
@@ -82,7 +83,7 @@ const IntegrationsSettings = () => {
     },
     {
       id: "github",
-      name: "GitHub",
+      name: "TrackCodex",
       description:
         "Sync repositories, issues, and pull requests via Git protocol.",
       icon: "code",
@@ -134,6 +135,8 @@ const IntegrationsSettings = () => {
         }
 
         // Check connection status from backend (no tokens stored client-side)
+        // Note: Direct TrackCodex/GitLab token fetching via api.integrations is not
+        // available. Repos are fetched via the backend API and sync endpoints.
         const status = await api.integrations.status();
         if (status?.connected) {
           current = current.map((int) => ({
@@ -206,15 +209,15 @@ const IntegrationsSettings = () => {
             window.dispatchEvent(
               new CustomEvent("trackcodex-notification", {
                 detail: {
-                  title: "GitHub Connected",
-                  message: "Successfully integrated with GitHub. Syncing data...",
+                  title: "TrackCodex Connected",
+                  message: "Successfully integrated with TrackCodex. Syncing data...",
                   type: "success",
                 },
               }),
             );
           }
         } catch (error) {
-          console.error("GitHub integration failed:", error);
+          console.error("TrackCodex integration failed:", error);
         } finally {
           setIsVerifying(false);
           window.history.replaceState({}, document.title, window.location.pathname);
@@ -227,6 +230,10 @@ const IntegrationsSettings = () => {
   const handleConnectClick = (integration: Integration) => {
     if (integration.connected) {
       // Disconnect via backend
+      if (
+        !confirm(`Are you sure you want to disconnect your ${integration.name} account?`)
+      ) return;
+      
       toggleConnection(integration.id);
         try {
           api.integrations.disconnect(integration.id);
@@ -264,8 +271,8 @@ const IntegrationsSettings = () => {
         // Navigate directly to GitHub
         window.location.href = githubUrl;
         
-      } catch (err: any) {
-        console.error("GitHub OAuth redirect failed:", err);
+      } catch (err: Error | any) {
+        console.error("TrackCodex OAuth redirect failed:", err);
         setIsVerifying(false);
       }
     } else if (pendingIntegration.id === "gitlab") {
@@ -283,7 +290,7 @@ const IntegrationsSettings = () => {
         localStorage.setItem("integration_pending_provider", "gitlab");
 
         window.location.href = gitlabUrl;
-      } catch (err: any) {
+      } catch (err: Error | any) {
         console.error("GitLab OAuth redirect failed:", err);
         setIsVerifying(false);
       }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import diffLang from "react-syntax-highlighter/dist/esm/languages/hljs/diff";
-import { githubGist } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { githubGist as codeStyle } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { api } from "../../services/infra/api";
 import { ReactionPicker, ReactionList } from "../../components/common/ReactionSystem";
 
@@ -608,7 +608,7 @@ const PullRequestDetail: React.FC = () => {
               <div className="border border-gh-border rounded-lg overflow-hidden">
                 <SyntaxHighlighter
                   language="diff"
-                  style={githubGist}
+                  style={codeStyle}
                   customStyle={{
                     margin: 0,
                     padding: "1rem",

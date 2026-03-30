@@ -531,7 +531,7 @@ export const MOCK_JOBS: Job[] = [
     repoId: "test-repo",
     creator: {
       name: "TrackCodex Test",
-      avatar: "https://github.com/ghost.png",
+      avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=ghost",
     },
     postedDate: "Just now",
     metadata: {
@@ -850,8 +850,8 @@ export const MOCK_EXTENSIONS = [
   },
   {
     id: "copilot",
-    name: "GitHub Copilot",
-    publisher: "GitHub",
+    name: "TrackCodex AI",
+    publisher: "TrackCodex",
     version: "1.143.0",
     downloads: "12M",
     icon: "https://github.githubassets.com/assets/copilot-logo-6c617132848e.svg",

@@ -196,29 +196,29 @@ const RepoAboutSidebar: React.FC<RepoAboutSidebarProps> = ({ repo }) => {
           </>
         )}
 
-        <div className="flex flex-col gap-2 text-sm text-gh-text-secondary">
-          <a href="#" className="flex items-center gap-2 hover:text-primary transition-colors">
+        <div className="flex flex-col gap-3 text-sm text-gh-text-secondary mt-4">
+          <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className="flex items-center gap-2 hover:text-primary transition-colors text-left">
             <span className="material-symbols-outlined !text-[18px]">menu_book</span>
             Readme
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined !text-[18px]">gavel</span>
-            {repo.license || "MIT license"}
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:text-primary transition-colors">
+          </button>
+          <div className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
+            <span className="material-symbols-outlined !text-[18px]">insights</span>
+            Activity
+          </div>
+          <div className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
+            <span className="material-symbols-outlined !text-[18px]">star</span>
+            <span className="font-bold text-gh-text">{repo.stars || 0}</span> {repo.stars === 1 ? 'star' : 'stars'}
+          </div>
+          <div className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
             <span className="material-symbols-outlined !text-[18px]">visibility</span>
             <span className="font-bold text-gh-text">{repo.watchers || 0}</span> watching
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:text-primary transition-colors">
+          </div>
+          <div className="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer">
             <span className="material-symbols-outlined !text-[18px]">fork_right</span>
             <span className="font-bold text-gh-text">{repo.forks || 0}</span> forks
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:text-primary transition-colors">
-            <span className="material-symbols-outlined !text-[18px]">star</span>
-            <span className="font-bold text-gh-text">{repo.stars || 0}</span> stars
-          </a>
+          </div>
           {repo.website && (
-            <a href={repo.website.startsWith('http') ? repo.website : `https://${repo.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline mt-1">
+            <a href={repo.website.startsWith('http') ? repo.website : `https://${repo.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline font-semibold mt-1">
               <span className="material-symbols-outlined !text-[18px]">link</span>
               {repo.website.replace(/^https?:\/\//, '')}
             </a>
@@ -228,13 +228,10 @@ const RepoAboutSidebar: React.FC<RepoAboutSidebarProps> = ({ repo }) => {
 
       {/* Releases Section */}
       {(repo.settings?.includeReleases !== false) && (
-        <div className="pb-6 border-b border-gh-border">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-base font-bold text-gh-text hover:text-primary cursor-pointer transition-colors">
+        <div className="pb-6 border-b border-[#30363d]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold text-gh-text hover:text-primary cursor-pointer transition-colors">
               Releases
-              <span className="ml-2 bg-gh-bg-secondary px-2 py-0.5 rounded-full text-xs font-medium border border-gh-border text-gh-text-secondary">
-                {releases.length}
-              </span>
             </h2>
           </div>
           {releases.length > 0 ? (
@@ -251,22 +248,28 @@ const RepoAboutSidebar: React.FC<RepoAboutSidebarProps> = ({ repo }) => {
               </a>
             </div>
           ) : (
-            <p className="text-sm text-gh-text-secondary mt-2">
-              No releases published
-            </p>
+            <div className="space-y-1">
+              <p className="text-xs text-gh-text-secondary">
+                No releases published
+              </p>
+              <button className="text-[11px] text-[#2f81f7] font-semibold hover:underline">Create a new release</button>
+            </div>
           )}
         </div>
       )}
 
       {/* Packages Section */}
       {(repo.settings?.includePackages !== false) && (
-        <div className="pb-6 border-b border-gh-border">
-          <h2 className="text-base font-bold text-gh-text hover:text-primary cursor-pointer transition-colors mb-2">
+        <div className="pb-6 border-b border-[#30363d]">
+          <h2 className="text-sm font-bold text-gh-text hover:text-primary cursor-pointer transition-colors mb-4">
             Packages
           </h2>
-          <p className="text-sm text-gh-text-secondary">
-            No packages published
-          </p>
+          <div className="space-y-1">
+            <p className="text-xs text-gh-text-secondary">
+              No packages published
+            </p>
+            <button className="text-[11px] text-[#2f81f7] font-semibold hover:underline">Publish your first package</button>
+          </div>
         </div>
       )}
 

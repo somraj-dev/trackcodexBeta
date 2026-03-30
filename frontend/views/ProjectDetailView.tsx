@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { InviteModal } from '../components/modals/InviteModal';
-import { projectService, EnvVar, DomainItem, ProjectMetric, AnalyticsSummary } from '../services/infra/projectService';
+import { projectService, EnvVar, DomainItem, DeploymentItem, ProjectMetric, AnalyticsSummary } from '../services/infra/projectService';
 import { 
   LineChart, Line, AreaChart, Area, XAxis, 
   Tooltip, ResponsiveContainer, BarChart, Bar 
@@ -58,7 +58,7 @@ const Btn = ({ children, onClick, href, style: extra, title, className, disabled
 };
 
 /* ─── Search Items Builder ─── */
-const buildSearchItems = (setActiveTab: any, setSettingsTab: any, setObservabilityTab: any, setUsageTab: any) => [
+const buildSearchItems = (setActiveTab: (t: string) => void, setSettingsTab: (t: string) => void, setObservabilityTab: (t: string) => void, setUsageTab: (t: string) => void) => [
   { label: "Overview", icon: "⬡", group: "Navigation", action: () => setActiveTab("Overview") },
   { label: "Deployments", icon: "⊞", group: "Navigation", action: () => setActiveTab("Deployments") },
   { label: "Logs", icon: "☰", group: "Navigation", action: () => setActiveTab("Logs") },
@@ -91,7 +91,7 @@ const buildSearchItems = (setActiveTab: any, setSettingsTab: any, setObservabili
 ];
 
 /* ─── Search Modal ─── */
-const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: boolean, onClose: () => void, items: any[], onSelect: (i: any) => void }) => {
+const ProjectSearchModal = ({ isOpen, onClose, items, onSelect }: { isOpen: boolean, onClose: () => void, items: any[], onSelect: (i: { action: () => void }) => void }) => {
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -203,6 +203,7 @@ const ProjectDetailView: React.FC = () => {
   const [usageTab, setUsageTab] = useState("Overview");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isChecklistOpen, setIsChecklistOpen] = useState(false);
+  const [isProjectLoading, setIsProjectLoading] = useState(false);
 
   useEffect(() => {
     if (searchParams.get("openChecklist") === "true") {
@@ -212,10 +213,8 @@ const ProjectDetailView: React.FC = () => {
 
   // Initialize project state
   const [fetchedProject, setFetchedProject] = useState<ProjInfo | null>(null);
-  let p: any = fetchedProject;
-  const [isProjectLoading, setIsProjectLoading] = useState(false);
-
-  // Try to fetch from API
+  let p: ProjInfo | null = fetchedProject;
+  // Use fetched data if available, otherwise fallback
   useEffect(() => {
     if (!projectId) return;
     
@@ -223,22 +222,23 @@ const ProjectDetailView: React.FC = () => {
       setIsProjectLoading(true);
       try {
         const detail = await projectService.getProject(projectId);
+        const slug = detail.name.toLowerCase().replace(/\s+/g, '-');
         setFetchedProject({
           name: detail.name,
-          domain: (detail as any).domains?.[0]?.name || (detail as any).slug + ".trackcodex.com",
-          altDomain: (detail as any).altDomain || undefined,
-          repoUrl: detail.repoUrl || `https://github.com/${detail.repoOwner || 'user'}/${detail.repoName || detail.name}`,
-          deployUrl: (detail as any).deployUrl || `${detail.name}.trackcodex.com`,
+          domain: detail.customDomains?.[0]?.domain || slug + ".trackcodex.com",
+          altDomain: detail.customDomains?.[1]?.domain || undefined,
+          repoUrl: detail.repoUrl || `https://trackcodex.com/repo/${detail.repoOwner || 'user'}/${detail.repoName || detail.name}`,
+          deployUrl: slug + ".trackcodex.com",
           status: detail.latestStatus || 'Ready',
-          createdAgo: detail.createdAgo ? new Date(detail.createdAgo as any).toLocaleDateString() : 'Just now',
+          createdAgo: detail.createdAgo ? new Date(detail.createdAgo).toLocaleDateString() : 'Just now',
           createdBy: detail.createdBy || 'somraj-dev',
           branch: detail.latestBranch || 'main',
           commitHash: detail.commitHash || '0000000',
           commitMsg: detail.commitMsg || 'No deployments yet',
-          checklist: (detail as any).checklist || [],
-          edgeReqs: (detail as any).edgeReqs || 0,
-          fnInvocations: (detail as any).fnInvocations || 0,
-          errorRate: (detail as any).errorRate || '0%',
+          checklist: [], // Add checklist mapping if needed
+          edgeReqs: 0,
+          fnInvocations: 0,
+          errorRate: '0%',
           customDomains: detail.customDomains || [],
         });
       } catch (err) {
@@ -250,20 +250,18 @@ const ProjectDetailView: React.FC = () => {
     fetchProject();
   }, [projectId]);
 
-  // The useEffect block for fetching deployments and domains was removed as per instructions.
-
   // Use fetched data if available, otherwise fallback
   if (!p && fetchedProject) {
     p = fetchedProject;
   }
   
   if (!p) {
-    const stateData = (location.state as any)?.projectData;
+    const stateData = (location.state as { projectData?: any })?.projectData;
     if (stateData) {
       p = {
         name: stateData.name || projectId || "Unknown",
         domain: stateData.domain || `${projectId}.trackcodex.com`,
-        repoUrl: stateData.repoUrl || `https://github.com/somraj-dev/${projectId}`,
+        repoUrl: stateData.repoUrl || `https://trackcodex.com/repo/somraj-dev/${projectId}`,
         deployUrl: `${(stateData.name || projectId || "project").toLowerCase().replace(/\s+/g, '-')}.trackcodex.com`,
         status: "Ready",
         createdAgo: stateData.deployDate || "Just now",
@@ -281,11 +279,10 @@ const ProjectDetailView: React.FC = () => {
         edgeReqs: 0,
         fnInvocations: 0,
         errorRate: "0%",
+        customDomains: [],
       };
     }
   }
-
-  const searchItems = buildSearchItems(setActiveTab, setSettingsTab, setObservabilityTab, setUsageTab);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -311,10 +308,11 @@ const ProjectDetailView: React.FC = () => {
     </div>
   );
   
-  const doneCount = p.checklist.filter((c: any) => c.done).length;
-  const uiData = p; // Use p as uiData for consistency with new tab props
+  const doneCount = p ? p.checklist.filter((c: any) => c.done).length : 0;
+  const searchItems = buildSearchItems(setActiveTab, setSettingsTab, setObservabilityTab, setUsageTab);
 
   const renderContent = () => {
+    if (!p) return null;
     switch (activeTab) {
       case "Overview":
         return <OverviewTab p={p} done={doneCount} onOpenChecklist={() => setIsChecklistOpen(true)} />;
@@ -327,7 +325,7 @@ const ProjectDetailView: React.FC = () => {
       case "Speed Insights":
         return <SpeedInsightsTab />;
       case "Observability":
-        return <ObservabilityTab p={p} tab={observabilityTab} />;
+        return <ObservabilityTab tab={observabilityTab} />;
       case "Firewall":
         return <FirewallTab />;
       case "CDN":
@@ -361,43 +359,21 @@ const ProjectDetailView: React.FC = () => {
       <div className="pd-sidebar no-scrollbar">
         {activeTab === "Settings" ? (
           <>
-            {/* Search */}
             <div className="pd-sidebar-search">
-              <button 
-                type="button"
-                onClick={() => setIsSearchOpen(true)} 
-                className="pd-search-trigger"
-                aria-label="Search project settings"
-              >
+              <button type="button" onClick={() => setIsSearchOpen(true)} className="pd-search-trigger" aria-label="Search project settings">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gh-text-secondary)" strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <span>Find...</span>
                 <span className="pd-search-key" aria-hidden="true">F</span>
               </button>
             </div>
-            
-            {/* Back to Project */}
             <div className="pd-sidebar-back">
-              <button 
-                onClick={() => setActiveTab("Overview")} 
-                className="pd-back-link"
-                type="button"
-              >
+              <button onClick={() => setActiveTab("Overview")} className="pd-back-link" type="button">
                 <span style={{ fontSize: 18, lineHeight: 1, position: "relative", top: -1 }} aria-hidden="true">‹</span> Settings
               </button>
             </div>
-
-            {/* Settings Links */}
             <div className="pd-sidebar-nav" role="tablist" aria-label="Settings Categories">
               {["General", "Billing", "Build and Deployment", "Invoices", "Members", "Access Groups", "Agent", "Drains", "Webhooks", "Security & Privacy", "Deployment Protection", "Microfrontends", "Connectivity", "Environment Variables", "Activity", "My Notifications", "Apps"].map(t => (
-                <button 
-                  key={t} 
-                  type="button"
-                  onClick={() => setSettingsTab(t)} 
-                  className={`pd-nav-item ${settingsTab === t ? "active" : ""}`}
-                  role="tab"
-                  aria-selected={settingsTab === t ? "true" : "false"}
-                  title={`Settings: ${t}`}
-                >
+                <button key={t} type="button" onClick={() => setSettingsTab(t)} className={`pd-nav-item ${settingsTab === t ? "active" : ""}`} role="tab" aria-selected={settingsTab === t ? "true" : "false"} title={`Settings: ${t}`}>
                   {t}
                 </button>
               ))}
@@ -405,43 +381,21 @@ const ProjectDetailView: React.FC = () => {
           </>
         ) : activeTab === "Usage" ? (
           <div role="tablist" aria-label="Usage Categories" style={{ display: 'contents' }}>
-            {/* Search */}
             <div className="pd-sidebar-search">
-              <button 
-                type="button"
-                onClick={() => setIsSearchOpen(true)} 
-                className="pd-search-trigger"
-                aria-label="Search project usage"
-              >
+              <button type="button" onClick={() => setIsSearchOpen(true)} className="pd-search-trigger" aria-label="Search project usage">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gh-text-secondary)" strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <span>Find...</span>
                 <span className="pd-search-key" aria-hidden="true">F</span>
               </button>
             </div>
-            
-            {/* Back to Project */}
             <div className="pd-sidebar-back">
-              <button 
-                onClick={() => setActiveTab("Overview")} 
-                className="pd-back-link"
-                type="button"
-              >
+              <button onClick={() => setActiveTab("Overview")} className="pd-back-link" type="button">
                 <span style={{ fontSize: 18, lineHeight: 1, position: "relative", top: -1 }} aria-hidden="true">‹</span> Usage
               </button>
             </div>
-
-            {/* Usage Links */}
             <div className="pd-sidebar-nav">
               {["Overview", "Networking", "Incremental Static Regeneration", "Data Cache", "TrackCodex Functions", "Edge Functions", "Edge Middleware", "Edge Config", "Builds", "Artifacts", "Blob", "Queues", "Cron Jobs", "Drains", "Observability", "Image Optimization", "Flags", "BotID Requests", "Trace Spans", "Connectivity", "Sandbox"].map(t => (
-                <button 
-                  key={t} 
-                  type="button"
-                  onClick={() => setUsageTab(t)} 
-                  className={`pd-nav-item ${usageTab === t ? "active" : ""}`}
-                  role="tab"
-                  aria-selected={usageTab === t ? "true" : "false"}
-                  title={`Usage: ${t}`}
-                >
+                <button key={t} type="button" onClick={() => setUsageTab(t)} className={`pd-nav-item ${usageTab === t ? "active" : ""}`} role="tab" aria-selected={usageTab === t ? "true" : "false"} title={`Usage: ${t}`}>
                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ fontSize: 12, color: "var(--gh-text-tertiary)", width: 12, display: "flex", justifyContent: "center" }} aria-hidden="true">{t !== "Overview" && "›"}</span>
                       {t}
@@ -452,40 +406,24 @@ const ProjectDetailView: React.FC = () => {
           </div>
         ) : (
           <div role="tablist" aria-label="Main Navigation" style={{ display: 'contents' }}>
-            {/* Search */}
             <div className="pd-sidebar-search" style={{ marginBottom: 8 }}>
-              <button 
-                type="button"
-                onClick={() => setIsSearchOpen(true)} 
-                className="pd-search-trigger"
-                aria-label="Search project pages"
-              >
+              <button type="button" onClick={() => setIsSearchOpen(true)} className="pd-search-trigger" aria-label="Search project pages">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gh-text-secondary)" strokeWidth="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <span>Find...</span>
                 <span className="pd-search-key" aria-hidden="true">F</span>
               </button>
             </div>
-
-            {/* Nav Group 1 */}
             {[
-              { icon: "⬡", label: "Overview", active: true },
+              { icon: "⬡", label: "Overview" },
               { icon: "⊞", label: "Deployments" },
               { icon: "☰", label: "Logs" },
               { icon: "↗", label: "Analytics" },
-              { icon: "◎", label: "Speed Insights", highlight: true },
+              { icon: "◎", label: "Speed Insights" },
               { icon: "◉", label: "Observability", chevron: true },
               { icon: "⊡", label: "Firewall", chevron: true },
               { icon: "⊕", label: "CDN", chevron: true },
             ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => setActiveTab(item.label)}
-                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
-                role="tab"
-                aria-selected={activeTab === item.label ? "true" : "false"}
-                title={`View ${item.label}`}
-              >
+              <button key={item.label} type="button" onClick={() => setActiveTab(item.label)} className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`} role="tab" aria-selected={activeTab === item.label ? "true" : "false"} title={`View ${item.label}`}>
                 <div className="pd-nav-item-content">
                   <span className="pd-nav-icon" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
@@ -493,10 +431,7 @@ const ProjectDetailView: React.FC = () => {
                 {item.chevron && <span style={{ fontSize: 11, color: "var(--gh-text-tertiary)" }} aria-hidden="true">›</span>}
               </button>
             ))}
-
             <div className="pd-divider"></div>
-
-            {/* Nav Group 2 */}
             {[
               { icon: "⊞", label: "Domains" },
               { icon: "⊡", label: "Integrations" },
@@ -506,15 +441,7 @@ const ProjectDetailView: React.FC = () => {
               { icon: "⊛", label: "AI Gateway", chevron: true },
               { icon: "⊡", label: "Sandboxes" },
             ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => setActiveTab(item.label)}
-                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
-                role="tab"
-                aria-selected={activeTab === item.label ? "true" : "false"}
-                title={`View ${item.label}`}
-              >
+              <button key={item.label} type="button" onClick={() => setActiveTab(item.label)} className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`} role="tab" aria-selected={activeTab === item.label ? "true" : "false"} title={`View ${item.label}`}>
                 <div className="pd-nav-item-content">
                   <span className="pd-nav-icon" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
@@ -522,23 +449,12 @@ const ProjectDetailView: React.FC = () => {
                 {item.chevron && <span style={{ fontSize: 11, color: "var(--gh-text-tertiary)" }} aria-hidden="true">›</span>}
               </button>
             ))}
-
             <div className="pd-divider"></div>
-
-            {/* Nav Group 3 */}
             {[
               { icon: "◔", label: "Usage" },
               { icon: "⚙", label: "Settings", chevron: true },
             ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => setActiveTab(item.label)}
-                className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`}
-                role="tab"
-                aria-selected={activeTab === item.label ? "true" : "false"}
-                title={`View ${item.label}`}
-              >
+              <button key={item.label} type="button" onClick={() => setActiveTab(item.label)} className={`pd-nav-item ${activeTab === item.label ? "active" : ""}`} role="tab" aria-selected={activeTab === item.label ? "true" : "false"} title={`View ${item.label}`}>
                 <div className="pd-nav-item-content">
                   <span className="pd-nav-icon" aria-hidden="true">{item.icon}</span>
                   <span>{item.label}</span>
@@ -559,7 +475,6 @@ const ProjectDetailView: React.FC = () => {
 
       {/* ── Main Content ── */}
       <div className="pd-main no-scrollbar">
-        {/* Top bar */}
         <div className="pd-topbar">
           <div className="pd-topbar-left">
             <button onClick={() => nav("/dashboard")} className="pd-topbar-btn" title="Dashboard Menu">☰</button>
@@ -572,15 +487,14 @@ const ProjectDetailView: React.FC = () => {
             <button className="pd-topbar-btn" title="More Options">⋯</button>
           </div>
         </div>
-
         {renderContent()}
       </div>
-      <ProductionChecklistSidebar isOpen={isChecklistOpen} onClose={() => setIsChecklistOpen(false)} p={p} />
+      <ProductionChecklistSidebar isOpen={isChecklistOpen} onClose={() => setIsChecklistOpen(false)} />
     </div>
   );
 };
 
-function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, onClose: () => void, p: ProjInfo }) {
+function ProductionChecklistSidebar({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   if (!isOpen) return null;
 
   const items = [
@@ -589,7 +503,7 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
       title: "Connect Git Repository", 
       desc: "Get preview deployments for every push, and go live on your domain by merging to the production branch.", 
       done: true,
-      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+      svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-1.25 1.05-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.47.65-.8 1.4-1 2.2V22"></path></svg>
     },
     { 
       id: "domain", 
@@ -626,27 +540,14 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
     <div className="pd-checklist-overlay">
       <div className="pd-checklist-backdrop" onClick={onClose} />
       <div className="pd-checklist-content">
-        {/* Header Close Button */}
         <div style={{ padding: "16px 24px", display: "flex", justifyContent: "flex-end" }}>
-          <button 
-            onClick={onClose} 
-            className="pd-topbar-btn"
-            aria-label="Close checklist"
-            style={{ color: "var(--gh-text-secondary)" }}
-          >
+          <button onClick={onClose} className="pd-topbar-btn" aria-label="Close checklist" style={{ color: "var(--gh-text-secondary)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg>
           </button>
         </div>
-
-        {/* Scrollable Content */}
         <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "0 48px 48px" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ 
-              width: 56, height: 56, borderRadius: "50%", background: "transparent", 
-              border: `2px solid ${V.accent}`, display: "flex", alignItems: "center", 
-              justifyContent: "center", margin: "0 auto 24px", color: V.accent,
-              boxShadow: `0 0 20px rgba(0,112,243,0.15)`
-            }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "transparent", border: `2px solid ${V.accent}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", color: V.accent, boxShadow: `0 0 20px rgba(0,112,243,0.15)` }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 12px", color: V.text, letterSpacing: "-0.02em" }}>Production Checklist</h2>
@@ -654,50 +555,27 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
               Get the most from TrackCodex as you prepare to take your project to production—review security and key feature settings.
             </p>
           </div>
-
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {items.map((item) => (
-              <div 
-                key={item.id} 
-                style={{ 
-                  border: `1px solid ${item.done ? "rgba(0,112,243,0.3)" : "var(--gh-border)"}`, 
-                  borderRadius: 14, padding: 24, 
-                  background: item.done ? "rgba(0,112,243,0.03)" : "var(--gh-bg)",
-                  transition: "all 0.2s ease",
-                  position: "relative"
-                }}
-              >
+              <div key={item.id} style={{ border: `1px solid ${item.done ? "rgba(0,112,243,0.3)" : "var(--gh-border)"}`, borderRadius: 14, padding: 24, background: item.done ? "rgba(0,112,243,0.03)" : "var(--gh-bg)", transition: "all 0.2s ease", position: "relative" }}>
                 <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
-                  <div style={{ 
-                    width: 40, height: 40, borderRadius: 10, background: V.bg, 
-                    border: `1px solid ${V.border}`, display: "flex", alignItems: "center", 
-                    justifyContent: "center", color: item.done ? V.accent : V.textTertiary,
-                    flexShrink: 0
-                  }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: V.bg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", color: item.done ? V.accent : V.textTertiary, flexShrink: 0 }}>
                     {item.svg}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                       <h3 style={{ fontSize: 15, fontWeight: 600, color: V.text }}>{item.title}</h3>
                       {item.done && (
-                        <div style={{ 
-                          width: 20, height: 20, borderRadius: "50%", background: V.accent, 
-                          display: "flex", alignItems: "center", justifyContent: "center", color: V.text
-                        }}>
+                        <div style={{ width: 20, height: 20, borderRadius: "50%", background: V.accent, display: "flex", alignItems: "center", justifyContent: "center", color: V.text }}>
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                       )}
                     </div>
                     <p style={{ fontSize: 13, color: V.textSecondary, marginBottom: item.done ? 0 : 20, lineHeight: 1.55 }}>{item.desc}</p>
-                    
                     {!item.done && (
                       <div style={{ display: "flex", gap: 12 }}>
-                        <button className="pd-btn-base" style={{ background: "var(--gh-text)", color: "var(--gh-bg)", border: "none" }}>
-                          {item.action}
-                        </button>
-                        <button className="pd-btn-base" style={{ background: "transparent", color: V.textSecondary }}>
-                          Skip
-                        </button>
+                        <button className="pd-btn-base" style={{ background: "var(--gh-text)", color: "var(--gh-bg)", border: "none" }}>{item.action}</button>
+                        <button className="pd-btn-base" style={{ background: "transparent", color: V.textSecondary }}>Skip</button>
                       </div>
                     )}
                   </div>
@@ -705,13 +583,9 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
               </div>
             ))}
           </div>
-
           <div style={{ marginTop: 40, borderTop: `1px solid ${V.border}`, paddingTop: 32 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: V.textTertiary, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>Further reading</div>
-            <div 
-              className="pd-card-header"
-              style={{ borderRadius: 14, cursor: "pointer", transition: "all 0.15s" }}
-            >
+            <div className="pd-card-header" style={{ borderRadius: 14, cursor: "pointer", transition: "all 0.15s" }}>
                <div style={{ width: 44, height: 44, borderRadius: "50%", background: V.bg, border: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📖</div>
                <div style={{ flex: 1, padding: "0 16px" }}>
                  <div style={{ fontSize: 14, fontWeight: 600, color: V.text }}>Production checklist for launch</div>
@@ -721,38 +595,24 @@ function ProductionChecklistSidebar({ isOpen, onClose, p }: { isOpen: boolean, o
             </div>
           </div>
         </div>
-
-        {/* Footer Actions */}
         <div style={{ padding: "20px 48px", borderTop: `1px solid ${V.border}`, display: "flex", justifyContent: "flex-end", background: V.bg }}>
-          <button 
-            onClick={onClose} 
-            className="pd-btn-base"
-            style={{ 
-              background: "var(--gh-text)", color: "var(--gh-bg)", border: "none",
-              padding: "10px 32px", fontSize: 14, fontWeight: 700,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-            }}
-          >
-            Done
-          </button>
+          <button onClick={onClose} className="pd-btn-base" style={{ background: "var(--gh-text)", color: "var(--gh-bg)", border: "none", padding: "10px 32px", fontSize: 14, fontWeight: 700, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>Done</button>
         </div>
       </div>
     </div>
   );
 };
 
-function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpenChecklist: () => void }) {
-  const [isQRVisible, setIsQRVisible] = useState(false);
+function OverviewTab({ p, done, onOpenChecklist }: { p: ProjInfo, done: number, onOpenChecklist: () => void }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <div className="pd-tab-container" style={{ maxWidth: 1200, margin: "0 auto" }}>
-      {/* 1. Production Deployment Header */}
       <div className="pd-overview-header">
         <h2 className="pd-overview-title" style={{ fontSize: 16 }}>Production Deployment</h2>
         <div className="pd-overview-actions">
           <button className="pd-vercel-btn">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 21L12 12M12 12L3 3M12 12L21 3M12 12L3 21" /></svg>
             Repository
           </button>
           <button className="pd-vercel-btn">
@@ -768,17 +628,14 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
         </div>
       </div>
 
-      {/* 2. Production Card High Fidelity */}
       <div className="pd-prod-card-vercel">
         <div className="pd-prod-card-main">
-          {/* Site Preview Mock */}
           <div className="pd-prod-preview-vercel" style={{ background: "var(--gh-bg-secondary)", padding: 0 }}>
              <div style={{ position: "relative", width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                 <div style={{ textAlign: "center", padding: 40, zIndex: 2 }}>
                    <div style={{ color: "var(--gh-text)", fontWeight: 900, fontSize: 36, marginBottom: 16, lineHeight: 1.1, letterSpacing: "-0.05em" }}>Accelerate your<br/>Development<br/>with TrackCodex</div>
                    <div style={{ fontSize: 11, color: "var(--gh-text-secondary)", maxWidth: 220, margin: "0 auto", lineHeight: 1.5 }}>Build, Collaborate, Ship with Confidence. TrackCodex is your ultimate project nursery.</div>
                 </div>
-                {/* Floating Mock Code Window */}
                 <div style={{ position: "absolute", bottom: 24, right: 24, width: 180, height: 130, background: "var(--gh-bg)", borderRadius: 10, boxShadow: "0 20px 50px rgba(0,0,0,0.3)", padding: 12, border: "1px solid var(--gh-border)", transform: "rotate(-2deg)" }}>
                    <div style={{ display: "flex", gap: 5, marginBottom: 12 }}>
                       <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ff5f56" }}></div>
@@ -796,7 +653,6 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
              </div>
           </div>
 
-          {/* Deployment Info Polished */}
           <div className="pd-prod-info-vercel">
             <div className="pd-info-item">
               <div className="pd-info-label">Deployment</div>
@@ -846,16 +702,9 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
           </div>
         </div>
 
-        {/* Integration Bar */}
         <div style={{ padding: "0 32px 24px" }}>
-            <div 
-              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-              style={{ display: "flex", alignItems: "center", gap: 12, color: "#0070f3", fontSize: 14, cursor: "pointer", fontWeight: 500 }}
-            >
-               <svg 
-                 width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
-                 style={{ transform: isSettingsOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}
-               >
+            <div onClick={() => setIsSettingsOpen(!isSettingsOpen)} style={{ display: "flex", alignItems: "center", gap: 12, color: "#0070f3", fontSize: 14, cursor: "pointer", fontWeight: 500 }}>
+               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ transform: isSettingsOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>
                  <polyline points="9 18 15 12 9 6"></polyline>
                </svg>
                Deployment Settings
@@ -864,87 +713,53 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
 
         {isSettingsOpen && (
           <div className="pd-expanded-settings">
-
-            {/* Build Settings */}
             <div className="pd-settings-section">
               <div className="pd-settings-section-title">Build Settings</div>
               <div className="pd-settings-dashboard">
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">On-Demand Concurrent Builds</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon disabled">✕</div>
-                     Disabled
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon disabled">✕</div> Disabled</div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Build Machine</div>
-                  <div className="pd-setting-value">
-                     Standard 
-                     <span className="pd-setting-pill">4 vCPUs</span>
-                     <span className="pd-setting-pill">8 GB Memory</span>
-                  </div>
+                  <div className="pd-setting-value">Standard <span className="pd-setting-pill">4 vCPUs</span> <span className="pd-setting-pill">8 GB Memory</span></div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Prioritize Production Builds</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon enabled">✓</div>
-                     Enabled
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon enabled">✓</div> Enabled</div>
                 </div>
               </div>
             </div>
-
-            {/* Runtime Settings */}
             <div className="pd-settings-section">
               <div className="pd-settings-section-title">Runtime Settings</div>
               <div className="pd-settings-dashboard" style={{ gridTemplateRows: "repeat(3, auto)" }}>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Fluid Compute</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon enabled">✓</div>
-                     Enabled
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon enabled">✓</div> Enabled</div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Function CPU</div>
-                  <div className="pd-setting-value">
-                     Standard
-                     <span className="pd-setting-pill">1 vCPU</span>
-                     <span className="pd-setting-pill">2 GB Memory</span>
-                  </div>
+                  <div className="pd-setting-value">Standard <span className="pd-setting-pill">1 vCPU</span> <span className="pd-setting-pill">2 GB Memory</span></div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Node.js Version</div>
                   <div className="pd-setting-value">24.x</div>
                 </div>
-                
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Deployment Protection</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon enabled">✓</div>
-                     Standard Protection
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon enabled">✓</div> Standard Protection</div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Skew Protection</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon disabled">✕</div>
-                     Disabled
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon disabled">✕</div> Disabled</div>
                 </div>
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Cold Start Prevention</div>
-                  <div className="pd-setting-value">
-                     <div className="pd-status-icon disabled">✕</div>
-                     Disabled
-                  </div>
+                  <div className="pd-setting-value"><div className="pd-status-icon disabled">✕</div> Disabled</div>
                 </div>
-                
                 <div className="pd-setting-item">
                   <div className="pd-setting-label">Function Region</div>
-                  <div className="pd-setting-value">
-                     <span className="pd-setting-badge">iad1</span>
-                  </div>
+                  <div className="pd-setting-value"><span className="pd-setting-badge">iad1</span></div>
                 </div>
               </div>
             </div>
@@ -967,14 +782,12 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
         </div>
       </div>
 
-      {/* 3. Metrics Grid */}
       <div className="pd-overview-grid-vercel">
-        {/* Checklist */}
-        <div className="pd-vercel-card">
+        <div className="pd-vercel-card" onClick={onOpenChecklist} style={{ cursor: "pointer" }}>
           <div className="pd-vercel-card-header">
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                <span className="pd-vercel-card-title">Production Checklist</span>
-               <span style={{ fontSize: 12, color: "#888" }}>4/5</span>
+               <span style={{ fontSize: 12, color: "#888" }}>{done}/5</span>
             </div>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
           </div>
@@ -986,13 +799,7 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
                { id: "analytics", title: "Enable Web Analytics", done: false, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> },
                { id: "speed", title: "Enable Speed Insights", done: true, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> }
              ].map((item, idx) => (
-                <div key={idx} style={{ 
-                   display: "flex", alignItems: "center", justifyContent: "space-between", 
-                   padding: "10px 14px", borderRadius: 6, border: "1px solid #333",
-                   background: item.done ? "rgba(0,112,243,0.15)" : "#0a0a0a",
-                   color: item.done ? "#0070f3" : "#888",
-                   fontSize: 13, fontWeight: 500
-                }}>
+                <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 6, border: "1px solid #333", background: item.done ? "rgba(0,112,243,0.15)" : "#0a0a0a", color: item.done ? "#0070f3" : "#888", fontSize: 13, fontWeight: 500 }}>
                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ opacity: 0.8 }}>{item.icon}</span>
                       {item.title}
@@ -1002,8 +809,6 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
              ))}
           </div>
         </div>
-
-        {/* Observability */}
         <div className="pd-vercel-card">
           <div className="pd-vercel-card-header">
              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1018,9 +823,7 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
                    <div className="pd-info-label">Edge Requests</div>
                    <div style={{ fontSize: 16, fontWeight: 700 }}>178</div>
                 </div>
-                <div style={{ height: 40, marginTop: 12 }}>
-                   <Sparkline />
-                </div>
+                <div style={{ height: 40, marginTop: 12 }}><Sparkline /></div>
              </div>
              <div className="pd-metric-item">
                 <div className="pd-metric-header">
@@ -1038,14 +841,12 @@ function OverviewTab({ p, done, onOpenChecklist }: { p: any, done: number, onOpe
              </div>
           </div>
         </div>
-
-        {/* Analytics */}
       </div>
     </div>
   );
 }
 
-function DeploymentsTab({ p }: { p: any }) {
+function DeploymentsTab({ p }: { p: ProjInfo & { deployments?: DeploymentItem[] } }) {
   const deployments = p.deployments || [];
   const [tab, setTab] = useState("All");
 
@@ -1058,29 +859,16 @@ function DeploymentsTab({ p }: { p: any }) {
          <Btn style={{ padding: "0 12px", height: 32 }} title="Filter by environments">All Environments ▾</Btn>
       </div>
     </div>
-    
     <div className="pd-tabs-bar" role="tablist" aria-label="Deployments filter">
       {["All", "Production", "Preview"].map((t) => (
-        <button 
-          key={t} 
-          onClick={() => setTab(t)} 
-          className={`pd-tab-btn ${tab === t ? "active" : ""}`}
-          role="tab"
-          aria-selected={tab === t ? "true" : "false"}
-          tabIndex={0}
-        >
-          {t}
-        </button>
+        <button key={t} onClick={() => setTab(t)} className={`pd-tab-btn ${tab === t ? "active" : ""}`} role="tab" aria-selected={tab === t ? "true" : "false"} tabIndex={0}>{t}</button>
       ))}
     </div>
-
     <div className="pd-deployments-list">
-      {deployments.length > 0 ? deployments.map((d: any, i: number) => (
+      {deployments.length > 0 ? deployments.map((d) => (
         <div key={d.id} className="pd-deployment-row">
           <div style={{ display: "flex", gap: 16 }}>
-            <div className="pd-deployment-icon-box" aria-hidden="true">
-               <div className="pd-deployment-mock-icon"></div>
-            </div>
+            <div className="pd-deployment-icon-box" aria-hidden="true"><div className="pd-deployment-mock-icon"></div></div>
             <div className="pd-deployment-details">
               <div className="pd-deployment-url">{d.url}</div>
               <div className="pd-deployment-meta">
@@ -1106,18 +894,13 @@ function DeploymentsTab({ p }: { p: any }) {
   );
 }
 
-function LogsTab({ p }: { p: any }) {
+function LogsTab({ p }: { p: ProjInfo }) {
   return (
    <div className="pd-logs-container">
     <div className="pd-logs-toolbar">
       <div className="pd-logs-search-box" role="search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input 
-          type="text" 
-          placeholder="Search logs..." 
-          aria-label="Search logs"
-          className="pd-logs-search-input"
-        />
+        <input type="text" placeholder="Search logs..." aria-label="Search logs" className="pd-logs-search-input" />
       </div>
       <Btn className="pd-toolbar-btn" title="Filter log sources">All Sources ▾</Btn>
       <Btn className="pd-toolbar-btn" title="Filter log levels">All Levels ▾</Btn>
@@ -1140,14 +923,10 @@ function AnalyticsTab({ projectId }: { projectId: string }) {
 
   useEffect(() => {
     if (!projectId) return;
-    
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [m, s] = await Promise.all([
-          projectService.getAnalytics(projectId),
-          projectService.getAnalyticsSummary(projectId)
-        ]);
+        const [m, s] = await Promise.all([projectService.getAnalytics(projectId), projectService.getAnalyticsSummary(projectId)]);
         setMetrics(m || []);
         setSummary(s || null);
       } catch (err) {
@@ -1156,7 +935,6 @@ function AnalyticsTab({ projectId }: { projectId: string }) {
         setIsLoading(false);
       }
     };
-    
     fetchData();
   }, [projectId]);
 
@@ -1164,23 +942,17 @@ function AnalyticsTab({ projectId }: { projectId: string }) {
     time: new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     requests: m.requests,
     latency: m.avgLatency,
-    bandwidth: Math.round(Number(m.bandwidth) / 1024 / 1024 * 100) / 100 // MB
+    bandwidth: Math.round(Number(m.bandwidth) / 1024 / 1024 * 100) / 100
   }));
 
-  if (isLoading) {
-    return <div className="pd-loading-state">Loading analytics...</div>;
-  }
+  if (isLoading) return <div className="pd-loading-state">Loading analytics...</div>;
 
   return (
    <div className="pd-analytics-view">
     <div className="pd-analytics-header">
       <div className="pd-analytics-title">Web Analytics</div>
-      <div className="flex gap-3">
-         <Btn className="pd-toolbar-btn" title="Filter time range">Last 24 Hours ▾</Btn>
-      </div>
+      <div className="flex gap-3"><Btn className="pd-toolbar-btn" title="Filter time range">Last 24 Hours ▾</Btn></div>
     </div>
-    
-    {/* Summary Stats */}
     <div className="pd-analytics-summary-grid">
        <div className="pd-analytics-stat-card">
           <div className="pd-stat-label">Total Requests</div>
@@ -1192,103 +964,66 @@ function AnalyticsTab({ projectId }: { projectId: string }) {
        </div>
        <div className="pd-analytics-stat-card">
           <div className="pd-stat-label">Error Rate</div>
-          <div className={`pd-stat-value ${Number(summary?.errorRate) > 5 ? 'error' : ''}`}>
-            {summary?.errorRate || "0.00"}%
-          </div>
+          <div className={`pd-stat-value ${Number(summary?.errorRate) > 5 ? 'error' : ''}`}>{summary?.errorRate || "0.00"}%</div>
        </div>
        <div className="pd-analytics-stat-card">
           <div className="pd-stat-label">Bandwidth</div>
-          <div className="pd-stat-value">
-            {summary ? (Number(summary.totalBandwidth) / 1024 / 1024).toFixed(2) : 0} MB
-          </div>
+          <div className="pd-stat-value">{summary ? (Number(summary.totalBandwidth) / 1024 / 1024).toFixed(2) : 0} MB</div>
        </div>
     </div>
-
     <div className="pd-tabs-bar" role="tablist" aria-label="Analytics sub-tabs">
       {["Overview", "Real-time", "Visitors", "Performance"].map((t) => (
-        <button 
-          key={t} 
-          onClick={() => setActiveSubTab(t)} 
-          className={`pd-tab-btn ${activeSubTab === t ? "active" : ""}`}
-          role="tab"
-          aria-selected={activeSubTab === t ? "true" : "false"}
-          tabIndex={0}
-        >
-          {t}
-        </button>
+        <button key={t} onClick={() => setActiveSubTab(t)} className={`pd-tab-btn ${activeSubTab === t ? "active" : ""}`} role="tab" aria-selected={activeSubTab === t ? "true" : "false"} tabIndex={0}>{t}</button>
       ))}
     </div>
-
     {activeSubTab === "Overview" && (
       <div className="pd-overview-grid">
         <ChartCard title="Requests" hasChevron={false}>
           <div className="pd-chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
+                <defs><linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/><stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/></linearGradient></defs>
                 <XAxis dataKey="time" hide />
-                <Tooltip 
-                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
-                  itemStyle={{ color: V.text }}
-                />
+                <Tooltip contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }} itemStyle={{ color: V.text }} />
                 <Area type="monotone" dataKey="requests" stroke="#3b82f6" fillOpacity={1} fill="url(#colorRequests)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
-
         <ChartCard title="Average Latency (ms)" hasChevron={false}>
           <div className="pd-chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <XAxis dataKey="time" hide />
-                <Tooltip 
-                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
-                  itemStyle={{ color: V.text }}
-                />
+                <Tooltip contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }} itemStyle={{ color: V.text }} />
                 <Line type="monotone" dataKey="latency" stroke="#10b981" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
-
         <ChartCard title="Bandwidth (MB)" hasChevron={false}>
           <div className="pd-chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <XAxis dataKey="time" hide />
-                <Tooltip 
-                  contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }}
-                  itemStyle={{ color: "#fff" }}
-                />
+                <Tooltip contentStyle={{ background: V.card, border: `1px solid ${V.border}`, borderRadius: 8 }} itemStyle={{ color: "#fff" }} />
                 <Bar dataKey="bandwidth" fill="#8884d8" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </ChartCard>
-
         <div className="pd-analytics-feature-card">
           <div className="pd-feature-icon" aria-hidden="true">🚀</div>
           <div className="pd-feature-title">Edge Performance</div>
-          <div className="pd-feature-desc">
-            Your site is being served globally from {metrics.length} distinct edge locations.
-          </div>
+          <div className="pd-feature-desc">Your site is being served globally from {metrics.length} distinct edge locations.</div>
         </div>
       </div>
     )}
-
     {activeSubTab !== "Overview" && (
       <div className="pd-empty-data-card">
         <div className="pd-empty-icon" aria-hidden="true">📈</div>
         <div className="pd-feature-title">{activeSubTab} Data</div>
-        <div className="pd-feature-desc">
-          This data is currently being aggregated. Please check back in a few minutes.
-        </div>
+        <div className="pd-feature-desc">This data is currently being aggregated. Please check back in a few minutes.</div>
       </div>
     )}
   </div>
@@ -1302,9 +1037,7 @@ function SpeedInsightsTab() {
     <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 40, textAlign: "center", background: V.card }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>⚡</div>
       <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Enable Speed Insights</div>
-      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
-        Measure Core Web Vitals from your actual users and get actionable insights to improve performance.
-      </div>
+      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>Measure Core Web Vitals from your actual users and get actionable insights to improve performance.</div>
       <Btn style={{ background: V.text, color: V.bg, border: "none" }}>Enable</Btn>
     </div>
   </div>
@@ -1326,31 +1059,17 @@ function ChartCard({ title, children, hasChevron = true }: { title: string, chil
 function ObservabilityOverview() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, marginTop: 8 }}>
-      {/* Filters */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ padding: "6px 12px", background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, fontSize: 13, display: "flex", alignItems: "center", gap: 12, cursor: "pointer", color: V.text }}>
-          Production <span style={{ fontSize: 10, color: V.textTertiary }}>▾</span>
-        </div>
+        <div style={{ padding: "6px 12px", background: V.bg, border: `1px solid ${V.border}`, borderRadius: 6, fontSize: 13, display: "flex", alignItems: "center", gap: 12, cursor: "pointer", color: V.text }}>Production <span style={{ fontSize: 10, color: V.textTertiary }}>▾</span></div>
         <div style={{ display: "flex", alignItems: "center", gap: 0, border: `1px solid ${V.border}`, borderRadius: 6, overflow: "hidden" }}>
-           <div style={{ padding: "6px 10px", background: V.bg, borderRight: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textTertiary} strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-           </div>
-           <div style={{ padding: "6px 12px", background: V.bg, fontSize: 13, display: "flex", alignItems: "center", gap: 12, cursor: "pointer", color: V.text }}>
-             Last 12 hours <span style={{ fontSize: 10, color: V.textTertiary }}>▾</span>
-           </div>
+           <div style={{ padding: "6px 10px", background: V.bg, borderRight: `1px solid ${V.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={V.textTertiary} strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+           <div style={{ padding: "6px 12px", background: V.bg, fontSize: 13, display: "flex", alignItems: "center", gap: 12, cursor: "pointer", color: V.text }}>Last 12 hours <span style={{ fontSize: 10, color: V.textTertiary }}>▾</span></div>
         </div>
       </div>
-
-      {/* Banner */}
       <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: "12px 20px", background: "linear-gradient(90deg, var(--gh-bg), var(--gh-bg-secondary))", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary }}>
-           <span style={{ color: V.text, filter: "drop-shadow(0 0 4px #fff)" }}>✦</span>
-           Unlock anomaly alerts, custom queries, 30-day retention, and more with Pro and Observability Plus.
-        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: V.textSecondary }}><span style={{ color: V.text, filter: "drop-shadow(0 0 4px #fff)" }}>✦</span> Unlock anomaly alerts, custom queries, 30-day retention, and more with Pro and Observability Plus.</div>
         <Btn style={{ background: "#fff", color: V.bg, border: "none", padding: "6px 16px", fontSize: 12, fontWeight: 600 }}>Upgrade to Pro</Btn>
       </div>
-
-      {/* Charts Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         <ChartCard title="Edge Requests">
           <div style={{ height: 160, display: "flex", flexDirection: "column" }}>
@@ -1360,24 +1079,16 @@ function ObservabilityOverview() {
                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#f5a623" }}></div> 4XX</span>
             </div>
             <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "flex-end", gap: 4, padding: "0 4px", borderBottom: `1px solid ${V.borderLight}` }}>
-               {/* Vertical grid lines */}
                {[0.2, 0.4, 0.6, 0.8].map(p => <div key={p} style={{ position: "absolute", left: 0, right: 0, bottom: `${p * 100}%`, height: 1, background: V.borderLight, opacity: 0.3 }}></div>)}
-               
                {[12, 28, 10, 32, 20, 8, 4, 10, 42, 25, 15, 18, 12, 6, 28, 22, 35, 12, 8, 25].map((h, i) => (
-                 <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column-reverse", gap: 1 }}>
-                    <div style={{ height: `${h * 2}px`, background: i % 4 === 0 ? "#f5a623" : i % 7 === 0 ? "#666" : "#0070f3", opacity: 0.9, borderRadius: "1px 1px 0 0" }}></div>
-                 </div>
+                 <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column-reverse", gap: 1 }}><div style={{ height: `${h * 2}px`, background: i % 4 === 0 ? "#f5a623" : i % 7 === 0 ? "#666" : "#0070f3", opacity: 0.9, borderRadius: "1px 1px 0 0" }}></div></div>
                ))}
                <div style={{ position: "absolute", left: -2, top: -4, fontSize: 10, color: V.textTertiary }}>40</div>
                <div style={{ position: "absolute", right: -4, bottom: -18, fontSize: 10, color: V.textTertiary }}>2m ago</div>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 10, color: V.textTertiary }}>
-              <span>12h ago</span>
-              <span></span>
-            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 10, color: V.textTertiary }}><span>12h ago</span><span></span></div>
           </div>
         </ChartCard>
-
         <ChartCard title="Fast Data Transfer">
            <div style={{ height: 160, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", gap: 16, fontSize: 11, color: V.textTertiary, marginBottom: 16 }}>
@@ -1386,33 +1097,24 @@ function ObservabilityOverview() {
             </div>
             <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "flex-end", gap: 3, padding: "0 4px", borderBottom: `1px solid ${V.borderLight}` }}>
                {[0.25, 0.5, 0.75].map(p => <div key={p} style={{ position: "absolute", left: 0, right: 0, bottom: `${p * 100}%`, height: 1, background: V.borderLight, opacity: 0.3 }}></div>)}
-               
                {[8, 35, 15, 50, 25, 12, 65, 38, 15, 28, 10, 22, 14, 8, 70, 40, 25, 15, 10, 32].map((h, i) => (
-                 <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column-reverse", gap: 1 }}>
-                    <div style={{ height: `${h}%`, background: i === 14 || i === 6 || i === 3 ? "#0070f3" : i % 5 === 0 ? "#f5a623" : "#0070f3", opacity: 0.9, borderRadius: "1px 1px 0 0" }}></div>
-                 </div>
+                 <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column-reverse", gap: 1 }}><div style={{ height: `${h}%`, background: i === 14 || i === 6 || i === 3 ? "#0070f3" : i % 5 === 0 ? "#f5a623" : "#0070f3", opacity: 0.9, borderRadius: "1px 1px 0 0" }}></div></div>
                ))}
                <div style={{ position: "absolute", left: -2, top: -4, fontSize: 10, color: V.textTertiary }}>2MB</div>
                <div style={{ position: "absolute", left: -2, top: "50%", fontSize: 10, color: V.textTertiary, marginTop: -5 }}>1MB</div>
                <div style={{ position: "absolute", left: -2, bottom: 2, fontSize: 10, color: V.textTertiary }}>OB</div>
                <div style={{ position: "absolute", right: -4, bottom: -18, fontSize: 10, color: V.textTertiary }}>2m ago</div>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 10, color: V.textTertiary }}>
-              <span>12h ago</span>
-              <span></span>
-            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 10, color: V.textTertiary }}><span>12h ago</span><span></span></div>
           </div>
         </ChartCard>
-
         <ChartCard title="TrackCodex Functions">
            <div style={{ height: 160, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", gap: 16, fontSize: 11, color: V.textTertiary, marginBottom: 16 }}>
                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>Error <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ff4d4f" }}></div> <span style={{ color: V.textTertiary }}>-</span></div>
                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>Timeout <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#f5a623" }}></div> <span style={{ color: V.textTertiary }}>-</span></div>
             </div>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: V.textTertiary, borderBottom: `1px solid ${V.borderLight}`, background: "rgba(255,255,255,0.01)" }}>
-               No data in this time range
-            </div>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: V.textTertiary, borderBottom: `1px solid ${V.borderLight}`, background: "rgba(255,255,255,0.01)" }}>No data in this time range</div>
             <div style={{ position: "relative", height: 0 }}>
                <div style={{ position: "absolute", left: -2, bottom: 8, fontSize: 10, color: V.textTertiary }}>0%</div>
                <div style={{ position: "absolute", left: -2, bottom: 50, fontSize: 10, color: V.textTertiary }}>2%</div>
@@ -1420,15 +1122,12 @@ function ObservabilityOverview() {
             </div>
           </div>
         </ChartCard>
-
         <ChartCard title="Compute">
            <div style={{ height: 160, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", gap: 16, fontSize: 11, color: V.textTertiary, marginBottom: 16 }}>
                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>Active CPU <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#0070f3" }}></div> <span style={{ color: V.textTertiary }}>-</span></div>
             </div>
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: V.textTertiary, borderBottom: `1px solid ${V.borderLight}`, background: "rgba(255,255,255,0.01)" }}>
-               No data in this time range
-            </div>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: V.textTertiary, borderBottom: `1px solid ${V.borderLight}`, background: "rgba(255,255,255,0.01)" }}>No data in this time range</div>
           </div>
         </ChartCard>
       </div>
@@ -1436,19 +1135,14 @@ function ObservabilityOverview() {
   );
 };
 
-function ObservabilityTab({ p, tab }: { p: ProjInfo, tab: string }) {
+function ObservabilityTab({ tab }: { tab: string }) {
   return (
    <div style={{ padding: "32px 24px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
       <div style={{ fontSize: 24, fontWeight: 700 }}>Observability — {tab}</div>
     </div>
-    
-    {tab === "Overview" ? (
-      <ObservabilityOverview />
-    ) : (
-      <div style={{ padding: 40, textAlign: "center", color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 12, background: V.card }}>
-        Observability data for {tab} is not available yet.
-      </div>
+    {tab === "Overview" ? <ObservabilityOverview /> : (
+      <div style={{ padding: 40, textAlign: "center", color: V.textSecondary, border: `1px solid ${V.border}`, borderRadius: 12, background: V.card }}>Observability data for {tab} is not available yet.</div>
     )}
   </div>
   );
@@ -1464,9 +1158,7 @@ function FirewallTab() {
     <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 40, textAlign: "center", background: V.card }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🛡️</div>
       <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>No Firewall Rules</div>
-      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
-        Protect your application from malicious traffic and DDoS attacks with TrackCodex Web Application Firewall.
-      </div>
+      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>Protect your application from malicious traffic and DDoS attacks with TrackCodex Web Application Firewall.</div>
       <Btn>Configure</Btn>
     </div>
   </div>
@@ -1482,16 +1174,14 @@ function CDNTab() {
     <div style={{ border: `1px solid ${V.border}`, borderRadius: 12, padding: 40, textAlign: "center", background: V.card }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🌍</div>
       <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Global Edge Network</div>
-      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>
-        Your application is automatically deployed to our global Edge Network for maximum performance.
-      </div>
+      <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 24, maxWidth: 400, margin: "0 auto 24px" }}>Your application is automatically deployed to our global Edge Network for maximum performance.</div>
       <Btn>View Cache Settings</Btn>
     </div>
   </div>
   );
 }
 
-function DomainsTab({ p }: { p: any }) {
+function DomainsTab({ p }: { p: ProjInfo }) {
   const { projectId } = useParams<{ projectId: string }>();
   const [domains, setDomains] = useState<DomainItem[]>(p.customDomains || []);
   const [newDomain, setNewDomain] = useState("");
@@ -1516,7 +1206,7 @@ function DomainsTab({ p }: { p: any }) {
       setNewDomain("");
       setIsAdding(false);
       await fetchDomains();
-    } catch (err) {
+    } catch {
       alert("Failed to add domain. Make sure it's valid.");
     } finally {
       setLoading(false);
@@ -1528,7 +1218,7 @@ function DomainsTab({ p }: { p: any }) {
     try {
       await projectService.removeDomain(projectId, did);
       await fetchDomains();
-    } catch (err) {
+    } catch {
       alert("Failed to remove domain.");
     }
   };
@@ -1584,7 +1274,7 @@ function DomainsTab({ p }: { p: any }) {
           <Btn style={{ opacity: 0.5, cursor: "not-allowed" }} title="Default domain cannot be removed">⋮</Btn>
         </div>
 
-        {domains.map((d, i) => (
+        {domains.map((d) => (
           <div key={d.id} style={{ borderTop: `1px solid ${V.borderLight}` }}>
             <div style={{ padding: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", background: V.bg }}>
               <div>
@@ -1631,7 +1321,7 @@ function IntegrationsTab() {
     </div>
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
       {[
-        { name: "GitHub", desc: "Automatic deployments from your GitHub repositories.", status: "Connected" },
+        { name: "TrackCodex", desc: "Automatic deployments from your repositories.", status: "Connected" },
         { name: "Slack", desc: "Receive notifications about deployments and errors.", status: "Connected" },
         { name: "Upstash Redis", desc: "Serverless Redis for TrackCodex Functions and edge.", status: "Add" },
       ].map((int, i) => (
@@ -1822,125 +1512,6 @@ function UsageTab({ usageTab }: { usageTab: string }) {
   );
 }
 
-function VisitQRCodePopup({ isOpen, onClose, domain }: { isOpen: boolean; onClose: () => void; domain: string }) {
-  if (!isOpen) return null;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://trackcodex.com/auth-redirect?url=${encodeURIComponent(`https://${domain}`)}`)}`;
-
-  return (
-    <div 
-      style={{ 
-        position: "fixed", 
-        top: 0, 
-        left: 0, 
-        right: 0, 
-        bottom: 0, 
-        zIndex: 9999, 
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "center", 
-        background: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(4px)"
-      }}
-      onClick={onClose}
-    >
-      <div 
-        style={{ 
-          width: 340, 
-          background: V.bg, 
-          border: `1px solid ${V.border}`, 
-          borderRadius: 16, 
-          boxShadow: "0 20px 50px rgba(0,0,0,0.8)", 
-          color: V.text, 
-          fontFamily: V.font,
-          overflow: "hidden",
-          animation: "popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <style>{`
-          @keyframes popIn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-          }
-        `}</style>
-        
-        {/* Header */}
-        <div style={{ padding: "16px 20px", borderBottom: `1px solid ${V.border}`, display: "flex", alignItems: "center", gap: 12, background: V.bg }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--gh-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${V.border}` }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>Visit with Toolbar</div>
-          </div>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#666", cursor: "pointer", padding: 8, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color = "#fff"} onMouseLeave={e => e.currentTarget.style.color = "#666"}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: "24px 24px 12px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ margin: 0, fontSize: 13, color: "#888", textAlign: "left", lineHeight: 1.5 }}>
-            Scan this QR code to open with the toolbar on a different device.
-          </p>
-          
-          <div style={{ 
-            position: "relative",
-            width: "100%", 
-            aspectRatio: "1/1", 
-            background: "#fff", 
-            borderRadius: 12, 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            padding: 12,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
-          }}>
-            <img src={qrUrl} alt="QR Code" style={{ width: "100%", height: "100%" }} />
-            <div style={{ 
-              position: "absolute", 
-              width: 48, 
-              height: 48, 
-              background: V.bg, 
-              borderRadius: 10, 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.5)",
-              border: "2px solid #fff",
-              overflow: "hidden"
-            }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: V.text, letterSpacing: -0.5 }}>TC</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ fontSize: 12, color: "#666", lineHeight: 1.5 }}>
-            Get easy access to the toolbar on your production deployments.
-          </div>
-          <Btn 
-            style={{ 
-              width: "100%", 
-              background: "#fff", 
-              color: V.bg, 
-              fontWeight: 700, 
-              fontSize: 13, 
-              height: 40, 
-              borderRadius: 8, 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              border: "none"
-            }}
-          >
-            Install Extension
-          </Btn>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 function ProjectMembersSettings() {
@@ -2463,7 +2034,7 @@ function SettingsTab({ p, tab }: { p: ProjInfo, tab: string }) {
       {tab === "Members" && <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 32 }}>Manage team members and invitations</div>}
       {tab === "Deployment Protection" && <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 32 }}>Ensure deployments for your projects are protected, and manage external access to all of your deployments. <span style={{ color: "#3291ff", cursor: "pointer" }}>Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ display: "inline", marginBottom: 2 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span></div>}
       {tab === "Activity" && <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 32 }}>View history of changes to your project</div>}
-      {tab === "My Notifications" && <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 32 }}>Manage your personal notification settings for the Quantaforze team.</div>}
+      {tab === "My Notifications" && <div style={{ fontSize: 14, color: V.textSecondary, marginBottom: 32 }}>Manage your personal notification settings for the TrackCodex team.</div>}
 
       {tab === "Members" && <ProjectMembersSettings />}
       {tab === "Deployment Protection" && <ProjectDeploymentProtectionSettings />}

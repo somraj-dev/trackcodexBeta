@@ -245,7 +245,7 @@ const Repositories = () => {
           <div className="flex items-center justify-center pt-8 pb-12">
             <EmptyState
               title="No Repositories Found"
-              message="Establish your digital legacy. Create your first native repository or import from GitHub."
+              message="Establish your digital legacy. Create your first native repository or import from external sources."
               imageSrc="/inbox-zero-dark.svg"
               action={{
                 label: "Create Repository",

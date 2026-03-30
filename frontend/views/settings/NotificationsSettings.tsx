@@ -47,10 +47,7 @@ const NotificationsSettings = () => {
     inProductMessages: true,
   });
 
-  const handleSave = () => {
-    console.log("Saving settings:", settings);
-    // Add save logic here
-  };
+
 
   return (
     <div className="space-y-6 pb-20">
@@ -75,11 +72,12 @@ const NotificationsSettings = () => {
         </p>
         <div className="flex items-center gap-3">
           <select
+            title="Default notifications email"
             value={settings.defaultEmail}
             onChange={(e) =>
               setSettings({ ...settings, defaultEmail: e.target.value })
             }
-            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text"
+            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all appearance-none"
           >
             <option value="quantaforge2@gmail.com">quantaforge2@gmail.com</option>
           </select>
@@ -105,15 +103,11 @@ const NotificationsSettings = () => {
             </a>
             .
           </p>
-          <select
-            value={settings.watching.notifyOn}
-            onChange={(e) =>
-              setSettings({
-                ...settings,
-                watching: { notifyOn: e.target.value },
-              })
-            }
-            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text"
+          <select 
+            title="Global Notification Preference"
+            value={settings.watching.notifyOn} 
+            onChange={(e) => setSettings({ ...settings, watching: { notifyOn: e.target.value } })}
+            className="w-full h-10 px-3 bg-gh-bg border border-gh-border rounded-md text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all appearance-none"
           >
             <option value="github-email">Notify me: on TrackCodex, Email</option>
             <option value="github">Notify me: on TrackCodex</option>
@@ -131,6 +125,7 @@ const NotificationsSettings = () => {
             you with an @mention. Also for all activity when subscribed to specific events.
           </p>
           <select
+            title="Participating, @mentions and custom notifications destination"
             value={settings.participating.notifyOn}
             onChange={(e) =>
               setSettings({
@@ -138,7 +133,7 @@ const NotificationsSettings = () => {
                 participating: { notifyOn: e.target.value },
               })
             }
-            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text"
+            className="w-full h-10 px-3 bg-gh-bg border border-gh-border rounded-md text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all appearance-none"
           >
             <option value="github-email">Notify me: on TrackCodex, Email</option>
             <option value="github">Notify me: on TrackCodex</option>
@@ -155,7 +150,10 @@ const NotificationsSettings = () => {
             Choose which additional events you'll receive emails for when participating or
             watching.
           </p>
-          <button className="px-3 py-1.5 bg-gh-bg border border-gh-border text-gh-text rounded-lg text-sm font-bold hover:bg-gh-bg-tertiary transition-all">
+          <button 
+            title="Customize email events"
+            className="px-3 py-1.5 bg-gh-bg border border-gh-border text-gh-text rounded-lg text-sm font-bold hover:bg-gh-bg-tertiary transition-all"
+          >
             Reviews, Pushes, Comments
           </button>
         </div>
@@ -192,6 +190,7 @@ const NotificationsSettings = () => {
             .
           </p>
           <select
+            title="Actions notifications destination"
             value={settings.actions.notifyOn}
             onChange={(e) =>
               setSettings({
@@ -199,7 +198,7 @@ const NotificationsSettings = () => {
                 actions: { notifyOn: e.target.value },
               })
             }
-            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text"
+            className="w-full h-10 px-3 bg-gh-bg border border-gh-border rounded-md text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all appearance-none"
           >
             <option value="github-email-failed">
               Notify me: on TrackCodex, Email (Failed workflows only)
@@ -209,47 +208,43 @@ const NotificationsSettings = () => {
           </select>
         </div>
 
-        {/* Dependabot alerts: New vulnerabilities */}
+        {/* TrackCodex Guard alerts: New vulnerabilities */}
         <div className="p-6 border-b border-gh-border">
           <h3 className="text-base font-bold text-gh-text mb-2">
-            Dependabot alerts: New vulnerabilities
+            TrackCodex Guard alerts: New vulnerabilities
           </h3>
           <p className="text-sm text-gh-text-secondary mb-4">
             When you're given access to{" "}
             <a href="#" className="text-primary hover:underline">
-              Dependabot alerts
+              TrackCodex Guard alerts
             </a>
             , automatically receive notifications when a new vulnerability is found in one of
             your dependencies.
           </p>
-          <select
-            value={settings.dependabotAlerts.notifyOn}
-            onChange={(e) =>
-              setSettings({
-                ...settings,
-                dependabotAlerts: { notifyOn: e.target.value },
-              })
-            }
-            className="px-3 py-2 bg-gh-bg border border-gh-border rounded-lg text-sm text-gh-text"
+          <select 
+            title="Notification Preference"
+            className="w-full h-10 px-3 bg-gh-bg border border-gh-border rounded-md text-sm text-gh-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all appearance-none"
+            defaultValue="github-email"
           >
-            <option value="github-email-cli">
-              Notify me: on TrackCodex, Email, CLI
+            <option value="github-email-failed">
+              Notify me: on TrackCodex, Email
             </option>
             <option value="github-email">Notify me: on TrackCodex, Email</option>
             <option value="github">Notify me: on TrackCodex</option>
           </select>
         </div>
 
-        {/* Dependabot alerts: Email digest */}
+        {/* TrackCodex Guard alerts: Email digest */}
         <div className="p-6 border-b border-gh-border">
           <h3 className="text-base font-bold text-gh-text mb-2">
-            Dependabot alerts: Email digest
+            TrackCodex Guard alerts: Email digest
           </h3>
           <p className="text-sm text-gh-text-secondary mb-4">
-            Email a regular summary of Dependabot alerts for up to 10 of your repositories.
+            Email a regular summary of TrackCodex Guard alerts for up to 10 of your repositories.
           </p>
           <div className="flex items-center gap-3">
             <button
+              title={settings.dependabotDigest ? "Turn off email digest" : "Turn on email digest"}
               onClick={() =>
                 setSettings({
                   ...settings,
@@ -284,6 +279,7 @@ const NotificationsSettings = () => {
           </p>
           <div className="flex items-center gap-3">
             <button
+              title={settings.securityCampaigns ? "Turn off security campaign emails" : "Turn on security campaign emails"}
               onClick={() =>
                 setSettings({
                   ...settings,
@@ -315,6 +311,7 @@ const NotificationsSettings = () => {
           </p>
           <div className="flex items-center gap-3">
             <button
+              title={settings.deployKeyAlerts ? "Turn off deploy key alert emails" : "Turn on deploy key alert emails"}
               onClick={() =>
                 setSettings({
                   ...settings,
@@ -346,6 +343,7 @@ const NotificationsSettings = () => {
           </p>
           <div className="flex items-center gap-3">
             <button
+              title={settings.inProductMessages ? "Turn off in-product messages" : "Turn on in-product messages"}
               onClick={() =>
                 setSettings({
                   ...settings,
@@ -371,5 +369,3 @@ const NotificationsSettings = () => {
 };
 
 export default NotificationsSettings;
-
-
