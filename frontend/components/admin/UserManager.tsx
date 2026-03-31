@@ -36,13 +36,17 @@ const UserManager = () => {
             <tr className="bg-gh-bg text-gh-text-secondary text-[10px] font-medium uppercase tracking-widest border-b border-gh-border">
               <th className="px-6 py-4">User Details</th>
               <th className="px-6 py-4">System Role</th>
-              <th className="px-6 py-4">Joined Date</th>
+              <th className="px-6 py-4">Last Login / Device</th>
               <th className="px-6 py-4">Account Status</th>
-              <th className="px-6 py-4 text-right">Actions</th>
+              <th className="px-6 py-4 text-right">Operations</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gh-border">
-            {users.map((user) => (
+            {[
+              { id: "u1", name: "Somraj Saha", email: "somraj@trackcodex.dev", avatar: "https://github.com/somraj.png", role: "Super Admin", lastLogin: "2m ago", device: "Chrome / Windows 11", status: "Active" },
+              { id: "u2", name: "Jane Cooper", email: "jane.c@example.com", avatar: "https://i.pravatar.cc/150?u=u2", role: "Moderator", lastLogin: "14h ago", device: "Safari / macOS", status: "Active" },
+              { id: "u3", name: "Robert Fox", email: "robert.f@example.com", avatar: "https://i.pravatar.cc/150?u=u3", role: "Contributor", lastLogin: "3d ago", device: "Firefox / Linux", status: "Shadowbanned" },
+            ].map((user) => (
               <tr
                 key={user.id}
                 className="hover:bg-gh-bg-tertiary transition-colors group"
@@ -52,7 +56,7 @@ const UserManager = () => {
                     <img
                       src={user.avatar}
                       alt={user.name}
-                      className="size-10 rounded-full border border-border-[#1A1A1A]ark object-cover"
+                      className="size-10 rounded-xl border border-gh-border object-cover"
                     />
                     <div>
                       <p className="text-sm font-bold text-gh-text">
@@ -78,29 +82,36 @@ const UserManager = () => {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-5 text-xs text-gh-text-secondary">
-                  {user.joined}
+                <td className="px-6 py-5">
+                  <p className="text-xs text-gh-text font-medium">{user.lastLogin}</p>
+                  <p className="text-[10px] text-gh-text-secondary uppercase font-semibold tracking-tighter italic">{user.device}</p>
                 </td>
                 <td className="px-6 py-5">
                   <span
-                    className={`flex items-center gap-1.5 text-[10px] font-bold uppercase ${user.status === "Active" ? "text-emerald-500" : "text-rose-500"}`}
+                    className={`flex items-center gap-1.5 text-[10px] font-bold uppercase ${user.status === "Active" ? "text-emerald-500" : "text-amber-500"}`}
                   >
                     <span
-                      className={`size-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500" : "bg-rose-500 animate-pulse"}`}
+                      className={`size-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500" : "bg-amber-500"}`}
                     ></span>
                     {user.status}
                   </span>
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="size-8 rounded-lg bg-gh-bg-tertiary text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+                    <button className="h-8 px-3 rounded-lg bg-gh-bg-tertiary text-slate-400 hover:text-white flex items-center gap-2 transition-colors text-[10px] uppercase font-bold tracking-widest border border-gh-border">
+                      <span className="material-symbols-outlined !text-[16px]">
+                        history
+                      </span>
+                      Audit
+                    </button>
+                    <button className="size-8 rounded-lg bg-gh-bg-tertiary text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-gh-border">
                       <span className="material-symbols-outlined !text-[18px]">
-                        edit
+                        manage_accounts
                       </span>
                     </button>
-                    <button className="size-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors">
+                    <button className="size-8 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-colors border border-rose-500/20">
                       <span className="material-symbols-outlined !text-[18px]">
-                        {user.status === "Active" ? "block" : "undo"}
+                        block
                       </span>
                     </button>
                   </div>

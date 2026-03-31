@@ -5,6 +5,7 @@ import { api } from "../services/infra/api";
 import { Repository } from "../types";
 import EmptyState from "../components/common/EmptyState";
 import { CreateProjectModal } from "../components/modals/CreateProjectModal";
+import { CreateTaskModal } from "../components/modals/CreateTaskModal";
 import { useAppData } from "../context/AppDataContext";
 import { 
     CheckCircle2, 
@@ -70,11 +71,12 @@ const HomeView = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'project' | 'goal' | 'task'>('project');
 
-  const handleCreate = (newItem: any) => {
+  const handleCreate = async (newItem: any) => {
     if (modalMode === 'task') {
         addTask({...newItem, status: 'To-do', people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium', type: 'Dashboard', estimation: '3 days'});
+        return null;
     } else {
-        addProject(newItem);
+        return await addProject(newItem);
     }
   };
 
@@ -332,7 +334,11 @@ const HomeView = () => {
           </div>
         </div>
 
-        <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
+        {modalMode === 'task' ? (
+          <CreateTaskModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSave={handleCreate} />
+        ) : (
+          <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
+        )}
       </div>
     </div>
   );

@@ -15,7 +15,6 @@ const CreateWorkspaceView = () => {
   const [includeGitignore, setIncludeGitignore] = useState("Yes (recommended)");
   const [description, setDescription] = useState("");
   const [forking, setForking] = useState("Allow only private forks");
-  const [language, setLanguage] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [isLoadingRepos, setIsLoadingRepos] = useState(true);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -242,22 +241,6 @@ const CreateWorkspaceView = () => {
               </select>
             </div>
 
-            <div className="form-group mt-4">
-              <label className="form-label" htmlFor="language-select">Language</label>
-              <select 
-                id="language-select" 
-                className="select-field full-width"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                <option value="">Select language...</option>
-                <option value="javascript">JavaScript</option>
-                <option value="typescript">TypeScript</option>
-                <option value="python">Python</option>
-                <option value="go">Go</option>
-                <option value="rust">Rust</option>
-              </select>
-            </div>
           </div>
         </div>
       </div>

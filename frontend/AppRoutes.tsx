@@ -61,6 +61,7 @@ const CookiePolicy = React.lazy(() => import("./views/legal/CookiePolicy"));
 const CommunityView = React.lazy(() => import("./views/community/Community"));
 const DiscussionDetail = React.lazy(() => import("./views/community/DiscussionDetail"));
 const CreateRepoView = React.lazy(() => import("./views/repo/CreateRepo"));
+const ImportRepoView = React.lazy(() => import("./views/repo/ImportRepo"));
 const ConnectWorkspaceView = React.lazy(() => import("./views/workspace/ConnectWorkspace"));
 const WorkspaceOverviewView = React.lazy(() => import("./views/workspace/WorkspaceOverview"));
 const RepositoryOverviewView = React.lazy(() => import("./views/repo/RepositoryOverview"));
@@ -239,6 +240,7 @@ const AppRoutes = React.memo(() => {
             <Route path="/workspace/:id/ide" element={<VSCodeWorkspaceView />} />
             <Route path="/repositories" element={<RepositoriesView />} />
             <Route path="/repositories/new" element={<CreateRepoView />} />
+            <Route path="/repositories/import" element={<ImportRepoView />} />
             <Route path="/workspace/import" element={<ConnectWorkspaceView />} />
             <Route path="/repo/:id/pulls/:number" element={<ReviewMode />} />
             <Route path="/:owner/:repo/pulls/new" element={<CreatePullRequestView />} />

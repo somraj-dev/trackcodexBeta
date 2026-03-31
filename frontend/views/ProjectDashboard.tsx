@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../types/project";
 import { CreateProjectModal } from "../components/modals/CreateProjectModal";
+import { CreateTaskModal } from "../components/modals/CreateTaskModal";
 import { useAppData } from "../context/AppDataContext";
 
 
@@ -170,7 +171,7 @@ const ProjectDashboard: React.FC = () => {
     if (modalMode === 'task') {
         const task = {...newItem, id: Date.now().toString(), status: 'To-do' as const, people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium' as const, type: 'Dashboard', estimation: '3 days'};
         addTask(task);
-        return task;
+        return null;
     } else {
         return await addProject(newItem);
     }
@@ -239,7 +240,11 @@ const ProjectDashboard: React.FC = () => {
           )}
         </div>
       </div>
-      <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
+      {modalMode === 'task' ? (
+        <CreateTaskModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onSave={handleCreate} />
+      ) : (
+        <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} onDeploy={handleCreate} mode={modalMode} />
+      )}
     </div>
   );
 };

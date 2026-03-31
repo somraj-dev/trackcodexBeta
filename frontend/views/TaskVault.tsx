@@ -27,6 +27,7 @@ import {
     Target
 } from 'lucide-react';
 import { CreateProjectModal } from '../components/modals/CreateProjectModal';
+import { CreateTaskModal } from '../components/modals/CreateTaskModal';
 import { InviteModal } from '../components/modals/InviteModal';
 
 const TaskVault: React.FC = () => {
@@ -426,11 +427,10 @@ const TaskVault: React.FC = () => {
                     mode="goal"
                 />
 
-                <CreateProjectModal 
+                <CreateTaskModal 
                     isOpen={isCreateTaskModalOpen} 
                     onClose={() => setIsCreateTaskModalOpen(false)} 
-                    onDeploy={handleCreateTask}
-                    mode="task"
+                    onSave={handleCreateTask}
                 />
             </div>
             <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />

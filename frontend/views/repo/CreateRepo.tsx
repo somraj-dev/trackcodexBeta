@@ -94,7 +94,7 @@ const CreateRepo: React.FC = () => {
           <p className="text-gh-text-secondary text-[14px] leading-relaxed">
             Repositories contain a project's files and version history. Have a project elsewhere?{" "}
             <button
-              onClick={() => navigate("/workspace/import")}
+              onClick={() => navigate("/repositories/import")}
               className="text-primary hover:underline"
             >
               Import a repository.

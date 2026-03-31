@@ -120,6 +120,11 @@ model User {
   countryRef              Country?          @relation(fields: [countryCode], references: [code])
   countryCode            String?            @db.Char(2) // ISO 3166-1 alpha-2
 
+  // Hackathons
+  hackathonsCreated      Hackathon[]      @relation("HackathonCreator")
+  hackathonParticipations HackathonParticipant[]
+  hackathonSubmissions    HackathonSubmission[]
+
   @@index([email, accountLocked])
 }
 
@@ -417,6 +422,8 @@ model Repository {
   activityLogs     ActivityLog[]
   codeSymbols      CodeSymbol[]
   releases         Release[]
+
+  hackathonSubmissions HackathonSubmission[]
 
   @@index([ownerId])
   @@index([orgId])
@@ -1973,5 +1980,63 @@ model PersonalAccessToken {
 
   @@index([userId])
   @@index([prefix])
+}
+
+// --- Hackathons & Events ---
+
+model Hackathon {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text
+  slug        String   @unique
+  bannerUrl   String?
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("UPCOMING") // UPCOMING, ACTIVE, COMPLETED, CANCELLED
+  prizes      Json?    // Array of objects { rank, prize, details }
+  rules       String?  @db.Text
+  isPublic    Boolean  @default(true)
+
+  creatorId   String
+  creator     User     @relation("HackathonCreator", fields: [creatorId], references: [id])
+
+  participants HackathonParticipant[]
+  submissions  HackathonSubmission[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, startDate])
+}
+
+model HackathonParticipant {
+  id          String    @id @default(uuid())
+  hackathonId String
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime  @default(now())
+
+  @@unique([hackathonId, userId])
+}
+
+model HackathonSubmission {
+  id          String    @id @default(uuid())
+  hackathonId String
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repoId      String?
+  repo        Repository? @relation(fields: [repoId], references: [id])
+  
+  title       String
+  description String    @db.Text
+  demoUrl     String?
+  
+  status      String    @default("PENDING") // PENDING, UNDER_REVIEW, WINNER, REJECTED
+  rank        Int?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 

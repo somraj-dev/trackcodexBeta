@@ -17,7 +17,6 @@ const ConnectWorkspaceView: React.FC = () => {
   const [isPrivate, setIsPrivate] = useState(true);
   const [description, setDescription] = useState("");
   const [forking, setForking] = useState("Allow only private forks");
-  const [language, setLanguage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(true); // Keeping it open based on screenshot
 
@@ -35,8 +34,7 @@ const ConnectWorkspaceView: React.FC = () => {
         settings: {
           projectName,
           description,
-          forking,
-          language
+          forking
         }
       });
 
@@ -204,20 +202,6 @@ const ConnectWorkspaceView: React.FC = () => {
                 </select>
               </div>
 
-              <div className="form-group-horizontal mt-4">
-                <label className="form-label" htmlFor="language-select">Language</label>
-                <select 
-                  id="language-select" 
-                  className="select-field"
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  <option value="">Select language...</option>
-                  <option value="javascript">JavaScript</option>
-                  <option value="typescript">TypeScript</option>
-                  <option value="python">Python</option>
-                </select>
-              </div>
 
             </div>
           </div>
