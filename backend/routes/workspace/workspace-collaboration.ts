@@ -198,6 +198,45 @@ export async function workspaceCollaborationRoutes(fastify: FastifyInstance) {
   );
 
   /**
+   * Get pending invites for workspace
+   * GET /api/v1/workspaces/:workspaceId/invites
+   */
+  fastify.get(
+    "/workspaces/:workspaceId/invites",
+    { preHandler: requireAuth },
+    async (request, reply) => {
+      const { workspaceId } = request.params as { workspaceId: string };
+      const userId = (request as any).user?.userId;
+
+      if (!userId) {
+        return reply.code(401).send({ message: "Unauthorized" });
+      }
+
+      try {
+        // Check if user has permission
+        const member = await prisma.workspaceMember.findUnique({
+          where: { workspaceId_userId: { workspaceId, userId } },
+        });
+
+        if (!member || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+          return reply.code(403).send({ message: "Insufficient permissions" });
+        }
+
+        const invites = await prisma.workspaceInvite.findMany({
+          where: { workspaceId, acceptedAt: null, expiresAt: { gt: new Date() } },
+          orderBy: { createdAt: "desc" },
+        });
+
+        return { invites };
+      } catch (error) {
+        console.error("Get workspace invites error:", error);
+        return reply.code(500).send({ message: "Failed to fetch invites" });
+      }
+    },
+  );
+
+
+  /**
    * Update member role
    * PATCH /api/v1/workspaces/:workspaceId/members/:memberId
    */

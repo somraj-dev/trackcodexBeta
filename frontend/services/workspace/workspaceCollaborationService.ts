@@ -165,6 +165,14 @@ class WorkspaceCollaborationService {
   }
 
   /**
+   * Get pending invites for a specific workspace (admin only)
+   */
+  async getWorkspacePendingInvites(workspaceId: string): Promise<{ invites: WorkspaceInvite[] }> {
+    const response = await api.get(`/workspaces/${workspaceId}/invites`);
+    return response.data;
+  }
+
+  /**
    * Accept workspace invite
    */
   async acceptInvite(token: string): Promise<{ message: string }> {

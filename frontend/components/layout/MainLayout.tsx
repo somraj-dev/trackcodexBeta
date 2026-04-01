@@ -4,13 +4,11 @@ import ReactGA from "react-ga4";
 
 // Layout & UI Components
 import Footer from "./Footer";
-import MessagingPanel from "../messaging/MessagingPanel";
 import CommandPalette from "./CommandPalette";
-import ChatWidget from "../social/ChatWidget";
 import UserProfileDropdown from "../profile/UserProfileDropdown";
 import ResumePreviewModal from "../profile/ResumePreviewModal";
 import TrackCodexLogo from "../branding/TrackCodexLogo";
-import { LoggedInProviders } from "../auth/LoggedInProviders";
+
 
 // Contexts & Services
 import { useAuth } from "../../context/AuthContext";
@@ -24,8 +22,8 @@ const MainLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { notifications, unreadCount } = useNotifications();
-  const { totalUnreadCount, setIsPanelOpen } = useMessaging();
+  const { unreadCount } = useNotifications();
+  const { totalUnreadCount } = useMessaging();
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -98,16 +96,15 @@ const MainLayout: React.FC = () => {
     };
   }, []);
 
-  const isStandalone =
-    window.location.hostname.startsWith("workspace.") ||
-    new URLSearchParams(window.location.search).get("standalone") === "true";
-
   const isIdeView = (
     location.pathname.startsWith("/workspace/") &&
-    !["/workspace/new", "/workspace/import"].includes(location.pathname)
+    location.pathname.includes("/ide")
   ) || ["/editor", "/trials/live-session"].some(
-    (path) => location.pathname.includes(path),
-  ) || isStandalone;
+    (path) => location.pathname.includes(path)
+  );
+
+  const shouldHideNavbar = isIdeView || isFocusMode;
+
 
   const isFullScreenView = isIdeView || 
     ["/messages", "/notifications"].includes(location.pathname);
@@ -131,7 +128,7 @@ const MainLayout: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isAddMenuOpen, isNotificationsOpen, isProfileDropdownOpen]);
 
-  const displayNotifications = notifications.length > 0 ? notifications : [];
+
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden text-gh-text font-display bg-gh-bg transition-colors duration-300">
@@ -157,7 +154,6 @@ const MainLayout: React.FC = () => {
                 { icon: "store", label: "Marketplace", to: "/marketplace" },
                 { icon: "diversity_3", label: "Community", to: "/community" },
                 { icon: "bolt", label: "ForgeAI", to: "/forge-ai" },
-                { icon: "account_circle", label: "Profile", to: `/profile/${profile.username}` },
               ].map((item) => (
                 <button key={item.label} onClick={() => { setIsSidebarOpen(false); navigate(item.to); }} className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-[14px] font-medium ${location.pathname.startsWith(item.to) ? "text-gh-text bg-primary/15" : "text-gh-text hover:bg-gh-bg-secondary hover:text-gh-text"}`}>
                   <span className="material-symbols-outlined !text-[18px]">{item.icon}</span>
@@ -174,7 +170,7 @@ const MainLayout: React.FC = () => {
           ref={mainScrollRef} 
           className={`flex-1 min-w-0 flex flex-col relative bg-gh-bg ${isFullScreenView || isFocusMode ? "overflow-hidden" : "overflow-y-auto no-scrollbar"}`}
         >
-          {!isIdeView && !isFocusMode && (
+          {!shouldHideNavbar && (
             <div className={`h-12 border-b border-gh-border flex items-center px-4 bg-gh-bg-secondary shrink-0 sticky top-0 z-40 gap-2 transition-transform duration-300 ${isNavbarVisible ? "translate-y-0" : "-translate-y-full"}`}>
               <div className="flex items-center gap-3">
                 <button onClick={() => setIsSidebarOpen(true)} className="text-gh-text hover:text-primary h-8 w-8 flex items-center justify-center rounded-md hover:bg-gh-bg-tertiary">
@@ -259,7 +255,7 @@ const MainLayout: React.FC = () => {
                 </div>
 
                 {/* Messages Button */}
-                <button onClick={() => setIsPanelOpen(true)} className="h-8 w-8 flex items-center justify-center rounded-md text-gh-text hover:bg-gh-bg-secondary hover:text-primary relative">
+                <button onClick={() => navigate('/messages')} className="h-8 w-8 flex items-center justify-center rounded-md text-gh-text hover:bg-gh-bg-secondary hover:text-primary relative">
                   <span className="material-symbols-outlined !text-[20px]">chat_bubble</span>
                   {totalUnreadCount > 0 && (
                     <span className="absolute top-1 right-1 px-1 min-w-[14px] h-[14px] flex items-center justify-center bg-blue-500 text-white text-[9px] font-bold rounded-full border border-gh-bg shadow-sm">
@@ -286,12 +282,10 @@ const MainLayout: React.FC = () => {
             <div className="flex-1">
               <Outlet />
             </div>
-            {!isIdeView && !isFocusMode && !isFullPageAction && <Footer />}
+            {!shouldHideNavbar && !isFullPageAction && <Footer />}
           </div>
         </main>
       </div>
-      {!isFocusMode && <MessagingPanel />}
-      <ChatWidget />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
       <ResumePreviewModal 
         isOpen={isResumeModalOpen} 

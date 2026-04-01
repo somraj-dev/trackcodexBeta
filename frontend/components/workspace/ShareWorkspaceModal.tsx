@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   workspaceCollaborationService,
   WorkspaceInvite,
@@ -25,21 +25,20 @@ export const ShareWorkspaceModal: React.FC<ShareWorkspaceModalProps> = ({
   const [success, setSuccess] = useState("");
   const [pendingInvites, setPendingInvites] = useState<WorkspaceInvite[]>([]);
 
+  const loadPendingInvites = useCallback(async () => {
+    try {
+      const { invites } = await workspaceCollaborationService.getWorkspacePendingInvites(workspaceId);
+      setPendingInvites(invites);
+    } catch (err) {
+      console.error("Error loading invites:", err);
+    }
+  }, [workspaceId]);
+
   useEffect(() => {
     if (isOpen) {
       loadPendingInvites();
     }
-  }, [isOpen, workspaceId]);
-
-  const loadPendingInvites = async () => {
-    try {
-      // Note: This would need a workspace-specific endpoint
-      // For now, we'll skip loading pending invites
-      setPendingInvites([]);
-    } catch (err) {
-      console.error("Error loading invites:", err);
-    }
-  };
+  }, [isOpen, workspaceId, loadPendingInvites]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();

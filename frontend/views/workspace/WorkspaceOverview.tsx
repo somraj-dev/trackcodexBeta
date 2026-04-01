@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../../services/infra/api";
 import { Workspace, Repository } from "../../types";
-import { MOCK_WORKSPACES, MOCK_REPO_FILES } from "../../constants";
+import { MOCK_REPO_FILES } from "../../constants";
 import Spinner from "../../components/ui/Spinner";
 import "../../styles/WorkspaceOverview.css";
 
@@ -10,7 +10,6 @@ const WorkspaceOverview: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [repo, setRepo] = useState<Repository | null>(null);
   const [contents, setContents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [readme, setReadme] = useState<string | null>(null);
@@ -26,8 +25,7 @@ const WorkspaceOverview: React.FC = () => {
         // If workspace has a repository, fetch its details and contents
         if (wsData.repositoryId) {
           try {
-            const repoData = await api.repositories.get(wsData.repositoryId);
-            setRepo(repoData);
+            await api.repositories.get(wsData.repositoryId);
 
             const contentData = await api.repositories.getContents(wsData.repositoryId);
             setContents(contentData || []);
@@ -42,17 +40,12 @@ const WorkspaceOverview: React.FC = () => {
             if (readmeData && readmeData.content) {
               setReadme(atob(readmeData.content));
             }
-          } catch (e) {
-            console.log("No README.md found via API");
+          } catch {
+            console.warn("No README.md found via API");
           }
         }
       } catch (err) {
-        console.error("Workspace API failed, checking mocks:", err);
-        const mockWs = MOCK_WORKSPACES.find(ws => ws.id === id);
-        if (mockWs) {
-          setWorkspace(mockWs);
-          setContents(MOCK_REPO_FILES);
-        }
+        console.error("Workspace API failed:", err);
       } finally {
         setIsLoading(false);
       }

@@ -1,24 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_WORKSPACES } from '../../constants';
+import { useParams } from 'react-router-dom';
+import { api } from '../../services/infra/api';
 import { Workspace } from '../../types';
 import Spinner from '../../components/ui/Spinner';
-import EditorView from './Editor';
+import EditorView from '../editor/Editor';
 
 const WorkspaceDetailView = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const [workspace, setWorkspace] = useState<Workspace | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setIsLoading(true);
-        // Simulate fetching data
-        setTimeout(() => {
-            const found = MOCK_WORKSPACES.find(ws => ws.id === id);
-            setWorkspace(found || MOCK_WORKSPACES[0]);
-            setIsLoading(false);
-        }, 500);
+        const fetchWorkspace = async () => {
+            if (!id) return;
+            setIsLoading(true);
+            try {
+                const data = await api.workspaces.get(id);
+                setWorkspace(data);
+            } catch (error) {
+                console.error("Failed to fetch workspace:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchWorkspace();
     }, [id]);
 
     if (isLoading || !workspace) {

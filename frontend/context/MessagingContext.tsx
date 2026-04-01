@@ -166,7 +166,8 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const unsubscribe = directMessageBus.subscribe(async (event: DMEvent) => {
             if (event.type === 'DM_OPEN') {
                 console.log('[MessagingContext] DM_OPEN received for user:', event.data.userId);
-                setIsPanelOpen(true);
+                // Navigate to full messages page
+                window.location.href = `/messages?user=${event.data.userId}`;
 
                 // Use ref to check existing to avoid stale closures
                 // Fix: Ensure we are matching the correct person (not ourselves) or just any participant with that ID

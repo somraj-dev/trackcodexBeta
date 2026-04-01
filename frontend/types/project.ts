@@ -16,17 +16,24 @@ export interface Domain {
 export interface Project {
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   repoUrl: string | null;
+  repoOwner?: string | null;
+  repoName?: string | null;
   branch: string | null;
   framework: string | null;
   status: string;
-  createdAt: string;
-  userId: string;
+  createdAt?: string;
+  userId?: string;
   domains?: Domain[];
   deployments?: Deployment[];
-  // Legacy fields for compatibility if needed
+  // Legacy / Additional fields
   logo?: string;
   logoBg?: string;
   domain?: string;
+  deploymentCount?: number;
+  analyticsEnabled?: boolean;
+  speedInsightsEnabled?: boolean;
+  commitMsg?: string;
+  deployDate?: string;
 }

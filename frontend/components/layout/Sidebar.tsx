@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSidebarState } from "../../hooks/useSidebarState";
-import { useAuth } from "../../context/AuthContext";
+
 import { useProfile } from "../../context/ProfileContext";
 import { UserProfile } from "../../services/activity/profile";
 import SidebarItem from "./SidebarItem";
@@ -87,7 +87,7 @@ const OrgSwitcher = ({
 
 const Sidebar = () => {
   const { isExpanded, toggleSidebar, setIsExpanded } = useSidebarState();
-  const { user } = useAuth();
+
   const { profile } = useProfile();
   const isAdmin = checkIsAdmin(profile.systemRole);
 
@@ -188,12 +188,7 @@ const Sidebar = () => {
           label="ForgeAI"
           isExpanded={isExpanded}
         />
-        <SidebarItem
-          to={`/profile/${user?.username || "me"}`}
-          icon="account_circle"
-          label="Profile"
-          isExpanded={isExpanded}
-        />
+
         <SidebarItem
           to="/taskvault"
           icon="inventory_2"
@@ -219,39 +214,7 @@ const Sidebar = () => {
           />
         </div>
 
-        {/* User Profile Section (Same to Same Design) */}
-        <div className="p-2 border-t border-gh-border/50 transition-all duration-300">
-          <div className={`flex items-center gap-3 rounded-xl transition-all group cursor-pointer ${isExpanded ? "hover:bg-gh-bg p-2 -m-1" : "justify-center"}`}>
-            <div className="relative shrink-0">
-              <img
-                src={user?.avatar || profile.avatar}
-                className="size-10 rounded-xl border border-gh-border group-hover:border-primary/50 transition-all object-cover shadow-lg"
-                alt={user?.name || profile.name}
-              />
-              <div className="absolute -bottom-0.5 -right-0.5 size-2.5 bg-green-500 border-2 border-gh-bg rounded-full shadow-sm" />
 
-            </div>
-
-            {isExpanded && (
-              <div className="flex flex-col min-w-0 flex-1 animate-in slide-in-from-left-2 duration-300">
-                <span className="text-[13px] font-medium text-gh-text truncate leading-none mb-1">
-                  {user?.name || profile.name}
-                </span>
-                <span className="text-[12px] text-gh-text-secondary truncate font-medium">
-                  {user?.email || "user@trackcodex.dev"}
-                </span>
-              </div>
-            )}
-
-            {isExpanded && (
-              <div className="flex items-center justify-center size-5 rounded-full border border-gh-border/50 text-gh-text-secondary group-hover:bg-gh-bg transition-all translate-x-1">
-                <span className="material-symbols-outlined !text-[12px]">
-                  circle
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
     </aside>

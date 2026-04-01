@@ -34,20 +34,11 @@ interface AppDataContextType {
 }
 
 // Fallback mock projects used when API is unreachable
-const FALLBACK_PROJECTS: Project[] = [
-  { id: "trackcodex", name: "trackcodex", domain: "trackcodex.com", logo: "⬡", logoBg: "#111", repoOwner: "somraj-dev", repoName: "trackcodexBeta", repoUrl: "https://github.com/somraj-dev/trackcodexBeta", commitMsg: "style: fix hardcoded dark themes in main layout and dashboard...", deployDate: "1h ago", branch: "main" },
-  { id: "docs", name: "docs", domain: "docs.trackcodex.com", logo: "N", logoBg: "#111", repoOwner: "somraj-dev", repoName: "docs", repoUrl: "https://github.com/somraj-dev/docs", commitMsg: "feat: update links to open in the same tab", deployDate: "Mar 14", branch: "main" },
-  { id: "support", name: "support", domain: "support.trackcodex.com", logo: "▲", logoBg: "#111", repoOwner: "somraj-dev", repoName: "support", repoUrl: "https://github.com/somraj-dev/support", commitMsg: "fix: resolve build failures by removing unused-vars and converti...", deployDate: "Mar 14", branch: "main" },
-];
+const FALLBACK_PROJECTS: Project[] = [];
 
-const INITIAL_TASKS: Task[] = [
-    { id: '1', name: 'Implementation of sidebar', description: 'Design and code the primary navigation sidebar', estimation: '3 days', type: 'Dashboard', people: ['https://i.pravatar.cc/150?u=gs', 'https://i.pravatar.cc/150?u=bt'], priority: 'High', status: 'On Progress' },
-    { id: '2', name: 'Fix build errors', description: 'Resolve dependency conflicts in the CI/CD pipeline', estimation: '1 day', type: 'Mobile', people: ['https://i.pravatar.cc/150?u=gs'], priority: 'Medium', status: 'To-do' },
-];
+const INITIAL_TASKS: Task[] = [];
 
-const INITIAL_GOALS: Goal[] = [
-    { id: 'g1', name: 'Q1 Product Launch', description: 'Complete all core features for the initial release', timeline: 'Mar 31' }
-];
+const INITIAL_GOALS: Goal[] = [];
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
 
@@ -76,18 +67,15 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
                 commitMsg: p.commitMsg || "No deployments yet",
                 deployDate: p.deployDate ? new Date(p.deployDate).toLocaleDateString() : "Just now",
                 branch: p.branch || "main",
-                framework: p.framework || undefined,
+                framework: p.framework || null,
                 status: p.status,
                 deploymentCount: p.deploymentCount,
                 analyticsEnabled: p.analyticsEnabled,
                 speedInsightsEnabled: p.speedInsightsEnabled,
             }));
 
-            // If backend returns projects, use them; otherwise keep fallback
-            if (mapped.length > 0) {
-                setProjects(mapped);
-            }
-            // If backend returns empty, keep the fallback so UI isn't empty
+            // Update projects state with values from backend
+            setProjects(mapped);
         } catch (err) {
             console.warn('[AppDataContext] Could not fetch projects from API, using local data:', err);
         } finally {
@@ -128,7 +116,8 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
                 commitMsg: data.commitMsg || "feat: Initial deployment via TrackCodex",
                 deployDate: "Just now",
                 branch: "main",
-                framework: created.framework,
+                framework: created.framework || null,
+                status: created.status || "READY",
             };
 
             setProjects(prev => [newProject, ...prev]);
@@ -148,6 +137,8 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
                 commitMsg: data.commitMsg || "feat: Initial setup",
                 deployDate: "Just now",
                 branch: "main",
+                framework: data.framework || null,
+                status: "READY",
             };
             setProjects(prev => [localProject, ...prev]);
             return localProject;
@@ -176,7 +167,7 @@ export const AppDataProvider: React.FC<{ children: ReactNode }> = ({ children })
         refreshProjects,
         addTask, 
         addGoal 
-    }), [projects, tasks, goals, isLoading, addProject, deleteProject, refreshProjects]);
+    }), [projects, tasks, goals, isLoading, addProject, deleteProject, refreshProjects, addTask, addGoal]);
 
     return (
         <AppDataContext.Provider value={value}>

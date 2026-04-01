@@ -223,7 +223,7 @@ export const profileService = {
           delete profile.techStatus;
         }
         return profile;
-      } catch (_e) {
+      } catch {
         return DEFAULT_PROFILE;
       }
     }
@@ -382,8 +382,8 @@ export const profileService = {
 
   subscribe(callback: (profile: UserProfile) => void) {
     const handler = (e: CustomEvent<UserProfile>) => callback(e.detail);
-    window.addEventListener(UPDATE_EVENT, handler as any);
-    return () => window.removeEventListener(UPDATE_EVENT, handler as any);
+    window.addEventListener(UPDATE_EVENT, handler as EventListener);
+    return () => window.removeEventListener(UPDATE_EVENT, handler as EventListener);
   },
 
   /**
@@ -432,15 +432,8 @@ export const profileService = {
    * Follow a user
    */
   async followUser(userId: string): Promise<void> {
-    // If it's a mock user, just simulate
-    if (userId.startsWith("user-") || userId.startsWith("@")) {
-      this.simulateNewFollower();
-      return;
-    }
-
     try {
       await apiInstance.post(`/users/${userId}/follow`);
-      this.simulateNewFollower();
     } catch (error: unknown) {
       console.error("Error following user:", error);
       const message = error instanceof Error ? error.message : "Failed to follow user";
@@ -452,14 +445,8 @@ export const profileService = {
    * Unfollow a user
    */
   async unfollowUser(userId: string): Promise<void> {
-    if (userId.startsWith("user-") || userId.startsWith("@")) {
-      this.simulateUnfollow();
-      return;
-    }
-
     try {
       await apiInstance.delete(`/users/${userId}/follow`);
-      this.simulateUnfollow();
     } catch (error: unknown) {
       console.error("Error unfollowing user:", error);
       const message = error instanceof Error ? error.message : "Failed to unfollow user";
@@ -474,7 +461,7 @@ export const profileService = {
     try {
       const response = await apiInstance.get(`/users/${userId}/followers`);
       return response.data;
-    } catch (error: any) {
+    } catch {
       // Fallback for mocks
       return [];
     }
@@ -487,7 +474,7 @@ export const profileService = {
     try {
       const response = await apiInstance.get(`/users/${userId}/following`);
       return response.data;
-    } catch (error: any) {
+    } catch {
       // Fallback for mocks
       return [];
     }
@@ -500,7 +487,7 @@ export const profileService = {
     try {
       const response = await apiInstance.get("/users/trending");
       return response.data || [];
-    } catch (error) {
+    } catch {
       return [];
     }
   },
@@ -512,7 +499,7 @@ export const profileService = {
     try {
       const response = await apiInstance.get("/users/suggested");
       return response.data || [];
-    } catch (error) {
+    } catch {
       return [];
     }
   },
