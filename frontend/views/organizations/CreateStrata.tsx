@@ -32,11 +32,11 @@ const CreateStrata: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await strataService.createStrata({
+      await strataService.createStrata({
         name: formData.enterpriseName,
         slug: formData.urlSlug
       });
-      navigate(`/strata/${result.slug}`);
+      navigate("/strata");
     } catch (error) {
       const err = error as { response?: { data?: { error?: string } }, message?: string };
       console.error("Strata creation failed", err);

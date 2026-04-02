@@ -11,6 +11,9 @@ export interface EnterpriseResponse {
   description?: string;
   createdAt: string;
   updatedAt: string;
+  _count?: {
+    members: number;
+  };
 }
 
 class StrataService {
