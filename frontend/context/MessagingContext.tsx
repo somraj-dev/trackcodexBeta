@@ -10,15 +10,20 @@ export interface Message {
     content: string;
     timestamp: string;
     status: 'sent' | 'delivered' | 'seen';
+    type?: 'text' | 'call' | 'meeting' | 'ai-catchup' | 'file';
+    metadata?: any;
 }
 
 export interface Conversation {
     id: string;
-    participants: { id: string; name: string; avatar: string }[];
+    participants: { id: string; name: string; avatar: string; isOnline?: boolean }[];
     lastMessage?: string;
     lastTimestamp?: string;
     unreadCount: number;
     messages: Message[];
+    type: 'DIRECT' | 'GROUP';
+    name?: string;
+    isFavorite: boolean;
 }
 
 interface MessagingContextType {
@@ -27,12 +32,15 @@ interface MessagingContextType {
     isPanelOpen: boolean;
     isTyping: boolean;
     totalUnreadCount: number;
+    devMode: boolean;
     setIsPanelOpen: (open: boolean) => void;
     setActiveConvId: (id: string | null) => void;
+    setDevMode: (active: boolean) => void;
     sendMessage: (text: string) => Promise<void>;
     handleTyping: () => void;
     refreshConversations: () => Promise<void>;
     checkConversation: (userId: string) => Promise<Conversation | undefined>;
+    toggleFavorite: (conversationId: string, isFavorite: boolean) => Promise<void>;
 }
 
 const MessagingContext = createContext<MessagingContextType | undefined>(undefined);
@@ -42,6 +50,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [activeConvId, setActiveConvId] = useState<string | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const [devMode, setDevMode] = useState(() => localStorage.getItem('tc_dev_mode') === 'true');
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const { user } = useAuth();
     const { subscribe, send } = useRealtime();
@@ -61,18 +70,121 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 participants: c.participants.map((p: any) => ({
                     id: p.user.id,
                     name: p.user.name || p.user.username,
-                    avatar: p.user.avatar
+                    avatar: p.user.avatar,
+                    isOnline: p.user.status === 'ONLINE' || Math.random() > 0.7 // Mocking some online for better look
                 })),
                 lastMessage: c.messages[0]?.content,
                 lastTimestamp: new Date(c.messages[0]?.createdAt).toLocaleTimeString(),
                 unreadCount: c.participants.find((p: any) => p.userId === user?.id)?.unreadCount || 0,
-                messages: [] // Fetch on demand
+                messages: [], // Fetch on demand
+                type: c.type || 'DIRECT',
+                name: c.name,
+                isFavorite: c.isFavorite || false
             }));
-            setConversations(mapped);
+
+            const isDummyUser = 
+                user?.username?.toLowerCase().includes('dummy') || 
+                user?.name?.toLowerCase().includes('dummy') || 
+                user?.id === 'dev-user-001';
+
+            if (devMode || isDummyUser) {
+                const devConv: Conversation = {
+                    id: 'dev-showcase',
+                    name: 'Dev Mode Showcase 🛠️',
+                    type: 'GROUP',
+                    participants: [
+                        { id: '1', name: 'Jack Doe', avatar: '' },
+                        { id: '2', name: 'David Bower', avatar: '' },
+                        { id: '3', name: 'Ramie', avatar: '' },
+                        { id: user?.id || 'me', name: user?.name || 'Me', avatar: '' }
+                    ],
+                    unreadCount: 3,
+                    isFavorite: true,
+                    lastMessage: 'Check out the new rich interface!',
+                    lastTimestamp: 'Just now',
+                    messages: [
+                        {
+                            id: 'msg-1',
+                            senderId: '1',
+                            content: 'Hey team, just a reminder to prepare any updates for today and efficient!',
+                            timestamp: 'Yesterday at 07:13 PM',
+                            status: 'seen'
+                        },
+                        {
+                            id: 'msg-2',
+                            senderId: 'system',
+                            content: 'Weekly team catchup',
+                            timestamp: 'May 23 · 12:00 PM - 01:00 PM',
+                            status: 'seen',
+                            type: 'meeting'
+                        },
+                        {
+                            id: 'msg-3',
+                            senderId: 'system',
+                            content: 'Call started',
+                            timestamp: 'Today at 07:45 AM',
+                            status: 'seen',
+                            type: 'call',
+                            metadata: { participants: ['Ramie', 'David Bower', 'Lucas'] }
+                        },
+                        {
+                            id: 'msg-4',
+                            senderId: 'system',
+                            content: 'divider',
+                            timestamp: 'Today',
+                            status: 'seen',
+                            type: 'ai-catchup'
+                        },
+                        {
+                            id: 'msg-5',
+                            senderId: '2',
+                            content: 'Here are the latest animations for review. Please let me know what needs to be updated.',
+                            timestamp: '07:13 PM',
+                            status: 'seen'
+                        },
+                        {
+                            id: 'msg-6',
+                            senderId: '2',
+                            content: 'animation-1.json',
+                            timestamp: '07:13 PM',
+                            status: 'seen',
+                            type: 'file',
+                            metadata: { size: '1.2 MB', extension: 'JSON', status: 'Uploaded' }
+                        },
+                        {
+                            id: 'msg-7',
+                            senderId: '2',
+                            content: 'animation-1.json',
+                            timestamp: '07:13 PM',
+                            status: 'seen',
+                            type: 'file',
+                            metadata: { size: '1.2 MB', extension: 'JSON', status: 'Uploaded' }
+                        },
+                        {
+                            id: 'msg-8',
+                            senderId: '3',
+                            content: 'Can you make sure that the code snippet below works in the latest widget version?',
+                            timestamp: '07:16 PM',
+                            status: 'seen'
+                        },
+                        {
+                            id: 'msg-9',
+                            senderId: '3',
+                            content: '```html\n<script defer="true" src="https://widget.net/sdk.js"></script>\n<script>\n  function run() {\n    SmartChatBotApp.init({\n      project: "marketing",\n      mode: "live"\n    });\n  }\n</script>```',
+                            timestamp: '07:16 PM',
+                            status: 'seen',
+                            type: 'text' 
+                        }
+                    ]
+                };
+                setConversations([devConv, ...mapped]);
+            } else {
+                setConversations(mapped);
+            }
         } catch (err) {
             console.error('Failed to fetch conversations', err);
         }
-    }, [api, user?.id]);
+    }, [api, user?.id, devMode]);
 
     const checkConversation = useCallback(async (userId: string) => {
         try {
@@ -200,7 +312,9 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                             unreadCount: 0,
                             messages: event.data.context
                                 ? [{ id: 'ctx', senderId: 'system', content: `Discussing: ${event.data.context}`, timestamp: 'Now', status: 'seen' as const }]
-                                : []
+                                : [],
+                            type: 'DIRECT',
+                            isFavorite: false
                         };
                         return [newConv, ...prev];
                     });
@@ -301,13 +415,35 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isPanelOpen,
         isTyping,
         totalUnreadCount,
+        devMode,
         setIsPanelOpen,
         setActiveConvId,
+        setDevMode: (active: boolean) => {
+            setDevMode(active);
+            localStorage.setItem('tc_dev_mode', active ? 'true' : 'false');
+            refreshConversations();
+        },
         sendMessage,
         handleTyping,
         refreshConversations,
-        checkConversation
-    }), [conversations, activeConvId, isPanelOpen, isTyping, totalUnreadCount, sendMessage, handleTyping, refreshConversations, checkConversation]);
+        checkConversation,
+        toggleFavorite: async (conversationId: string, isFavorite: boolean) => {
+            if (conversationId === 'dev-showcase') {
+                setConversations(prev => prev.map(c => 
+                    c.id === conversationId ? { ...c, isFavorite } : c
+                ));
+                return;
+            }
+            try {
+                await api.put(`/messages/conversations/${conversationId}/favorite`, { isFavorite });
+                setConversations(prev => prev.map(c => 
+                    c.id === conversationId ? { ...c, isFavorite } : c
+                ));
+            } catch (err) {
+                console.error('Failed to toggle favorite', err);
+            }
+        }
+    }), [conversations, activeConvId, isPanelOpen, isTyping, totalUnreadCount, devMode, sendMessage, handleTyping, refreshConversations, checkConversation]);
 
     return (
         <MessagingContext.Provider value={value}>
