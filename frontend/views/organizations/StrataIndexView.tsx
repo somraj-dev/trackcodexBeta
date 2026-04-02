@@ -1,28 +1,33 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MOCK_STRATA } from "../../constants";
-import { Strata } from "../../types";
+import { strataService, EnterpriseResponse } from "../../services/enterprise/strataService";
 import EmptyState from "../../components/common/EmptyState";
 
 // FIX: Changed component to React.FC to correctly handle the 'key' prop when used in a list.
-const StrataCard: React.FC<{ strata: Strata }> = ({ strata }) => {
+const StrataCard: React.FC<{ strata: EnterpriseResponse }> = ({ strata }) => {
   const navigate = useNavigate();
   return (
     <div
-      onClick={() => navigate(`/strata/${strata.id}`)}
+      onClick={() => navigate(`/strata/${strata.slug}`)}
       className="bg-gh-bg-secondary border border-gh-border rounded-2xl p-6 hover:border-primary/50 transition-all group cursor-pointer flex items-center gap-6"
     >
-      <img
-        src={strata.avatar}
-        alt={strata.name}
-        className="size-16 rounded-lg border-2 border-gh-border p-1 object-cover"
-      />
+      {strata.avatar ? (
+        <img
+          src={strata.avatar}
+          alt={strata.name}
+          className="size-16 rounded-lg border-2 border-gh-border p-1 object-cover"
+        />
+      ) : (
+        <div className="size-16 rounded-lg border-2 border-gh-border p-1 bg-gh-bg flex items-center justify-center text-gh-text-secondary text-2xl font-bold uppercase transition-colors group-hover:text-primary">
+          {strata.name.charAt(0)}
+        </div>
+      )}
       <div className="flex-1">
         <h3 className="text-lg font-bold text-gh-text group-hover:text-primary transition-colors">
           {strata.name}
         </h3>
         <p className="text-sm text-gh-text-secondary mt-1 line-clamp-1">
-          {strata.description}
+          {strata.description || `Plan: ${strata.plan}`}
         </p>
       </div>
       <button className="px-4 py-2 bg-gh-bg-tertiary text-gh-text-secondary text-xs font-bold rounded-lg hover:bg-primary hover:text-white transition-all">
@@ -34,6 +39,24 @@ const StrataCard: React.FC<{ strata: Strata }> = ({ strata }) => {
 
 const StrataIndexView = () => {
   const navigate = useNavigate();
+  const [strataList, setStrataList] = useState<EnterpriseResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    strataService.listStrata()
+      .then(data => {
+        if (isMounted) {
+          setStrataList(data);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to load strata", err);
+        if (isMounted) setIsLoading(false);
+      });
+    return () => { isMounted = false; };
+  }, []);
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar bg-gh-bg p-8 font-display">
@@ -49,7 +72,7 @@ const StrataIndexView = () => {
             </p>
           </div>
           <button
-            onClick={() => navigate("/strata/new")}
+            onClick={() => navigate("/stratahub")}
             className="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-primary/20"
           >
             <span className="material-symbols-outlined text-lg">add</span>
@@ -58,12 +81,24 @@ const StrataIndexView = () => {
         </div>
 
         <div className="space-y-4">
-          {MOCK_STRATA.length === 0 ? (
-            <div className="py-12 border-2 border-[#1A1A1A]ashed border-gh-border rounded-2xl">
-              <EmptyState />
+          {isLoading ? (
+            <div className="py-12 border-2 border-[#1A1A1A] border-dashed border-gh-border rounded-2xl flex flex-col items-center justify-center">
+              <span className="material-symbols-outlined text-4xl text-gh-text-secondary animate-spin">progress_activity</span>
+            </div>
+          ) : strataList.length === 0 ? (
+            <div className="py-12 border-2 border-[#1A1A1A] border-dashed border-gh-border rounded-2xl">
+              <EmptyState 
+                title="You don't belong to any Strata yet"
+                description="Create or join a Strata to collaborate with others."
+                action={{
+                  label: "Create new strata",
+                  onClick: () => navigate("/stratahub"),
+                  icon: "add_circle"
+                }}
+              />
             </div>
           ) : (
-            MOCK_STRATA.map((strata) => (
+            strataList.map((strata) => (
               <StrataCard key={strata.id} strata={strata} />
             ))
           )}

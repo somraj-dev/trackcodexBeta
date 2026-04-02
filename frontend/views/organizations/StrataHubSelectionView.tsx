@@ -14,6 +14,13 @@ const StrataHubSelectionView: React.FC = () => {
     <div className="strata-selection-container custom-scrollbar">
       <div className="strata-selection-content">
         <header className="strata-selection-header">
+          <button 
+            onClick={() => navigate("/strata")}
+            className="flex items-center gap-2 text-gh-text-secondary hover:text-gh-text text-sm mb-4 transition-colors relative -left-4"
+          >
+            <span className="material-symbols-outlined !text-[18px]">arrow_back</span>
+            Back to Strata Main
+          </button>
           <h1 className="strata-selection-title">Start by choosing an enterprise type</h1>
           <p className="strata-selection-description">
             Your enterprise type determines whether members can contribute to public repositories and if they can use their personal TrackCodex accounts.

@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { strataService } from "../../services/enterprise/strataService";
 import "../../styles/StrataHub.css";
 
 const CreateStrata: React.FC = () => {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     enterpriseName: "",
     urlSlug: "",
@@ -24,11 +27,22 @@ const CreateStrata: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: val }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic to create enterprise would go here
-    console.log("Creating enterprise:", formData);
-    navigate("/strata/trackcodex");
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const result = await strataService.createStrata({
+        name: formData.enterpriseName,
+        slug: formData.urlSlug
+      });
+      navigate(`/strata/${result.slug}`);
+    } catch (error) {
+      const err = error as { response?: { data?: { error?: string } }, message?: string };
+      console.error("Strata creation failed", err);
+      setError(err?.response?.data?.error || err.message || "Failed to create enterprise.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -260,12 +274,24 @@ const CreateStrata: React.FC = () => {
           </div>
 
           <div className="form-actions">
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-md text-sm">
+                {error}
+              </div>
+            )}
             <button 
               type="submit" 
-              className="btn-create-enterprise"
-              disabled={!formData.enterpriseName || !formData.urlSlug || !formData.termsAccepted || !formData.agreementsAccepted}
+              className="btn-create-enterprise flex justify-center items-center gap-2"
+              disabled={isSubmitting || !formData.enterpriseName || !formData.urlSlug || !formData.termsAccepted || !formData.agreementsAccepted}
             >
-              Create enterprise
+              {isSubmitting ? (
+                <>
+                  <span className="material-symbols-outlined !text-[18px] animate-spin">progress_activity</span>
+                  Creating...
+                </>
+              ) : (
+                "Create enterprise"
+              )}
             </button>
           </div>
         </form>

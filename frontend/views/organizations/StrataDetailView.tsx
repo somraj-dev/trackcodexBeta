@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useParams, NavLink, Outlet, useLocation } from "react-router-dom";
-import { MOCK_STRATA } from "../../constants";
+import React, { useState, useEffect } from "react";
+import { useParams, NavLink, Outlet } from "react-router-dom";
+import { strataService, EnterpriseResponse } from "../../services/enterprise/strataService";
 import "../../styles/StrataDashboard.css";
 
 interface NavItemProps {
@@ -53,9 +53,35 @@ const CollapsibleNavItem: React.FC<{
 
 const StrataDetailView = () => {
   const { strataId } = useParams();
-  const location = useLocation();
-  const strata = MOCK_STRATA.find((o) => o.id === strataId);
   const [isDirectoryOpen, setIsDirectoryOpen] = useState(true);
+  const [strata, setStrata] = useState<EnterpriseResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (strataId) {
+      strataService.getStrata(strataId)
+        .then(data => {
+          if (isMounted) {
+            setStrata(data);
+            setIsLoading(false);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to load strata detail", err);
+          if (isMounted) setIsLoading(false);
+        });
+    }
+    return () => { isMounted = false; };
+  }, [strataId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+         <span className="material-symbols-outlined text-4xl text-gh-text-secondary animate-spin">progress_activity</span>
+      </div>
+    );
+  }
 
   if (!strata) {
     return (
@@ -72,11 +98,17 @@ const StrataDetailView = () => {
         <div className="strata-sidebar-content">
           {/* Org Header */}
           <div className="strata-sidebar-org">
-            <img
-              src={strata.avatar}
-              alt={strata.name}
-              className="size-8 object-cover"
-            />
+            {strata.avatar ? (
+              <img
+                src={strata.avatar}
+                alt={strata.name}
+                className="size-8 object-cover rounded"
+              />
+            ) : (
+              <div className="size-8 bg-gh-border rounded flex items-center justify-center text-gh-text font-bold uppercase text-sm">
+                {strata.name.charAt(0)}
+              </div>
+            )}
             <span className="strata-sidebar-org-name">{strata.name}</span>
           </div>
 
