@@ -9,21 +9,20 @@ const MessagesView = () => {
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
     const initialUserId = searchParams.get("user");
-    const { conversations, checkConversation, sendMessage } = useMessaging();
+    const { conversations, checkConversation, sendMessage, activeConvId, setActiveConvId, isLoading } = useMessaging();
 
-    const [activeConvId, setActiveConvId] = useState<string | null>(null);
     const [messages, setMessages] = useState<any[]>([]);
     const [inputValue, setInputValue] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Initialize conversation if came from a ?user= link
     useEffect(() => {
-        if (initialUserId) {
+        if (initialUserId && user?.id) {
             checkConversation(initialUserId).then((conv) => {
                 if (conv) setActiveConvId(conv.id);
             }).catch(err => console.error("Error checking conversation", err));
         }
-    }, [initialUserId, checkConversation]);
+    }, [initialUserId, user?.id, checkConversation, setActiveConvId]);
 
     // Load messages for active conversation
     useEffect(() => {
@@ -34,8 +33,6 @@ const MessagesView = () => {
                     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
                 })
                 .catch(err => console.error("Error loading messages", err));
-        } else {
-            setMessages([]);
         }
     }, [activeConvId]);
 
@@ -66,7 +63,12 @@ const MessagesView = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
-                    {conversations.length === 0 ? (
+                    {isLoading ? (
+                        <div className="p-12 flex flex-col items-center justify-center gap-3">
+                            <div className="size-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                            <p className="text-xs text-gh-text-secondary animate-pulse">Syncing conversations...</p>
+                        </div>
+                    ) : conversations.length === 0 ? (
                         <div className="p-8 text-center text-gh-text-secondary">
                             <span className="material-symbols-outlined !text-[48px] mb-4 opacity-50">chat_bubble_outline</span>
                             <p className="text-sm">No conversations yet.</p>

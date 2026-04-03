@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/infra/api';
 import { useAuth } from './AuthContext';
 import { directMessageBus, DMEvent } from '../services/social/directMessageBus';
@@ -26,6 +27,7 @@ interface MessagingContextType {
     activeConvId: string | null;
     isPanelOpen: boolean;
     isTyping: boolean;
+    isLoading: boolean;
     totalUnreadCount: number;
     setIsPanelOpen: (open: boolean) => void;
     setActiveConvId: (id: string | null) => void;
@@ -42,7 +44,9 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const [activeConvId, setActiveConvId] = useState<string | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const navigate = useNavigate();
     const { user } = useAuth();
     const { subscribe, send } = useRealtime();
     
@@ -53,6 +57,8 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, [conversations]);
 
     const refreshConversations = useCallback(async () => {
+        if (!user?.id) return;
+        setIsLoading(true);
         try {
             const data: any[] = await api.get('/messages/conversations') as any;
             // Map backend data to local structure
@@ -71,6 +77,8 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             setConversations(mapped);
         } catch (err) {
             console.error('Failed to fetch conversations', err);
+        } finally {
+            setIsLoading(false);
         }
     }, [api, user?.id]);
 
@@ -166,8 +174,8 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const unsubscribe = directMessageBus.subscribe(async (event: DMEvent) => {
             if (event.type === 'DM_OPEN') {
                 console.log('[MessagingContext] DM_OPEN received for user:', event.data.userId);
-                // Navigate to full messages page
-                window.location.href = `/messages?user=${event.data.userId}`;
+                // Navigate to full messages page without hard reload
+                navigate(`/messages?user=${event.data.userId}`);
 
                 // Use ref to check existing to avoid stale closures
                 // Fix: Ensure we are matching the correct person (not ourselves) or just any participant with that ID
@@ -300,6 +308,7 @@ export const MessagingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         activeConvId,
         isPanelOpen,
         isTyping,
+        isLoading,
         totalUnreadCount,
         setIsPanelOpen,
         setActiveConvId,
