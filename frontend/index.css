@@ -98,20 +98,133 @@ body {
 /* ===== Global Form Element Theming ===== */
 /* Ensures all form elements respect the active theme via CSS variables,
    preventing the "half-light/half-dark" flash on navigation. */
-input, select, textarea, button {
-  background-color: var(--gh-bg);
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+select,
+textarea {
   color: var(--gh-text);
+  background-color: var(--gh-bg);
   border-color: var(--gh-border);
 }
 
-input::placeholder, textarea::placeholder {
-  color: var(--gh-text-secondary);
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="month"]:focus,
+input[type="week"]:focus,
+input[type="time"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--gh-primary);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+  outline: none;
 }
 
-/* Custom Scrollbar Styling */
+input[type="checkbox"],
+input[type="radio"] {
+  color: var(--gh-primary);
+  background-color: var(--gh-bg);
+  border-color: var(--gh-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--gh-text-secondary);
+  opacity: 0.7;
+}
+
+/* Select option styling for dark backgrounds */
+select option {
+  background-color: var(--gh-bg);
+  color: var(--gh-text);
+}
+
+/* ===== Typography Utilities ===== */
+.tc-heading {
+  font-size: var(--tc-font-lg);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+.tc-page-title {
+  font-size: var(--tc-font-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.tc-label {
+  font-size: var(--tc-font-sm);
+  font-weight: 500;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tc-body {
+  font-size: var(--tc-font-base);
+  font-weight: 400;
+  line-height: 1.5;
+}
+.tc-caption {
+  font-size: var(--tc-font-xs);
+  font-weight: 400;
+  line-height: 1.4;
+}
+.tc-breadcrumb {
+  font-size: var(--tc-font-base);
+  font-weight: 400;
+}
+.tc-breadcrumb-active {
+  font-size: var(--tc-font-base);
+  font-weight: 600;
+}
+
+/* ===== Glass Panel ===== */
+.glass-panel {
+  background: var(--gh-bg-secondary);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* ===== Material Symbols ===== */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: "FILL" 1;
+}
+
+/* ===== Custom Scrollbars ===== */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -119,188 +232,187 @@ input::placeholder, textarea::placeholder {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--gh-bg-tertiary);
-  border-radius: 5px;
-  border: 3px solid var(--gh-bg);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--gh-text-secondary);
+  background: rgba(139, 92, 246, 0.5);
 }
 
-/* Firefox scrollbar support */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--gh-bg-tertiary) transparent;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Animations */
-@keyframes slide-up {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* ===== Transitions ===== */
+html.anim-standard * {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.animate-slide-up {
-  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+html.anim-fast * {
+  transition:
+    background-color 0.1s ease,
+    border-color 0.1s ease,
+    color 0.1s ease,
+    transform 0.1s ease;
 }
 
-/* Card Effects */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
+.reduce-motion * {
+  transition-duration: 0.001ms !important;
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
 }
 
-/* Rich Block Enhancements */
-.rich-block-bg {
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+/* ===== Font Variables ===== */
+.font-inter {
+  --font-display: "Geist", "Inter", sans-serif;
+}
+.font-system {
+  --font-display:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+}
+.font-mono {
+  --font-display: "JetBrains Mono", monospace;
 }
 
-.rich-block-bg:hover {
-    border-color: rgba(9, 105, 218, 0.3);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.dark .rich-block-bg:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-/* ===== ChatGPT Code Block Styles ===== */
-.chatgpt-code-block {
-    background: #0d0d0d;
-    border-radius: 8px;
-    width: 100%;
-    border: 1px solid #2f2f2f;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    margin-top: 8px;
-}
-
-.chatgpt-code-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: #2f2f2f;
-    border-bottom: 1px solid #2f2f2f;
-    user-select: none;
-}
-
-.chatgpt-code-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: #b4b4b4;
-}
-
-.chatgpt-action-btn-icon {
-    cursor: pointer;
-    transition: color 0.2s;
-    display: flex;
-    align-items: center;
-}
-
-.chatgpt-action-btn-icon:hover {
-    color: #ffffff;
-}
-
-.chatgpt-run-container {
-    display: flex;
-    align-items: center;
-    background: #212121;
-    border-radius: 20px;
-    padding: 2px;
-    gap: 2px;
-}
-
-.chatgpt-run-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-
-.chatgpt-run-btn:hover {
-    background: #333333;
-    color: #ffffff;
-}
-
-
-/* Developer WhatsApp: Message Bubbles */
-.msg-bubble {
-    max-width: 80%;
-    padding: 10px 14px;
-    border-radius: 18px;
-    font-size: 14px;
-    line-height: 20px;
-    position: relative;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.msg-bubble-me {
-    background: #5C48D6;
-    color: #fff;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-
-.msg-bubble-them {
-    background: var(--gh-bg-secondary);
-    color: var(--gh-text);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    border: 1px solid var(--gh-border);
-}
-
-.msg-tick-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    margin-left: 6px;
-    vertical-align: middle;
-}
-
-.msg-tick {
-    width: 6px;
-    height: 4px;
-    border-left: 1.5px solid currentColor;
-    border-bottom: 1.5px solid currentColor;
-    transform: rotate(-45deg);
-    opacity: 0.6;
-}
-
-.msg-tick-double {
-    margin-left: -3px;
-}
-
-.msg-tick-seen {
-    color: #A5B4FC; /* Purple/Blue for seen */
+/* ===== Keyframe Animations ===== */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
     opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.typing-dots {
-    display: flex;
-    gap: 3px;
+.animate-fab {
+  animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.typing-dots span {
-    width: 4px;
-    height: 4px;
-    background: var(--gh-text-secondary);
-    border-radius: 50%;
-    animation: typing 1.4s infinite;
+/* Global Micro-animations */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
 }
 
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-@keyframes typing {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-3px); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ===== Premium Button Styles ===== */
+.btn-glow {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--gh-border);
+  color: var(--gh-text);
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+  overflow: hidden;
+}
+
+.btn-glow:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-glow:active {
+  transform: translateY(0);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Premium Card Hover ===== */
+.card-hover-glow {
+  transition: all 0.3s ease;
+  border: 1px solid var(--gh-border);
+}
+
+.card-hover-glow:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to bottom right, var(--gh-bg-secondary), #151515);
+}
+
+/* ===== Data-Driven Dynamic Utilities ===== */
+.dynamic-width {
+  width: var(--dynamic-width, 0%);
+}
+
+.dynamic-height {
+  height: var(--dynamic-height, 0%);
+}
+
+.dynamic-bg {
+  background-color: var(--dynamic-bg, transparent);
+}
+
+.dynamic-gradient {
+  background: var(--dynamic-gradient);
+}
+/* Hide native date picker icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
 }

@@ -43,10 +43,7 @@ export async function messageRoutes(fastify: FastifyInstance) {
       orderBy: { lastMessageAt: "desc" },
     });
 
-    return conversations.map((conv: any) => ({
-      ...conv,
-      isFavorite: conv.participants.find((p: any) => p.userId === user.userId)?.isFavorite || false,
-    }));
+    return conversations;
   });
 
   // 2. Create or Get Direct Conversation (One-on-One)
@@ -269,66 +266,6 @@ export async function messageRoutes(fastify: FastifyInstance) {
     );
 
     return { success: true, message: updatedMessage };
-  });
-
-  // 7. Create Group Conversation
-  fastify.post("/conversations/group", async (request, reply) => {
-    const user = (request as any).user;
-    if (!user) throw new AppError("Unauthorized", 401);
-
-    const { targetUserIds, name } = request.body as {
-      targetUserIds: string[];
-      name?: string;
-    };
-
-    if (!targetUserIds || !Array.isArray(targetUserIds) || targetUserIds.length === 0) {
-      throw BadRequest("Target user IDs are required for a group");
-    }
-
-    // Add current user to the list of participants if not already present
-    const allParticipantIds = Array.from(new Set([...targetUserIds, user.userId]));
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        type: "GROUP",
-        name: name || "New Group",
-        participants: {
-          create: allParticipantIds.map((userId) => ({ userId })),
-        },
-      },
-      include: {
-        participants: {
-          include: {
-            user: {
-              select: { id: true, username: true, name: true, avatar: true },
-            },
-          },
-        },
-      },
-    });
-
-    return conversation;
-  });
-
-  // 8. Toggle Favorite Status
-  fastify.put("/conversations/:id/favorite", async (request, reply) => {
-    const user = (request as any).user;
-    const { id } = request.params as { id: string };
-    const { isFavorite } = request.body as { isFavorite: boolean };
-
-    if (!user) throw new AppError("Unauthorized", 401);
-
-    const participant = await prisma.conversationParticipant.update({
-      where: {
-        conversationId_userId: {
-          conversationId: id,
-          userId: user.userId,
-        },
-      },
-      data: { isFavorite },
-    });
-
-    return { success: true, isFavorite: participant.isFavorite };
   });
 }
 
